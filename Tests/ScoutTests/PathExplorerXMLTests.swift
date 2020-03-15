@@ -87,4 +87,12 @@ final class PathExplorerXMLTests: XCTestCase {
 
         XCTAssertEqual(try xml.get(path).string, "Endo")
     }
+
+    func testSetKeyName() throws {
+        var xml = try PathExplorerXML(data: stubData1)
+
+        try xml.set(["stringValue"], keyNameTo: "kiki")
+
+        XCTAssertEqual(try xml.get(for: "kiki").string, "Hello")
+    }
 }

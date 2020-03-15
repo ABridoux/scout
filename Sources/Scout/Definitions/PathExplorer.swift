@@ -38,6 +38,9 @@ where
     mutating func set(_ path: Path, to newValue: Any) throws
     mutating func set(_ pathElements: PathElement..., to newValue: Any) throws
 
+    mutating func set(_ path: Path, keyNameTo newKeyName: String) throws
+    mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws
+
     // MARK: Export
 
     func exportData() throws -> Data

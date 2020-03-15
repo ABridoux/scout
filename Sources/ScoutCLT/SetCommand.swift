@@ -9,6 +9,9 @@ struct SetCommand: ParsableCommand {
         let readingPath: Path
         let value: String
 
+        /// Set to `true` when the value is a key name to change. A key name will be indicated with sharps #KeyName#
+        let changeKey: Bool
+
         init?(argument: String) {
             let splitted = argument.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: true)
             guard
@@ -19,7 +22,17 @@ struct SetCommand: ParsableCommand {
             }
 
             self.readingPath = readingPath
-            value = String(splitted[1])
+
+            var value = String(splitted[1])
+            if value.hasPrefix("#"), value.hasSuffix("#") {
+                value.removeFirst()
+                value.removeLast()
+                self.value = value
+                changeKey = true
+            } else {
+                self.value = value
+                changeKey = false
+            }
         }
     }
 
@@ -46,14 +59,38 @@ struct SetCommand: ParsableCommand {
     func set(from data: Data) throws {
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
-            try pathsAndValues.forEach { try json.set($0.readingPath, to: $0.value) }
+            try pathsAndValues.forEach {
+                if $0.changeKey {
+                    try json.set($0.readingPath, keyNameTo: $0.value)
+                } else {
+                    try json.set($0.readingPath, to: $0.value)
+                }
+            }
+
             try outputDataWith(json)
+
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
-            try pathsAndValues.forEach { try plist.set($0.readingPath, to: $0.value) }
+            try pathsAndValues.forEach {
+                if $0.changeKey {
+                    try plist.set($0.readingPath, keyNameTo: $0.value)
+                } else {
+                    try plist.set($0.readingPath, to: $0.value)
+                }
+            }
+
             try outputDataWith(plist)
+
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
-            try pathsAndValues.forEach { try xml.set($0.readingPath, to: $0.value) }
+            try pathsAndValues.forEach {
+                if $0.changeKey {
+                    try xml.set($0.readingPath, keyNameTo: $0.value)
+                } else {
+                    try xml.set($0.readingPath, to: $0.value)
+                }
+            }
+
             try outputDataWith(xml)
+
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")

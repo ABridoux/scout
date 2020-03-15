@@ -100,6 +100,38 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         try set(pathElements, to: newValue)
     }
 
+    public mutating func set(_ path: Path, keyNameTo newKeyName: String) throws {
+        var pathElements = path
+
+        guard !pathElements.isEmpty else { return }
+
+        guard let lastElement = pathElements.removeLast() as? String else {
+            throw PathExplorerError.underlyingError("Cannot modify key name in an array")
+        }
+
+        var currentPathExplorer = self
+        var pathExplorers = [currentPathExplorer]
+
+        try pathElements.forEach {
+            currentPathExplorer = try currentPathExplorer.get(element: $0)
+            pathExplorers.append(currentPathExplorer)
+        }
+
+        try currentPathExplorer.change(key: lastElement, nameTo: newKeyName)
+
+        for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
+            var pathExplorer = pathExplorer
+            try pathExplorer.set(element: element, to: currentPathExplorer.value)
+            currentPathExplorer = pathExplorer
+        }
+
+        self = currentPathExplorer
+    }
+
+    public mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws {
+        try set(pathElements, keyNameTo: newKeyName)
+    }
+    
     // MARK: Subscript helpers
 
     func get(for key: String) throws -> Self {
@@ -170,6 +202,20 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
             assertionFailure("Only Int and String can be PathElement")
             return
         }
+    }
+
+    mutating func change(key: String, nameTo newKeyName: String) throws {
+        guard var dict = value as? [String: Any] else {
+            throw PathExplorerError.dictionarySubscript(String(describing: value))
+        }
+
+        guard let childValue = dict[key] else {
+            throw PathExplorerError.subscriptMissingKey(key)
+        }
+
+        dict[newKeyName] = childValue
+        dict.removeValue(forKey: key)
+        value = dict
     }
 
     // MARK: Export

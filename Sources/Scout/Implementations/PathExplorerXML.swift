@@ -71,6 +71,20 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
         try set(pathElements, to: newValue)
     }
 
+    public mutating func set(_ path: Path, keyNameTo newKeyName: String) throws {
+        var currentPathExplorer = self
+
+        try path.forEach {
+            currentPathExplorer = try currentPathExplorer.get(element: $0)
+        }
+
+        currentPathExplorer.element.name = newKeyName
+    }
+
+    public mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws {
+        try set(pathElements, keyNameTo: newKeyName)
+    }
+
     // MARK: Subscript helpers
 
     func get(at index: Int) throws -> Self {
@@ -97,6 +111,10 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
         if element.name == key {
             return self
         } else {
+            let child = element[key]
+            guard child.error == nil else {
+                throw PathExplorerError.subscriptMissingKey(key)
+            }
             return PathExplorerXML(element: element[key])
         }
     }
