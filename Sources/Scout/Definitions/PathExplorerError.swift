@@ -5,9 +5,9 @@ enum PathExplorerError: LocalizedError {
     case invalidValue(Any)
     case wrongValueForKey(value: Any, element: PathElement)
 
-    case dictionarySubscript(String)
+    case dictionarySubscript(Any)
     case subscriptMissingKey(String)
-    case arraySubscript(String)
+    case arraySubscript(Any)
     case subscriptWrongIndex(index: Int, arrayCount: Int)
 
     case stringToDataConversionError
@@ -25,7 +25,7 @@ enum PathExplorerError: LocalizedError {
         case .dictionarySubscript(let key): return "The key \(key) is not a Dictionary"
         case .subscriptMissingKey(let key): return "The key \(key) cannot be found in the Dictionary"
         case .arraySubscript(let key): return "The key \(key) is not an Array"
-        case .subscriptWrongIndex(let index, let arrayCount): return "The index \(index) is not within the bount of the Array: 0...\(arrayCount)"
+        case .subscriptWrongIndex(let index, let arrayCount): return "The index \(index) is not within the bounds of the Array: 0...\(arrayCount - 1)"
 
         case .stringToDataConversionError: return "Unable to convert the input string into data"
         case .dataToStringConversionError: return "Unable to convert the data to a string"

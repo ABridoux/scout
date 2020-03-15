@@ -131,12 +131,41 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     public mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws {
         try set(pathElements, keyNameTo: newKeyName)
     }
+
+    public mutating func delete(_ path: Path) throws {
+        var pathElements = path
+
+        guard !pathElements.isEmpty else { return }
+
+        let lastElement = pathElements.removeLast()
+        var currentPathExplorer = self
+        var pathExplorers = [currentPathExplorer]
+
+        try pathElements.forEach {
+            currentPathExplorer = try currentPathExplorer.get(element: $0)
+            pathExplorers.append(currentPathExplorer)
+        }
+
+        try currentPathExplorer.delete(element: lastElement)
+
+        for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
+            var pathExplorer = pathExplorer
+            try pathExplorer.set(element: element, to: currentPathExplorer.value)
+            currentPathExplorer = pathExplorer
+        }
+
+        self = currentPathExplorer
+    }
+
+    public mutating func delete(_ pathElements: PathElement...) throws {
+        try delete(pathElements)
+    }
     
     // MARK: Subscript helpers
 
     func get(for key: String) throws -> Self {
         guard let dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(String(describing: value))
+            throw PathExplorerError.dictionarySubscript(value)
         }
 
         guard let childValue = dict[key] else {
@@ -148,7 +177,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     mutating func set(key: String, to newValue: Any) throws {
         guard var dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(String(describing: value))
+            throw PathExplorerError.dictionarySubscript(value)
         }
 
         dict[key] = try convert(newValue)
@@ -157,7 +186,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     func get(at index: Int) throws -> Self {
         guard let array = value as? [Any] else {
-            throw PathExplorerError.arraySubscript(String(describing: value))
+            throw PathExplorerError.arraySubscript(value)
         }
 
         guard array.count > index, index >= 0 else {
@@ -169,7 +198,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     mutating func set(index: Int, to newValue: Any) throws {
         guard var array = value as? [Any] else {
-            throw PathExplorerError.arraySubscript(String(describing: value))
+            throw PathExplorerError.arraySubscript(value)
         }
 
         guard array.count > index, index >= 0 else {
@@ -216,6 +245,27 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         dict[newKeyName] = childValue
         dict.removeValue(forKey: key)
         value = dict
+    }
+
+    mutating func delete(element: PathElement) throws {
+        if let key = element as? String {
+            guard var dict = value as? [String: Any] else {
+                throw PathExplorerError.dictionarySubscript(value)
+            }
+            dict.removeValue(forKey: key)
+            value = dict
+
+        } else if let index = element as? Int {
+            guard var array = value as? [Any] else {
+                throw PathExplorerError.arraySubscript(value)
+            }
+
+            array.remove(at: index)
+            value = array
+        } else {
+            throw PathExplorerError.wrongValueForKey(value: value, element: element)
+        }
+
     }
 
     // MARK: Export

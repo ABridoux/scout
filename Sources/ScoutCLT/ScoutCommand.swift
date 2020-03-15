@@ -1,3 +1,4 @@
+import Foundation
 import ArgumentParser
 import Scout
 
@@ -51,6 +52,15 @@ struct ScoutCommand: ParsableCommand {
             commandName: "scout",
             abstract: abstract,
             discussion: discussion,
-            subcommands: [ReadCommand.self, SetCommand.self],
+            subcommands: [ReadCommand.self, SetCommand.self, DeleteCommand.self],
             defaultSubcommand: ReadCommand.self)
+
+    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T) throws {
+        if let output = output?.replacingTilde {
+            let fm = FileManager.default
+            try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
+        } else {
+            print(try pathExplorer.exportString())
+        }
+    }
 }

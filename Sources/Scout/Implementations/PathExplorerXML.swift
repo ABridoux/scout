@@ -85,6 +85,20 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
         try set(pathElements, keyNameTo: newKeyName)
     }
 
+    public mutating func delete(_ path: Path) throws {
+        var currentPathExplorer = self
+
+        try path.forEach {
+            currentPathExplorer = try currentPathExplorer.get(element: $0)
+        }
+
+        currentPathExplorer.element.removeFromParent()
+    }
+
+    public mutating func delete(_ pathElements: PathElement...) throws {
+        try delete(pathElements)
+    }
+
     // MARK: Subscript helpers
 
     func get(at index: Int) throws -> Self {
@@ -141,6 +155,10 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
             assertionFailure("Only Int and String can be PathElement")
             return self
         }
+    }
+
+    func delete(element: PathElement) throws {
+        
     }
 
     // MARK: Export

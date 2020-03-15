@@ -93,4 +93,15 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         XCTAssertEqual(try plist.get(["animals", "children_ducks", 1]).string, "Fifi")
     }
+
+    func testDeleteKey() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: [PathElement] = ["animals", "ducks", 1]
+
+        try plist.delete(path)
+
+        XCTAssertEqual(try plist.get("animals", "ducks", 1).string, "Loulou")
+        XCTAssertThrowsError(try plist.get("animals", "ducks", 2))
+    }
 }

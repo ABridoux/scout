@@ -95,4 +95,14 @@ final class PathExplorerXMLTests: XCTestCase {
 
         XCTAssertEqual(try xml.get(for: "kiki").string, "Hello")
     }
+
+    func testDelete() throws {
+        var xml = try PathExplorerXML(data: stubData2)
+
+        try xml.delete(["dogs", 1])
+
+        XCTAssertEqual(try xml.get("dogs", 1).string, "Betty")
+        XCTAssertThrowsError(try xml.get("dogs", 2))
+
+    }
 }

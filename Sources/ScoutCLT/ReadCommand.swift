@@ -6,7 +6,7 @@ struct ReadCommand: ParsableCommand {
 
     // MARK: - Constants
 
-    static let configuration = CommandConfiguration(commandName: "read", abstract: "Read a value at a given path. See the discussion to know how to use paths.")
+    static let configuration = CommandConfiguration(commandName: "read", abstract: "Read a value at a given path")
 
     // MARK: - Properties
 

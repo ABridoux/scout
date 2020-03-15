@@ -67,7 +67,7 @@ struct SetCommand: ParsableCommand {
                 }
             }
 
-            try outputDataWith(json)
+            try ScoutCommand.output(output, dataWith: json)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
             try pathsAndValues.forEach {
@@ -78,7 +78,7 @@ struct SetCommand: ParsableCommand {
                 }
             }
 
-            try outputDataWith(plist)
+            try ScoutCommand.output(output, dataWith: plist)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             try pathsAndValues.forEach {
@@ -89,7 +89,7 @@ struct SetCommand: ParsableCommand {
                 }
             }
 
-            try outputDataWith(xml)
+            try ScoutCommand.output(output, dataWith: xml)
 
         } else {
             if let filePath = inputFilePath {
@@ -97,15 +97,6 @@ struct SetCommand: ParsableCommand {
             } else {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
             }
-        }
-    }
-
-    func outputDataWith<T: PathExplorer>(_ pathExplorer: T) throws {
-        if let output = output?.replacingTilde {
-            let fm = FileManager.default
-            try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
-        } else {
-            print(try pathExplorer.exportString())
         }
     }
 }
