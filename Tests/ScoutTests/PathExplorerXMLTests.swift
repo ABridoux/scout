@@ -1,13 +1,13 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Alexis Bridoux on 14/03/2020.
 //
 
 import XCTest
 import AEXML
-@testable import PathExplorer
+@testable import Scout
 
 final class PathExplorerXMLTests: XCTestCase {
 
@@ -44,44 +44,31 @@ final class PathExplorerXMLTests: XCTestCase {
     func testSubscriptString() throws {
         let xml = try PathExplorerXML(data: stubData1)
 
-        XCTAssertEqual(xml["stringValue"].string, "Hello")
-        XCTAssertEqual(xml["boolValue"].bool, false)
+
+        XCTAssertEqual(try xml.get(for: "stringValue").string, "Hello")
+        XCTAssertEqual(try xml.get(for: "boolValue").bool, false)
     }
 
     func testSubscriptStringSet() throws {
         var xml = try PathExplorerXML(data: stubData1)
 
-        xml["stringValue"] = PathExplorerXML(value: "world")
+        try xml.set(key: "stringValue", to: "world")
 
-        XCTAssertEqual(xml["stringValue"].string, "world")
-        XCTAssertEqual(xml["boolValue"].bool, false)
+        XCTAssertEqual(try xml.get(for: "stringValue").string, "world")
+        XCTAssertEqual(try xml.get(for: "boolValue").bool, false)
     }
 
     func testSubscriptInt() throws {
         let xml = try PathExplorerXML(data: stubData2)
 
-        XCTAssertEqual(xml["dogs"][1].string, "Spot")
+        XCTAssertEqual(try xml.get(for: "dogs").get(at: 1).string, "Spot")
     }
 
     func testSubscriptIntSet() throws {
         var xml = try PathExplorerXML(data: stubData2)
 
-        xml["dogs"][1] = PathExplorerXML(value: "Endo")
-        XCTAssertEqual(xml["dogs"][1].string, "Endo")
-    }
-
-    func testSubscriptVariadic() throws {
-        let xml = try PathExplorerXML(data: stubData2)
-
-        XCTAssertEqual(xml["dogs", 1].string, "Spot")
-    }
-
-    func testSubscriptVariadicSet() throws {
-        var xml = try PathExplorerXML(data: stubData2)
-
-        xml["dogs", 1] = "Endo"
-
-        XCTAssertEqual(xml["dogs", 1].string, "Endo")
+        try xml.set("dogs", 1, to: "Endo")
+        XCTAssertEqual(try xml.get(for: "dogs").get(at: 1).string, "Endo")
     }
 
     func testSubscriptArray() throws {
@@ -89,15 +76,15 @@ final class PathExplorerXMLTests: XCTestCase {
 
         let path: [PathElement] = ["dogs", 1]
 
-        XCTAssertEqual(xml[path].string, "Spot")
+        XCTAssertEqual(try xml.get(path).string, "Spot")
     }
 
     func testSubscriptArraySet() throws {
         var xml = try PathExplorerXML(data: stubData2)
         let path: [PathElement] = ["dogs", 1]
 
-        xml[path] = "Endo"
+        try xml.set(path, to: "Endo")
 
-        XCTAssertEqual(xml[path].string, "Endo")
+        XCTAssertEqual(try xml.get(path).string, "Endo")
     }
 }

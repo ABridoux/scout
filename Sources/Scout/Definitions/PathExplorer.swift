@@ -19,7 +19,9 @@ where
     var bool: Bool? { get }
     var int: Int? { get }
     var real: Double? { get }
-    var date: Date? { get }
+
+    /// String representation of value property (if value is nil this is empty String).
+    var stringValue: String { get }
 
     // MARK: - Initialization
 
@@ -28,17 +30,18 @@ where
 
     // MARK: - Functions
 
-    // MARK: Subscript
+    // MARK: CRUD
 
-    subscript(_ key: String) -> Self { get set }
-    subscript(_ index: Int) -> Self { get set }
-    subscript(_ path: PathElement...) -> Self { get set }
-    subscript(_ path: Path) -> Self { get set }
+    func get(_ path: Path) throws -> Self
+    func get(_ pathElements: PathElement...) throws -> Self
+
+    mutating func set(_ path: Path, to newValue: Any) throws
+    mutating func set(_ pathElements: PathElement..., to newValue: Any) throws
 
     // MARK: Export
 
     func exportData() throws -> Data
-    func outputString() throws -> String?
+    func exportString() throws -> String
 }
 
 // MARK: Literal types extensions
@@ -64,5 +67,39 @@ extension PathExplorer {
 extension PathExplorer {
     public init(floatLiteral value: Self.FloatLiteralType) {
         self.init(value: value)
+    }
+}
+
+// MARK: Data validation
+
+extension PathExplorer {
+
+    /// Ensure a value as a correct type
+    /// - Parameter value: The value to convert
+    /// - Throws: PathExplorerError.invalidValue
+    /// - Returns: The value converted to the optimal type
+    func convert(_ value: Any) throws -> Any {
+        // try single types
+        if let stringValue = value as? String {
+            if let bool = Bool(stringValue) {
+                return bool
+            } else if let int = Int(stringValue) {
+                return int
+            } else if let double = Double(stringValue) {
+                return double
+            } else {
+                return stringValue
+            }
+        }
+
+        // try group types
+        switch value {
+        case let dict as [String: Any]:
+            return dict
+        case let array as [Any]:
+            return array
+        default:
+            throw PathExplorerError.invalidValue(value)
+        }
     }
 }

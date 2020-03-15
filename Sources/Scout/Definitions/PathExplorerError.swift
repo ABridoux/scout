@@ -2,14 +2,33 @@ import Foundation
 
 enum PathExplorerError: LocalizedError {
     case invalidData(SerializationFormat.Type)
+    case invalidValue(Any)
+    case wrongValueForKey(value: Any, element: PathElement)
+
+    case dictionarySubscript(String)
+    case subscriptMissingKey(String)
+    case arraySubscript(String)
+    case subscriptWrongIndex(index: Int, arrayCount: Int)
+
     case stringToDataConversionError
+    case dataToStringConversionError
     case stringToIntConversionError(String)
+
     case underlyingError(String)
 
-    var description: String {
+    var errorDescription: String? {
         switch self {
         case .invalidData(let type): return "Cannot intialize a \(String(describing: type)) object with the given data"
+        case .invalidValue(let value): return "The value \(value) is invalid"
+        case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index \"\(element)\" which is a Dictionary or an Array"
+
+        case .dictionarySubscript(let key): return "The key \(key) is not a Dictionary"
+        case .subscriptMissingKey(let key): return "The key \(key) cannot be found in the Dictionary"
+        case .arraySubscript(let key): return "The key \(key) is not an Array"
+        case .subscriptWrongIndex(let index, let arrayCount): return "The index \(index) is not within the bount of the Array: 0...\(arrayCount)"
+
         case .stringToDataConversionError: return "Unable to convert the input string into data"
+        case .dataToStringConversionError: return "Unable to convert the data to a string"
         case .stringToIntConversionError(let string): return "Unable to convert \(string) to int"
         case .underlyingError(let description): return description
         }
