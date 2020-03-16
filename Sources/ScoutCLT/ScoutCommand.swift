@@ -54,9 +54,9 @@ Reading
 
 Setting
 -------
-`scout "people->Tom->hobbies->[0]":basket` will change Tom first hobby from "cooking" to "basket"
-`scout "people->Arnaud->height":160` will change Arnaud's height from 180 to 160
-`scout "people->Tom->age"=#years#` will change Tom age key name from #age# to #years#
+`scout set "people->Tom->hobbies->[0]":basket` will change Tom first hobby from "cooking" to "basket"
+`scout set "people->Arnaud->height":160` will change Arnaud's height from 180 to 160
+`scout set "people->Tom->age":#years#` will change Tom age key name from #age# to #years#
 
 Deleting
 ---------
@@ -80,11 +80,13 @@ struct ScoutCommand: ParsableCommand {
             subcommands: [ReadCommand.self, SetCommand.self, DeleteCommand.self, AddCommand.self],
             defaultSubcommand: ReadCommand.self)
 
-    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T) throws {
+    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool) throws {
         if let output = output?.replacingTilde {
             let fm = FileManager.default
             try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
-        } else {
+        }
+
+        if verbose {
             print(try pathExplorer.exportString())
         }
     }
