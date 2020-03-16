@@ -13,7 +13,7 @@ struct DeleteCommand: ParsableCommand {
     @Argument()
     var readingPath: Path
 
-    @Option(name: [.short, .long], help: "A file path from which read the data")
+    @Option(name: [.short, .customLong("--input")], help: "A file path from which to read the data")
     var inputFilePath: String?
 
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")

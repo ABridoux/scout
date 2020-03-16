@@ -2,44 +2,51 @@ import ArgumentParser
 import Scout
 import Foundation
 
+private let discussion =
+"""
+Note: If the path is invalid, the program will retrun an error
+=====
+
+Given the following XML (as input stream or file)
+
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+    <url>
+        <loc>https://your-website-url.com/posts</loc>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        <lastmod>2020-03-10</lastmod>
+    </url>
+    <url>
+        <loc>https://your-website-url.com/posts/first-post</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+        <lastmod>2020-03-10</lastmod>
+    </url>
+</urlset>
+
+Examples
+========
+
+`scout set "urlset->[1]->changefreq":yearly` will change the second url #changefreq# key value to "yearly"
+
+`scout set "urlset->[0]->priority":2.0` will change the first url #priority# key value to 2.0.0
+
+`scout set "urlset->[1]->changefreq":yearly` "urlset->[0]->priority":2.0` will change both he second url #changefreq# key value to "yearly" and the first url #priority# key value to 2.0.0
+
+`scout set "urlset->[0]->changefreq":#frequence#` will change the first url #changefreq# key name to #frequence#
+"""
+
 struct SetCommand: ParsableCommand {
-    static let configuration = CommandConfiguration(commandName: "set", abstract: "Change a value at a given path")
+    static let configuration = CommandConfiguration(
+        commandName: "set",
+        abstract: "Change a value at a given path. Set the value between sharp signs to change the key name",
+        discussion: discussion)
 
-    struct PathAndValue: ExpressibleByArgument {
-        let readingPath: Path
-        let value: String
-
-        /// Set to `true` when the value is a key name to change. A key name will be indicated with sharps #KeyName#
-        let changeKey: Bool
-
-        init?(argument: String) {
-            let splitted = argument.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: true)
-            guard
-                splitted.count == 2,
-                let readingPath = Path(argument: String(splitted[0]))
-            else {
-                return nil
-            }
-
-            self.readingPath = readingPath
-
-            var value = String(splitted[1])
-            if value.hasPrefix("#"), value.hasSuffix("#") {
-                value.removeFirst()
-                value.removeLast()
-                self.value = value
-                changeKey = true
-            } else {
-                self.value = value
-                changeKey = false
-            }
-        }
-    }
-
-    @Argument()
+    @Argument(help: PathAndValue.help)
     var pathsAndValues: [PathAndValue]
 
-    @Option(name: [.short, .long], help: "A file path from which read the data")
+    @Option(name: [.short, .customLong("--input")], help: "A file path from which to read the data")
     var inputFilePath: String?
 
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")

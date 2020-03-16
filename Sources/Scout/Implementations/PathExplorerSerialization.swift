@@ -160,6 +160,49 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     public mutating func delete(_ pathElements: PathElement...) throws {
         try delete(pathElements)
     }
+
+    public mutating func add(_ newValue: Any, at path: Path) throws {
+        guard !path.isEmpty else { return }
+
+        var pathElements = path
+        let lastElement = pathElements.removeLast()
+        var currentPathExplorer = self
+        var pathExplorers = [currentPathExplorer]
+
+        for (index, pathElement) in pathElements.enumerated() {
+            // if the key already exists, retrieve it
+            if let pathExplorer = try? currentPathExplorer.get(element: pathElement) {
+                pathExplorers.append(pathExplorer)
+                currentPathExplorer = pathExplorer
+            } else {
+                // add the new key
+                let childValue = makeDictionaryOrArray(childKey: path[index + 1])
+                try currentPathExplorer.add(childValue, for: pathElement)
+
+                let pathExplorer = try currentPathExplorer.get(element: pathElement)
+                // remove the previously added path explorer as we added a new key to it
+                pathExplorers.removeLast()
+                pathExplorers.append(currentPathExplorer)
+
+                pathExplorers.append(pathExplorer)
+                currentPathExplorer = pathExplorer
+            }
+        }
+
+        try currentPathExplorer.add(newValue, for: lastElement)
+
+        for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
+            var pathExplorer = pathExplorer
+            try pathExplorer.set(element: element, to: currentPathExplorer.value)
+            currentPathExplorer = pathExplorer
+        }
+
+        value = currentPathExplorer.value
+    }
+
+    public mutating func add(_ newValue: Any, at pathElements: PathElement...) throws {
+        try add(newValue, at: pathElements)
+    }
     
     // MARK: Subscript helpers
 
@@ -178,6 +221,10 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     mutating func set(key: String, to newValue: Any) throws {
         guard var dict = value as? [String: Any] else {
             throw PathExplorerError.dictionarySubscript(value)
+        }
+
+        guard dict[key] != nil else {
+            throw PathExplorerError.subscriptMissingKey(key)
         }
 
         dict[key] = try convert(newValue)
@@ -265,7 +312,56 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         } else {
             throw PathExplorerError.wrongValueForKey(value: value, element: element)
         }
+    }
 
+
+    /// Create a new dictionary or array path explorer depending in the child key
+    /// - Parameters:
+    ///   - childKey: If string, the path explorer will be a dictionary. Array if int
+    /// - Returns: The newly created path explorer
+    func makeDictionaryOrArray(childKey: PathElement) -> Any {
+        if childKey is String { // ditionary
+            return [String: Any]()
+        } else if childKey is Int { // array
+            return [Any]()
+        } else {
+            // prevent a new type other than int or string to conform to PathElement
+            assertionFailure("Only Int and String can be PathElement")
+            return ""
+        }
+    }
+
+    /// Add the new value to the array or dictionary value
+    /// - Parameters:
+    ///   - newValue: The new value to add
+    ///   - element: If string, try to add the new value to the dictionary. If int, try to add the new value to the array. `-1` will add the value at the end of the array.
+    /// - Throws: if self cannot be subscript with the given element
+    mutating func add(_ newValue: Any, for element: PathElement) throws {
+        let newValue = try convert(newValue)
+
+        if var dict = value as? [String: Any] {
+            guard let key = element as? String else {
+                throw PathExplorerError.dictionarySubscript(value)
+            }
+            dict[key] = newValue
+            value = dict
+
+        } else if var array = value as? [Any] {
+            guard let index = element as? Int else {
+                throw PathExplorerError.arraySubscript(value)
+            }
+
+            if index == -1 {
+                // add the new value at the end of the array
+                array.append(newValue)
+            } else if index >= 0, array.count > index || array.count == 0 {
+                // insert the new value at the index
+                array.insert(newValue, at: index)
+            } else {
+                throw PathExplorerError.wrongValueForKey(value: value, element: index)
+            }
+            value = array
+        }
     }
 
     // MARK: Export

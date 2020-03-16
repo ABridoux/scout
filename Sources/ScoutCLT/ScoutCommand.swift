@@ -4,20 +4,23 @@ import Scout
 
 private let abstract =
 """
-Read and set values in specific format file or data. Currently supported: Json, Plist and Xml.
+Read and modify values in specific format file or data. Currently supported: Json, Plist and Xml.
+
+Written by Alexis Bridoux.
+https://github.com/ABridoux/scout
 """
 
 private let discussion =
 """
-To indicate what value to read or to set, a path should be indicated. A path is a serie of key names or indexes separated by '->' to target one value.
+To indicate what value to target, a path should be indicated. A path is a serie of key names or indexes separated by '->' to target one value.
 It looks like this "firt_key->second_key->[second_index]->third_key".
 
 Notes
------
+=====
 - An index is indicated between squared brackets, like this [5]
 - When reading a value, the output is always a string
 
-Given the following Json
+Given the following Json (as input stream or file)
 
 {
   "people": {
@@ -41,9 +44,31 @@ Given the following Json
   }
 }
 
-Here are some example paths:
-- Tom first hobby: "people->Tom->hobbies->[0]" = cooking
-- Arnaud height: "people->Arnaud->height" = 180
+Examples
+================
+
+Reading
+-------
+`scout "people->Tom->hobbies->[0]"` will output "cooking"
+`scout "people->Arnaud->height"` will output "180"
+
+Setting
+-------
+`scout "people->Tom->hobbies->[0]":basket` will change Tom first hobby from "cooking" to "basket"
+`scout "people->Arnaud->height":160` will change Arnaud's height from 180 to 160
+`scout "people->Tom->age"=#years#` will change Tom age key name from #age# to #years#
+
+Deleting
+---------
+`scout delete "people->Tom>height"` will delete Tom height
+`scout delete "people->Tom>hobbies->[0]"` will delete Tom first hobby
+
+Adding
+------
+`scout add "people->Franklin->height":165` will create a new dictionary Franklin and add a height key into it with the value 165
+`scout add "people->Tom->hobbies->[-1]:"Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
+`scout add "people->Arnaud->hobbies->[1]:reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
+`scout add "people->Franklin->hobbies->[0]":"football"` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 """
 
 struct ScoutCommand: ParsableCommand {
@@ -52,7 +77,7 @@ struct ScoutCommand: ParsableCommand {
             commandName: "scout",
             abstract: abstract,
             discussion: discussion,
-            subcommands: [ReadCommand.self, SetCommand.self, DeleteCommand.self],
+            subcommands: [ReadCommand.self, SetCommand.self, DeleteCommand.self, AddCommand.self],
             defaultSubcommand: ReadCommand.self)
 
     static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T) throws {

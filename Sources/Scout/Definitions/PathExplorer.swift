@@ -44,6 +44,9 @@ where
     mutating func delete(_ path: Path) throws
     mutating func delete(_ pathElements: PathElement...) throws
 
+    mutating func add(_ newValue: Any, at path: Path) throws
+    mutating func add(_ newValue: Any, at pathElements: PathElement...) throws
+
     // MARK: Export
 
     func exportData() throws -> Data

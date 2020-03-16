@@ -20,11 +20,11 @@ enum PathExplorerError: LocalizedError {
         switch self {
         case .invalidData(let type): return "Cannot intialize a \(String(describing: type)) object with the given data"
         case .invalidValue(let value): return "The value \(value) is invalid"
-        case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index \"\(element)\" which is a Dictionary or an Array"
+        case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
 
-        case .dictionarySubscript(let key): return "The key \(key) is not a Dictionary"
-        case .subscriptMissingKey(let key): return "The key \(key) cannot be found in the Dictionary"
-        case .arraySubscript(let key): return "The key \(key) is not an Array"
+        case .dictionarySubscript(let key): return "The key #\(key)# is not a Dictionary"
+        case .subscriptMissingKey(let key): return "The key #\(key)# cannot be found in the Dictionary"
+        case .arraySubscript(let key): return "The key #\(key)# is not an Array"
         case .subscriptWrongIndex(let index, let arrayCount): return "The index \(index) is not within the bounds of the Array: 0...\(arrayCount - 1)"
 
         case .stringToDataConversionError: return "Unable to convert the input string into data"

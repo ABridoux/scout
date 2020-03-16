@@ -2,18 +2,54 @@ import ArgumentParser
 import Scout
 import Foundation
 
+private let discussion =
+"""
+Given the following Json (as input stream or file)
+
+{
+  "people": {
+    "Tom": {
+      "height": 175,
+      "age": 68,
+      "hobbies": [
+        "cooking",
+        "guitar"
+      ]
+    },
+    "Arnaud": {
+      "height": 180,
+      "age": 23,
+      "hobbies": [
+        "video games",
+        "party",
+        "tennis"
+      ]
+    }
+  }
+}
+
+Examples
+================
+
+- Tom first hobby: "people->Tom->hobbies->[0]" will output "cooking"
+- Arnaud height: "people->Arnaud->height" will output "180"
+"""
+
 struct ReadCommand: ParsableCommand {
 
     // MARK: - Constants
 
-    static let configuration = CommandConfiguration(commandName: "read", abstract: "Read a value at a given path")
+    static let configuration = CommandConfiguration(
+        commandName: "read",
+        abstract: "Read a value at a given path",
+        discussion: discussion)
 
     // MARK: - Properties
 
     @Argument()
     var readingPath: Path
 
-    @Option(name: [.short, .long], help: "A file path from which read the data")
+    @Option(name: [.short, .customLong("--input")], help: "A file path from which to read the data")
     var inputFilePath: String?
 
     // MARK: - Functions
