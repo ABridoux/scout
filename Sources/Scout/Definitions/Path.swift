@@ -5,6 +5,20 @@ public typealias Path = [PathElement]
 
 public extension Path {
 
+    var description: String {
+        var description = ""
+        forEach {
+            if let int = $0 as? Int {
+                description.append("[\(int)]")
+                description.append("->")
+            } else {
+                description.append(String(describing: $0))
+            }
+        }
+        // remove the last arrow
+        description.removeLast(2)
+        return description
+    }
     /**
     Instantiate a `Path` for a string representing path components separated with arrows
 
@@ -14,23 +28,23 @@ public extension Path {
 
      - parameter string: The string representing the path
     */
-    init(string: String) throws {
-        var components = [PathElement]()
+    init(string: String, separator: String = "->") throws {
+        var elements = [PathElement]()
 
-        for component in string.components(separatedBy: "->").map({ $0.trimmingCharacters(in: .whitespaces) }) {
+        try string.components(separatedBy: separator).map{ $0.trimmingCharacters(in: .whitespaces) }.forEach { element in
 
-            if component.hasPrefix("["), component.hasSuffix("]") {
+            if element.hasPrefix("["), element.hasSuffix("]") {
                 // array index so remove the square brackets and try to convert to int
-                let indexComponentString = component[1..<component.count - 1]
+                let indexComponentString = element[1..<element.count - 1]
                 guard let indexComponent = Int(indexComponentString) else {
                     throw PathExplorerError.stringToIntConversionError(string)
                 }
 
-                components.append(indexComponent)
+                elements.append(indexComponent)
             } else {
-                components.append(String(component))
+                elements.append(String(element))
             }
         }
-        self = components
+        self = elements
     }
 }

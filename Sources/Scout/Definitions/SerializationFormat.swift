@@ -22,6 +22,6 @@ public struct JsonFormat: SerializationFormat {
     }
 
     public static func serialize(value: Any) throws -> Data {
-        try JSONSerialization.data(withJSONObject: value, options: [])
+        try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
     }
 }
