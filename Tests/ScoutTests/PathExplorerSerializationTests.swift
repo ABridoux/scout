@@ -1,5 +1,5 @@
 import XCTest
-@testable import PathExplorer
+@testable import Scout
 
 final class PathExplorerSerializationTests: XCTestCase {
 
@@ -31,8 +31,8 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         let plist = try PathExplorerSerialization<PlistFormat>(data: data)
 
-        XCTAssertEqual(plist["stringValue"].string, StubPlistStruct().stringValue)
-        XCTAssertEqual(plist["intValue"].int, StubPlistStruct().intValue)
+        XCTAssertEqual(try plist.get(for: "stringValue").string, StubPlistStruct().stringValue)
+        XCTAssertEqual(try plist.get(for: "intValue").int, StubPlistStruct().intValue)
     }
 
     func testSubscriptDictSet() throws {
@@ -41,8 +41,8 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
 
-        plist["stringValue"] = PathExplorerSerialization(value: newValue)
-        XCTAssertEqual(plist["stringValue"].string, newValue)
+        try plist.set(key: "stringValue", to: newValue)
+        XCTAssertEqual(try plist.get(for: "stringValue").string, newValue)
     }
 
     func testSubscriptArray() throws {
@@ -51,7 +51,7 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         let plist = try PathExplorerSerialization<PlistFormat>(data: data)
 
-        XCTAssertEqual(plist[2].string, "cheesecakes")
+        XCTAssertEqual(try plist.get(at: 2).string, "cheesecakes")
     }
 
     func testSubscriptArraySet() throws {
@@ -61,26 +61,8 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
 
-        plist[2] = PathExplorerSerialization(value: newValue)
-        XCTAssertEqual(plist[2].string, newValue)
-    }
-
-    func testSubscriptWithVariadic() throws {
-        let data = try PropertyListEncoder().encode(StubStruct())
-
-        let plist = try PathExplorerSerialization<PlistFormat>(data: data)
-
-        XCTAssertEqual(plist["animals", "ducks", 1].string, "Fifi")
-        XCTAssertEqual(plist["animals"]["ducks"][1].string, "Fifi")
-    }
-
-    func testSubscriptWithVariadicSet() throws {
-        let data = try PropertyListEncoder().encode(StubStruct())
-        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
-
-        plist["animals", "ducks", 1] =  PathExplorerSerialization(value: "Donald")
-
-        XCTAssertEqual(plist["animals", "ducks", 1].string, "Donald")
+        try plist.set(index: 2, to: newValue)
+        XCTAssertEqual(try plist.get(at: 2).string, newValue)
     }
 
     func testSubscriptWithArray() throws {
@@ -88,16 +70,95 @@ final class PathExplorerSerializationTests: XCTestCase {
         let plist = try PathExplorerSerialization<PlistFormat>(data: data)
         let path: [PathElement] = ["animals", "ducks", 1]
 
-        XCTAssertEqual(plist[path].string, "Fifi")
+        XCTAssertEqual(try plist.get(path).string, "Fifi")
     }
 
     func testSubscriptWithArraySet() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let newValue = "Donald"
 
         let path: [PathElement] = ["animals", "ducks", 1]
-        plist[path] =  PathExplorerSerialization(value: "Donald")
+        try plist.set(path, to: newValue)
 
-        XCTAssertEqual(plist["animals", "ducks", 1].string, "Donald")
+        XCTAssertEqual(try plist.get(path).string, newValue)
+    }
+
+    func testSetKeyName() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: [PathElement] = ["animals", "ducks"]
+
+        try plist.set(path, keyNameTo: "children_ducks")
+
+        XCTAssertEqual(try plist.get(["animals", "children_ducks", 1]).string, "Fifi")
+    }
+
+    func testDeleteKey() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: [PathElement] = ["animals", "ducks", 1]
+
+        try plist.delete(path)
+
+        XCTAssertEqual(try plist.get("animals", "ducks", 1).string, "Loulou")
+        XCTAssertThrowsError(try plist.get("animals", "ducks", 2))
+    }
+
+    func testAddKeyDict() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+
+        try plist.add("Tom", for: "human")
+
+        XCTAssertEqual(try plist.get(for: "human").string, "Tom")
+    }
+
+    func testAddKeyArrayEnd() throws {
+        let data = try PropertyListEncoder().encode(Animals())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data).get(for: "ducks")
+
+        try plist.add("Donald", for: -1)
+
+        XCTAssertEqual(try plist.get(at: 3).string, "Donald")
+    }
+
+    func testAddKeyArrayInsert() throws {
+        let data = try PropertyListEncoder().encode(Animals())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data).get(for: "ducks")
+
+        try plist.add("Donald", for: 2)
+
+        XCTAssertEqual(try plist.get(at: 2).string, "Donald")
+    }
+
+    func testAddKey1() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: [PathElement] = ["animals", "ducks", -1]
+
+        try plist.add("Donald", at: path)
+
+        XCTAssertEqual(try plist.get(["animals", "ducks", 3]).string, "Donald")
+    }
+
+    func testAddKey2() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: [PathElement] = ["animals", "mouses", -1]
+
+        try plist.add("Mickey", at: path)
+
+        XCTAssertEqual(try plist.get(["animals", "mouses", 0]).string, "Mickey")
+    }
+
+    func testAddKey3() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: [PathElement] = ["animals", "mouses", "character"]
+
+        try plist.add("Mickey", at: path)
+
+        XCTAssertEqual(try plist.get(["animals", "mouses", "character"]).string, "Mickey")
     }
 }

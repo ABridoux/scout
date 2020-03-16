@@ -11,7 +11,8 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
     public var real: Double? { element.double }
-    public var date: Date? { nil }
+
+    public var stringValue: String { element.string }
 
     public var description: String { element.xml }
 
@@ -20,13 +21,6 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
     public init(data: Data) throws {
         let document = try AEXMLDocument(xml: data)
         element = document.root
-    }
-
-    public init(string: String) throws {
-        guard let data = string.data(using: .utf8) else {
-            throw PathExplorerError.stringToDataConversionError
-        }
-        try self.init(data: data)
     }
 
     init(element: AEXMLElement) {
@@ -39,68 +33,144 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
 
     // MARK: - Functions
 
-    // MARK: Subscript
+    // MARK: Public subscripts
 
-    public subscript(key: String) -> PathExplorerXML {
-        get { get(for: key) }
-        set { set(newValue, for: key)}
+    public func get(_ pathElements: Path) throws  -> Self {
+        var currentPathExplorer = self
+
+        try pathElements.forEach {
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+        }
+
+        return currentPathExplorer
     }
 
-    public subscript(index: Int) -> PathExplorerXML {
-        get { get(at: index) }
-        set { set(newValue, at: index) }
+    public func get(_ pathElements: PathElement...) throws -> Self {
+        try get(pathElements)
     }
 
-    public subscript(path: PathElement...) -> PathExplorerXML {
-        get { get(at: path) }
-        set { set(newValue, at: path) }
+    public mutating func set(_ path: [PathElement], to newValue: Any) throws  {
+        let newValueString = "\(newValue)"
+
+        var currentPathExplorer = self
+
+        try path.forEach {
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+        }
+
+        guard currentPathExplorer.element.children.isEmpty else {
+            throw PathExplorerError.wrongValueForKey(value: newValueString, element: currentPathExplorer.element.name)
+        }
+
+        currentPathExplorer.element.value = newValueString
     }
 
-    public subscript(path: Path) -> PathExplorerXML {
-        get { get(at: path) }
-        set { set(newValue, at: path) }
+    public mutating  func set(_ pathElements: PathElement..., to newValue: Any) throws  {
+        try set(pathElements, to: newValue)
+    }
+
+    public mutating func set(_ path: Path, keyNameTo newKeyName: String) throws {
+        var currentPathExplorer = self
+
+        try path.forEach {
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+        }
+
+        currentPathExplorer.element.name = newKeyName
+    }
+
+    public mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws {
+        try set(pathElements, keyNameTo: newKeyName)
+    }
+
+    public mutating func delete(_ path: Path) throws {
+        var currentPathExplorer = self
+
+        try path.forEach {
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+        }
+
+        currentPathExplorer.element.removeFromParent()
+    }
+
+    public mutating func delete(_ pathElements: PathElement...) throws {
+        try delete(pathElements)
+    }
+
+    public mutating func add(_ newValue: Any, at path: Path) throws {
+        guard !path.isEmpty else { return }
+
+        var path = path
+        let lastElement = path.removeLast()
+        var currentPathExplorer = self
+
+        try path.forEach {
+            if let pathExplorer = try? currentPathExplorer.get(pathElement: $0) {
+                // the key exist. Just keep parsing
+                currentPathExplorer = pathExplorer
+            } else {
+                // the key does not exist. Add a new key to it
+                let keyName = $0 as? String ?? element.childrenName
+                currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
+                currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+            }
+        }
+
+        try currentPathExplorer.add(newValue, for: lastElement)
+        self = currentPathExplorer
+    }
+
+    public mutating func add(_ newValue: Any, at pathElements: PathElement...) throws {
+        try add(newValue, at: pathElements)
     }
 
     // MARK: Subscript helpers
 
-    private func get(at index: Int) -> PathExplorerXML {
-        guard
-            element.children.count > index,
-            index >= 0
-        else {
-            return self
+    func get(at index: Int) throws -> Self {
+        guard element.children.count > index, index >= 0 else {
+            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: element.children.count)
         }
+
         return PathExplorerXML(element: element.children[index])
     }
 
-    private func set(_ newValue: PathExplorerXML, for key: String) {
-        element[key].value = newValue.string
+    mutating func set(index: Int, to newValue: Any) throws  {
+        let newValueString = "\(newValue)"
+
+        guard element.children.count > index, index >= 0 else {
+            throw PathExplorerError.arraySubscript(element.xml)
+        }
+
+        element.children[index].value = newValueString
     }
 
-    private func get(for key: String) -> PathExplorerXML {
+    func get(for key: String) throws  -> PathExplorerXML {
         if element.name == key {
             return self
         } else {
+            let child = element[key]
+            guard child.error == nil else {
+                throw PathExplorerError.subscriptMissingKey(key)
+            }
             return PathExplorerXML(element: element[key])
         }
     }
 
-    private func set(_ newValue: PathExplorerXML, at index: Int) {
-        guard
-            element.children.count > index,
-            index >= 0
-        else {
-            return
+    mutating func set(key: String, to newValue: Any) throws {
+        let newValueString = "\(newValue)"
+
+        guard element[key].children.isEmpty else {
+            throw PathExplorerError.invalidValue(newValue)
         }
 
-        element.children[index].value = newValue.string
+        element[key].value = newValueString
     }
 
-    private func get(forElement pathElement: PathElement) -> PathExplorerXML {
+    func get(pathElement: PathElement) throws  -> Self {
         if let stringElement = pathElement as? String {
-            return get(for: stringElement)
+            return try get(for: stringElement)
         } else if let intElement = pathElement as? Int {
-            return get(at: intElement)
+            return try get(at: intElement)
         } else {
             // prevent a new type other than int or string to conform to PathElement
             assertionFailure("Only Int and String can be PathElement")
@@ -108,24 +178,40 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
         }
     }
 
-    private func get(at pathElements: Path) -> PathExplorerXML {
-        var currentPathExplorer = self
+    /// Add the new value to the array or dictionary value
+    /// - Parameters:
+    ///   - newValue: The new value to add
+    ///   - element: If string, try to add the new value to the dictionary. If int, try to add the new value to the array. `-1` will add the value at the end of the array.
+    /// - Throws: if self cannot be subscript with the given element
+    mutating func add(_ newValue: Any, for pathElement: PathElement) throws {
+        let newValueString = "\(newValue)"
 
-        pathElements.forEach {
-            currentPathExplorer = currentPathExplorer.get(forElement: $0)
+        if let key = pathElement as? String {
+            element.addChild(name: key, value: newValueString, attributes: [:])
+        } else if let index = pathElement as? Int {
+            let keyName = element.childrenName
+
+            if index == -1 {
+                element.addChild(name: keyName, value: newValueString, attributes: [:])
+            } else if index >= 0, element.children.count > index {
+                // we have to copy the element as we cannot modify its children
+                let copy = AEXMLElement(name: element.name, value: element.value, attributes: element.attributes)
+                for childIndex in 0...element.children.count {
+                    switch childIndex {
+                    case 0..<index:
+                        copy.addChild(element.children[childIndex])
+                    case index:
+                        copy.addChild(name: keyName, value: newValueString, attributes: [:])
+                    case index+1...element.children.count:
+                        copy.addChild(element.children[childIndex - 1])
+                    default: break
+                    }
+                }
+                element = copy
+            } else {
+                throw PathExplorerError.wrongValueForKey(value: newValue, element: index)
+            }
         }
-
-        return currentPathExplorer
-    }
-
-    private func set(_ newValue: PathExplorerXML, at pathElements: [PathElement]) {
-        var currentPathExplorer = self
-
-        pathElements.forEach {
-            currentPathExplorer = currentPathExplorer.get(forElement: $0)
-        }
-
-        currentPathExplorer.element.value = newValue.element.value
     }
 
     // MARK: Export
@@ -141,8 +227,7 @@ public struct PathExplorerXML: PathExplorer, CustomStringConvertible {
         return data
     }
 
-    public func outputString() throws -> String? {
-        let document = AEXMLDocument(root: element, options: .init())
-        return document.xml
+    public func exportString() throws -> String {
+        AEXMLDocument(root: element, options: .init()).xml
     }
 }
