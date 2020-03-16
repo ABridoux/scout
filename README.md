@@ -22,7 +22,7 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 #### Installing
 
-Use the following lines to clone the repository and to install `scout`.
+Use the following lines to clone the repository and to install **scout** (requires swift to be installed).
 
 ```bash
 $ git clone https://github.com/ABridoux/scout
@@ -35,6 +35,13 @@ The program should be install in */ur/local/bin*. You can then remove the reposi
 ```bash
 $ cd ..
 $ rm -r Scout
+```
+
+If you cannot use this method, you can rather download the latest version of the executable [here](https://alexis-bridoux-perso.s3.us-east-2.amazonaws.com/scout-0-1-2.zip).
+After having unzipped the file, you can install it if you want to:
+
+```bash
+install scout /usr/local/bin/ 
 ```
 
 #### Usage examples
@@ -177,7 +184,7 @@ try json.delete("people", "Tom", "height") // will delete Tom height key
 // Adding
 // -------
 
-// will add a new dictionary key named "Franklin" into "people" and and insert a key named "height" into it with the value 190
+// will add a new dictionary key named "Franklin" into "people" and insert a key named "height" into it with the value 190
 try json.add(190, at: "people", "Franklin", "height")
 
 // will add a new dictionary key named "Franklin" into "people", adding a hobbies array with one element: "basket"
@@ -245,7 +252,7 @@ to parse this file
 If you have modified the path explorer, you can export it to a `Data` or a `String`
 
 ```swift
-let xml = try PathExplorerFactory.make(XML.self, from: data)
+let xml = try PathExplorerFactory.make(Xml.self, from: data)
 
 // do some modifications...
 

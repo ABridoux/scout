@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. `Scout` adh
 
 ---
 
+## [0.1.2](https://github.com/ABridoux/scout/tree/0.1.2) (16/03/2020)
+
+### Added
+- Instructions to download and use the executable from S3.
+
 ## [0.1.1](https://github.com/ABridoux/scout/tree/0.1.1) (16/03/2020)
 
 ### Fixed
