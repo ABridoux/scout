@@ -19,6 +19,9 @@ struct DeleteCommand: ParsableCommand {
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
     var output: String?
 
+    @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
+    var verbose: Bool
+
     // MARK: - Functions
 
     func run() throws {
@@ -36,15 +39,15 @@ struct DeleteCommand: ParsableCommand {
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
             try json.delete(readingPath)
-            try ScoutCommand.output(output, dataWith: json)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
             try plist.delete(readingPath)
-            try ScoutCommand.output(output, dataWith: plist)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             try xml.delete(readingPath)
-            try ScoutCommand.output(output, dataWith: xml)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
 
         } else {
             if let filePath = inputFilePath {

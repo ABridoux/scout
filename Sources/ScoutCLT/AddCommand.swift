@@ -54,6 +54,9 @@ struct AddCommand: ParsableCommand {
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
     var output: String?
 
+    @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
+    var verbose: Bool
+    
     func run() throws {
 
         if let filePath = inputFilePath {
@@ -69,15 +72,15 @@ struct AddCommand: ParsableCommand {
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
             try pathsAndValues.forEach { try json.add($0.value, at: $0.readingPath) }
-            try ScoutCommand.output(output, dataWith: json)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
             try pathsAndValues.forEach { try plist.add($0.value, at: $0.readingPath) }
-            try ScoutCommand.output(output, dataWith: plist)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             try pathsAndValues.forEach { try xml.add($0.value, at: $0.readingPath) }
-            try ScoutCommand.output(output, dataWith: xml)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
 
         } else {
             if let filePath = inputFilePath {
