@@ -25,8 +25,8 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 Use the following lines to clone the repository and to install `scout`.
 
 ```bash
-$ git https://github.com/ABridoux/scout
-$ cd Scout
+$ git clone https://github.com/ABridoux/scout
+$ cd scout
 $ make
 ```
 
