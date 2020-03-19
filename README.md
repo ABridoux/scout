@@ -22,6 +22,16 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 #### Installing
 
+##### Homebrew
+Use the following command:
+
+```bash
+brew install ABridoux/formulae/scout
+```
+It requires Xcode 10 or the Swift 5.1 toolchain to build the program.
+
+##### Git
+
 Use the following lines to clone the repository and to install **scout** (requires swift to be installed).
 
 ```bash
@@ -37,7 +47,9 @@ $ cd ..
 $ rm -r Scout
 ```
 
-If you cannot use this method, you can rather download the latest version of the executable [here](https://alexis-bridoux-perso.s3.us-east-2.amazonaws.com/scout-0-1-2.zip).
+##### Download
+
+If you cannot use those methods, you can rather download the latest version of the executable [here](https://alexis-bridoux-perso.s3.us-east-2.amazonaws.com/scout-0-1-4.zip).
 After having unzipped the file, you can install it if you want to:
 
 ```bash
@@ -86,6 +98,8 @@ Given the following Json (as input stream or file with the `input` option)
 
 `scout set "people->Tom->age":#years#` will change Tom age key name from #age# to #years#
 
+`scout set "people->Tom->height":/175/` will change Tom height from 180 to a **String value** "175"
+
 ##### Deleting
 `scout delete "people->Tom>height"` will delete Tom height
 `scout delete "people->Tom>hobbies->[0]"` will delete Tom first hobby
@@ -98,6 +112,8 @@ Given the following Json (as input stream or file with the `input` option)
 `scout add "people->Arnaud->hobbies->[1]:reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
 
 `scout add "people->Franklin->hobbies->[0]":"football"` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
+
+`scout add "people->Franklin->height":/165/` will create a new dictionary Franklin and add a height key into it with the **String value** "165"
 
 #### Options
 Each command will have several options, like the possibility to output the modified data to string or into a file.
@@ -112,6 +128,8 @@ Each command will have several options, like the possibility to output the modif
 
 Unlike [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON), Scout does not offer the `subscript` methods. As those methods do not allow today to throw an error, using them implies to find sometimes strange ways to return value when the key is missing.
 
+#### Import
+
 Start by importing the package in your file *Packages.swift*.
 ```swift
 let package = Package (
@@ -123,6 +141,13 @@ let package = Package (
 )
 ```
 You can then import the package when needed.
+
+#### Some remarks
+- When setting a value, if a key does not exist in the path, an error will be thrown.
+- When adding a value, all the keys which do not exist in the path will be created.
+- The type of a value is automatically inferred when setting or adding a key value. You can try to force the type with the `as type` parameter. An error will be thrown if the value is not convertible to the given type.
+
+#### Examples
 
 To explore a format, start by creating the corresponding explorer:
 
@@ -170,6 +195,15 @@ try json.get("people", "Arnaud", "hobbies", 2).string // output "party"
 // will change Tom's height from 175 to 160
 try json.set("people", "Tom", "height", to: 160)
 
+// will change Tom's height from 175 to the String value "160" 
+try json.set("people", "Tom", "height", to: 160, as: .string)
+
+// will change Tom's height from 175 to the Double value 160.0
+try json.set("people", "Tom", "height", to: 160, as: .real)
+
+// will throw an error as "height" is not convertible to an integer
+try json.set("people", "Tom", "height", to: "height", as: .int)
+
 // will change Arnaud second hobby from "party" to "basketball"
 try json.set("people", "Arnaud", "hobbies",  1, to: "basketball")
 
@@ -186,6 +220,9 @@ try json.delete("people", "Tom", "height") // will delete Tom height key
 
 // will add a new dictionary key named "Franklin" into "people" and insert a key named "height" into it with the value 190
 try json.add(190, at: "people", "Franklin", "height")
+
+// will add a new dictionary key named "Franklin" into "people" and insert a key named "height" into it with the String value "190"
+try json.add(190, at: "people", "Franklin", "height", as: .string)
 
 // will add a new dictionary key named "Franklin" into "people", adding a hobbies array with one element: "basket"
 try json.add("basket", at: "people", "Franklin", "hobbies", 0)
@@ -242,10 +279,6 @@ to parse this file
 </plist>
 
 ```
-
-#### Some remarks
-- When setting a value, if a key does not exist in the path, an error will be thrown.
-- When adding a value, all the keys which do not exist in the path will be created.
 
 #### Export
 
