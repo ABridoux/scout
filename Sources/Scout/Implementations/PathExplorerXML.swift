@@ -7,13 +7,6 @@ public struct PathExplorerXML {
 
     var element: AEXMLElement
 
-    public var string: String? { element.string }
-    public var bool: Bool? { element.bool }
-    public var int: Int? { element.int }
-    public var real: Double? { element.double }
-
-    public var stringValue: String { element.string }
-
     // MARK: - Initialization
 
     public init(data: Data) throws {
@@ -214,7 +207,14 @@ public struct PathExplorerXML {
 
 extension PathExplorerXML: PathExplorer {
 
+    public var string: String? { element.string }
+    public var bool: Bool? { element.bool }
+    public var int: Int? { element.int }
+    public var real: Double? { element.double }
+
     public var description: String { element.xml }
+
+    public var stringValue: String { element.string }
 
     // MARK: Get
 

@@ -7,28 +7,8 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     var value: Any
 
-    public var string: String? { value as? String }
-    public var bool: Bool? { value as? Bool }
-    public var int: Int? { value as? Int }
-    public var real: Double? { value as? Double }
-
     var isDictionary: Bool { value is [String: Any] }
     var isArray: Bool { value is [Any] }
-
-    public var stringValue: String {
-        switch value {
-        case let bool as Bool:
-            return bool.description
-        case let int as Int:
-            return String(int)
-        case let double as Double:
-            return String(double)
-        case let string as String:
-            return string
-        default:
-                return ""
-        }
-    }
 
     // MARK: - Initialization
 
@@ -355,6 +335,26 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 }
 
 extension PathExplorerSerialization: PathExplorer {
+
+    public var string: String? { value as? String }
+    public var bool: Bool? { value as? Bool }
+    public var int: Int? { value as? Int }
+    public var real: Double? { value as? Double }
+
+    public var stringValue: String {
+        switch value {
+        case let bool as Bool:
+            return bool.description
+        case let int as Int:
+            return String(int)
+        case let double as Double:
+            return String(double)
+        case let string as String:
+            return string
+        default:
+                return ""
+        }
+    }
 
     public var description: String {
         if let description = try? exportString() {

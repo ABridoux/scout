@@ -41,7 +41,6 @@ where
 
     // MARK: Get
 
-
     /// Get the key at the given path, specified as array
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indication an index on a non-array key)
     func get(_ path: Path) throws -> Self

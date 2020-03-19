@@ -1,5 +1,5 @@
 prefix ?= /usr/local
-bindir = $(/usr/local)/bin
+bindir = $(prefix)/bin
 
 install:
 	swift build -c release
