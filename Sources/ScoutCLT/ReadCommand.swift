@@ -31,8 +31,8 @@ Given the following Json (as input stream or file)
 Examples
 ========
 
-- Tom first hobby: "people->Tom->hobbies->[0]" will output "cooking"
-- Arnaud height: "people->Arnaud->height" will output "180"
+- Tom first hobby: "people.Tom.hobbies[0]" will output "cooking"
+- Arnaud height: "people.Arnaud.height" will output "180"
 """
 
 struct ReadCommand: ParsableCommand {

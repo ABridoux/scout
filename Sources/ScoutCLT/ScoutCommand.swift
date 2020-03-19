@@ -12,8 +12,8 @@ https://github.com/ABridoux/scout
 
 private let discussion =
 """
-To indicate what value to target, a path should be indicated. A path is a serie of key names or indexes separated by '->' to target one value.
-It looks like this "firt_key->second_key->[second_index]->third_key".
+To indicate what value to target, a path should be indicated. A path is a serie of key names or indexes separated by '.' to target one value.
+It looks like this "firt_key.second_key[second_index].third_key".
 
 Notes
 =====
@@ -49,26 +49,26 @@ Examples
 
 Reading
 -------
-`scout "people->Tom->hobbies->[0]"` will output "cooking"
-`scout "people->Arnaud->height"` will output "180"
+`scout "people.Tom.hobbies[0]"` will output "cooking"
+`scout "people.Arnaud.height"` will output "180"
 
 Setting
 -------
-`scout set "people->Tom->hobbies->[0]":basket` will change Tom first hobby from "cooking" to "basket"
-`scout set "people->Arnaud->height":160` will change Arnaud's height from 180 to 160
-`scout set "people->Tom->age":#years#` will change Tom age key name from #age# to #years#
+`scout set "people.Tom.hobbies[0]"=basket` will change Tom first hobby from "cooking" to "basket"
+`scout set "people.Arnaud.height"=160` will change Arnaud's height from 180 to 160
+`scout set "people.Tom.age"=#years#` will change Tom age key name from #age# to #years#
 
 Deleting
 ---------
-`scout delete "people->Tom>height"` will delete Tom height
-`scout delete "people->Tom>hobbies->[0]"` will delete Tom first hobby
+`scout delete "people.Tom.height"` will delete Tom height
+`scout delete "people.Tom.hobbies[0]"` will delete Tom first hobby
 
 Adding
 ------
-`scout add "people->Franklin->height":165` will create a new dictionary Franklin and add a height key into it with the value 165
-`scout add "people->Tom->hobbies->[-1]:"Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
-`scout add "people->Arnaud->hobbies->[1]:reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
-`scout add "people->Franklin->hobbies->[0]":"football"` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
+`scout add "people.Franklin.height"=165` will create a new dictionary Franklin and add a height key into it with the value 165
+`scout add "people.Tom.hobbies[-1]"=Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
+`scout add "people.Arnaud.hobbies[1]"=reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
+`scout add "people.Franklin.hobbies[0]"="football"` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 """
 
 struct ScoutCommand: ParsableCommand {

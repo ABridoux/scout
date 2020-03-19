@@ -35,15 +35,15 @@ Given the following Json (as input stream or file)
   }
 }
 
-`scout add "people->Franklin->height":165` will create a new dictionary Franklin and add a height key into it with the value 165
+`scout add "people.Franklin.height"=165` will create a new dictionary Franklin and add a height key into it with the value 165
 
-`scout add "people->Tom->hobbies->[-1]:"Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
+`scout add "people.Tom.hobbies[-1]"="Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
 
-`scout add "people->Arnaud->hobbies->[1]:reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
+`scout add "people.Arnaud.hobbies[1]"=reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
 
-`scout add "people->Franklin->hobbies->[0]":"football"` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
+`scout add "people.Franklin.hobbies[0]"=football` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 
-`scout add "people->Franklin->height":/165/` will create a new dictionary Franklin and add a height key into it with the String value "165"
+`scout add "people.Franklin.height"=/165/` will create a new dictionary Franklin and add a height key into it with the String value "165"
 """
 
 struct AddCommand: ParsableCommand {

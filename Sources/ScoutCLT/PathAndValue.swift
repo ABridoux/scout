@@ -4,8 +4,8 @@ import Scout
 private let abstract =
 """
 Let you specify a reading path with an associated value.
-Like this: `FirstKey->SecondKey->[FirstIndex]->ThirdKey":value`
-or `"FirstKey->[FirstIndex]":"Text value with spaces"`
+Like this: `FirstKey.SecondKey[Index].ThirdKey"=value`
+or `"FirstKey[Index]"="Text value with spaces"`
 """
 
 /// Represent a reading path and an associated value, like `path->components->[0]:value`.

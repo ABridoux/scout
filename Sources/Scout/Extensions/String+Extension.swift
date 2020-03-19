@@ -15,7 +15,7 @@ extension String {
     subscript(_ range: NSRange) -> Substring {
         let sliceStartIndex = index(startIndex, offsetBy: range.location)
         let sliceEndIndex = index(startIndex, offsetBy: range.upperBound - 1)
-        
+
         return self[sliceStartIndex...sliceEndIndex]
     }
 }
