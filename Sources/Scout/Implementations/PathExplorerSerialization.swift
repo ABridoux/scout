@@ -1,34 +1,14 @@
 import Foundation
 
 /// PathExplorer struct which uses a serializer to parse data: Json and Plist
-public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
+public struct PathExplorerSerialization<F: SerializationFormat> {
 
     // MARK: - Properties
 
     var value: Any
 
-    public var string: String? { value as? String }
-    public var bool: Bool? { value as? Bool }
-    public var int: Int? { value as? Int }
-    public var real: Double? { value as? Double }
-
     var isDictionary: Bool { value is [String: Any] }
     var isArray: Bool { value is [Any] }
-
-    public var stringValue: String {
-        switch value {
-        case let bool as Bool:
-            return bool.description
-        case let int as Int:
-            return String(int)
-        case let double as Double:
-            return String(double)
-        case let string as String:
-            return string
-        default:
-                return ""
-        }
-    }
 
     // MARK: - Initialization
 
@@ -49,8 +29,44 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     }
 
     // MARK: - Functions
+    
+    // MARK: Get
 
-    // MARK: Public subscripts
+    func get(for key: String) throws -> Self {
+        guard let dict = value as? [String: Any] else {
+            throw PathExplorerError.dictionarySubscript(value)
+        }
+
+        guard let childValue = dict[key] else {
+            throw PathExplorerError.subscriptMissingKey(key)
+        }
+
+        return PathExplorerSerialization(value: childValue)
+    }
+
+    func get(at index: Int) throws -> Self {
+        guard let array = value as? [Any] else {
+            throw PathExplorerError.arraySubscript(value)
+        }
+
+        guard array.count > index, index >= 0 else {
+            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+        }
+
+        return PathExplorerSerialization(value: array[index])
+    }
+
+    func get(element pathElement: PathElement) throws -> Self {
+        if let stringElement = pathElement as? String {
+            return try get(for: stringElement)
+        } else if let intElement = pathElement as? Int {
+            return try get(at: intElement)
+        } else {
+            // prevent a new type other than int or string to conform to PathElement
+            assertionFailure("Only Int and String can be PathElement")
+            return self
+        }
+    }
 
     public func get(_ path: Path) throws -> Self {
         var currentPathExplorer = self
@@ -62,11 +78,49 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         return currentPathExplorer
     }
 
-    public func get(_ pathElements: PathElement...) throws -> Self {
-        try get(pathElements)
+    // MARK: Set
+
+    mutating func set(key: String, to newValue: Any) throws {
+        guard var dict = value as? [String: Any] else {
+            throw PathExplorerError.dictionarySubscript(value)
+        }
+
+        guard dict[key] != nil else {
+            throw PathExplorerError.subscriptMissingKey(key)
+        }
+
+        dict[key] = newValue
+        value = dict
     }
 
-    public mutating func set(_ path: [PathElement], to newValue: Any) throws {
+    mutating func set(index: Int, to newValue: Any) throws {
+        guard var array = value as? [Any] else {
+            throw PathExplorerError.arraySubscript(value)
+        }
+
+        guard array.count > index, index >= 0 else {
+            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+        }
+
+        array[index] = try convert(newValue, to: .string)
+        value = array
+    }
+
+    mutating func set(element pathElement: PathElement, to newValue: Any) throws {
+        if let key = pathElement as? String {
+            try set(key: key, to: newValue)
+        } else if let index = pathElement as? Int {
+            try set(index: index, to: newValue)
+        } else {
+            // prevent a new type other than int or string to conform to PathElement
+            assertionFailure("Only Int and String can be PathElement")
+            return
+        }
+    }
+
+    public mutating func set<Type: KeyAllowedType>(_ path: [PathElement], to newValue: Any, as type: KeyType<Type>) throws {
+        let newValue = try convert(newValue, to: type)
+
         var pathElements = path
 
         guard !pathElements.isEmpty else { return }
@@ -96,40 +150,70 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         self = currentPathExplorer
     }
 
-    public mutating func set(_ pathElements: PathElement..., to newValue: Any) throws {
-        try set(pathElements, to: newValue)
+    // -- Key name
+
+    mutating func change(key: String, nameTo newKeyName: String) throws {
+        guard var dict = value as? [String: Any] else {
+            throw PathExplorerError.dictionarySubscript(String(describing: value))
+        }
+
+        guard let childValue = dict[key] else {
+            throw PathExplorerError.subscriptMissingKey(key)
+        }
+
+        dict[newKeyName] = childValue
+        dict.removeValue(forKey: key)
+        value = dict
     }
 
     public mutating func set(_ path: Path, keyNameTo newKeyName: String) throws {
-        var pathElements = path
+           var pathElements = path
 
-        guard !pathElements.isEmpty else { return }
+           guard !pathElements.isEmpty else { return }
 
-        guard let lastElement = pathElements.removeLast() as? String else {
-            throw PathExplorerError.underlyingError("Cannot modify key name in an array")
+           guard let lastElement = pathElements.removeLast() as? String else {
+               throw PathExplorerError.underlyingError("Cannot modify key name in an array")
+           }
+
+           var currentPathExplorer = self
+           var pathExplorers = [currentPathExplorer]
+
+           try pathElements.forEach {
+               currentPathExplorer = try currentPathExplorer.get(element: $0)
+               pathExplorers.append(currentPathExplorer)
+           }
+
+           try currentPathExplorer.change(key: lastElement, nameTo: newKeyName)
+
+           for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
+               var pathExplorer = pathExplorer
+               try pathExplorer.set(element: element, to: currentPathExplorer.value)
+               currentPathExplorer = pathExplorer
+           }
+
+           self = currentPathExplorer
+       }
+
+    // MARK: Delete
+
+    mutating func delete(element: PathElement) throws {
+        if let key = element as? String {
+            guard var dict = value as? [String: Any] else {
+                throw PathExplorerError.dictionarySubscript(value)
+            }
+            dict.removeValue(forKey: key)
+            value = dict
+
+        } else if let index = element as? Int {
+            guard var array = value as? [Any] else {
+                throw PathExplorerError.arraySubscript(value)
+            }
+
+            array.remove(at: index)
+            value = array
+        } else {
+            throw PathExplorerError.wrongValueForKey(value: value, element: element)
         }
-
-        var currentPathExplorer = self
-        var pathExplorers = [currentPathExplorer]
-
-        try pathElements.forEach {
-            currentPathExplorer = try currentPathExplorer.get(element: $0)
-            pathExplorers.append(currentPathExplorer)
-        }
-
-        try currentPathExplorer.change(key: lastElement, nameTo: newKeyName)
-
-        for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
-            var pathExplorer = pathExplorer
-            try pathExplorer.set(element: element, to: currentPathExplorer.value)
-            currentPathExplorer = pathExplorer
-        }
-
-        self = currentPathExplorer
-    }
-
-    public mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws {
-        try set(pathElements, keyNameTo: newKeyName)
     }
 
     public mutating func delete(_ path: Path) throws {
@@ -157,12 +241,61 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         self = currentPathExplorer
     }
 
-    public mutating func delete(_ pathElements: PathElement...) throws {
-        try delete(pathElements)
+    // MARK: Add
+
+    /// Add the new value to the array or dictionary value
+    /// - Parameters:
+    ///   - newValue: The new value to add
+    ///   - element: If string, try to add the new value to the dictionary. If int, try to add the new value to the array. `-1` will add the value at the end of the array.
+    /// - Throws: if self cannot be subscript with the given element
+    mutating func add(_ newValue: Any, for element: PathElement) throws {
+
+        if var dict = value as? [String: Any] {
+            guard let key = element as? String else {
+                throw PathExplorerError.dictionarySubscript(value)
+            }
+            dict[key] = newValue
+            value = dict
+
+        } else if var array = value as? [Any] {
+            guard let index = element as? Int else {
+                throw PathExplorerError.arraySubscript(value)
+            }
+
+            if index == -1 {
+                // add the new value at the end of the array
+                array.append(newValue)
+            } else if index >= 0, array.count > index || array.count == 0 {
+                // insert the new value at the index
+                array.insert(newValue, at: index)
+            } else {
+                throw PathExplorerError.wrongValueForKey(value: value, element: index)
+            }
+            value = array
+        }
     }
 
-    public mutating func add(_ newValue: Any, at path: Path) throws {
+
+    /// Create a new dictionary or array path explorer depending in the child key
+    /// - Parameters:
+    ///   - childKey: If string, the path explorer will be a dictionary. Array if int
+    /// - Returns: The newly created path explorer
+    func makeDictionaryOrArray(childKey: PathElement) -> Any {
+        if childKey is String { // ditionary
+            return [String: Any]()
+        } else if childKey is Int { // array
+            return [Any]()
+        } else {
+            // prevent a new type other than int or string to conform to PathElement
+            assertionFailure("Only Int and String can be PathElement")
+            return ""
+        }
+    }
+
+    public mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws {
         guard !path.isEmpty else { return }
+
+        let newValue = try convert(newValue, to: type)
 
         var pathElements = path
         let lastElement = pathElements.removeLast()
@@ -199,169 +332,82 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
         value = currentPathExplorer.value
     }
+}
+
+extension PathExplorerSerialization: PathExplorer {
+
+    public var string: String? { value as? String }
+    public var bool: Bool? { value as? Bool }
+    public var int: Int? { value as? Int }
+    public var real: Double? { value as? Double }
+
+    public var stringValue: String {
+        switch value {
+        case let bool as Bool:
+            return bool.description
+        case let int as Int:
+            return String(int)
+        case let double as Double:
+            return String(double)
+        case let string as String:
+            return string
+        default:
+                return ""
+        }
+    }
+
+    public var description: String {
+        if let description = try? exportString() {
+            return description
+        } else {
+            return "Unable to convert \(String(describing: self)) to a String. The serialization has thrown an error. Try the `exportString()` function"
+        }
+    }
+
+    // MARK: Get
+
+    public func get(_ pathElements: PathElement...) throws -> Self {
+        try get(pathElements)
+    }
+
+    // MARK: Set
+
+    public mutating func set(_ path: [PathElement], to newValue: Any) throws {
+        try set(path, to: newValue, as: .automatic)
+    }
+
+    public mutating func set<Type: KeyAllowedType>(_ pathElements: PathElement..., to newValue: Any, as type: KeyType<Type>) throws {
+        try set(pathElements, to: newValue, as: type)
+    }
+
+    public mutating func set(_ pathElements: PathElement..., to newValue: Any) throws {
+        try set(pathElements, to: newValue, as: .automatic)
+    }
+
+    // -- Set key name
+
+    public mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws {
+        try set(pathElements, keyNameTo: newKeyName)
+    }
+
+    // MARK: Delete
+
+    public mutating func delete(_ pathElements: PathElement...) throws {
+        try delete(pathElements)
+    }
+
+    // MARK: Add
+
+    public mutating func add(_ newValue: Any, at path: Path) throws {
+        try add(newValue, at: path, as: .automatic)
+    }
 
     public mutating func add(_ newValue: Any, at pathElements: PathElement...) throws {
-        try add(newValue, at: pathElements)
-    }
-    
-    // MARK: Subscript helpers
-
-    func get(for key: String) throws -> Self {
-        guard let dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(value)
-        }
-
-        guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(key)
-        }
-
-        return PathExplorerSerialization(value: childValue)
+        try add(newValue, at: pathElements, as: .automatic)
     }
 
-    mutating func set(key: String, to newValue: Any) throws {
-        guard var dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(value)
-        }
-
-        guard dict[key] != nil else {
-            throw PathExplorerError.subscriptMissingKey(key)
-        }
-
-        dict[key] = try convert(newValue)
-        value = dict
-    }
-
-    func get(at index: Int) throws -> Self {
-        guard let array = value as? [Any] else {
-            throw PathExplorerError.arraySubscript(value)
-        }
-
-        guard array.count > index, index >= 0 else {
-            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
-        }
-
-        return PathExplorerSerialization(value: array[index])
-    }
-
-    mutating func set(index: Int, to newValue: Any) throws {
-        guard var array = value as? [Any] else {
-            throw PathExplorerError.arraySubscript(value)
-        }
-
-        guard array.count > index, index >= 0 else {
-            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
-        }
-
-        array[index] = try convert(newValue)
-        value = array
-    }
-
-    func get(element pathElement: PathElement) throws -> Self {
-        if let stringElement = pathElement as? String {
-            return try get(for: stringElement)
-        } else if let intElement = pathElement as? Int {
-            return try get(at: intElement)
-        } else {
-            // prevent a new type other than int or string to conform to PathElement
-            assertionFailure("Only Int and String can be PathElement")
-            return self
-        }
-    }
-
-    mutating func set(element pathElement: PathElement, to newValue: Any) throws {
-        if let key = pathElement as? String {
-            try set(key: key, to: newValue)
-        } else if let index = pathElement as? Int {
-            try set(index: index, to: newValue)
-        } else {
-            // prevent a new type other than int or string to conform to PathElement
-            assertionFailure("Only Int and String can be PathElement")
-            return
-        }
-    }
-
-    mutating func change(key: String, nameTo newKeyName: String) throws {
-        guard var dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(String(describing: value))
-        }
-
-        guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(key)
-        }
-
-        dict[newKeyName] = childValue
-        dict.removeValue(forKey: key)
-        value = dict
-    }
-
-    mutating func delete(element: PathElement) throws {
-        if let key = element as? String {
-            guard var dict = value as? [String: Any] else {
-                throw PathExplorerError.dictionarySubscript(value)
-            }
-            dict.removeValue(forKey: key)
-            value = dict
-
-        } else if let index = element as? Int {
-            guard var array = value as? [Any] else {
-                throw PathExplorerError.arraySubscript(value)
-            }
-
-            array.remove(at: index)
-            value = array
-        } else {
-            throw PathExplorerError.wrongValueForKey(value: value, element: element)
-        }
-    }
-
-
-    /// Create a new dictionary or array path explorer depending in the child key
-    /// - Parameters:
-    ///   - childKey: If string, the path explorer will be a dictionary. Array if int
-    /// - Returns: The newly created path explorer
-    func makeDictionaryOrArray(childKey: PathElement) -> Any {
-        if childKey is String { // ditionary
-            return [String: Any]()
-        } else if childKey is Int { // array
-            return [Any]()
-        } else {
-            // prevent a new type other than int or string to conform to PathElement
-            assertionFailure("Only Int and String can be PathElement")
-            return ""
-        }
-    }
-
-    /// Add the new value to the array or dictionary value
-    /// - Parameters:
-    ///   - newValue: The new value to add
-    ///   - element: If string, try to add the new value to the dictionary. If int, try to add the new value to the array. `-1` will add the value at the end of the array.
-    /// - Throws: if self cannot be subscript with the given element
-    mutating func add(_ newValue: Any, for element: PathElement) throws {
-        let newValue = try convert(newValue)
-
-        if var dict = value as? [String: Any] {
-            guard let key = element as? String else {
-                throw PathExplorerError.dictionarySubscript(value)
-            }
-            dict[key] = newValue
-            value = dict
-
-        } else if var array = value as? [Any] {
-            guard let index = element as? Int else {
-                throw PathExplorerError.arraySubscript(value)
-            }
-
-            if index == -1 {
-                // add the new value at the end of the array
-                array.append(newValue)
-            } else if index >= 0, array.count > index || array.count == 0 {
-                // insert the new value at the index
-                array.insert(newValue, at: index)
-            } else {
-                throw PathExplorerError.wrongValueForKey(value: value, element: index)
-            }
-            value = array
-        }
+    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type : KeyAllowedType {
+        try add(newValue, at: pathElements, as: type)
     }
 
     // MARK: Export

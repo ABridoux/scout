@@ -4,7 +4,8 @@ import Scout
 private let abstract =
 """
 Let you specify a reading path with an associated value.
-Like this: `FirstKey->SecondKey->[FirstIndex]->ThirdKey":value` or `"FirstKey->[FirstIndex]":"Text value with spaces"`
+Like this: `FirstKey->SecondKey->[FirstIndex]->ThirdKey":value`
+or `"FirstKey->[FirstIndex]":"Text value with spaces"`
 """
 
 /// Represent a reading path and an associated value, like `path->components->[0]:value`.
@@ -21,7 +22,10 @@ struct PathAndValue: ExpressibleByArgument {
     let value: String
 
     /// Set to `true` when the value is a key name to change. A key name will be indicated with sharps #KeyName#
-    let changeKey: Bool
+    var changeKey = false
+
+    /// Set to `true` when the key value should be considered as a `string` no matter what it is
+    var forceString = false
 
     init?(argument: String) {
         let splitted = argument.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: true)
@@ -40,9 +44,13 @@ struct PathAndValue: ExpressibleByArgument {
             value.removeLast()
             self.value = value
             changeKey = true
+        } else if value.hasSuffix("/"), value.hasPrefix("/") {
+            value.removeFirst()
+            value.removeLast()
+            self.value = value
+            forceString = true
         } else {
             self.value = value
-            changeKey = false
         }
     }
 }

@@ -29,7 +29,7 @@ Given the following Json (as input stream or file)
 }
 
 Examples
-================
+========
 
 - Tom first hobby: "people->Tom->hobbies->[0]" will output "cooking"
 - Arnaud height: "people->Arnaud->height" will output "180"
@@ -49,7 +49,7 @@ struct ReadCommand: ParsableCommand {
     @Argument()
     var readingPath: Path
 
-    @Option(name: [.short, .customLong("--input")], help: "A file path from which to read the data")
+    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
 
     // MARK: - Functions

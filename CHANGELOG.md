@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. `Scout` adh
 
 ---
 
+
+## [0.1.3](https://github.com/ABridoux/scout/tree/0.1.3) (17/03/2020)
+
+### Changed
+- Makefile and Package.swift updated
+
 ## [0.1.2](https://github.com/ABridoux/scout/tree/0.1.2) (16/03/2020)
 
 ### Added

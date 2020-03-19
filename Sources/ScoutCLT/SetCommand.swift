@@ -4,8 +4,15 @@ import Foundation
 
 private let discussion =
 """
-Note: If the path is invalid, the program will retrun an error
+Notes
 =====
+- If the path is invalid, the program will retrun an error
+- Enclose the value with sharp signs to change the key name: #keyName#
+- Enclose the value with slash signs to force the value as a string: /valueAsString/ (useless with XML as XML only has string values)
+
+Examples
+========
+
 
 Given the following XML (as input stream or file)
 
@@ -25,9 +32,6 @@ Given the following XML (as input stream or file)
     </url>
 </urlset>
 
-Examples
-========
-
 `scout set "urlset->[1]->changefreq":yearly` will change the second url #changefreq# key value to "yearly"
 
 `scout set "urlset->[0]->priority":2.0` will change the first url #priority# key value to 2.0.0
@@ -40,7 +44,7 @@ Examples
 struct SetCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "set",
-        abstract: "Change a value at a given path. Set the value between sharp signs to change the key name",
+        abstract: "Change a value at a given path.",
         discussion: discussion)
 
     @Argument(help: PathAndValue.help)
@@ -70,10 +74,16 @@ struct SetCommand: ParsableCommand {
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
             try pathsAndValues.forEach {
+
                 if $0.changeKey {
                     try json.set($0.readingPath, keyNameTo: $0.value)
                 } else {
-                    try json.set($0.readingPath, to: $0.value)
+                    switch $0.forceString {
+                    case true:
+                        try json.set($0.readingPath, to: $0.value, as: .string)
+                    case false:
+                        try json.set($0.readingPath, to: $0.value)
+                    }
                 }
             }
 
@@ -84,7 +94,12 @@ struct SetCommand: ParsableCommand {
                 if $0.changeKey {
                     try plist.set($0.readingPath, keyNameTo: $0.value)
                 } else {
-                    try plist.set($0.readingPath, to: $0.value)
+                    switch $0.forceString {
+                    case true:
+                        try plist.set($0.readingPath, to: $0.value, as: .string)
+                    case false:
+                        try plist.set($0.readingPath, to: $0.value)
+                    }
                 }
             }
 
@@ -92,10 +107,16 @@ struct SetCommand: ParsableCommand {
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             try pathsAndValues.forEach {
+                
                 if $0.changeKey {
                     try xml.set($0.readingPath, keyNameTo: $0.value)
                 } else {
-                    try xml.set($0.readingPath, to: $0.value)
+                    switch $0.forceString {
+                    case true:
+                        try xml.set($0.readingPath, to: $0.value, as: .string)
+                    case false:
+                        try xml.set($0.readingPath, to: $0.value)
+                    }
                 }
             }
 

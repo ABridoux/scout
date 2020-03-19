@@ -45,7 +45,7 @@ Given the following Json (as input stream or file)
 }
 
 Examples
-================
+========
 
 Reading
 -------
@@ -77,7 +77,12 @@ struct ScoutCommand: ParsableCommand {
             commandName: "scout",
             abstract: abstract,
             discussion: discussion,
-            subcommands: [ReadCommand.self, SetCommand.self, DeleteCommand.self, AddCommand.self],
+            subcommands: [
+                ReadCommand.self,
+                SetCommand.self,
+                DeleteCommand.self,
+                AddCommand.self,
+                VersionCommand.self],
             defaultSubcommand: ReadCommand.self)
 
     static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool) throws {
