@@ -4,8 +4,8 @@ import Scout
 private let abstract =
 """
 Let you specify a reading path with an associated value.
-Like this: `FirstKey->SecondKey->[FirstIndex]->ThirdKey":value`
-or `"FirstKey->[FirstIndex]":"Text value with spaces"`
+Like this: `FirstKey.SecondKey[Index].ThirdKey"=value`
+or `"FirstKey[Index]"="Text value with spaces"`
 """
 
 /// Represent a reading path and an associated value, like `path->components->[0]:value`.
@@ -14,7 +14,7 @@ struct PathAndValue: ExpressibleByArgument {
 
     // MARK: - Constants
 
-    static let help = ArgumentHelp(abstract, valueName: "path:value", shouldDisplay: true)
+    static let help = ArgumentHelp(abstract, valueName: "path=value", shouldDisplay: true)
 
     // MARK: - Properties
 
@@ -28,7 +28,7 @@ struct PathAndValue: ExpressibleByArgument {
     var forceString = false
 
     init?(argument: String) {
-        let splitted = argument.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: true)
+        let splitted = argument.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: true)
         guard
             splitted.count == 2,
             let readingPath = Path(argument: String(splitted[0]))

@@ -201,12 +201,21 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             guard var dict = value as? [String: Any] else {
                 throw PathExplorerError.dictionarySubscript(value)
             }
+
+            guard dict[key] != nil else {
+                throw PathExplorerError.subscriptMissingKey(key)
+            }
+
             dict.removeValue(forKey: key)
             value = dict
 
         } else if let index = element as? Int {
             guard var array = value as? [Any] else {
                 throw PathExplorerError.arraySubscript(value)
+            }
+
+            guard 0 <= index, index < array.count else {
+                throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
             }
 
             array.remove(at: index)
