@@ -29,7 +29,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     }
 
     // MARK: - Functions
-    
+
     // MARK: Get
 
     func get(for key: String) throws -> Self {
@@ -275,7 +275,6 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         }
     }
 
-
     /// Create a new dictionary or array path explorer depending in the child key
     /// - Parameters:
     ///   - childKey: If string, the path explorer will be a dictionary. Array if int
@@ -406,7 +405,7 @@ extension PathExplorerSerialization: PathExplorer {
         try add(newValue, at: pathElements, as: .automatic)
     }
 
-    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type : KeyAllowedType {
+    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try add(newValue, at: pathElements, as: type)
     }
 

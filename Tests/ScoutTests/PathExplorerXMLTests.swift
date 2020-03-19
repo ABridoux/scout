@@ -44,7 +44,6 @@ final class PathExplorerXMLTests: XCTestCase {
     func testSubscriptString() throws {
         let xml = try PathExplorerXML(data: stubData1)
 
-
         XCTAssertEqual(try xml.get(for: "stringValue").string, "Hello")
         XCTAssertEqual(try xml.get(for: "boolValue").bool, false)
     }

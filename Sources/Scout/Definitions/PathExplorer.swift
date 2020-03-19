@@ -1,9 +1,7 @@
 import Foundation
 
-
 /// Wrap different structs to explore several format: Json, Plist and Xml
-public protocol PathExplorer:
-    CustomStringConvertible,
+public protocol PathExplorer: CustomStringConvertible,
     ExpressibleByStringLiteral,
     ExpressibleByBooleanLiteral,
     ExpressibleByIntegerLiteral,
@@ -15,7 +13,6 @@ where
     FloatLiteralType == Double {
 
     // MARK: - Properties
-
 
     /// Non-nil if the key is of the `String` type
     var string: String? { get }
@@ -351,7 +348,7 @@ extension PathExplorer {
     }
 }
 
-extension PathExplorer  {
+extension PathExplorer {
     public init(booleanLiteral value: Self.BooleanLiteralType) {
         self.init(value: value)
     }

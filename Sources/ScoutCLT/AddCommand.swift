@@ -63,7 +63,7 @@ struct AddCommand: ParsableCommand {
 
     @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
     var verbose: Bool
-    
+
     func run() throws {
 
         if let filePath = inputFilePath {
