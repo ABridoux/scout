@@ -32,7 +32,7 @@ public extension Path {
     init(string: String, separator: String = "->") throws {
         var elements = [PathElement]()
 
-        try string.components(separatedBy: separator).map{ $0.trimmingCharacters(in: .whitespaces) }.forEach { element in
+        try string.components(separatedBy: separator).map { $0.trimmingCharacters(in: .whitespaces) }.forEach { element in
 
             if element.hasPrefix("["), element.hasSuffix("]") {
                 // array index so remove the square brackets and try to convert to int

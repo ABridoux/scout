@@ -107,7 +107,7 @@ struct SetCommand: ParsableCommand {
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             try pathsAndValues.forEach {
-                
+
                 if $0.changeKey {
                     try xml.set($0.readingPath, keyNameTo: $0.value)
                 } else {
@@ -131,4 +131,3 @@ struct SetCommand: ParsableCommand {
         }
     }
 }
-
