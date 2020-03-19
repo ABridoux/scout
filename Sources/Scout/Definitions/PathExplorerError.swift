@@ -13,7 +13,8 @@ enum PathExplorerError: LocalizedError {
 
     case stringToDataConversionError
     case dataToStringConversionError
-    case stringToIntConversionError(String)
+    case invalidPathElement(PathElement)
+    case unmatchingBracket(PathElement)
 
     case underlyingError(String)
 
@@ -31,7 +32,9 @@ enum PathExplorerError: LocalizedError {
 
         case .stringToDataConversionError: return "Unable to convert the input string into data"
         case .dataToStringConversionError: return "Unable to convert the data to a string"
-        case .stringToIntConversionError(let string): return "Unable to convert \(string) to int"
+        case .invalidPathElement(let element): return "Invalid path element: \(element)"
+        case .unmatchingBracket(let element): return "Unmatching bracket in path element \(element)"
+
         case .underlyingError(let description): return description
         }
     }
