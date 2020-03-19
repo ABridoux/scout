@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [0.2.0](https://github.com/ABridoux/scout/tree/0.2.0) (19/03/2020)
+
+## Added
+- SwiftLint file to execute SwiftLint analysis
+- CLT brackets for key names containing the separator
+
+## Changed
+- CLT path to read the values: the separator was changed from `->` to `.`
+- CLT path to set the values: the separator was changed from `:` to `=`
+- CLT array subscript. Remove the separator e.g. `array.[index]` to `array[index]`
+
 ## [0.1.4](https://github.com/ABridoux/scout/tree/0.1.4) (19/03/2020)
 
 ### Added

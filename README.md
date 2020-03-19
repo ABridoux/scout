@@ -135,6 +135,14 @@ Each command will have several options, like the possibility to output the modif
 
 `scout set "people.Tom.height"=190 "people.Arnaud.hobbies[1]"=football -v` will output the modified data.
 
+#### Key names containing dots
+
+If a key name contains dots, e.g. `com.company.product`, you can enclose it between brackets:
+
+```bash
+scout "bundle.(com.company.product).version"
+```
+
 ### Swift
 
 Unlike [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON), Scout does not offer the `subscript` methods. As those methods do not allow today to throw an error, using them implies to find sometimes strange ways to return value when the key is missing.
