@@ -23,16 +23,17 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 #### Installing
 
 ##### Homebrew
-Use the following command:
+Use the following command.
 
 ```bash
 brew install ABridoux/formulae/scout
 ```
-It requires Xcode 10 or the Swift 5.1 toolchain to build the program.
+
+It will **download the executable** from [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip). There is a [known bug](https://github.com/apple/swift-argument-parser/issues/80) which is resolved by using Swift 5.2 but the Xcode version supporting Swift 5.2 is still in [beta](https://developer.apple.com/download/more/). Moreover, I believe that most Homebrew users do not really care about building the program themselves. If I am wrong, please let me know (by opening an [issue](https://github.com/ABridoux/scout/issues)) for example). Note that you can still build the program by cloning this git as explained below.
 
 ##### Git
 
-Use the following lines to clone the repository and to install **scout** (requires swift to be installed).
+Use the following lines to clone the repository and to install **scout** (requires Swift 5.2 toolchain to be installed). You can check the *Makefile* to see the commands used to build and install the executable.
 
 ```bash
 $ git clone https://github.com/ABridoux/scout
@@ -40,7 +41,7 @@ $ cd scout
 $ make
 ```
 
-The program should be install in */ur/local/bin*. You can then remove the repository if you do not want to keep it:
+The program should be install in */usr/local/bin*. You can then remove the repository if you do not want to keep it:
 
 ```bash
 $ cd ..
@@ -56,14 +57,15 @@ After having unzipped the file, you can install it if you want to:
 install scout /usr/local/bin/ 
 ```
 
-Here is a command which downloads the latest version of the programm and install it in */usr/local/bin*. 
+Here is a command which downloads the latest version of the program and install it in */usr/local/bin*. 
 Run it to download and install the latest version of the program. It erases the current version you may have.
 
 ```bash
-curl -o scout.zip https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip \
+curl -o scout.zip https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip && \
 unzip scout.zip && \
 rm scout.zip && \
-install scout /usr/local/bin
+install scout /usr/local/bin && \
+rm scout
 ```
 
 #### Usage examples
@@ -131,9 +133,23 @@ Each command will have several options, like the possibility to output the modif
 `cat People.json | scout "people.Tom.height" ` is the same as 
 `scout "people.Tom.height -i People.json `
 
-`scout set "people.Tom.height"=190 "people.Arnaud.hobbies[1]"=football -o People.json` will copy the content in the file *People.json*, modify it and write it back to *People.json*
+The command
+``` bash
+scout set \
+"people.Tom.height"=190 \
+"people.Arnaud.hobbies[1]"=football \
+-i People.json -o People.json
+```
+ will copy the content in the file *People.json*, modify it and write it back to *People.json*.
 
-`scout set "people.Tom.height"=190 "people.Arnaud.hobbies[1]"=football -v` will output the modified data.
+The command
+```bash
+scout set \
+"people.Tom.height"=190 \
+"people.Arnaud.hobbies[1]"=football \
+-i People.json -v
+```
+will output the modified data.
 
 #### Key names containing dots
 
