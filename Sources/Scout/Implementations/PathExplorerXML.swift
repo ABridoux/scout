@@ -60,7 +60,7 @@ public struct PathExplorerXML {
 
     // MARK: Set
 
-    mutating func set(index: Int, to newValue: String) throws  {
+    mutating func set(index: Int, to newValue: String) throws {
         guard element.children.count > index, index >= 0 else {
             throw PathExplorerError.arraySubscript(element.xml)
         }
@@ -77,7 +77,7 @@ public struct PathExplorerXML {
         element[key].value = newValue
     }
 
-    public mutating func set(_ path: [PathElement], to newValue: Any) throws  {
+    public mutating func set(_ path: [PathElement], to newValue: Any) throws {
         let newValueString = try convert(newValue, to: .string)
 
         var currentPathExplorer = self
@@ -234,15 +234,15 @@ extension PathExplorerXML: PathExplorer {
 
     // MARK: Set
 
-    public mutating func set<Type>(_ path: [PathElement], to newValue: Any, as type: KeyType<Type>) throws where Type : KeyAllowedType {
+    public mutating func set<Type>(_ path: [PathElement], to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try set(path, to: newValue)
     }
 
-    public mutating  func set(_ pathElements: PathElement..., to newValue: Any) throws  {
+    public mutating  func set(_ pathElements: PathElement..., to newValue: Any) throws {
         try set(pathElements, to: newValue)
     }
 
-    public mutating func set<Type>(_ pathElements: PathElement..., to newValue: Any, as type: KeyType<Type>) throws where Type : KeyAllowedType {
+    public mutating func set<Type>(_ pathElements: PathElement..., to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try set(pathElements, to: newValue)
     }
 
@@ -254,13 +254,12 @@ extension PathExplorerXML: PathExplorer {
 
     // MARK: Add
 
-    public mutating func add<Type>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws where Type : KeyAllowedType {
+    public mutating func add<Type>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try add(newValue, at: path)
     }
 
-    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type : KeyAllowedType {
+    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try add(newValue, at: pathElements)
     }
-
 
 }

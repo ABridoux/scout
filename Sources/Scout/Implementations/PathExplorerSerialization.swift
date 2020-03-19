@@ -29,7 +29,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     }
 
     // MARK: - Functions
-    
+
     // MARK: Get
 
     func get(for key: String) throws -> Self {
@@ -201,12 +201,21 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             guard var dict = value as? [String: Any] else {
                 throw PathExplorerError.dictionarySubscript(value)
             }
+
+            guard dict[key] != nil else {
+                throw PathExplorerError.subscriptMissingKey(key)
+            }
+
             dict.removeValue(forKey: key)
             value = dict
 
         } else if let index = element as? Int {
             guard var array = value as? [Any] else {
                 throw PathExplorerError.arraySubscript(value)
+            }
+
+            guard 0 <= index, index < array.count else {
+                throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
             }
 
             array.remove(at: index)
@@ -274,7 +283,6 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             value = array
         }
     }
-
 
     /// Create a new dictionary or array path explorer depending in the child key
     /// - Parameters:
@@ -406,7 +414,7 @@ extension PathExplorerSerialization: PathExplorer {
         try add(newValue, at: pathElements, as: .automatic)
     }
 
-    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type : KeyAllowedType {
+    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try add(newValue, at: pathElements, as: type)
     }
 

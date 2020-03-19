@@ -49,11 +49,21 @@ $ rm -r Scout
 
 ##### Download
 
-If you cannot use those methods, you can rather download the latest version of the executable [here](https://alexis-bridoux-perso.s3.us-east-2.amazonaws.com/scout-0-1-4.zip).
+If you cannot use those methods, you can rather download the latest version of the executable [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip).
 After having unzipped the file, you can install it if you want to:
 
 ```bash
 install scout /usr/local/bin/ 
+```
+
+Here is a command which downloads the latest version of the programm and install it in */usr/local/bin*. 
+Run it to download and install the latest version of the program. It erases the current version you may have.
+
+```bash
+curl -o scout.zip https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip \
+unzip scout.zip && \
+rm scout.zip && \
+install scout /usr/local/bin
 ```
 
 #### Usage examples
@@ -85,44 +95,53 @@ Given the following Json (as input stream or file with the `input` option)
 ```
 
 ##### Reading
-`scout "people->Tom->hobbies->[0]"` will output "cooking"
+`scout "people.Tom.hobbies[0]"` will output "cooking"
 
-`scout "people->Arnaud->height"` will output "180"
+`scout "people.Arnaud.height"` will output "180"
 
 ##### Setting
-`scout set "people->Tom->hobbies->[0]":basket` will change Tom first hobby from "cooking" to "basket"
+`scout set "people.Tom.hobbies[0]"=basket` will change Tom first hobby from "cooking" to "basket"
 
-`scout set "people->Arnaud->height":160` will change Arnaud's height from 180 to 160
+`scout set "people.Arnaud.height"=160` will change Arnaud's height from 180 to 160
 
-`scout set "people->Tom->hobbies->[0]":basket "people->Arnaud->height":160` will change Tom first hobby from "cooking" to "basket" **and** change Arnaud's height from 180 to 160
+`scout set "people.Tom.hobbies[0]"=basket "people.Arnaud.height"=160` will change Tom first hobby from "cooking" to "basket" **and** change Arnaud's height from 180 to 160
 
-`scout set "people->Tom->age":#years#` will change Tom age key name from #age# to #years#
+`scout set "people.Tom.age"=#years#` will change Tom age key name from #age# to #years#
 
-`scout set "people->Tom->height":/175/` will change Tom height from 180 to a **String value** "175"
+`scout set "people.Tom.height"=/175/` will change Tom height from 180 to a **String value** "175"
 
 ##### Deleting
-`scout delete "people->Tom>height"` will delete Tom height
-`scout delete "people->Tom>hobbies->[0]"` will delete Tom first hobby
+`scout delete "people.Tom.height"` will delete Tom height
+`scout delete "people.Tom.hobbies[0]"` will delete Tom first hobby
 
 ##### Adding
-`scout add "people->Franklin->height":165` will create a new dictionary Franklin and add a height key into it with the value 165
+`scout add "people.Franklin.height"=165` will create a new dictionary Franklin and add a height key into it with the value 165
 
-`scout add "people->Tom->hobbies->[-1]:"Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
+`scout add "people.Tom.hobbies[-1]="Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
 
-`scout add "people->Arnaud->hobbies->[1]:reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
+`scout add "people.Arnaud.hobbies[1]"=reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
 
-`scout add "people->Franklin->hobbies->[0]":"football"` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
+`scout add "people.Franklin.hobbies[0]"=football` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 
-`scout add "people->Franklin->height":/165/` will create a new dictionary Franklin and add a height key into it with the **String value** "165"
+`scout add "people.Franklin.height"=/165/` will create a new dictionary Franklin and add a height key into it with the **String value** "165"
 
 #### Options
 Each command will have several options, like the possibility to output the modified data to string or into a file.
 
-`cat People.json | scout "people->Tom->height" ` is the same as `scout "people->Tom->height -i People.json `
+`cat People.json | scout "people.Tom.height" ` is the same as 
+`scout "people.Tom.height -i People.json `
 
-`scout set "people->Tom height":190 "people->Arnaud->hobbies->[1]":"football" -o People.json` will copy the content in the file *People.json*, modify it and write it back to *People.json*
+`scout set "people.Tom.height"=190 "people.Arnaud.hobbies[1]"=football -o People.json` will copy the content in the file *People.json*, modify it and write it back to *People.json*
 
-`scout set "people->Tom height":190 "people->Arnaud->hobbies->[1]":"football" -v` will output the modified data.
+`scout set "people.Tom.height"=190 "people.Arnaud.hobbies[1]"=football -v` will output the modified data.
+
+#### Key names containing dots
+
+If a key name contains dots, e.g. `com.company.product`, you can enclose it between brackets:
+
+```bash
+scout "bundle.(com.company.product).version"
+```
 
 ### Swift
 

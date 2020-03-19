@@ -32,13 +32,13 @@ Given the following XML (as input stream or file)
     </url>
 </urlset>
 
-`scout set "urlset->[1]->changefreq":yearly` will change the second url #changefreq# key value to "yearly"
+`scout set "urlset[1].changefreq"=yearly` will change the second url #changefreq# key value to "yearly"
 
-`scout set "urlset->[0]->priority":2.0` will change the first url #priority# key value to 2.0.0
+`scout set "urlset[0].priority"=2.0` will change the first url #priority# key value to 2.0.0
 
-`scout set "urlset->[1]->changefreq":yearly` "urlset->[0]->priority":2.0` will change both he second url #changefreq# key value to "yearly" and the first url #priority# key value to 2.0.0
+`scout set "urlset[1].changefreq"=yearly` "urlset[0].priority"=2.0` will change both he second url #changefreq# key value to "yearly" and the first url #priority# key value to 2.0.0
 
-`scout set "urlset->[0]->changefreq":#frequence#` will change the first url #changefreq# key name to #frequence#
+`scout set "urlset[0].changefreq"=#frequence#` will change the first url #changefreq# key name to #frequence#
 """
 
 struct SetCommand: ParsableCommand {
@@ -107,7 +107,7 @@ struct SetCommand: ParsableCommand {
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             try pathsAndValues.forEach {
-                
+
                 if $0.changeKey {
                     try xml.set($0.readingPath, keyNameTo: $0.value)
                 } else {
@@ -131,4 +131,3 @@ struct SetCommand: ParsableCommand {
         }
     }
 }
-
