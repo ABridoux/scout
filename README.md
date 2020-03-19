@@ -56,14 +56,15 @@ After having unzipped the file, you can install it if you want to:
 install scout /usr/local/bin/ 
 ```
 
-Here is a command which downloads the latest version of the programm and install it in */usr/local/bin*. 
+Here is a command which downloads the latest version of the program and install it in */usr/local/bin*. 
 Run it to download and install the latest version of the program. It erases the current version you may have.
 
 ```bash
-curl -o scout.zip https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip \
+curl -o scout.zip https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip && \
 unzip scout.zip && \
 rm scout.zip && \
-install scout /usr/local/bin
+install scout /usr/local/bin && \
+rm scout
 ```
 
 #### Usage examples
@@ -131,9 +132,23 @@ Each command will have several options, like the possibility to output the modif
 `cat People.json | scout "people.Tom.height" ` is the same as 
 `scout "people.Tom.height -i People.json `
 
-`scout set "people.Tom.height"=190 "people.Arnaud.hobbies[1]"=football -o People.json` will copy the content in the file *People.json*, modify it and write it back to *People.json*
+The command
+``` bash
+scout set \
+"people.Tom.height"=190 \
+"people.Arnaud.hobbies[1]"=football \
+-i People.json -o People.json
+```
+ will copy the content in the file *People.json*, modify it and write it back to *People.json*.
 
-`scout set "people.Tom.height"=190 "people.Arnaud.hobbies[1]"=football -v` will output the modified data.
+The command
+```bash
+scout set \
+"people.Tom.height"=190 \
+"people.Arnaud.hobbies[1]"=football \
+-i People.json -v
+```
+will output the modified data.
 
 #### Key names containing dots
 
