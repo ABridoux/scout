@@ -3,10 +3,13 @@ bindir = $(prefix)/bin
 
 install:
 	swift build -c release
-	install .build/release/ScoutCLT "$(bindir)/scout"
+	install ".build/release/ScoutCLT" "$(bindir)/scout"
 	
 uninstall:
-	rm -f "$(bindir)/scout" 
+	rm -f "$(bindir)/scout"
 	
 clean:
 	rm -rf .build
+
+.PHONY: build install uninstall clean
+
