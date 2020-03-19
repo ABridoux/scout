@@ -50,7 +50,7 @@ struct SetCommand: ParsableCommand {
     @Argument(help: PathAndValue.help)
     var pathsAndValues: [PathAndValue]
 
-    @Option(name: [.short, .customLong("--input")], help: "A file path from which to read the data")
+    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
 
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
