@@ -49,7 +49,7 @@ struct ReadCommand: ParsableCommand {
     @Argument()
     var readingPath: Path
 
-    @Option(name: [.short, .customLong("--input")], help: "A file path from which to read the data")
+    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
 
     // MARK: - Functions

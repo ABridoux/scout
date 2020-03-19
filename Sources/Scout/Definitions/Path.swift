@@ -1,6 +1,6 @@
 import Foundation
 
-/// Array of `PathElement`s
+/// Array of `PathElement`s. Only `String` and `Int` to indicate a key name or an array index
 public typealias Path = [PathElement]
 
 public extension Path {
@@ -22,11 +22,12 @@ public extension Path {
     /**
     Instantiate a `Path` for a string representing path components separated with arrows
 
-     ### Example
+     ### Example with default separator "->"
      - ```computers->[2]->name``` will make the path ["computers", 2, "name"]
      - ```computer->general->serial_number``` will make the path ["computer", "general", "serial_number"]
 
      - parameter string: The string representing the path
+     - parameter separator: The separator used to split the string. Default is "->"
     */
     init(string: String, separator: String = "->") throws {
         var elements = [PathElement]()

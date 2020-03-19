@@ -3,6 +3,7 @@ import Foundation
 enum PathExplorerError: LocalizedError {
     case invalidData(SerializationFormat.Type)
     case invalidValue(Any)
+    case valueConversionError(value: Any, type: String)
     case wrongValueForKey(value: Any, element: PathElement)
 
     case dictionarySubscript(Any)
@@ -19,7 +20,8 @@ enum PathExplorerError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidData(let type): return "Cannot intialize a \(String(describing: type)) object with the given data"
-        case .invalidValue(let value): return "The value \(value) is invalid"
+        case .invalidValue(let value): return "The key value \(value) is invalid"
+        case .valueConversionError(let value, let type): return "Unable to convert the value \(value) to \(type)"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
 
         case .dictionarySubscript(let key): return "The key #\(key)# is not a Dictionary"

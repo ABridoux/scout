@@ -108,7 +108,7 @@ final class PathExplorerXMLTests: XCTestCase {
     func testAddKeyDict() throws {
         var xml = try PathExplorerXML(data: stubData1)
 
-        try xml.add(2, for: "intValue")
+        try xml.add("2", for: "intValue")
 
         XCTAssertEqual(try xml.get(for: "intValue").int, 2)
     }
