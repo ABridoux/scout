@@ -68,8 +68,30 @@ install scout /usr/local/bin && \
 rm scout
 ```
 
-#### Usage examples
+<u>Note</u>: You can find all the scout executable versions [here](https://github.com/ABridoux/scout/wiki/Scout-versions-download).
 
+### Swift package
+
+Start by importing the package in your file *Packages.swift*.
+```swift
+let package = Package (
+    ...
+    dependencies: [
+        .package(url: "https://github.com/ABridoux/Scout", from: "0.1.0")
+    ],
+    ...
+)
+```
+You can then import the package when needed.
+
+## Usage examples
+
+#### Some remarks
+- When getting/setting/deleting a value, if a key does not exist in the path, an error will be returned/thrown.
+- When adding a value, all the keys which do not exist in the path will be created. Thus, to add a dictionary or an array, you have to specify one child key. Otherwise scout will consider that it is a single value which should be added.
+- <u>Swift package</u>: The type of a value is automatically inferred when setting or adding a key value. You can try to force the type with the `as type` parameter. An error will be thrown if the value is not convertible to the given type.
+
+### Command-line
 Given the following Json (as input stream or file with the `input` option)
 
 ```json
@@ -130,7 +152,10 @@ Given the following Json (as input stream or file with the `input` option)
 #### Options
 Each command will have several options, like the possibility to output the modified data to string or into a file.
 
-`cat People.json | scout "people.Tom.height" ` is the same as 
+`cat People.json | scout "people.Tom.height" `
+<br>
+is the same as
+<br>
 `scout "people.Tom.height -i People.json `
 
 The command
@@ -159,30 +184,12 @@ If a key name contains dots, e.g. `com.company.product`, you can enclose it betw
 scout "bundle.(com.company.product).version"
 ```
 
+#### Playground
+You can find the same file *People* using the different available formats in the [Playground folder](Playground). Also an *Example commands* so that you can see how to use the same command to parse the files.
+
 ### Swift
 
 Unlike [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON), Scout does not offer the `subscript` methods. As those methods do not allow today to throw an error, using them implies to find sometimes strange ways to return value when the key is missing.
-
-#### Import
-
-Start by importing the package in your file *Packages.swift*.
-```swift
-let package = Package (
-    ...
-    dependencies: [
-        .package(url: "https://github.com/ABridoux/Scout", from: "0.1.0")
-    ],
-    ...
-)
-```
-You can then import the package when needed.
-
-#### Some remarks
-- When setting a value, if a key does not exist in the path, an error will be thrown.
-- When adding a value, all the keys which do not exist in the path will be created.
-- The type of a value is automatically inferred when setting or adding a key value. You can try to force the type with the `as type` parameter. An error will be thrown if the value is not convertible to the given type.
-
-#### Examples
 
 To explore a format, start by creating the corresponding explorer:
 

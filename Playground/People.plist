@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>people</key>
+	<dict>
+		<key>Tom</key>
+		<dict>
+			<key>height</key>
+			<integer>175</integer>
+			<key>age</key>
+			<integer>68</integer>
+			<key>hobbies</key>
+			<array>
+				<string>cooking</string>
+				<string>guitar</string>
+			</array>
+		</dict>
+		<key>Robert</key>
+		<dict>
+			<key>height</key>
+			<integer>181</integer>
+			<key>age</key>
+			<integer>23</integer>
+			<key>hobbies</key>
+			<array>
+				<string>video games</string>
+				<string>party</string>
+				<string>tennis</string>
+			</array>
+		</dict>
+		<key>Suzanne</key>
+		<dict>
+			<key>job</key>
+			<string>actress</string>
+			<key>movies</key>
+			<array>
+				<dict>
+					<key>title</key>
+					<string>Tomorrow is so far</string>
+					<key>awards</key>
+					<string>Best speech for a silent movie</string>
+				</dict>
+				<dict>
+					<key>title</key>
+					<string>Yesterday will never go</string>
+					<key>awards</key>
+					<string>Best title</string>
+				</dict>
+				<dict>
+					<key>title</key>
+					<string>What about today?</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+</dict>
+</plist>

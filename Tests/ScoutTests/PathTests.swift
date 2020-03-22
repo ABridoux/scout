@@ -8,10 +8,17 @@ final class PathTests: XCTestCase {
     let firstKey = "firstKey"
     let secondKey = "secondKey"
     let secondKeyWithIndex = "secondKey[1]"
+    let secondKeyWithNegativeIndex = "secondKey[-1]"
     let secondKeyWithdot = "second.key"
     let secondKeyWithDotAndIndex = "second.key[1]"
+    let secondKeyWithFourthSeparator = "second$key"
+    let secondKeyWithFourthSeparatorAndIndex = "second$key[1]"
     let thirdKey = "thirdKey"
     let thirdKeyWithDot = "third.Key"
+
+    let secondSeparator = "->"
+    let thirdSeparator = "/"
+    let fourthSeparator = "\\$"
 
     // MARK: - Functions
 
@@ -22,9 +29,16 @@ final class PathTests: XCTestCase {
         XCTAssertTrue(path == array)
     }
 
-    func testKeysWithIndexes() throws {
+    func testKeysWithIndex() throws {
         let array: Path = [firstKey, secondKey, 1, thirdKey]
         let path = try Path(string: "\(firstKey).\(secondKeyWithIndex).\(thirdKey)")
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testKeysWithNegativeIndex() throws {
+        let array: Path = [firstKey, secondKey, -1, thirdKey]
+        let path = try Path(string: "\(firstKey).\(secondKeyWithNegativeIndex).\(thirdKey)")
 
         XCTAssertTrue(path == array)
     }
@@ -39,6 +53,34 @@ final class PathTests: XCTestCase {
     func testKeysWithBracketsAndIndex() throws {
         let array: Path = [firstKey, secondKeyWithdot, 1, thirdKey]
         let path = try Path(string: "\(firstKey).(\(secondKeyWithDotAndIndex)).\(thirdKey)")
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testSeparator1() throws {
+        let array: Path = [firstKey, secondKey, thirdKey]
+        let path = try Path(string: "\(firstKey)\(secondSeparator)\(secondKey)\(secondSeparator)\(thirdKey)", separator: secondSeparator)
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testSeparator2() throws {
+        let array: Path = [firstKey, secondKey, thirdKey]
+        let path = try Path(string: "\(firstKey)\(thirdSeparator)\(secondKey)\(thirdSeparator)\(thirdKey)", separator: thirdSeparator)
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testSeparator3() throws {
+        let array: Path = [firstKey, secondKey, thirdKey]
+        let path = try Path(string: "\(firstKey)$\(secondKey)$\(thirdKey)", separator: fourthSeparator)
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testSeparator3WithBracketAndIndex() throws {
+        let array: Path = [firstKey, secondKeyWithFourthSeparator, 1, thirdKey]
+        let path = try Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparatorAndIndex))$\(thirdKey)", separator: fourthSeparator)
 
         XCTAssertTrue(path == array)
     }

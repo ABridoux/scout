@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<people>
+
+	<Tom>
+		<height>175</height>
+		<age>68</age>
+		<hobbies>
+			<hobby>cooking</hobby>
+			<hobby>guitar</hobby>
+		</hobbies>
+	</Tom>
+
+	<Robert>
+		<height>181</height>
+		<age>23</age>
+		<hobbies>
+			<hobby>video games</hobby>
+			<hobby>party</hobby>
+			<hobby>tennis</hobby>
+		</hobbies>
+	</Robert>
+
+	<Suzanne>
+		<job>actress</job>
+		<movies>
+			<movie>
+				<title>Tomorrow is so far</title>
+				<awards>Best speech for a silent movie</awards>
+			</movie>
+			<movie>
+				<title>Yesterday will never go</title>
+				<awards>Best title</awards>
+			</movie>
+			<movie>
+				<title>What about today?</title>
+			</movie>
+		</movies>
+	</Suzanne>
+
+</people>

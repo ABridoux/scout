@@ -1,0 +1,37 @@
+{
+  "people": {
+    "Tom": {
+      "height": 175,
+      "age": 68,
+      "hobbies": [
+        "cooking",
+        "guitar"
+      ]
+    },
+    "Robert": {
+      "height": 181,
+      "age": 23,
+      "hobbies": [
+        "video games",
+        "party",
+        "tennis"
+      ]
+    },
+    "Suzanne": {
+      "job": "actress",
+      "movies": [
+        {
+          "title": "Tomorrow is so far",
+          "awards": "Best speech for a silent movie"
+        },
+        {
+          "title": "Yesterday will never go",
+          "awards": "Best title"
+        },
+        {
+          "title": "What about today?"
+        }
+      ]
+    }
+  }
+}
