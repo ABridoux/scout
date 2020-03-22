@@ -21,7 +21,7 @@ public extension KeyAllowedType {
     init(_ value: Any) throws {
         if let convertedValue = value as? Self {
             self = convertedValue
-        } else if let stringValue = value as? String, let convertedValue = Self(stringValue) {
+        } else if let stringValue = (value as? CustomStringConvertible)?.description, let convertedValue = Self(stringValue) {
             self = convertedValue
         } else {
             throw PathExplorerError.valueConversionError(value: value, type: String(describing: Self.Type.self))

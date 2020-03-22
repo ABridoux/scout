@@ -8,6 +8,7 @@ final class PathTests: XCTestCase {
     let firstKey = "firstKey"
     let secondKey = "secondKey"
     let secondKeyWithIndex = "secondKey[1]"
+    let secondKeyWithNegativeIndex = "secondKey[-1]"
     let secondKeyWithdot = "second.key"
     let secondKeyWithDotAndIndex = "second.key[1]"
     let secondKeyWithFourthSeparator = "second$key"
@@ -28,9 +29,16 @@ final class PathTests: XCTestCase {
         XCTAssertTrue(path == array)
     }
 
-    func testKeysWithIndexes() throws {
+    func testKeysWithIndex() throws {
         let array: Path = [firstKey, secondKey, 1, thirdKey]
         let path = try Path(string: "\(firstKey).\(secondKeyWithIndex).\(thirdKey)")
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testKeysWithNegativeIndex() throws {
+        let array: Path = [firstKey, secondKey, -1, thirdKey]
+        let path = try Path(string: "\(firstKey).\(secondKeyWithNegativeIndex).\(thirdKey)")
 
         XCTAssertTrue(path == array)
     }

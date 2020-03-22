@@ -47,7 +47,7 @@ public extension Path {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
-        let indexRegexPattern = #"(?<=\[)[0-9]+(?=\])"#
+        let indexRegexPattern = #"(?<=\[)[0-9-]+(?=\])"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern, options: [])
         let indexRegex = try NSRegularExpression(pattern: indexRegexPattern, options: [])
 

@@ -49,6 +49,13 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             throw PathExplorerError.arraySubscript(value)
         }
 
+        if index == -1 {
+            if array.isEmpty {
+                throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+            }
+            return PathExplorerSerialization(value: array[array.count - 1])
+        }
+
         guard array.count > index, index >= 0 else {
             throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
         }
@@ -98,11 +105,17 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             throw PathExplorerError.arraySubscript(value)
         }
 
+        if index == -1 {
+            array.append(newValue)
+            value = array
+            return
+        }
+
         guard array.count > index, index >= 0 else {
             throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
         }
 
-        array[index] = try convert(newValue, to: .string)
+        array[index] = newValue
         value = array
     }
 
@@ -214,6 +227,15 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
                 throw PathExplorerError.arraySubscript(value)
             }
 
+            if index == -1 {
+                guard !array.isEmpty else {
+                    throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+                }
+                array.removeLast()
+                value = array
+                return
+            }
+
             guard 0 <= index, index < array.count else {
                 throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
             }
@@ -271,10 +293,10 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
                 throw PathExplorerError.arraySubscript(value)
             }
 
-            if index == -1 {
+            if index == -1 || array.isEmpty {
                 // add the new value at the end of the array
                 array.append(newValue)
-            } else if index >= 0, array.count > index || array.count == 0 {
+            } else if index >= 0, array.count > index {
                 // insert the new value at the index
                 array.insert(newValue, at: index)
             } else {
@@ -334,7 +356,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
             var pathExplorer = pathExplorer
-            try pathExplorer.set(element: element, to: currentPathExplorer.value)
+            try pathExplorer.add(currentPathExplorer.value, for: element)
             currentPathExplorer = pathExplorer
         }
 
@@ -370,6 +392,17 @@ extension PathExplorerSerialization: PathExplorer {
         } else {
             return "Unable to convert \(String(describing: self)) to a String. The serialization has thrown an error. Try the `exportString()` function"
         }
+    }
+
+    public var format: DataFormat {
+        if F.self == JsonFormat.self {
+            return .json
+        } else if F.self == PlistFormat.self {
+            return .plist
+        } else {
+            fatalError("Serialiation format not recognized. Allowed: Jsonformat and PlistFormat")
+        }
+
     }
 
     // MARK: Get
