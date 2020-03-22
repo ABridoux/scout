@@ -5,6 +5,8 @@ public typealias Path = [PathElement]
 
 public extension Path {
 
+    // MARK: - Computed properties
+
     var description: String {
         var description = ""
         forEach {
@@ -20,6 +22,8 @@ public extension Path {
         return description
     }
 
+    // MARK: - Initialization
+
     /**
      Instantiate a `Path` for a string representing path components separated with the separator.
 
@@ -34,16 +38,20 @@ public extension Path {
      - note: When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
      will make the path ["computer", "general.information", "serial_number"]
 
+     - note: The following separators will not work: "[", "]", "(", ")".
+     When using a special caracter with [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
+     it is required to quote it with "\\".
+
     */
-    init(string: String, separator: String = ".") throws {
+    init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
-        let pattern = #"(?<=(^|\.))(\(.+\)|[^\.]+)(?=(\.|$))"#
-        let regex = try NSRegularExpression(pattern: pattern, options: [.anchorsMatchLines])
-        let indexPattern = #"(?<=\[)[0-9]+(?=\])"#
-        let indexRegex = try NSRegularExpression(pattern: indexPattern, options: [])
+        let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
+        let indexRegexPattern = #"(?<=\[)[0-9]+(?=\])"#
+        let splitRegex = try NSRegularExpression(pattern: splitRegexPattern, options: [])
+        let indexRegex = try NSRegularExpression(pattern: indexRegexPattern, options: [])
 
-        let matches = regex.matches(in: string)
+        let matches = splitRegex.matches(in: string)
         for match in matches {
 
             // remove the brackets if any
@@ -71,9 +79,9 @@ public extension Path {
 
         self = elements
     }
-}
 
-extension Path {
+    // MARK: - Functions
+
     static func ==(lhs: Path, rhs: Path) -> Bool {
         guard lhs.count == rhs.count else { return false }
 
