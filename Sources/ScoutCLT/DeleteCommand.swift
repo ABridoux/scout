@@ -10,8 +10,8 @@ struct DeleteCommand: ParsableCommand {
 
     // MARK: - Properties
 
-    @Argument()
-    var readingPath: Path
+    @Argument(help: PathAndValue.help)
+    var readingPaths: [Path]
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
@@ -38,15 +38,15 @@ struct DeleteCommand: ParsableCommand {
     func delete(from data: Data) throws {
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
-            try json.delete(readingPath)
+            try readingPaths.forEach { try json.delete($0) }
             try ScoutCommand.output(output, dataWith: json, verbose: verbose)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
-            try plist.delete(readingPath)
+            try readingPaths.forEach { try plist.delete($0) }
             try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
-            try xml.delete(readingPath)
+            try readingPaths.forEach { try xml.delete($0) }
             try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
 
         } else {
