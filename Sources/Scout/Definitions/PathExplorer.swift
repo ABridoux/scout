@@ -29,6 +29,8 @@ where
     /// String representation of value property (if value is nil this is empty String).
     var stringValue: String { get }
 
+    var format: DataFormat { get }
+
     // MARK: - Initialization
 
     init(data: Data) throws
@@ -385,7 +387,7 @@ extension PathExplorer {
         // try to infer the type
 
         // handle the case when value is a string
-        if let stringValue = value as? String {
+        if let stringValue = (value as? CustomStringConvertible)?.description {
             if let bool = Bool(stringValue) {
                 return try Type(bool)
             } else if let int = Int(stringValue) {

@@ -9,3 +9,7 @@ public struct PathExplorerFactory {
         try T(data: data)
     }
 }
+
+public enum DataFormat: String {
+    case json, plist, xml
+}

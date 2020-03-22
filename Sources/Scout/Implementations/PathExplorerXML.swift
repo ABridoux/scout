@@ -26,7 +26,17 @@ public struct PathExplorerXML {
 
     // MARK: Get
 
-    func get(at index: Int) throws -> Self {
+    /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
+    func get(at index: Int, negativeIndexEnabled: Bool = false) throws -> Self {
+
+        if negativeIndexEnabled, index == -1 {
+            guard let last = element.children.last else {
+                throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: element.children.count)
+            }
+
+            return PathExplorerXML(element: last)
+        }
+
         guard element.children.count > index, index >= 0 else {
             throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: element.children.count)
         }
@@ -46,11 +56,11 @@ public struct PathExplorerXML {
         }
     }
 
-    func get(pathElement: PathElement) throws  -> Self {
+    func get(pathElement: PathElement, negativeIndexEnabled: Bool = true) throws  -> Self {
         if let stringElement = pathElement as? String {
             return try get(for: stringElement)
         } else if let intElement = pathElement as? Int {
-            return try get(at: intElement)
+            return try get(at: intElement, negativeIndexEnabled: negativeIndexEnabled)
         } else {
             // prevent a new type other than int or string to conform to PathElement
             assertionFailure("Only Int and String can be PathElement")
@@ -133,19 +143,26 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach {
-            if let pathExplorer = try? currentPathExplorer.get(pathElement: $0) {
+            if let pathExplorer = try? currentPathExplorer.get(pathElement: $0, negativeIndexEnabled: false) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
                 // the key does not exist. Add a new key to it
-                let keyName = $0 as? String ?? element.childrenName
+                let keyName = $0 as? String ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
-                currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+
+                if let index = $0 as? Int, index == -1 {
+                    // get the last element
+                    let childrenCount = currentPathExplorer.element.children.count - 1
+                    currentPathExplorer = try currentPathExplorer.get(pathElement: childrenCount)
+                } else {
+                    currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+                }
             }
         }
 
         try currentPathExplorer.add(newValue, for: lastElement)
-        self = currentPathExplorer
+
     }
 
     public mutating func add(_ newValue: Any, at pathElements: PathElement...) throws {
@@ -164,7 +181,7 @@ public struct PathExplorerXML {
         } else if let index = pathElement as? Int {
             let keyName = element.childrenName
 
-            if index == -1 {
+            if index == -1 || element.children.isEmpty {
                 element.addChild(name: keyName, value: newValue, attributes: [:])
             } else if index >= 0, element.children.count > index {
                 // we have to copy the element as we cannot modify its children
@@ -180,7 +197,14 @@ public struct PathExplorerXML {
                     default: break
                     }
                 }
-                element = copy
+                if let parent = element.parent {
+                    // replace the element in the hierarchy if necessary
+                    element.removeFromParent()
+                    parent.addChild(copy)
+                } else {
+                    // the element is the root element, so simply change it
+                    element = copy
+                }
             } else {
                 throw PathExplorerError.wrongValueForKey(value: newValue, element: index)
             }
@@ -212,9 +236,11 @@ extension PathExplorerXML: PathExplorer {
     public var int: Int? { element.int }
     public var real: Double? { element.double }
 
+    public var stringValue: String { element.string }
+
     public var description: String { element.xml }
 
-    public var stringValue: String { element.string }
+    public var format: DataFormat { .xml }
 
     // MARK: Get
 
