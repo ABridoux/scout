@@ -1,7 +1,7 @@
 import XCTest
 @testable import Scout
 
-final class PathExplorerTests_Integration: XCTestCase {
+final class PathExplorerTestsIntegration: XCTestCase {
 
     // MARK: - Constants
 
@@ -22,14 +22,18 @@ final class PathExplorerTests_Integration: XCTestCase {
     // MARK: - Setup & Teardown
 
     override func setUp() {
-        let jsonData = try! Data(contentsOf: .peopleJson)
-        json = try! Json(data: jsonData)
+        do {
+            let jsonData = try Data(contentsOf: .peopleJson)
+            json = try Json(data: jsonData)
 
-        let plistData = try! Data(contentsOf: .peoplePlist)
-        plist = try! Plist(data: plistData)
+            let plistData = try Data(contentsOf: .peoplePlist)
+            plist = try Plist(data: plistData)
 
-        let xmlData = try! Data(contentsOf: .peopleXml)
-        xml = try! Xml(data: xmlData)
+            let xmlData = try Data(contentsOf: .peopleXml)
+            xml = try Xml(data: xmlData)
+        } catch {
+            fatalError("Cannot start Integration Tests. \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Functions

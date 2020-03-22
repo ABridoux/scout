@@ -82,7 +82,7 @@ public extension Path {
 
     // MARK: - Functions
 
-    static func ==(lhs: Path, rhs: Path) -> Bool {
+    static func == (lhs: Path, rhs: Path) -> Bool {
         guard lhs.count == rhs.count else { return false }
 
         var isEqual = true
