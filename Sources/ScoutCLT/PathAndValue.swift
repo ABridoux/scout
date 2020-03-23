@@ -3,8 +3,7 @@ import Scout
 
 private let abstract =
 """
-Let you specify a reading path with an associated value.
-Like this: `FirstKey.SecondKey[Index].ThirdKey"=value`
+Let you specify a reading path with an associated value. Like this: `FirstKey.SecondKey[Index].ThirdKey"=value`
 or `"FirstKey[Index]"="Text value with spaces"`
 """
 

@@ -17,7 +17,7 @@ Examples
 Given the following XML (as input stream or file)
 
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<urlset>
     <url>
         <loc>https://your-website-url.com/posts</loc>
         <changefreq>daily</changefreq>
@@ -56,12 +56,15 @@ struct SetCommand: ParsableCommand {
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
     var output: String?
 
+    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path")
+    var modifyFilePath: String?
+
     @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
     var verbose: Bool
 
     func run() throws {
 
-        if let filePath = inputFilePath {
+        if let filePath = modifyFilePath ?? inputFilePath {
             let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
             try set(from: data)
         } else {
@@ -71,6 +74,7 @@ struct SetCommand: ParsableCommand {
     }
 
     func set(from data: Data) throws {
+        let output = modifyFilePath ?? self.output
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
             try pathsAndValues.forEach {
