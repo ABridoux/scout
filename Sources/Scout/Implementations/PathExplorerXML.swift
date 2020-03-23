@@ -56,6 +56,7 @@ public struct PathExplorerXML {
         }
     }
 
+    /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(pathElement: PathElement, negativeIndexEnabled: Bool = true) throws  -> Self {
         if let stringElement = pathElement as? String {
             return try get(for: stringElement)
@@ -142,21 +143,21 @@ public struct PathExplorerXML {
         let lastElement = path.removeLast()
         var currentPathExplorer = self
 
-        try path.forEach {
-            if let pathExplorer = try? currentPathExplorer.get(pathElement: $0, negativeIndexEnabled: false) {
+        try path.forEach { element in
+            if let pathExplorer = try? currentPathExplorer.get(pathElement: element, negativeIndexEnabled: false) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
                 // the key does not exist. Add a new key to it
-                let keyName = $0 as? String ?? currentPathExplorer.element.childrenName
+                let keyName = element as? String ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
 
-                if let index = $0 as? Int, index == -1 {
+                if let index = element as? Int, index == -1 {
                     // get the last element
                     let childrenCount = currentPathExplorer.element.children.count - 1
                     currentPathExplorer = try currentPathExplorer.get(pathElement: childrenCount)
                 } else {
-                    currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+                    currentPathExplorer = try currentPathExplorer.get(pathElement: element)
                 }
             }
         }
@@ -177,7 +178,13 @@ public struct PathExplorerXML {
     mutating func add(_ newValue: String, for pathElement: PathElement) throws {
 
         if let key = pathElement as? String {
-            element.addChild(name: key, value: newValue, attributes: [:])
+            if let existingChild = element.firstDescendant(where: { $0.name == key }) {
+                // set the value of the child if one exists with the given key
+                existingChild.value = newValue
+            } else {
+                // otherwise add the child
+                element.addChild(name: key, value: newValue, attributes: [:])
+            }
         } else if let index = pathElement as? Int {
             let keyName = element.childrenName
 

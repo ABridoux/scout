@@ -12,6 +12,8 @@ final class PathTests: XCTestCase {
     let secondKeyWithdot = "second.key"
     let secondKeyWithDotAndIndex = "second.key[1]"
     let secondKeyWithFourthSeparator = "second$key"
+    let secondKeyWithNestedArray = "secondKey[1][0]"
+    let secondKeyWithTwoNestedArrays = "secondKey[1][0][2]"
     let secondKeyWithFourthSeparatorAndIndex = "second$key[1]"
     let thirdKey = "thirdKey"
     let thirdKeyWithDot = "third.Key"
@@ -53,6 +55,20 @@ final class PathTests: XCTestCase {
     func testKeysWithBracketsAndIndex() throws {
         let array: Path = [firstKey, secondKeyWithdot, 1, thirdKey]
         let path = try Path(string: "\(firstKey).(\(secondKeyWithDotAndIndex)).\(thirdKey)")
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testNestedArray() throws {
+        let array: Path = [firstKey, secondKey, 1, 0, thirdKey]
+        let path = try Path(string: "\(firstKey).\(secondKeyWithNestedArray).\(thirdKey)")
+
+        XCTAssertTrue(path == array)
+    }
+
+    func testNestedArrayTwoLevels() throws {
+        let array: Path = [firstKey, secondKey, 1, 0, 2, thirdKey]
+        let path = try Path(string: "\(firstKey).\(secondKeyWithTwoNestedArrays).\(thirdKey)")
 
         XCTAssertTrue(path == array)
     }
