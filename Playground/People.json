@@ -15,6 +15,19 @@
         "video games",
         "party",
         "tennis"
+      ],
+      "running_records": [
+        [
+          10,
+          12,
+          9,
+          10
+        ],
+        [
+          9,
+          12,
+          11
+        ]
       ]
     },
     "Suzanne": {
