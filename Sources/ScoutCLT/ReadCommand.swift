@@ -4,7 +4,18 @@ import Foundation
 
 private let discussion =
 """
-Given the following Json (as input stream or file)
+
+Notes
+=====
+- If the path is invalid, the program will retrun an error
+- Enclose the value with sharp signs to change the key name: #keyName#
+- Enclose the value with slash signs to force the value as a string: /valueAsString/ (useless with XML as XML only has string values)
+- When accessing an array value by its index, use the index -1 to access to the last element
+
+Examples
+========
+
+Given the following Json (as input stream or file):
 
 {
   "people": {
@@ -33,6 +44,7 @@ Examples
 
 - Tom first hobby: "people.Tom.hobbies[0]" will output "cooking"
 - Arnaud height: "people.Arnaud.height" will output "180"
+- Tom first hobby: "people.Tom.hobbies[-1]" will output Tom last hobby: "guitar"
 """
 
 struct ReadCommand: ParsableCommand {

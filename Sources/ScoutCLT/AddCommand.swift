@@ -8,6 +8,7 @@ Notes
 =====
 - All the keys which do not exist in the path will be created
 - Enclose the value with slash signs to force the value as a string: /valueAsString/ (useless with XML as XML only has string values)
+- When adding an element in an array , use the index -1 to add the element at the end of the array
 
 Examples
 ========
@@ -44,6 +45,10 @@ Given the following Json (as input stream or file)
 `scout add "people.Franklin.hobbies[0]"=football` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 
 `scout add "people.Franklin.height"=/165/` will create a new dictionary Franklin and add a height key into it with the String value "165"
+
+More
+====
+You can find more examples here: https://github.com/ABridoux/scout/tree/master/Playground
 """
 
 struct AddCommand: ParsableCommand {

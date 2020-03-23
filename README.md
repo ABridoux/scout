@@ -5,7 +5,7 @@ It was inspired by [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON) and al
 
 ## Why?
 
-With the Foundation libraries to encode/decode Json and Plist, one could ask: why would someone need **Scout**? Simple answer: there are still cases where you do not know the data format. Sometimes, you will just want to read a single value from a Plist file, and you do not want to create the the `struct` to decode this file. Or you simply cannot know the data format at build time.
+With the Foundation libraries to encode/decode Json and Plist, one could ask: why would someone need Scout? Simple answer: there are still cases where you do not know the data format. Sometimes, you will just want to read a single value from a Plist file, and you do not want to create the the `struct` to decode this file. Or you simply cannot know the data format at build time.
 
 ## Context
 I have been working with many Mac admins recently, and many had to deal with Json, Plist and Xml data. While some where using a format-specific library like [jq](https://stedolan.github.io/jq/) to parse Json, others where using **awk**.  Each approach is valid, though it comes with some compromises.
@@ -20,9 +20,7 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 ### Command Line
 
-#### Installing
-
-##### Homebrew
+#### Homebrew
 Use the following command.
 
 ```bash
@@ -31,7 +29,7 @@ brew install ABridoux/formulae/scout
 
 It will **download the executable** from [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip). There is a [known bug](https://github.com/apple/swift-argument-parser/issues/80) which is resolved by using Swift 5.2 but the Xcode version supporting Swift 5.2 is still in [beta](https://developer.apple.com/download/more/). Moreover, I believe that most Homebrew users do not really care about building the program themselves. If I am wrong, please let me know (by opening an [issue](https://github.com/ABridoux/scout/issues) for example). Note that you can still build the program by cloning this git as explained below.
 
-##### Git
+#### Git
 
 Use the following lines to clone the repository and to install **scout** (requires Swift 5.2 toolchain to be installed). You can check the *Makefile* to see the commands used to build and install the executable.
 
@@ -48,7 +46,7 @@ $ cd ..
 $ rm -r Scout
 ```
 
-##### Download
+#### Download
 
 If you cannot use those methods, you can rather download the latest version of the executable [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip).
 After having unzipped the file, you can install it if you want to:
@@ -86,10 +84,17 @@ You can then import the package when needed.
 
 ## Usage examples
 
-#### Some remarks
-- When getting/setting/deleting a value, if a key does not exist in the path, an error will be returned/thrown.
+### Some remarks
+#### Invalid paths
+When getting/setting/deleting a value, if a key does not exist in the path, an error will be returned/thrown.
+
+#### Adding command specificities
 - When adding a value, all the keys which do not exist in the path will be created. Thus, to add a dictionary or an array, you have to specify one child key. Otherwise scout will consider that it is a single value which should be added.
-- <u>Swift package</u>: The type of a value is automatically inferred when setting or adding a key value. You can try to force the type with the `as type` parameter. An error will be thrown if the value is not convertible to the given type.
+- That said: when accessing an array child key using the index `-1` with the `add` command, the program will add a new key rather than accessing the last element of the array.
+- Adding a value to an existing key is the same as using the `set` command.
+
+#### Swift package
+The type of a value is automatically inferred when setting or adding a key value. You can try to force the type with the `as type` parameter. An error will be thrown if the value is not convertible to the given type.
 
 ### Command-line
 Given the following Json (as input stream or file with the `input` option)
@@ -163,7 +168,7 @@ The command
 scout set \
 "people.Tom.height"=190 \
 "people.Arnaud.hobbies[1]"=football \
--i People.json -o People.json
+-m People.json
 ```
  will copy the content in the file *People.json*, modify it and write it back to *People.json*.
 
@@ -174,7 +179,7 @@ scout set \
 "people.Arnaud.hobbies[1]"=football \
 -i People.json -v
 ```
-will output the modified data.
+will output the modified data in the console.
 
 #### Key names containing dots
 
@@ -185,7 +190,7 @@ scout "bundle.(com.company.product).version"
 ```
 
 #### Playground
-You can find the same file *People* using the different available formats in the [Playground folder](Playground). Also an *Example commands* so that you can see how to use the same command to parse the files.
+You can find and try more examples with one file *People* with the different formats available formats in the [Playground folder](Playground). The folder contains an *Example commands* so that you can see how to use the same commands to parse the different formats.
 
 ### Swift
 
