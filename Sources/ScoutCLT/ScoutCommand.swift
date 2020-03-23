@@ -51,24 +51,28 @@ Reading
 -------
 `scout "people.Tom.hobbies[0]"` will output "cooking"
 `scout "people.Arnaud.height"` will output "180"
+`scout "people.Tom.hobbies[-1]"` will output last Tom hobbies: "guitar"
 
 Setting
 -------
 `scout set "people.Tom.hobbies[0]"=basket` will change Tom first hobby from "cooking" to "basket"
 `scout set "people.Arnaud.height"=160` will change Arnaud's height from 180 to 160
 `scout set "people.Tom.age"=#years#` will change Tom age key name from #age# to #years#
+`scout set "people.Tom.hobbies[-1]"="playing music"` will change Tom last hobby from "guitar" to "playing music"
 
 Deleting
 ---------
 `scout delete "people.Tom.height"` will delete Tom height
 `scout delete "people.Tom.hobbies[0]"` will delete Tom first hobby
+`scout delete "people.Tom.hobbies[-1]"` will delete Tom last hobby
 
 Adding
 ------
 `scout add "people.Franklin.height"=165` will create a new dictionary Franklin and add a height key into it with the value 165
 `scout add "people.Tom.hobbies[-1]"=Playing music"` will add the hobby "Playing music" to Tom hobbies at the end of the array
 `scout add "people.Arnaud.hobbies[1]"=reading` will insert the hobby "reading" to Arnaud hobbies between the hobby "video games" and "party"
-`scout add "people.Franklin.hobbies[0]"="football"` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
+`scout add "people.Arnaud.hobbies[-1]"=surf` will add the hobby "surf" to Arnaud hobbies at the end of the array
+`scout add "people.Franklin.hobbies[0]"=football` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 """
 
 struct ScoutCommand: ParsableCommand {

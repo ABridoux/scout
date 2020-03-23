@@ -6,11 +6,14 @@ struct DeleteCommand: ParsableCommand {
 
     // MARK: - Constants
 
-    static let configuration = CommandConfiguration(commandName: "delete", abstract: "Delete a value at a given path")
+    static let configuration = CommandConfiguration(
+        commandName: "delete",
+        abstract: "Delete a value at a given path",
+        discussion: "When accessing an array value by its index, use the index -1 to access to the last element")
 
     // MARK: - Properties
 
-    @Argument(help: PathAndValue.help)
+    @Argument(help: "Paths to indicate the keys to be deleted")
     var readingPaths: [Path]
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
@@ -19,6 +22,9 @@ struct DeleteCommand: ParsableCommand {
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
     var output: String?
 
+    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path")
+    var modifyFilePath: String?
+
     @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
     var verbose: Bool
 
@@ -26,7 +32,7 @@ struct DeleteCommand: ParsableCommand {
 
     func run() throws {
 
-        if let filePath = inputFilePath {
+        if let filePath = modifyFilePath ?? inputFilePath {
             let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
             try delete(from: data)
         } else {
@@ -36,6 +42,7 @@ struct DeleteCommand: ParsableCommand {
     }
 
     func delete(from data: Data) throws {
+        let output = modifyFilePath ?? self.output
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
             try readingPaths.forEach { try json.delete($0) }

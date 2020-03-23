@@ -18,6 +18,19 @@
 			<hobby>party</hobby>
 			<hobby>tennis</hobby>
 		</hobbies>
+		<running_records>
+			<records>
+				<record>10</record>
+				<record>12</record>
+				<record>9</record>
+				<record>10</record>
+			</records>
+			<records>
+				<record>9</record>
+				<record>12</record>
+				<record>11</record>
+			</records>
+		</running_records>
 	</Robert>
 
 	<Suzanne>

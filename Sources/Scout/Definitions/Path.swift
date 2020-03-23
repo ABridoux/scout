@@ -60,9 +60,11 @@ public extension Path {
                 match.removeFirst()
                 match.removeLast()
             }
+            var indexMatches = indexRegex.matches(in: match, options: [], range: match.nsRange)
 
-            // try to get the index if any
-            if let indexMatch = indexRegex.firstMatch(in: match, options: [], range: match.nsRange) {
+            // try to get the indexes if any
+            if let indexMatch = indexMatches.first {
+                // we have a first index, so we can retrieve the array name and the first index
                 guard indexMatch.range.lowerBound > 1 else { throw PathExplorerError.invalidPathElement(match) }
                 // get the array name
                 let newMatch = String(match[0..<indexMatch.range.lowerBound - 1])
@@ -71,6 +73,14 @@ public extension Path {
 
                 elements.append(newMatch)
                 elements.append(index)
+
+                // now retrieve the remaining indexes
+                indexMatches.removeFirst()
+
+                try indexMatches.forEach { indexMatch in
+                    guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
+                    elements.append(index)
+                }
 
             } else {
                 elements.append(match)
@@ -82,7 +92,7 @@ public extension Path {
 
     // MARK: - Functions
 
-    static func ==(lhs: Path, rhs: Path) -> Bool {
+    static func == (lhs: Path, rhs: Path) -> Bool {
         guard lhs.count == rhs.count else { return false }
 
         var isEqual = true

@@ -1,6 +1,6 @@
 import Foundation
 
-enum PathExplorerError: LocalizedError {
+public enum PathExplorerError: LocalizedError {
     case invalidData(SerializationFormat.Type)
     case invalidValue(Any)
     case valueConversionError(value: Any, type: String)
@@ -17,7 +17,7 @@ enum PathExplorerError: LocalizedError {
 
     case underlyingError(String)
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .invalidData(let type): return "Cannot intialize a \(String(describing: type)) object with the given data"
         case .invalidValue(let value): return "The key value \(value) is invalid"

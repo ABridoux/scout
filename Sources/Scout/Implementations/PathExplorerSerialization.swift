@@ -44,12 +44,13 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         return PathExplorerSerialization(value: childValue)
     }
 
-    func get(at index: Int) throws -> Self {
+    /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
+    func get(at index: Int, negativeIndexEnabled: Bool = true) throws -> Self {
         guard let array = value as? [Any] else {
             throw PathExplorerError.arraySubscript(value)
         }
 
-        if index == -1 {
+        if index == -1, negativeIndexEnabled {
             if array.isEmpty {
                 throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
             }
@@ -63,11 +64,12 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         return PathExplorerSerialization(value: array[index])
     }
 
-    func get(element pathElement: PathElement) throws -> Self {
+    /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
+    func get(element pathElement: PathElement, negativeIndexEnabled: Bool = true) throws -> Self {
         if let stringElement = pathElement as? String {
             return try get(for: stringElement)
         } else if let intElement = pathElement as? Int {
-            return try get(at: intElement)
+            return try get(at: intElement, negativeIndexEnabled: negativeIndexEnabled)
         } else {
             // prevent a new type other than int or string to conform to PathElement
             assertionFailure("Only Int and String can be PathElement")
@@ -296,7 +298,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             if index == -1 || array.isEmpty {
                 // add the new value at the end of the array
                 array.append(newValue)
-            } else if index >= 0, array.count > index {
+            } else if index >= 0, array.count >= index {
                 // insert the new value at the index
                 array.insert(newValue, at: index)
             } else {
@@ -334,7 +336,9 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         for (index, pathElement) in pathElements.enumerated() {
             // if the key already exists, retrieve it
-            if let pathExplorer = try? currentPathExplorer.get(element: pathElement) {
+            if let pathExplorer = try? currentPathExplorer.get(element: pathElement, negativeIndexEnabled: false) {
+                // when using the -1 index and adding a value,
+                // we will consider it has to be added, not that it is used to target the last value
                 pathExplorers.append(pathExplorer)
                 currentPathExplorer = pathExplorer
             } else {
@@ -356,7 +360,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
             var pathExplorer = pathExplorer
-            try pathExplorer.add(currentPathExplorer.value, for: element)
+            try pathExplorer.set(element: element, to: currentPathExplorer.value)
             currentPathExplorer = pathExplorer
         }
 
