@@ -61,12 +61,15 @@ struct AddCommand: ParsableCommand {
     @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
     var output: String?
 
+    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path")
+    var modifyFilePath: String?
+
     @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
     var verbose: Bool
 
     func run() throws {
 
-        if let filePath = inputFilePath {
+        if let filePath = modifyFilePath ?? inputFilePath {
             let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
             try add(from: data)
         } else {
@@ -76,6 +79,7 @@ struct AddCommand: ParsableCommand {
     }
 
     func add(from data: Data) throws {
+        let output = modifyFilePath ?? self.output
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
 

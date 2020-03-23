@@ -46,7 +46,7 @@ struct ReadCommand: ParsableCommand {
 
     // MARK: - Properties
 
-    @Argument()
+    @Argument(help: "Path in the data where to read the key value")
     var readingPath: Path
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
