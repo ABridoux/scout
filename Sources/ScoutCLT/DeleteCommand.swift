@@ -6,7 +6,10 @@ struct DeleteCommand: ParsableCommand {
 
     // MARK: - Constants
 
-    static let configuration = CommandConfiguration(commandName: "delete", abstract: "Delete a value at a given path")
+    static let configuration = CommandConfiguration(
+        commandName: "delete",
+        abstract: "Delete a value at a given path",
+        discussion: "When accessing an array value by its index, use the index -1 to access to the last element")
 
     // MARK: - Properties
 

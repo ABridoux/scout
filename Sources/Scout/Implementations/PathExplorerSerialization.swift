@@ -360,7 +360,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
             var pathExplorer = pathExplorer
-            try pathExplorer.add(currentPathExplorer.value, for: element)
+            try pathExplorer.set(element: element, to: currentPathExplorer.value)
             currentPathExplorer = pathExplorer
         }
 

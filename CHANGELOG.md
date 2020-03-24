@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [0.2.2](https://github.com/ABridoux/scout/tree/0.2.2) (24/03/2020)
+
+### Added
+- Github test action
+- Nested array support: `array[0][2]...`
+- CLT [-m | --modify] option to read and write the data from/to the same file
+
+### Fixed
+- Xml value adding when key already existed was not working
+
 ## [0.2.1](https://github.com/ABridoux/scout/tree/0.2.1) (22/03/2020)
 
 ### Added

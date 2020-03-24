@@ -9,10 +9,10 @@ Notes
 - If the path is invalid, the program will retrun an error
 - Enclose the value with sharp signs to change the key name: #keyName#
 - Enclose the value with slash signs to force the value as a string: /valueAsString/ (useless with XML as XML only has string values)
+- When accessing an array value by its index, use the index -1 to access to the last element
 
 Examples
 ========
-
 
 Given the following XML (as input stream or file)
 
@@ -38,7 +38,12 @@ Given the following XML (as input stream or file)
 
 `scout set "urlset[1].changefreq"=yearly` "urlset[0].priority"=2.0` will change both he second url #changefreq# key value to "yearly" and the first url #priority# key value to 2.0.0
 
+`scout set "urlset[-1].priority"=2.0` will change the last url #priority# key value to 2.0.0
+
 `scout set "urlset[0].changefreq"=#frequence#` will change the first url #changefreq# key name to #frequence#
+
+`scout set "urlset[0].priority"=/2.0/` will change the first url #priority# key value to the String value "2.0.0"
+
 """
 
 struct SetCommand: ParsableCommand {
