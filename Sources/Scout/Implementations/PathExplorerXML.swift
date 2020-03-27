@@ -7,15 +7,19 @@ public struct PathExplorerXML {
 
     var element: AEXMLElement
 
+    public var readingPath = Path()
+
     // MARK: - Initialization
 
     public init(data: Data) throws {
         let document = try AEXMLDocument(xml: data)
         element = document.root
+        readingPath.append(element.name)
     }
 
-    init(element: AEXMLElement) {
+    init(element: AEXMLElement, path: Path) {
         self.element = element
+        readingPath = path
     }
 
     public init(value: Any) {
@@ -31,17 +35,17 @@ public struct PathExplorerXML {
 
         if negativeIndexEnabled, index == -1 {
             guard let last = element.children.last else {
-                throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: element.children.count)
+                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: element.children.count)
             }
 
-            return PathExplorerXML(element: last)
+            return PathExplorerXML(element: last, path: readingPath.appending(index))
         }
 
         guard element.children.count > index, index >= 0 else {
-            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: element.children.count)
+            throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: element.children.count)
         }
 
-        return PathExplorerXML(element: element.children[index])
+        return PathExplorerXML(element: element.children[index], path: readingPath.appending(index))
     }
 
     func get(for key: String) throws  -> PathExplorerXML {
@@ -50,9 +54,9 @@ public struct PathExplorerXML {
         } else {
             let child = element[key]
             guard child.error == nil else {
-                throw PathExplorerError.subscriptMissingKey(key)
+                throw PathExplorerError.subscriptMissingKey(readingPath, key)
             }
-            return PathExplorerXML(element: element[key])
+            return PathExplorerXML(element: element[key], path: readingPath.appending(key))
         }
     }
 
@@ -73,7 +77,7 @@ public struct PathExplorerXML {
 
     mutating func set(index: Int, to newValue: String) throws {
         guard element.children.count > index, index >= 0 else {
-            throw PathExplorerError.arraySubscript(element.xml)
+            throw PathExplorerError.arraySubscript(readingPath)
         }
 
         element.children[index].value = newValue
