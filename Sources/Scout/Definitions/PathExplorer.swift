@@ -31,6 +31,9 @@ where
 
     var format: DataFormat { get }
 
+    /// The path leading to the PathExplorer: firstKey.secondKey[index].thirdKey...
+    var readingPath: Path { get }
+
     // MARK: - Initialization
 
     init(data: Data) throws
