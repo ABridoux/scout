@@ -88,40 +88,17 @@ struct AddCommand: ParsableCommand {
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
 
-            try pathsAndValues.forEach {
-                switch $0.forceString {
-                case true:
-                    try json.add($0.value, at: $0.readingPath, as: .string)
-                case false:
-                    try json.add($0.value, at: $0.readingPath)
-                }
-            }
-
+            try add(pathsAndValues, to: &json)
             try ScoutCommand.output(output, dataWith: json, verbose: verbose)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
 
-            try pathsAndValues.forEach {
-                switch $0.forceString {
-                case true:
-                    try plist.add($0.value, at: $0.readingPath, as: .string)
-                case false:
-                    try plist.add($0.value, at: $0.readingPath)
-                }
-            }
-
+            try add(pathsAndValues, to: &plist)
             try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
 
-            try pathsAndValues.forEach {
-                switch $0.forceString {
-                case true:
-                    try xml.add($0.value, at: $0.readingPath, as: .string)
-                case false:
-                    try xml.add($0.value, at: $0.readingPath)
-                }
-            }
+            try add(pathsAndValues, to: &xml)
             try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
 
         } else {
@@ -129,6 +106,23 @@ struct AddCommand: ParsableCommand {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
             } else {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
+            }
+        }
+    }
+
+    func add<Explorer: PathExplorer>(_ pathsAndValues: [PathAndValue], to explorer: inout Explorer) throws {
+        try pathsAndValues.forEach { pathAndValue in
+            let (path, value) = (pathAndValue.readingPath, pathAndValue.value)
+
+            if let forceType = pathAndValue.forceType {
+                switch forceType {
+                case .string: try explorer.add(value, at: path, as: .string)
+                case .real: try explorer.add(value, at: path, as: .real)
+                case .int: try explorer.add(value, at: path, as: .int)
+                case .bool: try explorer.add(value, at: path, as: .bool)
+                }
+            } else {
+                try explorer.add(value, at: path)
             }
         }
     }

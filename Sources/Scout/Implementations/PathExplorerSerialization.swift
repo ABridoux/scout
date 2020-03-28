@@ -422,6 +422,14 @@ extension PathExplorerSerialization: PathExplorer {
         try get(pathElements)
     }
 
+    public func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T {
+        try T(value: get(path).value)
+    }
+
+    public func get<T: KeyAllowedType>(_ pathElements: PathElement..., as type: KeyType<T>) throws -> T {
+        try T(value: get(pathElements).value)
+    }
+
     // MARK: Set
 
     public mutating func set(_ path: [PathElement], to newValue: Any) throws {
