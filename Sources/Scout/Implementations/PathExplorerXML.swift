@@ -241,7 +241,6 @@ public struct PathExplorerXML {
 }
 
 extension PathExplorerXML: PathExplorer {
-
     public var string: String? { element.string }
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
@@ -267,6 +266,19 @@ extension PathExplorerXML: PathExplorer {
         }
 
         return currentPathExplorer
+    }
+
+    public func get<T>(_ path: Path, as type: KeyType<T>) throws -> T where T: KeyAllowedType {
+        let explorer = try get(path)
+
+        guard let value = explorer.element.value else {
+            throw PathExplorerError.underlyingError("Program error. No value at '\(path.description)' although the path is valid.")
+        }
+        return try T(value: value)
+    }
+
+    public func get<T>(_ pathElements: PathElement..., as type: KeyType<T>) throws -> T where T: KeyAllowedType {
+        try get(pathElements, as: type)
     }
 
     // MARK: Set

@@ -91,6 +91,10 @@ final class PathExplorerTestsIntegration: XCTestCase {
         testPathExplorersSet(path: robertRunningRecordsSecondFirst, value: 25)
     }
 
+    func setKeyName() {
+        testPathExplorersSet(path: tomHeight, keyName: "centimer")
+    }
+
     // MARK: Delete
 
     func testDeleteDictKey() {

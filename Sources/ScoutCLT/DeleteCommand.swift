@@ -45,14 +45,17 @@ struct DeleteCommand: ParsableCommand {
         let output = modifyFilePath ?? self.output
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
+
             try readingPaths.forEach { try json.delete($0) }
             try ScoutCommand.output(output, dataWith: json, verbose: verbose)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
+
             try readingPaths.forEach { try plist.delete($0) }
             try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
+
             try readingPaths.forEach { try xml.delete($0) }
             try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
 

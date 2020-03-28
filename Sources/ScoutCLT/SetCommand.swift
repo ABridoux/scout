@@ -42,7 +42,7 @@ Given the following XML (as input stream or file)
 
 `scout set "urlset[0].changefreq"=#frequence#` will change the first url #changefreq# key name to #frequence#
 
-`scout set "urlset[0].priority"=/2.0/` will change the first url #priority# key value to the String value "2.0.0"
+`scout set "urlset[0].priority"=/2.0/` will change the first url #priority# key value to the String value "2.0"
 
 """
 
@@ -82,53 +82,18 @@ struct SetCommand: ParsableCommand {
         let output = modifyFilePath ?? self.output
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
-            try pathsAndValues.forEach {
 
-                if $0.changeKey {
-                    try json.set($0.readingPath, keyNameTo: $0.value)
-                } else {
-                    switch $0.forceString {
-                    case true:
-                        try json.set($0.readingPath, to: $0.value, as: .string)
-                    case false:
-                        try json.set($0.readingPath, to: $0.value)
-                    }
-                }
-            }
-
+            try set(pathsAndValues, in: &json)
             try ScoutCommand.output(output, dataWith: json, verbose: verbose)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
-            try pathsAndValues.forEach {
-                if $0.changeKey {
-                    try plist.set($0.readingPath, keyNameTo: $0.value)
-                } else {
-                    switch $0.forceString {
-                    case true:
-                        try plist.set($0.readingPath, to: $0.value, as: .string)
-                    case false:
-                        try plist.set($0.readingPath, to: $0.value)
-                    }
-                }
-            }
 
+            try set(pathsAndValues, in: &plist)
             try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
-            try pathsAndValues.forEach {
 
-                if $0.changeKey {
-                    try xml.set($0.readingPath, keyNameTo: $0.value)
-                } else {
-                    switch $0.forceString {
-                    case true:
-                        try xml.set($0.readingPath, to: $0.value, as: .string)
-                    case false:
-                        try xml.set($0.readingPath, to: $0.value)
-                    }
-                }
-            }
-
+            try set(pathsAndValues, in: &xml)
             try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
 
         } else {
@@ -136,6 +101,28 @@ struct SetCommand: ParsableCommand {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
             } else {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
+            }
+        }
+    }
+
+    func set<Explorer: PathExplorer>(_ pathAndValues: [PathAndValue], in explorer: inout Explorer) throws {
+        for pathAndValue in pathAndValues {
+            let (path, value) = (pathAndValue.readingPath, pathAndValue.value)
+
+            if pathAndValue.changeKey {
+                try explorer.set(path, keyNameTo: value)
+                continue
+            }
+
+            if let forceType = pathAndValue.forceType {
+                switch forceType {
+                case .string: try explorer.set(path, to: value, as: .string)
+                case .real: try explorer.set(path, to: value, as: .real)
+                case .int: try explorer.set(path, to: value, as: .int)
+                case .bool: try explorer.set(path, to: value, as: .bool)
+                }
+            } else {
+                try explorer.set(path, to: value)
             }
         }
     }
