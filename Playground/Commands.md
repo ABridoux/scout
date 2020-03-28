@@ -32,7 +32,8 @@ scout "people.Robert.running_records[1][0]" -i People.json
 
 ## Set
 - Will output an error if a key in the given path does not exist.
-- You can set multiple value in one command. The `-v` flag is specified to let you see the modified data.
+- You can set multiple values in one command.
+- The `-v` flag is specified to let you see the modified data.
 
  Set Robert age to: 60
 ```bash
@@ -48,7 +49,7 @@ scout set "people.Suzanne.movies[1].title"="Never gonna die" -i People.json -v
 ```bash
 scout set \
 "people.Tom.hobbies[-1]"="playing music" \
-"people.Suzanne.job"="comedian" \
+"people.Suzanne.job"=comedian \
 -i People.plist -v
 ```
 
@@ -59,16 +60,24 @@ scout set "people.Robert.running_records[0][2]"=15 -i People.xml -v
 
  Set Tom height to the **String** value: 165
 ```bash
-scout set "people.Tom.height"=/165/ -i People.json -v
+scout set "people.Tom.height=/165/" -i People.json -v
 ```
+
+Set Tom height to the **Real** value: 165 (only usfeul for Plist files, as Json does not care about integer/real and Xml has only string values)
+```bash
+scout set "people.Tom.height=~165~" -i People.plist -v
+```
+
  Set Tom height key name to "centimeters"
 ```bash
-scout set "people.Tom.height"=#centimeters# -i People.json -v
+scout set "people.Tom.height=#centimeters#" -i People.json -v
 ```
+
 
 ## Delete
 
-- Will output an error if a key in the given path does not exist. 
+- Will output an error if a key in the given path does not exist.
+- You can delete multiple values in one command.
 - The `-v` flag is specified to let you see the modified data.
 
  Delete Robert second hobby
@@ -96,7 +105,7 @@ scout delete "people.Robert.running_records[0][2]" -i People.plist -v
 ## Add
 - If a key in the given path does not exist, it will be created. Thus, to add a dictionary or an array, you have to specify one child key. Otherwise scout will consider that it is a single value which should be added.
 - That said, using the index `-1` to specify the end of an array with the `add` command will make the program add a new key rather than read the last value of the array (like it does for the other commands). 
-- You can set multiple value in one command.
+- You can set multiple values in one command.
 -  The `-v` flag is specified to let you see the modified data.
 
  Add a surname for Robert: Bob
@@ -131,5 +140,5 @@ scout add "people.Robert.running_records[-1][0]"=15 -i People.json -v
 
  Add a new **String** value at the end the array to Robert running records first record
 ```bash
-scout add "people.Robert.running_records[0][-1]"=/15/ -i People.json -v
+scout add "people.Robert.running_records[0][-1]=/15/" -i People.json -v
 ```

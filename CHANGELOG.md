@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [0.3.0](https://github.com/ABridoux/scout/tree/0.3.0) (28/03/2020)
+
+### Added
+- Reading path for subscript errors. A subscript error now shows precisely where the error occurs.
+- CLT force type. Possibility to try to force a type when setting/adding a value. `~25~` for reals, `<25>` for integers and `?Yes?` for booleans.
+- Possibility to initialise a boolean with string values like 'y", "NO", "t", "True"...
+- `PathExplorer` generic `get` functions to try to convert to a `KeyAllowedType` type.
+
+### Fixed
+- It was not possible to initialise a `Path` starting with an array subscript like '[1].key1.key2'
+
 ## [0.2.2](https://github.com/ABridoux/scout/tree/0.2.2) (24/03/2020)
 
 ### Added
@@ -53,7 +64,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 - Refactored the `PathExplorerSerialization` and `PahExplorerXml`
 
 ### Fixed
-- Command-line tool ""----input"" long option to specify a file input fixed to "--input"
+- Command-line tool "----input" long option to specify a file input fixed to "--input"
 
 ## [0.1.3](https://github.com/ABridoux/scout/tree/0.1.3) (17/03/2020)
 

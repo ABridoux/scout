@@ -5,7 +5,7 @@ enum RuntimeError: LocalizedError {
     case noValueAt(path: String)
     case unknownFormat(String)
 
-    var errorDescription: String {
+    var errorDescription: String? {
         switch self {
         case .invalidData(let description): return description
         case .noValueAt(let path): return "No single value at '\(path)'. Either Dictionary or Array to subscript."
