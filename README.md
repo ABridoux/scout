@@ -14,14 +14,9 @@
     <a>
     <img src="https://img.shields.io/badge/install-pkg%2Bzip-blue" />
     </a>
-    <a>
-    <img src="https://img.shields.io/github/downloads/ABridoux/scout/latest/total" />
-    </a>
-    <br/>
-    <img src="https://img.shields.io/github/v/tag/ABridoux/scout" />
 </p>
 
-# Scout
+# Scout <a><img src="https://img.shields.io/github/v/tag/ABridoux/scout"/></a>
 
 This library aims to make specific formats data values reading and writing simple when the data format is not known at build time.
 It was inspired by [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON) and all the projects that followed, while trying to cover more ground, like Xml or Plist. It unifies writing and reading for those different formats. Getting a value in a Json format would be the same as getting a value in a Xml format.
@@ -225,24 +220,24 @@ scout "bundle.(com.company.product).version"
 When setting or adding a value, scout will automatically infer the value type. For example, `true` will be interpreted as a boolean, and `25.3` as a real.  That said, you can ask scout to try to force a type when setting or adding a value. This is useful to force a number to be interpreted as a string for example, if the key has to be a string. This type enforcing is not useful for all types and all formats. Xml for example only has string values. Finally, the program will return an error if the value cannot be converted to the given type. For example `Hello` cannot be converted as an Integer, nor a Real. Here is the syntax for each type:
 
 ##### String
-`/value`
-Example: `scout set "path=/valueToConvertToString/"`
+`/value/`<br>
+Example: `scout set "path=/valueToConvertToString/"`<br>
 Useful for Plist and Json
 
 ##### Boolean
-`?value?`
- Example: `scout add "path=?valueToConvertToBoolean?"`.
- Useful for Plist and Json
+`?value?`<br>
+ Example: `scout add "path=?valueToConvertToBoolean?"`<br>
+ Useful for Plist and Json<br>
  Available **recognised boolean strings**: "y", "yes", "Y", "Yes", "YES", "t", "true", "T", "True", "TRUE", "n", "no", "N", "No", "NO", "f", "false", "F", "False", "FALSE"
  
  ##### Real
-`~value~`
-Example: `scout add "path=~valueToConvertToReal~"`
+`~value~`<br>
+Example: `scout add "path=~valueToConvertToReal~"`<br>
 Useful for Plist
 
 ##### Integer
-`<value>`
-Example: `scout set "path=<valueToConvertToInteger>"`
+`<value>`<br>
+Example: `scout set "path=<valueToConvertToInteger>"`<br>
 Useful for Plist
 
 ### Swift
