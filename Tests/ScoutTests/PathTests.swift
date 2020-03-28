@@ -100,4 +100,11 @@ final class PathTests: XCTestCase {
 
         XCTAssertTrue(path == array)
     }
+
+    func testRootElementArray() throws {
+        let array: Path = [1, firstKey, secondKey]
+        let path = try Path(string: "[1].\(firstKey).\(secondKey)")
+
+        XCTAssertTrue(path == array)
+    }
 }

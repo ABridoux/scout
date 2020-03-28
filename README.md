@@ -1,3 +1,26 @@
+<p align="center">
+    <img src="https://img.shields.io/badge/Swift-5.1-orange.svg" />
+    <a href="https://swift.org/package-manager">
+        <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
+    </a>
+    <a>
+    <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift" />
+    </a>
+    <br/>
+     <img src="https://img.shields.io/badge/platforms-mac+linux-brightgreen.svg?style=flat" alt="Mac + Linux" />
+    </a>
+    <a>
+    </a>
+    <a>
+    <img src="https://img.shields.io/badge/install-pkg%2Bzip-blue" />
+    </a>
+    <a>
+    <img src="https://img.shields.io/github/downloads/ABridoux/scout/latest/total" />
+    </a>
+    <br/>
+    <img src="https://img.shields.io/github/v/tag/ABridoux/scout" />
+</p>
+
 # Scout
 
 This library aims to make specific formats data values reading and writing simple when the data format is not known at build time.
@@ -26,8 +49,7 @@ Use the following command.
 ```bash
 brew install ABridoux/formulae/scout
 ```
-
-It will **download the executable** from [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip). There is a [known bug](https://github.com/apple/swift-argument-parser/issues/80) which is resolved by using Swift 5.2 but the Xcode version supporting Swift 5.2 is still in [beta](https://developer.apple.com/download/more/). Moreover, I believe that most Homebrew users do not really care about building the program themselves. If I am wrong, please let me know (by opening an [issue](https://github.com/ABridoux/scout/issues) for example). Note that you can still build the program by cloning this git as explained below.
+It will **download the notarized executable** from [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip). I believe that most Homebrew users do not really care about building the program themselves. If I am wrong, please let me know (by opening an [issue](https://github.com/ABridoux/scout/issues) for example). Note that you can still build the program by cloning this git as explained below.
 
 #### Git
 
@@ -48,8 +70,7 @@ $ rm -r Scout
 
 #### Download
 
-If you cannot use those methods, you can rather download the latest version of the executable [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip).
-After having unzipped the file, you can install it if you want to:
+If you cannot use those methods, you can rather download the latest version of the executable [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip). Note that the **executable is notarized**. After having unzipped the file, you can install it if you want to:
 
 ```bash
 install scout /usr/local/bin/ 
@@ -66,7 +87,9 @@ install scout /usr/local/bin && \
 rm scout
 ```
 
-<u>Note</u>: You can find all the scout executable versions [here](https://github.com/ABridoux/scout/wiki/Scout-versions-download).
+Also, a notarized [scout package](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.pkg) is provided.
+
+<u>Note</u>: To find all scout versions, please browse the [releases](https://github.com/ABridoux/scout/releases) page.
 
 ### Swift package
 
@@ -97,6 +120,11 @@ When getting/setting/deleting a value, if a key does not exist in the path, an e
 The type of a value is automatically inferred when setting or adding a key value. You can try to force the type with the `as type` parameter. An error will be thrown if the value is not convertible to the given type.
 
 ### Command-line
+
+#### Playground
+You can find and try examples with one file *People* using the different available formats in the [Playground folder](Playground). The folder contains an *Example commands* file so that you can see how to use the same commands to parse the different formats.
+
+#### Examples
 Given the following Json (as input stream or file with the `input` option)
 
 ```json
@@ -131,13 +159,15 @@ Given the following Json (as input stream or file with the `input` option)
 ##### Setting
 `scout set "people.Tom.hobbies[0]"=basket` will change Tom first hobby from "cooking" to "basket"
 
-`scout set "people.Arnaud.height"=160` will change Arnaud's height from 180 to 160
+`scout set "people.Arnaud.height=160"` will change Arnaud's height from 180 to 160
 
-`scout set "people.Tom.hobbies[0]"=basket "people.Arnaud.height"=160` will change Tom first hobby from "cooking" to "basket" **and** change Arnaud's height from 180 to 160
+`scout set "people.Tom.hobbies[0]=basket" "people.Arnaud.height"=160` will change Tom first hobby from "cooking" to "basket" **and** change Arnaud's height from 180 to 160
 
-`scout set "people.Tom.age"=#years#` will change Tom age key name from #age# to #years#
+`scout set "people.Tom.age=#years#"` will change Tom age key name from #age# to #years#
 
-`scout set "people.Tom.height"=/175/` will change Tom height from 180 to a **String value** "175"
+`scout set "people.Tom.height=/175/"` will change Tom height from 180 to a **String value** "175"
+
+`scout set "people.Tom.height=~175~"` will change Tom height from 180 to a **Real value** 175
 
 ##### Deleting
 `scout delete "people.Tom.height"` will delete Tom height
@@ -153,6 +183,8 @@ Given the following Json (as input stream or file with the `input` option)
 `scout add "people.Franklin.hobbies[0]"=football` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 
 `scout add "people.Franklin.height"=/165/` will create a new dictionary Franklin and add a height key into it with the **String value** "165"
+
+`scout set "people.Tom.isChild"=true` or `scout set "people.Tom.isChild=?y?"` will add a key #isChild# to Tom dictionary with the value `true`
 
 #### Options
 Each command will have several options, like the possibility to output the modified data to string or into a file.
@@ -189,8 +221,29 @@ If a key name contains dots, e.g. `com.company.product`, you can enclose it betw
 scout "bundle.(com.company.product).version"
 ```
 
-#### Playground
-You can find and try more examples with one file *People* with the different formats available formats in the [Playground folder](Playground). The folder contains an *Example commands* so that you can see how to use the same commands to parse the different formats.
+#### Forcing a type
+When setting or adding a value, scout will automatically infer the value type. For example, `true` will be interpreted as a boolean, and `25.3` as a real.  That said, you can ask scout to try to force a type when setting or adding a value. This is useful to force a number to be interpreted as a string for example, if the key has to be a string. This type enforcing is not useful for all types and all formats. Xml for example only has string values. Finally, the program will return an error if the value cannot be converted to the given type. For example `Hello` cannot be converted as an Integer, nor a Real. Here is the syntax for each type:
+
+##### String
+`/value`
+Example: `scout set "path=/valueToConvertToString/"`
+Useful for Plist and Json
+
+##### Boolean
+`?value?`
+ Example: `scout add "path=?valueToConvertToBoolean?"`.
+ Useful for Plist and Json
+ Available **recognised boolean strings**: "y", "yes", "Y", "Yes", "YES", "t", "true", "T", "True", "TRUE", "n", "no", "N", "No", "NO", "f", "false", "F", "False", "FALSE"
+ 
+ ##### Real
+`~value~`
+Example: `scout add "path=~valueToConvertToReal~"`
+Useful for Plist
+
+##### Integer
+`<value>`
+Example: `scout set "path=<valueToConvertToInteger>"`
+Useful for Plist
 
 ### Swift
 

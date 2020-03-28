@@ -10,6 +10,8 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     var isDictionary: Bool { value is [String: Any] }
     var isArray: Bool { value is [Any] }
 
+    public var readingPath = Path()
+
     // MARK: - Initialization
 
     public init(data: Data) throws {
@@ -28,40 +30,45 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         self.value = value
     }
 
+    init(value: Any, path: Path) {
+        self.value = value
+        readingPath = path
+    }
+
     // MARK: - Functions
 
     // MARK: Get
 
     func get(for key: String) throws -> Self {
         guard let dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(value)
+            throw PathExplorerError.dictionarySubscript(readingPath)
         }
 
         guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(key)
+            throw PathExplorerError.subscriptMissingKey(readingPath, key)
         }
 
-        return PathExplorerSerialization(value: childValue)
+        return PathExplorerSerialization(value: childValue, path: readingPath.appending(key))
     }
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(at index: Int, negativeIndexEnabled: Bool = true) throws -> Self {
         guard let array = value as? [Any] else {
-            throw PathExplorerError.arraySubscript(value)
+            throw PathExplorerError.arraySubscript(readingPath)
         }
 
         if index == -1, negativeIndexEnabled {
             if array.isEmpty {
-                throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
             }
-            return PathExplorerSerialization(value: array[array.count - 1])
+            return PathExplorerSerialization(value: array[array.count - 1], path: readingPath.appending(index))
         }
 
         guard array.count > index, index >= 0 else {
-            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+            throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
         }
 
-        return PathExplorerSerialization(value: array[index])
+        return PathExplorerSerialization(value: array[index], path: readingPath.appending(index))
     }
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
@@ -91,11 +98,11 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     mutating func set(key: String, to newValue: Any) throws {
         guard var dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(value)
+            throw PathExplorerError.dictionarySubscript(readingPath)
         }
 
         guard dict[key] != nil else {
-            throw PathExplorerError.subscriptMissingKey(key)
+            throw PathExplorerError.subscriptMissingKey(readingPath, key)
         }
 
         dict[key] = newValue
@@ -104,7 +111,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     mutating func set(index: Int, to newValue: Any) throws {
         guard var array = value as? [Any] else {
-            throw PathExplorerError.arraySubscript(value)
+            throw PathExplorerError.arraySubscript(readingPath)
         }
 
         if index == -1 {
@@ -114,7 +121,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         }
 
         guard array.count > index, index >= 0 else {
-            throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+            throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
         }
 
         array[index] = newValue
@@ -169,11 +176,11 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     mutating func change(key: String, nameTo newKeyName: String) throws {
         guard var dict = value as? [String: Any] else {
-            throw PathExplorerError.dictionarySubscript(String(describing: value))
+            throw PathExplorerError.dictionarySubscript(readingPath)
         }
 
         guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(key)
+            throw PathExplorerError.subscriptMissingKey(readingPath, key)
         }
 
         dict[newKeyName] = childValue
@@ -214,11 +221,11 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     mutating func delete(element: PathElement) throws {
         if let key = element as? String {
             guard var dict = value as? [String: Any] else {
-                throw PathExplorerError.dictionarySubscript(value)
+                throw PathExplorerError.dictionarySubscript(readingPath)
             }
 
             guard dict[key] != nil else {
-                throw PathExplorerError.subscriptMissingKey(key)
+                throw PathExplorerError.subscriptMissingKey(readingPath, key)
             }
 
             dict.removeValue(forKey: key)
@@ -226,12 +233,12 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         } else if let index = element as? Int {
             guard var array = value as? [Any] else {
-                throw PathExplorerError.arraySubscript(value)
+                throw PathExplorerError.arraySubscript(readingPath)
             }
 
             if index == -1 {
                 guard !array.isEmpty else {
-                    throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+                    throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
                 }
                 array.removeLast()
                 value = array
@@ -239,7 +246,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             }
 
             guard 0 <= index, index < array.count else {
-                throw PathExplorerError.subscriptWrongIndex(index: index, arrayCount: array.count)
+                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
             }
 
             array.remove(at: index)
@@ -285,14 +292,14 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         if var dict = value as? [String: Any] {
             guard let key = element as? String else {
-                throw PathExplorerError.dictionarySubscript(value)
+                throw PathExplorerError.dictionarySubscript(readingPath)
             }
             dict[key] = newValue
             value = dict
 
         } else if var array = value as? [Any] {
             guard let index = element as? Int else {
-                throw PathExplorerError.arraySubscript(value)
+                throw PathExplorerError.arraySubscript(readingPath)
             }
 
             if index == -1 || array.isEmpty {
@@ -413,6 +420,14 @@ extension PathExplorerSerialization: PathExplorer {
 
     public func get(_ pathElements: PathElement...) throws -> Self {
         try get(pathElements)
+    }
+
+    public func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T {
+        try T(value: get(path).value)
+    }
+
+    public func get<T: KeyAllowedType>(_ pathElements: PathElement..., as type: KeyType<T>) throws -> T {
+        try T(value: get(pathElements).value)
     }
 
     // MARK: Set

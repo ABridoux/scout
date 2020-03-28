@@ -11,14 +11,21 @@ public extension Path {
         var description = ""
         forEach {
             if let int = $0 as? Int {
+                // remove the point added automatically to a path element
+                if description.hasSuffix(".") {
+                    description.removeLast()
+                }
                 description.append("[\(int)]")
-                description.append("->")
             } else {
                 description.append(String(describing: $0))
             }
+
+            description.append(".")
         }
-        // remove the last arrow
-        description.removeLast(2)
+        // remove the last point if any
+        if description.hasSuffix(".") {
+            description.removeLast()
+        }
         return description
     }
 
@@ -65,6 +72,12 @@ public extension Path {
             // try to get the indexes if any
             if let indexMatch = indexMatches.first {
                 // we have a first index, so we can retrieve the array name and the first index
+                if indexMatch.range.lowerBound == 1 {
+                    // specific case: the root element is an array
+                    guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
+                    elements.append(index)
+                    continue
+                }
                 guard indexMatch.range.lowerBound > 1 else { throw PathExplorerError.invalidPathElement(match) }
                 // get the array name
                 let newMatch = String(match[0..<indexMatch.range.lowerBound - 1])
@@ -109,5 +122,12 @@ public extension Path {
             }
         }
         return isEqual
+    }
+
+    func appending(_ element: PathElement) -> Path {
+        var newPath = self
+        newPath.append(element)
+
+        return newPath
     }
 }

@@ -18,6 +18,8 @@ final class PathExplorerSerializationTests: XCTestCase {
         let animals = Animals()
     }
 
+    let ducks = ["Riri", "Fifi", "Loulou"]
+
     // MARK: - Functions
 
     func testInit() throws {
@@ -82,6 +84,16 @@ final class PathExplorerSerializationTests: XCTestCase {
         try plist.set(path, to: newValue)
 
         XCTAssertEqual(try plist.get(path).string, newValue)
+    }
+
+    func testDecodeRootArray() throws {
+        let data = try PropertyListEncoder().encode(ducks)
+        let plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let second: [PathElement] = [1]
+        let last: [PathElement] = [-1]
+
+        XCTAssertEqual(try plist.get(second).string, "Fifi")
+        XCTAssertEqual(try plist.get(last).string, "Loulou")
     }
 
     func testSetKeyName() throws {

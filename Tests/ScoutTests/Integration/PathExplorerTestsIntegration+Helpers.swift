@@ -7,22 +7,8 @@ extension PathExplorerTestsIntegration {
 
     func testGet<Explorer: PathExplorer, Value: KeyAllowedType>(path: Path, explorer: Explorer, value: Value, file: StaticString = #file, line: UInt = #line) {
         do {
-            switch value {
-            case let stringValue as String:
-                let value = try explorer.get(path).string
-                XCTAssertEqual(value, stringValue, "\(explorer.format): \(value?.description ?? "nil") is not equal to \(stringValue)", file: file, line: line)
-            case let intValue as Int:
-                let value = try explorer.get(path).int
-                XCTAssertEqual(value, intValue, "\(explorer.format): \(value?.description ?? "nil") is not equal to \(intValue)", file: file, line: line)
-            case let doubleValue as Double:
-                let value = try explorer.get(path).real
-                XCTAssertEqual(value, doubleValue, "\(explorer.format): \(value?.description ?? "nil") is not equal to \(doubleValue)", file: file, line: line)
-            case let boolValue as Bool:
-                let value = try explorer.get(path).bool
-                XCTAssertEqual(value, boolValue, "\(explorer.format): \(value?.description ?? "nil") is not equal to \(boolValue)", file: file, line: line)
-            default:
-                assertionFailure("Value not a KeyAllowedType")
-            }
+            let foundValue = try explorer.get(path, as: .init(Value.self))
+            XCTAssertEqual(value, foundValue)
         } catch {
             XCTFail("\(explorer.format): \(error.localizedDescription)", file: file, line: line)
         }
@@ -52,6 +38,24 @@ extension PathExplorerTestsIntegration {
         testSet(path: path, explorer: json, value: value, file: file, line: line)
         testSet(path: path, explorer: plist, value: value, file: file, line: line)
         testSet(path: path, explorer: xml, value: value, file: file, line: line)
+    }
+
+    func testPathExplorersSet<Explorer: PathExplorer>(path: Path, explorer: Explorer, keyName: String, file: StaticString = #file, line: UInt = #line) {
+        var explorer = explorer
+        do {
+            let value = try explorer.get(path).stringValue
+            try explorer.set(path, keyNameTo: keyName)
+            XCTAssertEqual(value, try explorer.get(path).stringValue)
+        } catch {
+            XCTFail("\(explorer.format): \(error.localizedDescription)", file: file, line: line)
+            return
+        }
+    }
+
+    func testPathExplorersSet(path: Path, keyName: String, file: StaticString = #file, line: UInt = #line) {
+        testPathExplorersSet(path: path, explorer: json, keyName: keyName, file: file, line: line)
+        testPathExplorersSet(path: path, explorer: plist, keyName: keyName, file: file, line: line)
+        testPathExplorersSet(path: path, explorer: xml, keyName: keyName, file: file, line: line)
     }
 
     // MARK: - Delete

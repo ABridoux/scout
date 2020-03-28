@@ -7,7 +7,7 @@ Let you specify a reading path with an associated value. Like this: `FirstKey.Se
 or `"FirstKey[Index]"="Text value with spaces"`
 """
 
-/// Represent a reading path and an associated value, like `path->components->[0]:value`.
+/// Represents a reading path and an associated value, like `path.component[0]=value`.
 /// Putting the value between sharp signs `#value#` indicates a key name modification
 struct PathAndValue: ExpressibleByArgument {
 
@@ -26,6 +26,8 @@ struct PathAndValue: ExpressibleByArgument {
     /// Set to `true` when the key value should be considered as a `string` no matter what it is
     var forceString = false
 
+    var forceType: ValueType?
+
     init?(argument: String) {
         let splitted = argument.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: true)
         guard
@@ -38,18 +40,30 @@ struct PathAndValue: ExpressibleByArgument {
         self.readingPath = readingPath
 
         var value = String(splitted[1])
+        var shouldRemoveEnds = false
+
         if value.hasPrefix("#"), value.hasSuffix("#") {
-            value.removeFirst()
-            value.removeLast()
-            self.value = value
+            shouldRemoveEnds = true
             changeKey = true
         } else if value.hasSuffix("/"), value.hasPrefix("/") {
+            shouldRemoveEnds = true
+            forceType = .string
+        } else if value.hasSuffix("~"), value.hasPrefix("~") {
+            shouldRemoveEnds = true
+            forceType = .real
+        } else if value.hasPrefix("<"), value.hasSuffix(">") {
+            shouldRemoveEnds = true
+            forceType = .int
+        } else if value.hasPrefix("?"), value.hasSuffix("?") {
+            shouldRemoveEnds = true
+            forceType = .bool
+        }
+
+        if shouldRemoveEnds {
             value.removeFirst()
             value.removeLast()
-            self.value = value
-            forceString = true
-        } else {
-            self.value = value
         }
+
+        self.value = value
     }
 }

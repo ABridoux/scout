@@ -7,7 +7,10 @@ private let discussion =
 Notes
 =====
 - All the keys which do not exist in the path will be created
-- Enclose the value with slash signs to force the value as a string: /valueAsString/ (useless with XML as XML only has string values)
+- Enclose the value with slash signs to force the value as a string: /valueAsString/ (Plist, Json)
+- Enclose the value with interrogative signs to force the value as a boolean: ?valueToBoolean? (Plist, Json)
+- Enclose the value with tilde signs to force the value as a real: ~valueToReal~ (Plist)
+- Enclose the value with chevron signs to force the value as a integer: <valueToInteger> (Plist)
 - When adding an element in an array , use the index -1 to add the element at the end of the array
 
 Examples
@@ -45,6 +48,8 @@ Given the following Json (as input stream or file)
 `scout add "people.Franklin.hobbies[0]"=football` will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 
 `scout add "people.Franklin.height"=/165/` will create a new dictionary Franklin and add a height key into it with the String value "165"
+
+`scout add "people.Franklin.height"=~165~` will create a new dictionary Franklin and add a height key into it with the Real value 165 (Plist only)
 
 More
 ====
@@ -88,40 +93,17 @@ struct AddCommand: ParsableCommand {
 
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
 
-            try pathsAndValues.forEach {
-                switch $0.forceString {
-                case true:
-                    try json.add($0.value, at: $0.readingPath, as: .string)
-                case false:
-                    try json.add($0.value, at: $0.readingPath)
-                }
-            }
-
+            try add(pathsAndValues, to: &json)
             try ScoutCommand.output(output, dataWith: json, verbose: verbose)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
 
-            try pathsAndValues.forEach {
-                switch $0.forceString {
-                case true:
-                    try plist.add($0.value, at: $0.readingPath, as: .string)
-                case false:
-                    try plist.add($0.value, at: $0.readingPath)
-                }
-            }
-
+            try add(pathsAndValues, to: &plist)
             try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
 
-            try pathsAndValues.forEach {
-                switch $0.forceString {
-                case true:
-                    try xml.add($0.value, at: $0.readingPath, as: .string)
-                case false:
-                    try xml.add($0.value, at: $0.readingPath)
-                }
-            }
+            try add(pathsAndValues, to: &xml)
             try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
 
         } else {
@@ -129,6 +111,23 @@ struct AddCommand: ParsableCommand {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
             } else {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
+            }
+        }
+    }
+
+    func add<Explorer: PathExplorer>(_ pathsAndValues: [PathAndValue], to explorer: inout Explorer) throws {
+        try pathsAndValues.forEach { pathAndValue in
+            let (path, value) = (pathAndValue.readingPath, pathAndValue.value)
+
+            if let forceType = pathAndValue.forceType {
+                switch forceType {
+                case .string: try explorer.add(value, at: path, as: .string)
+                case .real: try explorer.add(value, at: path, as: .real)
+                case .int: try explorer.add(value, at: path, as: .int)
+                case .bool: try explorer.add(value, at: path, as: .bool)
+                }
+            } else {
+                try explorer.add(value, at: path)
             }
         }
     }
