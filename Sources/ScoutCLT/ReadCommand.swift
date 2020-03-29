@@ -43,7 +43,9 @@ Examples
 ========
 
 - Tom first hobby: "people.Tom.hobbies[0]" will output "cooking"
+
 - Arnaud height: "people.Arnaud.height" will output "180"
+
 - Tom first hobby: "people.Tom.hobbies[-1]" will output Tom last hobby: "guitar"
 """
 

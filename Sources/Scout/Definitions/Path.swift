@@ -71,21 +71,21 @@ public extension Path {
 
             // try to get the indexes if any
             if let indexMatch = indexMatches.first {
-                // we have a first index, so we can retrieve the array name and the first index
-                if indexMatch.range.lowerBound == 1 {
-                    // specific case: the root element is an array
-                    guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
-                    elements.append(index)
-                    continue
-                }
-                guard indexMatch.range.lowerBound > 1 else { throw PathExplorerError.invalidPathElement(match) }
-                // get the array name
-                let newMatch = String(match[0..<indexMatch.range.lowerBound - 1])
+                // we have a first index, so retrieve it and the array name if possible
+
                 // get the array index
                 guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
 
-                elements.append(newMatch)
-                elements.append(index)
+                if indexMatch.range.lowerBound == 1 {
+                    // specific case: the root element is an array: there is no array name
+                    elements.append(index)
+                } else {
+                    // get the array name
+                    let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
+
+                    elements.append(arrayName)
+                    elements.append(index)
+                }
 
                 // now retrieve the remaining indexes
                 indexMatches.removeFirst()
