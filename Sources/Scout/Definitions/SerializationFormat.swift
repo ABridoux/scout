@@ -22,6 +22,11 @@ public struct JsonFormat: SerializationFormat {
     }
 
     public static func serialize(value: Any) throws -> Data {
-        try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
+        if #available(OSX 10.15, *) {
+            return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes])
+        } else {
+            return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
+        }
+
     }
 }
