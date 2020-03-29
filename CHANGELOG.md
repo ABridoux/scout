@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [0.3.1](https://github.com/ABridoux/scout/tree/0.3.1) (29/03/2020)
+
+### Fixed
+- Root element with nested arrays: `[0][2][1].firstKey`
+
 ## [0.3.0](https://github.com/ABridoux/scout/tree/0.3.0) (28/03/2020)
 
 ### Added

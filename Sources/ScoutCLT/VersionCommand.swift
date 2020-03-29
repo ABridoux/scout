@@ -7,7 +7,7 @@ struct VersionCommand: ParsableCommand {
 
     static let configuration = CommandConfiguration(
         commandName: "version",
-        abstract: "display the current version of the program")
+        abstract: "Output the current version of the program")
 
     // MARK: - Functions
 
