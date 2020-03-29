@@ -72,7 +72,7 @@ Here is a command which downloads the latest version of the program and install 
 Run it to download and install the latest version of the program. It erases the current version you may have.
 
 ```bash
-curl -LO https://github.com/ABridoux/scout/releases/labretest/download/scout.zip && \
+curl -LO https://github.com/ABridoux/scout/releases/latest/download/scout.zip && \
 unzip scout.zip && \
 rm scout.zip && \
 install scout /usr/local/bin && \
@@ -120,7 +120,7 @@ You can then `import Scout` in a file.
 #### Invalid paths
 When getting/setting/deleting a value, if a key does not exist in the path, an error will be returned/thrown.
 
-#### Adding command specificities
+#### `add` command specificities
 - When adding a value, all the keys which do not exist in the path will be created. Thus, to add a dictionary or an array, you have to specify one child key. Otherwise scout will consider that it is a single value which should be added.
 - That said: when accessing an array child key using the index `-1` with the `add` command, the program will add a new key rather than accessing the last element of the array.
 - Adding a value to an existing key is the same as using the `set` command.
@@ -164,6 +164,18 @@ Given the following Json (as input stream or file with the `input` option)
 `scout "people.Tom.hobbies[0]"` will output "cooking"
 
 `scout "people.Arnaud.height"` will output "180"
+
+`scout "people.Arnaud"` will output Arnaud dictionary:
+
+```json
+"height": 180,
+"age": 23,
+"hobbies": [
+    "video games",
+    "party",
+    "tennis"
+]
+```
 
 ##### Setting
 `scout set "people.Tom.hobbies[0]"=basket` will change Tom first hobby from "cooking" to "basket"
@@ -244,7 +256,7 @@ Useful for Plist and Json
  Useful for Plist and Json<br>
  Available **recognised boolean strings**: "y", "yes", "Y", "Yes", "YES", "t", "true", "T", "True", "TRUE", "n", "no", "N", "No", "NO", "f", "false", "F", "False", "FALSE"
  
- ##### Real
+##### Real
 `~value~`<br>
 Example: `scout add "path=~valueToConvertToReal~"`<br>
 Useful for Plist
@@ -408,6 +420,6 @@ To parse Xml data, as the standard library does not offer simple way to do it, *
 Thanks also to the team at Apple behind the [ArgumentParser](https://github.com/apple/swift-argument-parser) library. They have done an incredible work to make command line tools in Swift easy to implement.
 
 ## Contributing
-Scout is open-source and you are free to use it the way you want. If you want to make a change or to add a new feature, please [open a Pull Request](https://github.com/ABridoux/scout/pull/new).
-Feel free to [report a bug, an error or even a typo](https://github.com/ABridoux/scout/issues).
+Scout is open-source and under a [MIT license](License). If you want to make a change or to add a new feature, please [open a Pull Request](https://github.com/ABridoux/scout/pull/new).
+Also, feel free to [report a bug, an error or even a typo](https://github.com/ABridoux/scout/issues).
 

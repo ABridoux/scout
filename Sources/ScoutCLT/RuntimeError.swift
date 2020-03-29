@@ -8,7 +8,7 @@ enum RuntimeError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidData(let description): return description
-        case .noValueAt(let path): return "No single value at '\(path)'. Either Dictionary or Array to subscript."
+        case .noValueAt(let path): return "No value at '\(path)'"
         case .unknownFormat(let description): return description
         }
     }
