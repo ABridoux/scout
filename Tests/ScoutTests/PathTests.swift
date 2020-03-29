@@ -107,4 +107,11 @@ final class PathTests: XCTestCase {
 
         XCTAssertTrue(path == array)
     }
+
+    func testRootElementNestedArrays() throws {
+        let array: Path = [1, 0, firstKey, secondKey]
+        let path = try Path(string: "[1][0].\(firstKey).\(secondKey)")
+
+        XCTAssertTrue(path == array)
+    }
 }
