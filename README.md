@@ -1,22 +1,33 @@
-<p align="center">
-    <img src="https://img.shields.io/badge/Swift-5.1-orange.svg" />
+<p>
+Swift package:<br>
+    <a href="#">
+        <img src="https://img.shields.io/badge/Swift-5.1-orange.svg" />
+    </a>
     <a href="https://swift.org/package-manager">
         <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
     </a>
-    <a>
-    <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift" />
+    <a href="https://github.com/ABridoux/scout/actions?query=workflow%3ASwift">
+        <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift" />
     </a>
     <br/>
-     <img src="https://img.shields.io/badge/platforms-mac+linux-brightgreen.svg?style=flat" alt="Mac + Linux" />
+Install:<br>
+    <a href="#">
+        <img src="https://img.shields.io/badge/platforms-mac+linux-brightgreen.svg?style=flat" alt="Mac + Linux" />
     </a>
-    <a>
+     <a href="https://github.com/ABridoux/scout/releases">
+        <img src="https://img.shields.io/badge/install-pkg%2Bzip-blue" />
     </a>
-    <a>
-    <img src="https://img.shields.io/badge/install-pkg%2Bzip-blue" />
+    <br/>
+Donwloads:<br>
+    <a href="#">
+    <img src="https://img.shields.io/github/downloads/ABridoux/scout/total" />
+    </a>
+    <a href="#">
+    <img src="https://img.shields.io/github/downloads/ABridoux/scout/latest/total" />
     </a>
 </p>
 
-# Scout <a><img src="https://img.shields.io/github/v/tag/ABridoux/scout"/></a>
+# Scout <a href="https://github.com/ABridoux/scout/releases"><img src="https://img.shields.io/github/v/release/Abridoux/scout?color=lightgrey&label=latest" /></a>
 
 This library aims to make specific formats data values reading and writing simple when the data format is not known at build time.
 It was inspired by [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON) and all the projects that followed, while trying to cover more ground, like Xml or Plist. It unifies writing and reading for those different formats. Getting a value in a Json format would be the same as getting a value in a Xml format.
@@ -44,7 +55,33 @@ Use the following command.
 ```bash
 brew install ABridoux/formulae/scout
 ```
-It will **download the notarized executable** from [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip). I believe that most Homebrew users do not really care about building the program themselves. If I am wrong, please let me know (by opening an [issue](https://github.com/ABridoux/scout/issues) for example). Note that you can still build the program by cloning this git as explained below.
+It will **download the notarized executable** from the [latest release](https://github.com/ABridoux/scout/releases/latest/download/scout.zip). I believe that most Homebrew users do not really care about building the program themselves. If I am wrong, please let me know (by opening an [issue](https://github.com/ABridoux/scout/issues) for example). Note that you can still build the program by cloning this git as explained below.
+
+
+#### Download
+
+You can download the [latest version of the executable](https://github.com/ABridoux/scout/releases/latest/download/scout.zip) from the [releases](https://github.com/ABridoux/scout/releases). Note that the **executable is notarized**. Also, a notarized [scout package](https://github.com/ABridoux/scout/releases/latest/download/scout.pkg) is provided.
+
+After having unzipped the file, you can install it if you want to:
+
+```bash
+install scout /usr/local/bin/ 
+```
+
+Here is a command which downloads the latest version of the program and install it in */usr/local/bin*. 
+Run it to download and install the latest version of the program. It erases the current version you may have.
+
+```bash
+curl -LO https://github.com/ABridoux/scout/releases/labretest/download/scout.zip && \
+unzip scout.zip && \
+rm scout.zip && \
+install scout /usr/local/bin && \
+rm scout
+```
+
+##### Note
+- To find all scout versions, please browse the [releases](https://github.com/ABridoux/scout/releases) page.
+- When deploying a package (with a MDM for example), it might be useful to add the version to the name. To get scout latest version: simply run `scout version` to get your **installed scout version**, or ` curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | scout tag_name` to get the latest version **available on the Github repository**.
 
 #### Git
 
@@ -63,29 +100,6 @@ $ cd ..
 $ rm -r Scout
 ```
 
-#### Download
-
-If you cannot use those methods, you can rather download the latest version of the executable [here](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip). Note that the **executable is notarized**. After having unzipped the file, you can install it if you want to:
-
-```bash
-install scout /usr/local/bin/ 
-```
-
-Here is a command which downloads the latest version of the program and install it in */usr/local/bin*. 
-Run it to download and install the latest version of the program. It erases the current version you may have.
-
-```bash
-curl -o scout.zip https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.zip && \
-unzip scout.zip && \
-rm scout.zip && \
-install scout /usr/local/bin && \
-rm scout
-```
-
-Also, a notarized [scout package](https://abridoux-public.s3.us-east-2.amazonaws.com/scout/scout-latest.pkg) is provided.
-
-<u>Note</u>: To find all scout versions, please browse the [releases](https://github.com/ABridoux/scout/releases) page.
-
 ### Swift package
 
 Start by importing the package in your file *Packages.swift*.
@@ -93,12 +107,12 @@ Start by importing the package in your file *Packages.swift*.
 let package = Package (
     ...
     dependencies: [
-        .package(url: "https://github.com/ABridoux/Scout", from: "0.1.0")
+        .package(url: "https://github.com/ABridoux/scout", from: "0.1.0")
     ],
     ...
 )
 ```
-You can then import the package when needed.
+You can then `import Scout` in a file.
 
 ## Usage examples
 
