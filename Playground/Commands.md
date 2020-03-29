@@ -30,6 +30,24 @@ scout "people.Suzanne.movies[0].title" -i People.xml
 scout "people.Robert.running_records[1][0]" -i People.json
 ```
 
+The following:
+
+```bash
+scout "people.Tom"
+```
+outputs Tom dictionary:
+
+```json
+{
+  "age" : 68,
+  "hobbies" : [
+    "cooking",
+    "guitar"
+  ],
+  "height" : 175
+}
+```
+
 ## Set
 - Will output an error if a key in the given path does not exist.
 - You can set multiple values in one command.
@@ -49,7 +67,7 @@ scout set "people.Suzanne.movies[1].title"="Never gonna die" -i People.json -v
 ```bash
 scout set \
 "people.Tom.hobbies[-1]"="playing music" \
-"people.Suzanne.job"=comedian \
+"people.Suzanne.job=comedian" \
 -i People.plist -v
 ```
 
@@ -135,10 +153,10 @@ scout add "people.Robert.running_records[1][-1]"=20 -i People.json -v
  (Tricky one) Add a new record to robert running records and add a new value into it: 15
 
 ```bash
-scout add "people.Robert.running_records[-1][0]"=15 -i People.json -v
+scout add "people.Robert.running_records[-1][0]"=15 -i People.xml -v
 ```
 
  Add a new **String** value at the end the array to Robert running records first record
 ```bash
-scout add "people.Robert.running_records[0][-1]=/15/" -i People.json -v
+scout add "people.Robert.running_records[0][-1]=/15/" -i People.plist -v
 ```
