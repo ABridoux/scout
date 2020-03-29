@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [1.0.0](https://github.com/ABridoux/scout/tree/1.0.0) (29/03/2020)
+
+### Added
+- License
+- CLT: output a dictionary or an array rather than return an error
+- Json: backslashes removed when outputing the string
+
 ## [0.3.1](https://github.com/ABridoux/scout/tree/0.3.1) (29/03/2020)
 
 ### Fixed
