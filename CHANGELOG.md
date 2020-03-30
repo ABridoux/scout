@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [1.0.2](https://github.com/ABridoux/scout/tree/1.0.2) (30/03/2020)
+
+### Fixed
+- `PathExplorerXml` string value not empty because of new line.
+
 ## [1.0.1](https://github.com/ABridoux/scout/tree/1.0.1) (30/03/2020)
 
 ### Fixed
