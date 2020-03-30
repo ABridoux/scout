@@ -4,7 +4,7 @@ extension PathExplorerXML: PathExplorer {
     public var int: Int? { element.int }
     public var real: Double? { element.double }
 
-    public var stringValue: String { element.string }
+    public var stringValue: String { element.string.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     public var description: String { element.xml }
 
