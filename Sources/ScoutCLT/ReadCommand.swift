@@ -84,13 +84,13 @@ struct ReadCommand: ParsableCommand {
 
         if let json = try? PathExplorerFactory.make(Json.self, from: data) {
             let key = try json.get(readingPath)
-            value = key.string ?? key.description
+            value = key.stringValue != "" ? key.stringValue : key.description
         } else if let plist = try? PathExplorerFactory.make(Plist.self, from: data) {
             let key = try plist.get(readingPath)
-            value = key.string ?? key.description
+            value = key.stringValue != "" ? key.stringValue : key.description
         } else if let xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             let key = try xml.get(readingPath)
-            value = key.string ?? key.description
+            value = key.stringValue != "" ? key.stringValue : key.description
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")

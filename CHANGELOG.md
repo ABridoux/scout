@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [1.0.1](https://github.com/ABridoux/scout/tree/1.0.1) (30/03/2020)
+
+### Fixed
+- CLT read command when other type than string was not working
+
 ## [1.0.0](https://github.com/ABridoux/scout/tree/1.0.0) (29/03/2020)
 
 ### Added
