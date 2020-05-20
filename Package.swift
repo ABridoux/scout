@@ -20,7 +20,10 @@ let package = Package(
             from: "4.5.0"),
         .package(
             url: "https://github.com/apple/swift-argument-parser",
-            from: "0.0.1")
+            from: "0.0.1"),
+        .package(
+            url: "https://github.com/ABridoux/lux",
+            from: "0.1.0")
     ],
     targets: [
         .target(
@@ -28,7 +31,7 @@ let package = Package(
             dependencies: ["AEXML"]),
         .target(
             name: "ScoutCLT",
-            dependencies: ["Scout", "ArgumentParser"]),
+            dependencies: ["Scout", "ArgumentParser", "Lux"]),
         .testTarget(
             name: "ScoutTests",
             dependencies: ["Scout"]),
