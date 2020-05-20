@@ -38,6 +38,13 @@ You can use a library for each format. But I am not aware today of a library tha
 ### Using a generic text-processing tool
 Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is really easy to use, as we will see.
 
+### Syntax highlighting
+Starting from 1.1.0, Scout will highlight the output when reading or outputting (with the verbose flag) a dictionary or an array value. This is done with the [Lux](https://github.com/ABridoux/lux) library. You can try it with the following command.
+
+```bash
+curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | scout
+```
+
 ## How to use it
 
 ### Command Line
@@ -169,6 +176,9 @@ Given the following Json (as input stream or file with the `input` option)
     "tennis"
 ]
 ```
+
+`scout` will output the overall Json. No reading path means to read the overall input stream. This is useful when you just want to enjoy the syntax highlighting feature.
+
 
 ##### Setting
 `scout set "people.Tom.hobbies[0]"=basket` will change Tom first hobby from "cooking" to "basket"

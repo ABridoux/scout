@@ -1,6 +1,7 @@
 import ArgumentParser
 import Scout
 import Foundation
+import Lux
 
 private let discussion =
 """
@@ -61,7 +62,7 @@ struct ReadCommand: ParsableCommand {
     // MARK: - Properties
 
     @Argument(help: "Path in the data where to read the key value")
-    var readingPath: Path
+    var readingPath: Path?
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
@@ -82,15 +83,21 @@ struct ReadCommand: ParsableCommand {
     func read(from data: Data) throws {
         var value: String
 
+        var injector: Injector
+        let readingPath = self.readingPath ?? Path()
+
         if let json = try? PathExplorerFactory.make(Json.self, from: data) {
             let key = try json.get(readingPath)
             value = key.stringValue != "" ? key.stringValue : key.description
+            injector = JSONInjector(type: .plain)
         } else if let plist = try? PathExplorerFactory.make(Plist.self, from: data) {
             let key = try plist.get(readingPath)
             value = key.stringValue != "" ? key.stringValue : key.description
+            injector = PlistInjector(type: .plain)
         } else if let xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             let key = try xml.get(readingPath)
             value = key.stringValue != "" ? key.stringValue : key.description
+            injector = XMLEnhancedInjector(type: .plain)
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
@@ -103,6 +110,8 @@ struct ReadCommand: ParsableCommand {
             throw RuntimeError.noValueAt(path: readingPath.description)
         }
 
-        print(value)
+        let output = injector.inject(in: value)
+        print(output)
+
     }
 }

@@ -1,6 +1,7 @@
 import Foundation
 import ArgumentParser
 import Scout
+import Lux
 
 private let abstract =
 """
@@ -95,8 +96,19 @@ struct ScoutCommand: ParsableCommand {
             try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
         }
 
+        let injector: Injector
+
+        switch pathExplorer.format {
+        case .json: injector = JSONInjector(type: .plain)
+        case .plist: injector = PlistInjector(type: .plain)
+        case .xml: injector = XMLEnhancedInjector(type: .plain)
+        }
+
+        let output = try pathExplorer.exportString()
+        let highlightedOutput = injector.inject(in: output)
+
         if verbose {
-            print(try pathExplorer.exportString())
+            print(highlightedOutput)
         }
     }
 }
