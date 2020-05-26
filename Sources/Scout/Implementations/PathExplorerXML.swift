@@ -54,7 +54,7 @@ public struct PathExplorerXML {
         } else {
             let child = element[key]
             guard child.error == nil else {
-                throw PathExplorerError.subscriptMissingKey(readingPath, key)
+                throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(element.children.map { $0.name })))
             }
             return PathExplorerXML(element: element[key], path: readingPath.appending(key))
         }

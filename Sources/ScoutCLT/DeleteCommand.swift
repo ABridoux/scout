@@ -32,12 +32,17 @@ struct DeleteCommand: ParsableCommand {
 
     func run() throws {
 
-        if let filePath = modifyFilePath ?? inputFilePath {
-            let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
-            try delete(from: data)
-        } else {
-            let streamInput = FileHandle.standardInput.readDataToEndOfFile()
-            try delete(from: streamInput)
+        do {
+            if let filePath = modifyFilePath ?? inputFilePath {
+                let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
+                try delete(from: data)
+            } else {
+                let streamInput = FileHandle.standardInput.readDataToEndOfFile()
+                try delete(from: streamInput)
+            }
+        } catch let error as PathExplorerError {
+            print(error.commandLineErrorDescription)
+            return
         }
     }
 

@@ -74,12 +74,17 @@ struct SetCommand: ParsableCommand {
 
     func run() throws {
 
-        if let filePath = modifyFilePath ?? inputFilePath {
-            let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
-            try set(from: data)
-        } else {
-            let streamInput = FileHandle.standardInput.readDataToEndOfFile()
-            try set(from: streamInput)
+        do {
+            if let filePath = modifyFilePath ?? inputFilePath {
+                let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
+                try set(from: data)
+            } else {
+                let streamInput = FileHandle.standardInput.readDataToEndOfFile()
+                try set(from: streamInput)
+            }
+        } catch let error as PathExplorerError {
+            print(error.commandLineErrorDescription)
+            return
         }
     }
 
