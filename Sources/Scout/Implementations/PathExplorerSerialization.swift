@@ -45,7 +45,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         }
 
         guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(readingPath, key)
+            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
         }
 
         return PathExplorerSerialization(value: childValue, path: readingPath.appending(key))
@@ -102,7 +102,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         }
 
         guard dict[key] != nil else {
-            throw PathExplorerError.subscriptMissingKey(readingPath, key)
+            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
         }
 
         dict[key] = newValue
@@ -180,7 +180,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         }
 
         guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(readingPath, key)
+            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
         }
 
         dict[newKeyName] = childValue
@@ -225,7 +225,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             }
 
             guard dict[key] != nil else {
-                throw PathExplorerError.subscriptMissingKey(readingPath, key)
+                throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
             }
 
             dict.removeValue(forKey: key)

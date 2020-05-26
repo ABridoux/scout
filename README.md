@@ -47,6 +47,14 @@ curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | sc
 
 ![](Resources/syntax-highlight.png)
 
+Another example with one of the playground files and the following command:
+
+```bash
+scout -i People.plist "people.Robert.age=2" -v
+```
+
+![](Resources/syntax-highlighting-2.png)
+
 ## How to use it
 
 ### Command Line
