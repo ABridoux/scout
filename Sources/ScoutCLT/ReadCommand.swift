@@ -108,15 +108,33 @@ struct ReadCommand: ParsableCommand {
         if let json = try? PathExplorerFactory.make(Json.self, from: data) {
             let key = try json.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
-            injector = JSONInjector(type: .plain)
+
+            let jsonInjector = JSONInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            injector = jsonInjector
+
         } else if let plist = try? PathExplorerFactory.make(Plist.self, from: data) {
             let key = try plist.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
-            injector = PlistInjector(type: .plain)
+
+            let plistInjector = PlistInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.plist {
+                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
+            }
+            injector = plistInjector
+
         } else if let xml = try? PathExplorerFactory.make(Xml.self, from: data) {
             let key = try xml.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
-            injector = XMLEnhancedInjector(type: .plain)
+
+            let xmlInjector = XMLEnhancedInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.xml {
+                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
+            }
+            injector = xmlInjector
+
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
