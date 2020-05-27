@@ -12,9 +12,13 @@ extension String {
         return userHomeDirectory + pathAfterHome
     }
 
-    var reset: String { "\u{001B}[0m" }
-    var bold: String { "\u{001B}[1m\(self)\u{001B}[22m" }
-    var validation: String { "\u{001B}[32m\(self)\u{001B}[39m"}
-    var error: String { "\u{001B}[91m\(self)\u{001B}[39m"}
+    static var prefix: String { "\u{001B}[" }
+    static var colorReset: String { "\(Self.prefix)39m" }
+    static var reset: String { "\(Self.prefix)0m" }
+
+    var bold: String { "\(Self.prefix)1;39m\(self)\(Self.prefix)22m" }
+    var error: String { "\(Self.colorPrefix(91))\(self)\(Self.colorReset)"}
+
+    static func colorPrefix(_ code: Int) -> String { "\(prefix)38;5;\(code)m" }
 
 }
