@@ -1,5 +1,5 @@
 <p  align="center">
-<img src="Resources/scout-logo.png" style="height: 512px;" />
+<img src="Resources/scout-logo.png" height=512px" />
 <br>
 Swift package:<br>
     <a href="#">
