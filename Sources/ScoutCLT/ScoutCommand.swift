@@ -99,9 +99,28 @@ struct ScoutCommand: ParsableCommand {
         let injector: Injector
 
         switch pathExplorer.format {
-        case .json: injector = JSONInjector(type: .plain)
-        case .plist: injector = PlistInjector(type: .plain)
-        case .xml: injector = XMLEnhancedInjector(type: .plain)
+
+        case .json:
+            let jsonInjector = JSONInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            injector = jsonInjector
+
+        case .plist:
+
+            let plistInjector = PlistInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.plist {
+                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
+            }
+            injector = plistInjector
+
+        case .xml:
+            let xmlInjector = XMLEnhancedInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.xml {
+                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
+            }
+            injector = xmlInjector
         }
 
         let output = try pathExplorer.exportString()
@@ -110,5 +129,12 @@ struct ScoutCommand: ParsableCommand {
         if verbose {
             print(highlightedOutput)
         }
+    }
+
+    static func getColorFile() throws -> ColorFile? {
+        let colorFileURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".scout/Colors.plist")
+        guard let data = try? Data(contentsOf: colorFileURL) else { return nil }
+
+        return try PropertyListDecoder().decode(ColorFile.self, from: data)
     }
 }

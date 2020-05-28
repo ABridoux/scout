@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>json</key>
+	<dict>
+		<key>keyName</key>
+		<integer>187</integer>
+	</dict>
+	<key>plist</key>
+	<dict>
+		<key>keyName</key>
+		<integer>187</integer>
+		<key>tag</key>
+		<integer>245</integer>
+		<key>header</key>
+		<integer>239</integer>
+	</dict>
+	<key>xml</key>
+	<dict>
+		<key>openingTag</key>
+		<integer>187</integer>
+		<key>header</key>
+		<integer>239</integer>
+	</dict>
+</dict>
+</plist>

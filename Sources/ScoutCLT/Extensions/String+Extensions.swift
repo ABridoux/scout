@@ -1,6 +1,6 @@
 import Foundation
 
-public extension String {
+extension String {
 
     /// Replace the `~` in the file path
     var replacingTilde: String {
@@ -11,4 +11,14 @@ public extension String {
         let pathAfterHome = String(self[afterIndex...])
         return userHomeDirectory + pathAfterHome
     }
+
+    static var prefix: String { "\u{001B}[" }
+    static var colorReset: String { "\(Self.prefix)39m" }
+    static var reset: String { "\(Self.prefix)0m" }
+
+    var bold: String { "\(Self.prefix)1;39m\(self)\(Self.prefix)22m" }
+    var error: String { "\(Self.colorPrefix(91))\(self)\(Self.colorReset)"}
+
+    static func colorPrefix(_ code: Int) -> String { "\(prefix)38;5;\(code)m" }
+
 }

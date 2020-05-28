@@ -81,23 +81,60 @@ struct ReadCommand: ParsableCommand {
     }
 
     func read(from data: Data) throws {
-        var value: String
 
-        var injector: Injector
         let readingPath = self.readingPath ?? Path()
 
+        do {
+            let (value, injector) = try readValue(at: readingPath, in: data)
+
+            if value == "" {
+                throw RuntimeError.noValueAt(path: readingPath.description)
+            }
+
+            let output = injector.inject(in: value)
+            print(output)
+
+        } catch let error as PathExplorerError {
+            print(error.commandLineErrorDescription)
+            return
+        }
+    }
+
+    func readValue(at path: Path, in data: Data) throws -> (value: String, injector: Injector) {
+
+        var injector: Injector
+        var value: String
+
         if let json = try? PathExplorerFactory.make(Json.self, from: data) {
-            let key = try json.get(readingPath)
+            let key = try json.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
-            injector = JSONInjector(type: .plain)
+
+            let jsonInjector = JSONInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            injector = jsonInjector
+
         } else if let plist = try? PathExplorerFactory.make(Plist.self, from: data) {
-            let key = try plist.get(readingPath)
+            let key = try plist.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
-            injector = PlistInjector(type: .plain)
+
+            let plistInjector = PlistInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.plist {
+                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
+            }
+            injector = plistInjector
+
         } else if let xml = try? PathExplorerFactory.make(Xml.self, from: data) {
-            let key = try xml.get(readingPath)
+            let key = try xml.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
-            injector = XMLEnhancedInjector(type: .plain)
+
+            let xmlInjector = XMLEnhancedInjector(type: .plain)
+            if let colors = try ScoutCommand.getColorFile()?.xml {
+                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
+            }
+            injector = xmlInjector
+
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
@@ -106,12 +143,6 @@ struct ReadCommand: ParsableCommand {
             }
         }
 
-        if value == "" {
-            throw RuntimeError.noValueAt(path: readingPath.description)
-        }
-
-        let output = injector.inject(in: value)
-        print(output)
-
+        return (value, injector)
     }
 }
