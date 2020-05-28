@@ -24,7 +24,7 @@ final class JSONInjectorColorDelegate: JSONDelegate {
         switch category {
         case .punctuation: colorCode = colors.punctuation
         case .keyName: colorCode = colors.keyName
-        case .keyValue: colorCode = colors.punctuation
+        case .keyValue: colorCode = colors.keyValue
         }
 
         if let code = colorCode {
