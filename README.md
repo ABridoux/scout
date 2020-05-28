@@ -148,6 +148,9 @@ Thanks also to the team at Apple behind the [ArgumentParser](https://github.com/
 
 Finaly, thanks to [Thijs Xhaflaire](https://github.com/txhaflaire/) for your ideas and your helpful feedback.
 
+## References
+Font used for the logo: Ver Army by [Damien Gosset](http://sweeep.fr/cv/index.php?c=fonts)
+
 ## Contributing
 Scout is open-source and under a [MIT license](License). If you want to make a change or to add a new feature, please [open a Pull Request](https://github.com/ABridoux/scout/pull/new).
 Also, feel free to [report a bug, an error or even a typo](https://github.com/ABridoux/scout/issues).
