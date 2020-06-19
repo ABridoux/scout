@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/ABridoux/lux",
         "state": {
           "branch": null,
-          "revision": "a0bbdb1a5a03314b92533e780a50b7c90fa1e510",
-          "version": "0.1.1"
+          "revision": "b97bc3f12e516669ab95e05161b91062f7934a64",
+          "version": "0.2.1"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "223d62adc52d51669ae2ee19bdb8b7d9fd6fcd9c",
-          "version": "0.0.6"
+          "revision": "3d79b2b5a2e5af52c14e462044702ea7728f5770",
+          "version": "0.1.0"
         }
       }
     ]
