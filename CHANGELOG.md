@@ -3,7 +3,13 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
-## [1.2.0](https://github.com/ABridoux/scout/tree/1.2.0) (28/08/2020)
+## [1.2.1](https://github.com/ABridoux/scout/tree/1.2.1) (19/06/2020)
+
+## Changed
+
+- [Lux](https://github.com/ABridoux/lux) updated to 0.2.1 to handle tag characters in quotes
+
+## [1.2.0](https://github.com/ABridoux/scout/tree/1.2.0) (28/05/2020)
 
 ## Added
 
