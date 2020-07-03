@@ -1,29 +1,29 @@
 struct JsonColors: Codable {
-    var punctuation: Int?
-    var keyName: Int?
-    var keyValue: Int?
+    var punctuation: Int? = nil
+    var keyName: Int? = nil
+    var keyValue: Int? = nil
 }
 
 struct PlistColors: Codable {
-    var tag: Int?
-    var keyName: Int?
-    var keyValue: Int?
-    var header: Int?
-    var comment: Int?
+    var tag: Int? = nil
+    var keyName: Int? = nil
+    var keyValue: Int? = nil
+    var header: Int? = nil
+    var comment: Int? = nil
 }
 
 struct XmlColors: Codable {
-    var punctuation: Int?
-    var openingTag: Int?
-    var closingTag: Int?
-    var key: Int?
-    var header: Int?
-    var comment: Int?
+    var punctuation: Int? = nil
+    var openingTag: Int? = nil
+    var closingTag: Int? = nil
+    var key: Int? = nil
+    var header: Int? = nil
+    var comment: Int? = nil
 }
 
 /// Plist file to specify custom colors
 struct ColorFile: Codable {
-    var json: JsonColors?
-    var plist: PlistColors?
-    var xml: XmlColors?
+    var json: JsonColors? = nil
+    var plist: PlistColors? = nil
+    var xml: XmlColors? = nil
 }

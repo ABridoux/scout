@@ -3,53 +3,6 @@ import Scout
 import Foundation
 import Lux
 
-private let discussion =
-"""
-
-Notes
-=====
-- If the path is invalid, the program will retrun an error
-- Enclose the value with sharp signs to change the key name: #keyName#
-- Enclose the value with slash signs to force the value as a string: /valueAsString/ (useless with XML as XML only has string values)
-- When accessing an array value by its index, use the index -1 to access to the last element
-
-Examples
-========
-
-Given the following Json (as input stream or file):
-
-{
-  "people": {
-    "Tom": {
-      "height": 175,
-      "age": 68,
-      "hobbies": [
-        "cooking",
-        "guitar"
-      ]
-    },
-    "Arnaud": {
-      "height": 180,
-      "age": 23,
-      "hobbies": [
-        "video games",
-        "party",
-        "tennis"
-      ]
-    }
-  }
-}
-
-Examples
-========
-
-- Tom first hobby: "people.Tom.hobbies[0]" will output "cooking"
-
-- Arnaud height: "people.Arnaud.height" will output "180"
-
-- Tom first hobby: "people.Tom.hobbies[-1]" will output Tom last hobby: "guitar"
-"""
-
 struct ReadCommand: ParsableCommand {
 
     // MARK: - Constants
@@ -57,7 +10,7 @@ struct ReadCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "read",
         abstract: "Read a value at a given path",
-        discussion: discussion)
+        discussion: "To find examples and advanced explanations, please type `scout doc read`")
 
     // MARK: - Properties
 
@@ -100,16 +53,16 @@ struct ReadCommand: ParsableCommand {
         }
     }
 
-    func readValue(at path: Path, in data: Data) throws -> (value: String, injector: Injector) {
+    func readValue(at path: Path, in data: Data) throws -> (value: String, injector: TextInjector) {
 
-        var injector: Injector
+        var injector: TextInjector
         var value: String
 
         if let json = try? PathExplorerFactory.make(Json.self, from: data) {
             let key = try json.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
 
-            let jsonInjector = JSONInjector(type: .plain)
+            let jsonInjector = JSONInjector(type: .terminal)
             if let colors = try ScoutCommand.getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
             }
@@ -119,7 +72,7 @@ struct ReadCommand: ParsableCommand {
             let key = try plist.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
 
-            let plistInjector = PlistInjector(type: .plain)
+            let plistInjector = PlistInjector(type: .terminal)
             if let colors = try ScoutCommand.getColorFile()?.plist {
                 plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
             }
@@ -129,7 +82,7 @@ struct ReadCommand: ParsableCommand {
             let key = try xml.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
 
-            let xmlInjector = XMLEnhancedInjector(type: .plain)
+            let xmlInjector = XMLEnhancedInjector(type: .terminal)
             if let colors = try ScoutCommand.getColorFile()?.xml {
                 xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
             }

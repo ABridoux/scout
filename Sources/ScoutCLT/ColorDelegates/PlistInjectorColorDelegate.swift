@@ -13,12 +13,13 @@ final class PlistInjectorColorDelegate: PlistDelegate {
     }
 
     required init() {
-        fatalError("init() has not been implemented")
+        colors = PlistColors()
+        super.init()
     }
 
     // MARK: - Functions
 
-    override func injection(for category: PlistCategory, type: TextType) -> String {
+    override func terminalModifier(for category: PlistCategory) -> TerminalModifier {
         var colorCode: Int?
 
         switch category {
@@ -30,9 +31,9 @@ final class PlistInjectorColorDelegate: PlistDelegate {
         }
 
         if let code = colorCode {
-            return String.colorPrefix(code)
+            return TerminalModifier(colorCode: code)
         } else {
-            return super.injection(for: category, type: type)
+            return super.terminalModifier(for: category)
         }
     }
 }

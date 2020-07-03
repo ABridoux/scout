@@ -13,14 +13,16 @@ final class JSONInjectorColorDelegate: JSONDelegate {
     }
 
     required init() {
-        fatalError("init() has not been implemented")
+        colors = JsonColors()
+        super.init()
     }
 
     // MARK: - Functions
 
-    override func injection(for category: JSONCategory, type: TextType) -> String {
+    override func terminalModifier(for category: JSONCategory) -> TerminalModifier {
         var colorCode: Int?
 
+        // retrieve the color code in the colors plist if any
         switch category {
         case .punctuation: colorCode = colors.punctuation
         case .keyName: colorCode = colors.keyName
@@ -28,9 +30,9 @@ final class JSONInjectorColorDelegate: JSONDelegate {
         }
 
         if let code = colorCode {
-            return String.colorPrefix(code)
+            return TerminalModifier(colorCode: code)
         } else {
-            return super.injection(for: category, type: type)
+            return super.terminalModifier(for: category)
         }
     }
 }
