@@ -4,7 +4,6 @@ import Lux
 private let jsonInjector = JSONInjector(type: .terminal)
 private let zshInjector = ZshInjector(type: .terminal)
 
-
 private let jsonExample =
 """
 {
@@ -111,7 +110,6 @@ Adding
 \(zshInjector.inject(in: addExamples[4])) will create a new dictionary Franklin, add a hobbies array into it, and insert the value "football" in the array
 
 """
-
 
 struct DocCommand: ParsableCommand {
 static let configuration = CommandConfiguration(

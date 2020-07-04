@@ -32,7 +32,7 @@ struct ScoutCommand: ParsableCommand {
                 VersionCommand.self],
             defaultSubcommand: ReadCommand.self)
 
-    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool) throws {
+    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool, colorise: Bool) throws {
         if let output = output?.replacingTilde {
             let fm = FileManager.default
             try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
@@ -65,11 +65,11 @@ struct ScoutCommand: ParsableCommand {
             injector = xmlInjector
         }
 
-        let output = try pathExplorer.exportString()
-        let highlightedOutput = injector.inject(in: output)
+        var output = try pathExplorer.exportString()
+        output = colorise ? injector.inject(in: output) : output
 
         if verbose {
-            print(highlightedOutput)
+            print(output)
         }
     }
 

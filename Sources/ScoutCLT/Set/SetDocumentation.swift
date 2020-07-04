@@ -26,7 +26,7 @@ struct SetDocumentation: Documentation {
 
     private static let examples = [(#"`scout set "urlset[1].changefreq=yearly"`"#, #"will change the second url #changefreq# key value to "yearly""#),
                                    (#"`scout set "urlset[0].priority"=2.0`"#, #"will change the first url #priority# key value to 2.0"#),
-                                   (#"`scout set "urlset[1].changefreq=yearly"` "urlset[0].priority=2.0"`"#,  """
+                                   (#"`scout set "urlset[1].changefreq=yearly"` "urlset[0].priority=2.0"`"#, """
                                                                                                             will change both the second url #changefreq# key value to "yearly"
                                                                                                                 and the first url #priority# key value to 2.0
                                                                                                             """),
@@ -45,7 +45,9 @@ struct SetDocumentation: Documentation {
     -----
     - You can set multiple values in one command.
     - Specify the \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v")) flag to see the modified data
-    
+    - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
+        Useful if you encounter slowdowns when dealing with large files although it is not recommended not ouput large files in the terminal.
+
     - If the path is invalid, the program will return an error
     - Enclose the value with sharp signs to change the key name: #keyName#
     - Enclose the value with slash signs to force the value as a string: /valueAsString/ (Plist, Json)
@@ -58,7 +60,7 @@ struct SetDocumentation: Documentation {
     --------
 
     Xml file
-    
+
     \(xmlInjector.inject(in: xmlExample))
 
     \(examplesText(from: examples))

@@ -46,12 +46,14 @@ struct ReadDocumentation: Documentation {
     - If the path is invalid, the program will return an error
     - Enclose the value with sharp signs to change the key name: #keyName#
     - When accessing an array value by its index, use the index -1 to access to the last element
+    - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
+        Useful if you encounter slowdowns when dealing with large files although it is not recommended not ouput large files in the terminal.
 
     Examples
     --------
 
     JSON file
-    
+
     \(jsonInjector.inject(in: jsonExample))
 
     \(examplesText(from: examples))

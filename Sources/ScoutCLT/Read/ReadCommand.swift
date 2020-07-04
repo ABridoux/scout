@@ -20,6 +20,9 @@ struct ReadCommand: ParsableCommand {
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
 
+    @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
+    var color = true
+
     // MARK: - Functions
 
     func run() throws {
@@ -44,7 +47,7 @@ struct ReadCommand: ParsableCommand {
                 throw RuntimeError.noValueAt(path: readingPath.description)
             }
 
-            let output = injector.inject(in: value)
+            let output = color ? injector.inject(in: value) : value
             print(output)
 
         } catch let error as PathExplorerError {
@@ -53,6 +56,11 @@ struct ReadCommand: ParsableCommand {
         }
     }
 
+    /// - Parameters:
+    ///   - path: The path of the value to output
+    ///   - data: The data where to search for the value
+    /// - Throws: If the path is invalid or the values does not exist
+    /// - Returns: The value, and the corresponding
     func readValue(at path: Path, in data: Data) throws -> (value: String, injector: TextInjector) {
 
         var injector: TextInjector

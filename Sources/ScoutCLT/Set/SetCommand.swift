@@ -23,6 +23,9 @@ struct SetCommand: ParsableCommand {
     @Flag(name: [.short, .long], inversion: .prefixedNo, help: "Output the modified data")
     var verbose = false
 
+    @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
+    var color = true
+
     func run() throws {
 
         do {
@@ -45,17 +48,17 @@ struct SetCommand: ParsableCommand {
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
 
             try set(pathsAndValues, in: &json)
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
 
             try set(pathsAndValues, in: &plist)
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
 
             try set(pathsAndValues, in: &xml)
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color)
 
         } else {
             if let filePath = inputFilePath {

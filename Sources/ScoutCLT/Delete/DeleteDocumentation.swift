@@ -44,14 +44,17 @@ struct DeleteDocumentation: Documentation {
     -----
     - If the path is invalid, the program will return an error
     - You can delete multiple values in one command
-    - When accessing an array value by its index, use the index -1 to access to the last element
     - Specify the \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v")) flag to see the modified data
+    - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
+        Useful if you encounter slowdowns when dealing with large files although it is not recommended not ouput large files in the terminal.
+
+    - When accessing an array value by its index, use the index -1 to access to the last element
 
     Examples
     --------
 
     JSON file
-    
+
     \(jsonInjector.inject(in: jsonExample))
 
     \(examplesText(from: examples))

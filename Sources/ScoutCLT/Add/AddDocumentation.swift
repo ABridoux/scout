@@ -48,8 +48,10 @@ struct AddDocumentation: Documentation {
 
     Notes
     -----
-    - You add delete multiple values in one command
+    - You can add multiple values in one command
     - Specify the \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v")) flag to see the modified data
+    - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
+        Useful if you encounter slowdowns when dealing with large files although it is not recommended not ouput large files in the terminal.
 
     - All the keys which do not exist in the path will be created
     - Enclose the value with slash signs to force the value as a string: /valueAsString/ (Plist, Json)
