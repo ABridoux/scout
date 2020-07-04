@@ -3,22 +3,33 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [1.2.2](https://github.com/ABridoux/scout/tree/1.2.2) (04/07/2020)
+
+### Added
+- `--no-color`  flag to prevent colorisation when outputting
+
+### Changed
+- Moved the documentaion in a `doc` command
+
+### Fixed
+- JSON escaped quotes [#68]
+
 ## [1.2.1](https://github.com/ABridoux/scout/tree/1.2.1) (19/06/2020)
 
-## Changed
+### Changed
 
 - [Lux](https://github.com/ABridoux/lux) updated to 0.2.1 to handle tag characters in quotes
 
 ## [1.2.0](https://github.com/ABridoux/scout/tree/1.2.0) (28/05/2020)
 
-## Added
+### Added
 
 - Key proposition when subscript key error [#52]
 - Custom highight colors in a plist file [#51]
 
 ## [1.1.0](https://github.com/ABridoux/scout/tree/1.1.0) (20/05/2020)
 
-## Added
+### Added
 
 - Highlight output when outputting a dictionary or array value
 

@@ -46,7 +46,7 @@ struct DeleteDocumentation: Documentation {
     - You can delete multiple values in one command
     - Specify the \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v")) flag to see the modified data
     - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
-        Useful if you encounter slowdowns when dealing with large files although it is not recommended not ouput large files in the terminal.
+        Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
 
     - When accessing an array value by its index, use the index -1 to access to the last element
 
