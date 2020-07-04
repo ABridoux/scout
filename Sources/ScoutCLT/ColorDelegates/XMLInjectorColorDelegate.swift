@@ -13,12 +13,13 @@ final class XMLInjectorColorDelegate: XMLEnhancedDelegate {
     }
 
     required init() {
-        fatalError("init() has not been implemented")
+        colors = XmlColors()
+        super.init()
     }
 
     // MARK: - Functions
 
-    override func injection(for category: XMLEnhancedCategory, type: TextType) -> String {
+    override func terminalModifier(for category: XMLEnhancedCategory) -> TerminalModifier {
         var colorCode: Int?
 
         switch category {
@@ -31,9 +32,9 @@ final class XMLInjectorColorDelegate: XMLEnhancedDelegate {
         }
 
         if let code = colorCode {
-            return String.colorPrefix(code)
+            return TerminalModifier(colorCode: code)
         } else {
-            return super.injection(for: category, type: type)
+            return super.terminalModifier(for: category)
         }
     }
 }

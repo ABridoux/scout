@@ -9,12 +9,12 @@ struct DeleteCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "delete",
         abstract: "Delete a value at a given path",
-        discussion: "When accessing an array value by its index, use the index -1 to access to the last element")
+        discussion: "To find examples and advanced explanations, please type `scout doc delete`")
 
     // MARK: - Properties
 
     @Argument(help: "Paths to indicate the keys to be deleted")
-    var readingPaths: [Path]
+    var readingPaths = [Path]()
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
@@ -25,8 +25,11 @@ struct DeleteCommand: ParsableCommand {
     @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path")
     var modifyFilePath: String?
 
-    @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
-    var verbose: Bool
+    @Flag(name: [.short, .long], inversion: .prefixedNo, help: "Output the modified data")
+    var verbose = false
+
+    @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
+    var color = true
 
     // MARK: - Functions
 
@@ -52,17 +55,17 @@ struct DeleteCommand: ParsableCommand {
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
 
             try readingPaths.forEach { try json.delete($0) }
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
 
             try readingPaths.forEach { try plist.delete($0) }
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
 
             try readingPaths.forEach { try xml.delete($0) }
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color)
 
         } else {
             if let filePath = inputFilePath {
