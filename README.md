@@ -57,6 +57,8 @@ scout -i People.plist "people.Robert.age=2" -v
 
 ![](Resources/syntax-highlighting-2.png)
 
+When dealing with large files (although it is not recommended to ouput large files in the terminal), colorising the ouput might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color`.
+
 ### Customise colors
 You can specify your own color set as explained [here](https://github.com/ABridoux/scout/wiki/%5B30%5D-Syntax-highlighting:-custom-colors). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
 

@@ -2,63 +2,14 @@ import ArgumentParser
 import Scout
 import Foundation
 
-private let discussion =
-"""
-Notes
-=====
-- If the path is invalid, the program will retrun an error
-- Enclose the value with sharp signs to change the key name: #keyName#
-- Enclose the value with slash signs to force the value as a string: /valueAsString/ (Plist, Json)
-- Enclose the value with interrogative signs to force the value as a boolean: ?valueToBoolean? (Plist, Json)
-- Enclose the value with tilde signs to force the value as a real: ~valueToReal~ (Plist)
-- Enclose the value with chevron signs to force the value as a integer: <valueToInteger> (Plist)
-- When accessing an array value by its index, use the index -1 to access to the last element
-
-Examples
-========
-
-Given the following XML (as input stream or file)
-
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset>
-    <url>
-        <loc>https://your-website-url.com/posts</loc>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-        <lastmod>2020-03-10</lastmod>
-    </url>
-    <url>
-        <loc>https://your-website-url.com/posts/first-post</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
-        <lastmod>2020-03-10</lastmod>
-    </url>
-</urlset>
-
-`scout set "urlset[1].changefreq"=yearly` will change the second url #changefreq# key value to "yearly"
-
-`scout set "urlset[0].priority"=2.0` will change the first url #priority# key value to 2.0
-
-`scout set "urlset[1].changefreq"=yearly` "urlset[0].priority"=2.0` will change both he second url #changefreq# key value to "yearly" and the first url #priority# key value to 2.0
-
-`scout set "urlset[-1].priority"=2.0` will change the last url #priority# key value to 2.0
-
-`scout set "urlset[0].changefreq"=#frequence#` will change the first url #changefreq# key name to #frequence#
-
-`scout set "urlset[0].priority"=/2.0/` will change the first url #priority# key value to the String value "2.0"
-
-`scout set "urlset[0].priority"=~2~` will change the first url #priority# key value to the Real value 2 (Plist only)
-
-"""
-
 struct SetCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "set",
         abstract: "Change a value at a given path.",
-        discussion: discussion)
+        discussion: "To find examples and advanced explanations, please type `scout doc set`")
 
     @Argument(help: PathAndValue.help)
-    var pathsAndValues: [PathAndValue]
+    var pathsAndValues = [PathAndValue]()
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
     var inputFilePath: String?
@@ -69,8 +20,11 @@ struct SetCommand: ParsableCommand {
     @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path")
     var modifyFilePath: String?
 
-    @Flag(name: [.short, .long], default: false, inversion: .prefixedNo, help: "Output the modified data")
-    var verbose: Bool
+    @Flag(name: [.short, .long], inversion: .prefixedNo, help: "Output the modified data")
+    var verbose = false
+
+    @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
+    var color = true
 
     func run() throws {
 
@@ -94,17 +48,17 @@ struct SetCommand: ParsableCommand {
         if var json = try? PathExplorerFactory.make(Json.self, from: data) {
 
             try set(pathsAndValues, in: &json)
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color)
 
         } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
 
             try set(pathsAndValues, in: &plist)
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color)
 
         } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
 
             try set(pathsAndValues, in: &xml)
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color)
 
         } else {
             if let filePath = inputFilePath {
