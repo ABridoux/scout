@@ -43,9 +43,6 @@ struct DeleteCommand: ParsableCommand {
                 let streamInput = FileHandle.standardInput.readDataToEndOfFile()
                 try delete(from: streamInput)
             }
-        } catch let error as PathExplorerError {
-            print(error.commandLineErrorDescription)
-            return
         }
     }
 
