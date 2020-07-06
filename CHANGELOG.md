@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [1.2.3](https://github.com/ABridoux/scout/tree/1.2.3) (06/07/2020)
+
+### Changed
+- Errors now sent to the standard error ouput with an error code different from 0 [#74]
+- Documentation updated [#74]
+
+### Fixed
+- JSON empty string colorisation [#72]
+
 ## [1.2.2](https://github.com/ABridoux/scout/tree/1.2.2) (04/07/2020)
 
 ### Added

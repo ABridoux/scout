@@ -1,3 +1,3 @@
 public struct Version {
-    public static let current = "1.2.2"
+    public static let current = "1.2.3"
 }
