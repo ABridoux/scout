@@ -1,14 +1,10 @@
 import Scout
 import ArgumentParser
+import Foundation
 
 extension Path: ExpressibleByArgument {
 
     public init?(argument: String) {
-        do {
-            self = try Path(string: argument)
-        } catch {
-            print(error.localizedDescription)
-            return nil
-        }
+        try? self.init(string: argument)
     }
 }

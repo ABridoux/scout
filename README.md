@@ -19,6 +19,9 @@ Install:<br>
      <a href="https://github.com/ABridoux/scout/releases">
         <img src="https://img.shields.io/badge/install-pkg%2Bzip-blue" />
     </a>
+    <a href="#">
+        <img src="https://img.shields.io/github/downloads/ABridoux/scout/total">
+    </a>
     <br/>
 </p>
 

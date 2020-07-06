@@ -36,9 +36,6 @@ struct AddCommand: ParsableCommand {
                 let streamInput = FileHandle.standardInput.readDataToEndOfFile()
                 try add(from: streamInput)
             }
-        } catch let error as PathExplorerError {
-            print(error.commandLineErrorDescription)
-            return
         }
     }
 

@@ -30,10 +30,10 @@ struct ReadDocumentation: Documentation {
     }
     """
 
-    private static let examples = [(#"`scout "people.Tom.hobbies[0]"`"#, #"will output Tom first hobby "cooking")"#),
+    private static let examples = [(#"`scout "people.Tom.hobbies[0]"`"#, #"will output Tom first hobby "cooking""#),
                                    (#"`scout "people.Arnaud.height"`"#, #"will output Arnaud's height "180""#),
                                    (#"`scout "people.Tom.hobbies[-1]"`"#, #"will output Tom last hobby: "guitar""#),
-                                   (#"`scout "people.Tom`"#, #"will output Tom dictionary"#)]
+                                   (#"`scout "people.Tom"`"#, #"will output Tom dictionary"#)]
 
     static let text =
     """
