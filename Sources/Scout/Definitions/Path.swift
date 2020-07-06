@@ -48,15 +48,16 @@ public extension Path {
      - note: The following separators will not work: "[", "]", "(", ")".
      When using a special caracter with [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
      it is required to quote it with "\\".
-
     */
     init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
         let indexRegexPattern = #"(?<=\[)[0-9-]+(?=\])"#
-        let splitRegex = try NSRegularExpression(pattern: splitRegexPattern, options: [])
-        let indexRegex = try NSRegularExpression(pattern: indexRegexPattern, options: [])
+        let squareBracketPattern = #"\[|\]"#
+        let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
+        let indexRegex = try NSRegularExpression(pattern: indexRegexPattern)
+        let squareBracketRegex = try NSRegularExpression(pattern: squareBracketPattern)
 
         let matches = splitRegex.matches(in: string)
         for match in matches {
@@ -94,8 +95,10 @@ public extension Path {
                     guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
                     elements.append(index)
                 }
-
             } else {
+                if squareBracketRegex.firstMatch(in: match, range: match.nsRange) != nil {
+                    throw PathExplorerError.invalidPathElement(match)
+                }
                 elements.append(match)
             }
         }

@@ -14,7 +14,7 @@ struct ReadCommand: ParsableCommand {
 
     // MARK: - Properties
 
-    @Argument(help: "Path in the data where to read the key value")
+    @Argument(help: .readingPath)
     var readingPath: Path?
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
@@ -49,10 +49,6 @@ struct ReadCommand: ParsableCommand {
 
             let output = color ? injector.inject(in: value) : value
             print(output)
-
-        } catch let error as PathExplorerError {
-            print(error.commandLineErrorDescription)
-            return
         }
     }
 
