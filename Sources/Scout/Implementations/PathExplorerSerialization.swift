@@ -3,12 +3,17 @@ import Foundation
 /// PathExplorer struct which uses a serializer to parse data: Json and Plist
 public struct PathExplorerSerialization<F: SerializationFormat> {
 
+    // MARK: - Constants
+
+    typealias DictionaryValue = [String: Any]
+    typealias ArrayValue = [Any]
+
     // MARK: - Properties
 
     var value: Any
 
-    var isDictionary: Bool { value is [String: Any] }
-    var isArray: Bool { value is [Any] }
+    var isDictionary: Bool { value is DictionaryValue }
+    var isArray: Bool { value is ArrayValue }
 
     public var readingPath = Path()
 
@@ -17,9 +22,9 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     public init(data: Data) throws {
         let raw = try F.serialize(data: data)
 
-        if let dict = raw as? [String: Any] {
+        if let dict = raw as? DictionaryValue {
             value = dict
-        } else if let array = raw as? [Any] {
+        } else if let array = raw as? ArrayValue {
             value = array
         } else {
             throw PathExplorerError.invalidData(F.self)
@@ -40,7 +45,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     // MARK: Get
 
     func get(for key: String) throws -> Self {
-        guard let dict = value as? [String: Any] else {
+        guard let dict = value as? DictionaryValue else {
             throw PathExplorerError.dictionarySubscript(readingPath)
         }
 
@@ -53,7 +58,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(at index: Int, negativeIndexEnabled: Bool = true) throws -> Self {
-        guard let array = value as? [Any] else {
+        guard let array = value as? ArrayValue else {
             throw PathExplorerError.arraySubscript(readingPath)
         }
 
@@ -92,7 +97,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     // MARK: Set
 
     mutating func set(key: String, to newValue: Any) throws {
-        guard var dict = value as? [String: Any] else {
+        guard var dict = value as? DictionaryValue else {
             throw PathExplorerError.dictionarySubscript(readingPath)
         }
 
@@ -105,7 +110,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     }
 
     mutating func set(index: Int, to newValue: Any) throws {
-        guard var array = value as? [Any] else {
+        guard var array = value as? ArrayValue else {
             throw PathExplorerError.arraySubscript(readingPath)
         }
 
@@ -165,7 +170,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     // -- Key name
 
     mutating func change(key: String, nameTo newKeyName: String) throws {
-        guard var dict = value as? [String: Any] else {
+        guard var dict = value as? DictionaryValue else {
             throw PathExplorerError.dictionarySubscript(readingPath)
         }
 
@@ -212,7 +217,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         switch element {
 
         case .key(let key):
-            guard var dict = value as? [String: Any] else {
+            guard var dict = value as? DictionaryValue else {
                 throw PathExplorerError.dictionarySubscript(readingPath)
             }
 
@@ -224,7 +229,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             value = dict
 
         case .index(let index):
-            guard var array = value as? [Any] else {
+            guard var array = value as? ArrayValue else {
                 throw PathExplorerError.arraySubscript(readingPath)
             }
 
@@ -280,14 +285,14 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     /// - Throws: if self cannot be subscript with the given element
     mutating func add(_ newValue: Any, for element: PathElement) throws {
 
-        if var dict = value as? [String: Any] {
+        if var dict = value as? DictionaryValue {
             guard let key = element.key else {
                 throw PathExplorerError.dictionarySubscript(readingPath)
             }
             dict[key] = newValue
             value = dict
 
-        } else if var array = value as? [Any] {
+        } else if var array = value as? ArrayValue {
             guard let index = element.index else {
                 throw PathExplorerError.arraySubscript(readingPath)
             }
@@ -311,8 +316,8 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     /// - Returns: The newly created path explorer
     func makeDictionaryOrArray(childKey: PathElement) -> Any {
         switch childKey {
-        case .key: return [String: Any]() //dictionary
-        case .index: return [Any]() //array
+        case .key: return DictionaryValue() //dictionary
+        case .index: return ArrayValue() //array
         }
     }
 
