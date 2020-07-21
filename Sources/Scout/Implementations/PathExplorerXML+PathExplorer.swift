@@ -20,7 +20,7 @@ extension PathExplorerXML: PathExplorer {
         var currentPathExplorer = self
 
         try pathElements.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0.pathValue)
         }
 
         return currentPathExplorer
@@ -41,7 +41,7 @@ extension PathExplorerXML: PathExplorer {
 
     // MARK: Set
 
-    public mutating func set<Type>(_ path: [PathElement], to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
+    public mutating func set<Type>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try set(path, to: newValue)
     }
 

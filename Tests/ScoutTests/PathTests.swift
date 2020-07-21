@@ -7,6 +7,7 @@ final class PathTests: XCTestCase {
 
     let firstKey = "firstKey"
     let secondKey = "secondKey"
+    let index = 1
     let secondKeyWithIndex = "secondKey[1]"
     let secondKeyWithNegativeIndex = "secondKey[-1]"
     let secondKeyWithdot = "second.key"
@@ -24,6 +25,13 @@ final class PathTests: XCTestCase {
 
     // MARK: - Functions
 
+    func testEqual() throws {
+        let path1: Path = [firstKey, secondKey, thirdKey]
+        let path2: Path = [firstKey, secondKey, thirdKey]
+
+        XCTAssertTrue(path1 == path2)
+    }
+
     func testSimpleKeys() throws {
         let array: Path = [firstKey, secondKey, thirdKey]
         let path = try Path(string: "\(firstKey).\(secondKey).\(thirdKey)")
@@ -32,21 +40,21 @@ final class PathTests: XCTestCase {
     }
 
     func testKeysWithIndex() throws {
-        let array: Path = [firstKey, secondKey, 1, thirdKey]
+        let array: Path = [firstKey, secondKey, index, thirdKey]
         let path = try Path(string: "\(firstKey).\(secondKeyWithIndex).\(thirdKey)")
 
         XCTAssertTrue(path == array)
     }
 
     func testKeysWithNegativeIndex() throws {
-        let array: Path = [firstKey, secondKey, -1, thirdKey]
+        let array: Path = [firstKey, secondKey, -index, thirdKey]
         let path = try Path(string: "\(firstKey).\(secondKeyWithNegativeIndex).\(thirdKey)")
 
         XCTAssertTrue(path == array)
     }
 
     func testKeysWithBrackets() throws {
-        let array: Path = [firstKey, secondKey, 1, thirdKeyWithDot]
+        let array: Path = [firstKey, secondKey, index, thirdKeyWithDot]
         let path = try Path(string: "\(firstKey).\(secondKeyWithIndex).(\(thirdKeyWithDot))")
 
         XCTAssertTrue(path == array)
@@ -60,14 +68,14 @@ final class PathTests: XCTestCase {
     }
 
     func testNestedArray() throws {
-        let array: Path = [firstKey, secondKey, 1, 0, thirdKey]
+        let array: Path = [firstKey, secondKey, index, 0, thirdKey]
         let path = try Path(string: "\(firstKey).\(secondKeyWithNestedArray).\(thirdKey)")
 
         XCTAssertTrue(path == array)
     }
 
     func testNestedArrayTwoLevels() throws {
-        let array: Path = [firstKey, secondKey, 1, 0, 2, thirdKey]
+        let array: Path = [firstKey, secondKey, index, 0, 2, thirdKey]
         let path = try Path(string: "\(firstKey).\(secondKeyWithTwoNestedArrays).\(thirdKey)")
 
         XCTAssertTrue(path == array)
@@ -95,7 +103,7 @@ final class PathTests: XCTestCase {
     }
 
     func testSeparator3WithBracketAndIndex() throws {
-        let array: Path = [firstKey, secondKeyWithFourthSeparator, 1, thirdKey]
+        let array: Path = [firstKey, secondKeyWithFourthSeparator, index, thirdKey]
         let path = try Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparatorAndIndex))$\(thirdKey)", separator: fourthSeparator)
 
         XCTAssertTrue(path == array)

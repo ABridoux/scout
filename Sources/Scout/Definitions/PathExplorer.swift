@@ -64,14 +64,14 @@ where
     /// Set the value of the key at the given path, specified as array
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    mutating func set(_ path: [PathElement], to newValue: Any) throws
+    mutating func set(_ path: Path, to newValue: Any) throws
 
     /// Set the value of the key at the given path, specified as array
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred.
-    mutating func set<Type: KeyAllowedType>(_ path: [PathElement], to newValue: Any, as type: KeyType<Type>) throws
+    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws
 
     /// Set the value of the key at the given path, specified as array
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
