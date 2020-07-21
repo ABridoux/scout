@@ -62,14 +62,9 @@ public struct PathExplorerXML {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(pathElement: PathElement, negativeIndexEnabled: Bool = true) throws  -> Self {
-        if let stringElement = pathElement as? String {
-            return try get(for: stringElement)
-        } else if let intElement = pathElement as? Int {
-            return try get(at: intElement, negativeIndexEnabled: negativeIndexEnabled)
-        } else {
-            // prevent a new type other than int or string to conform to PathElement
-            assertionFailure("Only Int and String can be PathElement")
-            return self
+        switch pathElement {
+        case .key(let key): return try get(for: key)
+        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         }
     }
 
@@ -92,17 +87,17 @@ public struct PathExplorerXML {
         element[key].value = newValue
     }
 
-    public mutating func set(_ path: [PathElement], to newValue: Any) throws {
+    public mutating func set(_ path: Path, to newValue: Any) throws {
         let newValueString = try convert(newValue, to: .string)
 
         var currentPathExplorer = self
 
         try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0.pathValue)
         }
 
         guard currentPathExplorer.element.children.isEmpty else {
-            throw PathExplorerError.wrongValueForKey(value: newValueString, element: currentPathExplorer.element.name)
+            throw PathExplorerError.wrongValueForKey(value: newValueString, element: currentPathExplorer.element.name.pathValue)
         }
 
         currentPathExplorer.element.value = newValueString
@@ -114,7 +109,7 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0.pathValue)
         }
 
         currentPathExplorer.element.name = newKeyName
@@ -126,7 +121,7 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0.pathValue)
         }
 
         currentPathExplorer.element.removeFromParent()
@@ -148,25 +143,25 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach { element in
-            if let pathExplorer = try? currentPathExplorer.get(pathElement: element, negativeIndexEnabled: false) {
+            if let pathExplorer = try? currentPathExplorer.get(pathElement: element.pathValue, negativeIndexEnabled: false) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
                 // the key does not exist. Add a new key to it
-                let keyName = element as? String ?? currentPathExplorer.element.childrenName
+                let keyName = element.pathValue.key ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
 
-                if let index = element as? Int, index == -1 {
+                if case let .index(index) = element.pathValue, index == -1 {
                     // get the last element
                     let childrenCount = currentPathExplorer.element.children.count - 1
-                    currentPathExplorer = try currentPathExplorer.get(pathElement: childrenCount)
+                    currentPathExplorer = try currentPathExplorer.get(pathElement: childrenCount.pathValue)
                 } else {
-                    currentPathExplorer = try currentPathExplorer.get(pathElement: element)
+                    currentPathExplorer = try currentPathExplorer.get(pathElement: element.pathValue)
                 }
             }
         }
 
-        try currentPathExplorer.add(newValue, for: lastElement)
+        try currentPathExplorer.add(newValue, for: lastElement.pathValue)
 
     }
 
@@ -181,7 +176,9 @@ public struct PathExplorerXML {
     /// - Throws: if self cannot be subscript with the given element
     mutating func add(_ newValue: String, for pathElement: PathElement) throws {
 
-        if let key = pathElement as? String {
+        switch pathElement {
+
+        case .key(let key):
             if let existingChild = element.firstDescendant(where: { $0.name == key }) {
                 // set the value of the child if one exists with the given key
                 existingChild.value = newValue
@@ -189,7 +186,8 @@ public struct PathExplorerXML {
                 // otherwise add the child
                 element.addChild(name: key, value: newValue, attributes: [:])
             }
-        } else if let index = pathElement as? Int {
+
+        case .index(let index):
             let keyName = element.childrenName
 
             if index == -1 || element.children.isEmpty {
@@ -217,7 +215,7 @@ public struct PathExplorerXML {
                     element = copy
                 }
             } else {
-                throw PathExplorerError.wrongValueForKey(value: newValue, element: index)
+                throw PathExplorerError.wrongValueForKey(value: newValue, element: index.pathValue)
             }
         }
     }

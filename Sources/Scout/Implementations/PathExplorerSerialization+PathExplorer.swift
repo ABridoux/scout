@@ -57,7 +57,7 @@ extension PathExplorerSerialization: PathExplorer {
 
     // MARK: Set
 
-    public mutating func set(_ path: [PathElement], to newValue: Any) throws {
+    public mutating func set(_ path: Path, to newValue: Any) throws {
         try set(path, to: newValue, as: .automatic)
     }
 

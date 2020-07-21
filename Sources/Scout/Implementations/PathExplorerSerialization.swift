@@ -73,14 +73,9 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(element pathElement: PathElement, negativeIndexEnabled: Bool = true) throws -> Self {
-        if let stringElement = pathElement as? String {
-            return try get(for: stringElement)
-        } else if let intElement = pathElement as? Int {
-            return try get(at: intElement, negativeIndexEnabled: negativeIndexEnabled)
-        } else {
-            // prevent a new type other than int or string to conform to PathElement
-            assertionFailure("Only Int and String can be PathElement")
-            return self
+        switch pathElement {
+        case .key(let key): return try get(for: key)
+        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         }
     }
 
@@ -88,7 +83,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         var currentPathExplorer = self
 
         try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(element: $0)
+            currentPathExplorer = try currentPathExplorer.get(element: $0.pathValue)
         }
 
         return currentPathExplorer
@@ -129,18 +124,13 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     }
 
     mutating func set(element pathElement: PathElement, to newValue: Any) throws {
-        if let key = pathElement as? String {
-            try set(key: key, to: newValue)
-        } else if let index = pathElement as? Int {
-            try set(index: index, to: newValue)
-        } else {
-            // prevent a new type other than int or string to conform to PathElement
-            assertionFailure("Only Int and String can be PathElement")
-            return
+        switch pathElement {
+        case .key(let key): return try set(key: key, to: newValue)
+        case .index(let index): return try set(index: index, to: newValue)
         }
     }
 
-    public mutating func set<Type: KeyAllowedType>(_ path: [PathElement], to newValue: Any, as type: KeyType<Type>) throws {
+    public mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws {
         let newValue = try convert(newValue, to: type)
 
         var pathElements = path
@@ -152,20 +142,20 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         var pathExplorers = [currentPathExplorer]
 
         try pathElements.forEach {
-            currentPathExplorer = try currentPathExplorer.get(element: $0)
+            currentPathExplorer = try currentPathExplorer.get(element: $0.pathValue)
             pathExplorers.append(currentPathExplorer)
         }
 
-        if let futureUpdatedValue = try? currentPathExplorer.get(lastElement),
+        if let futureUpdatedValue = try? currentPathExplorer.get(lastElement.pathValue),
         futureUpdatedValue.isArray || futureUpdatedValue.isDictionary {
-            throw PathExplorerError.wrongValueForKey(value: newValue, element: lastElement)
+            throw PathExplorerError.wrongValueForKey(value: newValue, element: lastElement.pathValue)
         }
 
-        try currentPathExplorer.set(element: lastElement, to: newValue)
+        try currentPathExplorer.set(element: lastElement.pathValue, to: newValue)
 
         for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
             var pathExplorer = pathExplorer
-            try pathExplorer.set(element: element, to: currentPathExplorer.value)
+            try pathExplorer.set(element: element.pathValue, to: currentPathExplorer.value)
             currentPathExplorer = pathExplorer
         }
 
@@ -189,37 +179,39 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     }
 
     public mutating func set(_ path: Path, keyNameTo newKeyName: String) throws {
-           var pathElements = path
+        var pathElements = path
 
-           guard !pathElements.isEmpty else { return }
+        guard !pathElements.isEmpty else { return }
 
-           guard let lastElement = pathElements.removeLast() as? String else {
-               throw PathExplorerError.underlyingError("Cannot modify key name in an array")
-           }
+        guard let lastElement = pathElements.removeLast().pathValue.key else {
+           throw PathExplorerError.underlyingError("Cannot modify key name in an array")
+       }
 
-           var currentPathExplorer = self
-           var pathExplorers = [currentPathExplorer]
+        var currentPathExplorer = self
+        var pathExplorers = [currentPathExplorer]
 
-           try pathElements.forEach {
-               currentPathExplorer = try currentPathExplorer.get(element: $0)
-               pathExplorers.append(currentPathExplorer)
-           }
+        try pathElements.forEach {
+            currentPathExplorer = try currentPathExplorer.get(element: $0.pathValue)
+            pathExplorers.append(currentPathExplorer)
+        }
 
-           try currentPathExplorer.change(key: lastElement, nameTo: newKeyName)
+        try currentPathExplorer.change(key: lastElement, nameTo: newKeyName)
 
-           for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
-               var pathExplorer = pathExplorer
-               try pathExplorer.set(element: element, to: currentPathExplorer.value)
-               currentPathExplorer = pathExplorer
-           }
+        for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
+           var pathExplorer = pathExplorer
+        try pathExplorer.set(element: element.pathValue, to: currentPathExplorer.value)
+           currentPathExplorer = pathExplorer
+        }
 
-           self = currentPathExplorer
+        self = currentPathExplorer
        }
 
     // MARK: Delete
 
     mutating func delete(element: PathElement) throws {
-        if let key = element as? String {
+        switch element {
+
+        case .key(let key):
             guard var dict = value as? [String: Any] else {
                 throw PathExplorerError.dictionarySubscript(readingPath)
             }
@@ -231,7 +223,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             dict.removeValue(forKey: key)
             value = dict
 
-        } else if let index = element as? Int {
+        case .index(let index):
             guard var array = value as? [Any] else {
                 throw PathExplorerError.arraySubscript(readingPath)
             }
@@ -251,8 +243,6 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
             array.remove(at: index)
             value = array
-        } else {
-            throw PathExplorerError.wrongValueForKey(value: value, element: element)
         }
     }
 
@@ -266,15 +256,15 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         var pathExplorers = [currentPathExplorer]
 
         try pathElements.forEach {
-            currentPathExplorer = try currentPathExplorer.get(element: $0)
+            currentPathExplorer = try currentPathExplorer.get(element: $0.pathValue)
             pathExplorers.append(currentPathExplorer)
         }
 
-        try currentPathExplorer.delete(element: lastElement)
+        try currentPathExplorer.delete(element: lastElement.pathValue)
 
         for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
             var pathExplorer = pathExplorer
-            try pathExplorer.set(element: element, to: currentPathExplorer.value)
+            try pathExplorer.set(element: element.pathValue, to: currentPathExplorer.value)
             currentPathExplorer = pathExplorer
         }
 
@@ -291,14 +281,14 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     mutating func add(_ newValue: Any, for element: PathElement) throws {
 
         if var dict = value as? [String: Any] {
-            guard let key = element as? String else {
+            guard let key = element.key else {
                 throw PathExplorerError.dictionarySubscript(readingPath)
             }
             dict[key] = newValue
             value = dict
 
         } else if var array = value as? [Any] {
-            guard let index = element as? Int else {
+            guard let index = element.index else {
                 throw PathExplorerError.arraySubscript(readingPath)
             }
 
@@ -309,7 +299,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
                 // insert the new value at the index
                 array.insert(newValue, at: index)
             } else {
-                throw PathExplorerError.wrongValueForKey(value: value, element: index)
+                throw PathExplorerError.wrongValueForKey(value: value, element: index.pathValue)
             }
             value = array
         }
@@ -320,14 +310,9 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     ///   - childKey: If string, the path explorer will be a dictionary. Array if int
     /// - Returns: The newly created path explorer
     func makeDictionaryOrArray(childKey: PathElement) -> Any {
-        if childKey is String { // ditionary
-            return [String: Any]()
-        } else if childKey is Int { // array
-            return [Any]()
-        } else {
-            // prevent a new type other than int or string to conform to PathElement
-            assertionFailure("Only Int and String can be PathElement")
-            return ""
+        switch childKey {
+        case .key: return [String: Any]() //dictionary
+        case .index: return [Any]() //array
         }
     }
 
@@ -343,17 +328,17 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         for (index, pathElement) in pathElements.enumerated() {
             // if the key already exists, retrieve it
-            if let pathExplorer = try? currentPathExplorer.get(element: pathElement, negativeIndexEnabled: false) {
+            if let pathExplorer = try? currentPathExplorer.get(element: pathElement.pathValue, negativeIndexEnabled: false) {
                 // when using the -1 index and adding a value,
                 // we will consider it has to be added, not that it is used to target the last value
                 pathExplorers.append(pathExplorer)
                 currentPathExplorer = pathExplorer
             } else {
                 // add the new key
-                let childValue = makeDictionaryOrArray(childKey: path[index + 1])
-                try currentPathExplorer.add(childValue, for: pathElement)
+                let childValue = makeDictionaryOrArray(childKey: path[index + 1].pathValue)
+                try currentPathExplorer.add(childValue, for: pathElement.pathValue)
 
-                let pathExplorer = try currentPathExplorer.get(element: pathElement)
+                let pathExplorer = try currentPathExplorer.get(element: pathElement.pathValue)
                 // remove the previously added path explorer as we added a new key to it
                 pathExplorers.removeLast()
                 pathExplorers.append(currentPathExplorer)
@@ -363,11 +348,11 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             }
         }
 
-        try currentPathExplorer.add(newValue, for: lastElement)
+        try currentPathExplorer.add(newValue, for: lastElement.pathValue)
 
         for (pathExplorer, element) in zip(pathExplorers, pathElements).reversed() {
             var pathExplorer = pathExplorer
-            try pathExplorer.set(element: element, to: currentPathExplorer.value)
+            try pathExplorer.set(element: element.pathValue, to: currentPathExplorer.value)
             currentPathExplorer = pathExplorer
         }
 

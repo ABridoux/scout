@@ -1,23 +1,23 @@
 import Foundation
 
-/// Array of `PathElement`s. Only `String` and `Int` to indicate a key name or an array index
-public typealias Path = [PathElement]
+/// Array of `PathElementRepresentable` to find a specific value in a `PathExplorer`
+public typealias Path = [PathElementRepresentable]
 
 public extension Path {
 
-    // MARK: - Computed properties
+    // MARK: - Properties
 
     var description: String {
         var description = ""
-        forEach {
-            if let int = $0 as? Int {
+        forEach { element in
+            if case let .index(index) = element.pathValue {
                 // remove the point added automatically to a path element
                 if description.hasSuffix(".") {
                     description.removeLast()
                 }
-                description.append("[\(int)]")
+                description.append("[\(index)]")
             } else {
-                description.append(String(describing: $0))
+                description.append(String(describing: element))
             }
 
             description.append(".")
@@ -68,38 +68,16 @@ public extension Path {
                 match.removeFirst()
                 match.removeLast()
             }
-            var indexMatches = indexRegex.matches(in: match, options: [], range: match.nsRange)
+            let indexMatches = indexRegex.matches(in: match, options: [], range: match.nsRange)
 
             // try to get the indexes if any
-            if let indexMatch = indexMatches.first {
-                // we have a first index, so retrieve it and the array name if possible
-
-                // get the array index
-                guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
-
-                if indexMatch.range.lowerBound == 1 {
-                    // specific case: the root element is an array: there is no array name
-                    elements.append(index)
-                } else {
-                    // get the array name
-                    let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
-
-                    elements.append(arrayName)
-                    elements.append(index)
-                }
-
-                // now retrieve the remaining indexes
-                indexMatches.removeFirst()
-
-                try indexMatches.forEach { indexMatch in
-                    guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
-                    elements.append(index)
-                }
+            if let indexesMatch = try Self.extractIndexes(in: indexMatches, from: match) {
+                elements.append(contentsOf: indexesMatch)
             } else {
                 if squareBracketRegex.firstMatch(in: match, range: match.nsRange) != nil {
-                    throw PathExplorerError.invalidPathElement(match)
+                    throw PathExplorerError.invalidPathElement(match.pathValue)
                 }
-                elements.append(match)
+                elements.append(match.pathValue)
             }
         }
 
@@ -108,23 +86,39 @@ public extension Path {
 
     // MARK: - Functions
 
-    static func == (lhs: Path, rhs: Path) -> Bool {
-        guard lhs.count == rhs.count else { return false }
+    static func extractIndexes(in indexMatches: [NSTextCheckingResult], from match: String) throws -> [PathElement]? {
+        var indexMatches = indexMatches
+        var elements = [PathElement]()
 
-        var isEqual = true
-        for (leftElement, rightElement) in zip(lhs, rhs) {
-            if let leftString = leftElement as? String {
-                guard let rightString = rightElement as? String else { return false }
-                isEqual = isEqual && leftString == rightString
-            } else if let leftInt = leftElement as? Int {
-                guard let rightInt = rightElement as? Int else { return false }
-                isEqual = isEqual && rightInt == leftInt
-            } else {
-                assertionFailure("Only String and Int can be PathElement")
-                return false
-            }
+        guard let indexMatch = indexMatches.first else { // we have a first index, so retrieve it and the array name if possible
+            return nil
         }
-        return isEqual
+
+        // get the array index
+        guard let index = Int(match[indexMatch.range]) else {
+            throw PathExplorerError.invalidPathElement(match.pathValue)
+        }
+
+        if indexMatch.range.lowerBound == 1 {
+            // specific case: the root element is an array: there is no array name
+            elements.append(index.pathValue)
+        } else {
+            // get the array name
+            let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
+
+            elements.append(arrayName.pathValue)
+            elements.append(index.pathValue)
+        }
+
+        // now retrieve the remaining indexes
+        indexMatches.removeFirst()
+
+        try indexMatches.forEach { indexMatch in
+            guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match.pathValue) }
+            elements.append(index.pathValue)
+        }
+
+        return elements
     }
 
     func appending(_ element: PathElement) -> Path {
@@ -132,5 +126,51 @@ public extension Path {
         newPath.append(element)
 
         return newPath
+    }
+
+    func appending(_ key: String) -> Path {
+        var newPath = self
+        newPath.append(key)
+
+        return newPath
+    }
+
+    func appending(_ index: Int) -> Path {
+        var newPath = self
+        newPath.append(index)
+
+        return newPath
+    }
+}
+
+extension Path {
+
+    static func == (lhs: Path, rhs: Path) -> Bool {
+        guard lhs.count == rhs.count else { return false }
+
+        for (leftElement, rightElement) in zip(lhs, rhs) {
+            switch leftElement.pathValue {
+
+            case .key(let leftKey):
+                guard case let .key(rightKey) = rightElement.pathValue else {
+                    return false
+                }
+
+                if leftKey != rightKey {
+                    return false
+                }
+
+            case .index(let leftIndex):
+                guard case let .index(rightIndex) = rightElement.pathValue else {
+                    return false
+                }
+
+                if leftIndex != rightIndex {
+                    return false
+                }
+            }
+        }
+
+        return true
     }
 }
