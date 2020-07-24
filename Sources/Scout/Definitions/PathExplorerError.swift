@@ -12,6 +12,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case subscriptMissingKey(path: Path, key: String, bestMatch: String?)
     case arraySubscript(Path)
     case subscriptWrongIndex(path: Path, index: Int, arrayCount: Int)
+    case keyNameSetOnNonDictionary(path: Path)
 
     case stringToDataConversionError
     case dataToStringConversionError
@@ -41,6 +42,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
         case .arraySubscript(let path): return "Cannot subscript the key at '\(path.description)' with an Integer as is not an Array"
         case .subscriptWrongIndex(let path, let index, let arrayCount): return "The index #\(index)# is not within the bounds of the Array (0...\(arrayCount - 1)) at '\(path.description)'"
+        case .keyNameSetOnNonDictionary(path: let path): return "'\(path.description)' is not a dictionary and cannot set the key name of its children if any"
 
         case .stringToDataConversionError: return "Unable to convert the input string into data"
         case .dataToStringConversionError: return "Unable to convert the data to a string"

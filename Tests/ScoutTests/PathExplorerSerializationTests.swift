@@ -189,39 +189,25 @@ final class PathExplorerSerializationTests: XCTestCase {
     func testGetArrayCount_ThrowsErrorIfNotFinal() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         let plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let path: Path = ["animals", "ducks", PathElement.arrayCount, 1]
+        let errorPath: Path = ["animals", "ducks", PathElement.arrayCount]
+        let path = errorPath.appending(1)
 
-        XCTAssertThrowsError(
-        _ = try plist.get(path).string,
-        "Subscripting after an array count should throw an error") { error in
-            guard case PathExplorerError.arraySubscript = error else {
-                XCTFail()
-                return
-            }
-        }
+        XCTAssertErrorsEqual(try plist.get(path), .arrayCountWrongUsage(path: errorPath))
     }
 
     func testSetArrayCount_ThrowsError() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let path: Path = ["animals", "ducks", PathElement.arrayCount, 1]
+        let path: Path = ["animals", "ducks", PathElement.arrayCount]
 
         XCTAssertErrorsEqual(try plist.set(path, to: "Woomy"), .arrayCountWrongUsage(path: path))
     }
 
-    func testDeleteArrayCount_ThrowsError() throws {
+    func testSetKeyNameArrayCount_ThrowsError() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let path: Path = ["animals", "ducks", PathElement.arrayCount, 1]
+        let path: Path = ["animals", "ducks", PathElement.arrayCount]
 
-        XCTAssertErrorsEqual(_ = try plist.delete(path), .arrayCountWrongUsage(path: path))
-    }
-
-    func testAddArrayCount_ThrowsError() throws {
-        let data = try PropertyListEncoder().encode(StubStruct())
-        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let path: Path = ["animals", "ducks", PathElement.arrayCount, 1]
-
-        XCTAssertErrorsEqual(_ = try plist.add("oomi", at: path), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try plist.set(path, keyNameTo: "Woomy"), .keyNameSetOnNonDictionary(path: path))
     }
 }

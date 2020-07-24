@@ -40,3 +40,14 @@ extension PathElement: ExpressibleByIntegerLiteral {
         self = .index(integerLiteral)
     }
 }
+
+extension PathElement: CustomStringConvertible {
+
+    public var description: String {
+        switch self {
+        case .key(let key): return key
+        case .index(let index): return "[\(index)]"
+        case .arrayCount: return "[#]"
+        }
+    }
+}

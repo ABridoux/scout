@@ -12,7 +12,7 @@ extension XCTestCase {
                 let resultPathExplorerError = error as? PathExplorerError,
                 resultPathExplorerError == expectedError
             else {
-                XCTFail("The expression did not throw the error \(expectedError)", file: file, line: line)
+                XCTFail("The expression did not throw the error \(expectedError). Error thrown: \(error)", file: file, line: line)
                 return
             }
         }

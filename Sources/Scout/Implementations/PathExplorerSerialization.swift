@@ -87,6 +87,10 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(element pathElement: PathElement, negativeIndexEnabled: Bool = true) throws -> Self {
+        guard readingPath.last != .arrayCount else {
+            throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        }
+
         switch pathElement {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
@@ -97,8 +101,8 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     public func get(_ path: Path) throws -> Self {
         var currentPathExplorer = self
 
-        try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(element: $0)
+        try path.forEach { element in
+            currentPathExplorer = try currentPathExplorer.get(element: element)
         }
 
         return currentPathExplorer
@@ -115,10 +119,6 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         let lastElement = craftingPath.removeLast()
 
         let explorers = try craftingPath.reduce([self]) { (explorers, element) in
-            guard element != .arrayCount else { // arrayCount forbidden here
-                throw PathExplorerError.arrayCountWrongUsage(path: path)
-            }
-
             guard let currentExplorer = try explorers.last?.get(element: element) else {
                 return explorers // should not happen
             }
@@ -163,8 +163,12 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         value = array
     }
 
-    mutating func set(element pathElement: PathElement, to newValue: Any) throws {
-        switch pathElement {
+    mutating func set(element: PathElement, to newValue: Any) throws {
+        guard element != .arrayCount else {
+            throw PathExplorerError.arrayCountWrongUsage(path: readingPath.appending(element))
+        }
+
+        switch element {
         case .key(let key): return try set(key: key, to: newValue)
         case .index(let index): return try set(index: index, to: newValue)
         case .arrayCount: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
@@ -219,12 +223,12 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         let (pathExplorers, path, lastElement) = try getExplorers(from: path)
 
-        guard let lastKey = lastElement.key else {
-           throw PathExplorerError.underlyingError("Cannot modify key name in an array")
+        guard case let .key(lastKey) = lastElement else {
+            throw PathExplorerError.keyNameSetOnNonDictionary(path: path.appending(lastElement))
        }
 
         guard var currentExplorer = pathExplorers.last else {
-            throw PathExplorerError.underlyingError("Internal error while exploring the path '\(path.description)' to set it")
+            throw PathExplorerError.underlyingError("Internal error while exploring the path '\(path.appending(lastElement).description)' to set it")
         }
 
         try currentExplorer.change(key: lastKey, nameTo: newKeyName)
@@ -358,10 +362,6 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         var pathExplorers = [currentPathExplorer]
 
         for (index, element) in craftingPath.enumerated() {
-            guard element != .arrayCount else {
-                throw PathExplorerError.arrayCountWrongUsage(path: path)
-            }
-
             // if the key already exists, retrieve it
             if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
                 // when using the -1 index and adding a value,

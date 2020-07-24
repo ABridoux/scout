@@ -11,6 +11,7 @@ public struct Path: Equatable {
 
     public var startIndex: Int { elements.startIndex }
     public var endIndex: Int { elements.endIndex }
+    public var last: PathElement? { elements.last }
 
     public static var empty: Path { Path([PathElement]()) }
 
@@ -122,26 +123,8 @@ public struct Path: Equatable {
         return elements
     }
 
-    public func appending(_ element: PathElement) -> Path {
-        var newPath = self
-        newPath.append(element)
-
-        return newPath
-    }
-
-    public func appending(_ key: String) -> Path {
-        var newPath = self
-        newPath.append(key)
-
-        return newPath
-    }
-
-    public func appending(_ index: Int) -> Path {
-        var newPath = self
-        newPath.append(index)
-
-        return newPath
-    }
+    public func appending(_ elements: PathElementRepresentable...) -> Path { Path(self.elements + elements) }
+    public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
 
     public mutating func removeLast() -> PathElement { elements.removeLast() }
 }
@@ -174,14 +157,15 @@ extension Path: CustomStringConvertible {
     public var description: String {
         var description = ""
         elements.forEach { element in
-            if case let .index(index) = element {
+            switch element {
+            case .index, .arrayCount:
                 // remove the point added automatically to a path element
                 if description.hasSuffix(".") {
                     description.removeLast()
                 }
-                description.append("[\(index)]")
-            } else {
-                description.append(String(describing: element))
+                description.append(element.description)
+
+            case .key: description.append(element.description)
             }
 
             description.append(".")

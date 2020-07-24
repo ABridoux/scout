@@ -157,4 +157,34 @@ final class PathExplorerXMLTests: XCTestCase {
 
         XCTAssertEqual(try xml.get(["cats", "my_cat"]).string, "Mocka")
     }
+
+    // MARK: Array count
+
+    func testGetArrayCount() throws {
+        let xml = try PathExplorerXML(data: stubData2)
+
+        XCTAssertEqual(try xml.get(for: "dogs").get(pathElement: .arrayCount).int, 3)
+    }
+
+    func testGetArrayCount_ThrowsErrorIfNotFinal() throws {
+        let xml = try PathExplorerXML(data: stubData2)
+        let errorPath = Path("root", "dogs", PathElement.arrayCount)
+        let path = errorPath.appending(2)
+
+        XCTAssertErrorsEqual(try xml.get(path), .arrayCountWrongUsage(path: errorPath))
+    }
+
+    func testSetArrayCount_ThrowsError() throws {
+        var xml = try PathExplorerXML(data: stubData2)
+        let path = Path("root", "dogs", PathElement.arrayCount)
+
+        XCTAssertErrorsEqual(try xml.set(path, to: "Woomy"), .arrayCountWrongUsage(path: path))
+    }
+
+    func testSetKeyNameArrayCount_ThrowsError() throws {
+        var xml = try PathExplorerXML(data: stubData2)
+        let path = Path("root", "dogs", PathElement.arrayCount)
+
+        XCTAssertErrorsEqual(try xml.set(path, keyNameTo: "Woomy"), .arrayCountWrongUsage(path: path))
+    }
 }

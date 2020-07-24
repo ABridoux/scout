@@ -62,10 +62,16 @@ public struct PathExplorerXML {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(pathElement: PathElement, negativeIndexEnabled: Bool = true) throws  -> Self {
+        guard readingPath.last !=	 .arrayCount else {
+            throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        }
+
         switch pathElement {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
-        case .arrayCount: return PathExplorerXML(integerLiteral: element.count)
+        case .arrayCount:
+            return PathExplorerXML(element: .init(name: "", value: "\(element.children.count)", attributes: [:]),
+                                   path: readingPath.appending(pathElement))
         }
     }
 
@@ -93,8 +99,11 @@ public struct PathExplorerXML {
 
         var currentPathExplorer = self
 
-        try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+        try path.forEach { element in
+            guard element != .arrayCount else {
+                throw PathExplorerError.arrayCountWrongUsage(path: path)
+            }
+            currentPathExplorer = try currentPathExplorer.get(pathElement: element)
         }
 
         guard currentPathExplorer.element.children.isEmpty else {
@@ -111,6 +120,10 @@ public struct PathExplorerXML {
 
         try path.forEach {
             currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
+        }
+
+        guard currentPathExplorer.readingPath.last != .arrayCount else {
+            throw PathExplorerError.arrayCountWrongUsage(path: path)
         }
 
         currentPathExplorer.element.name = newKeyName
