@@ -42,17 +42,17 @@ struct AddCommand: ParsableCommand {
     func add(from data: Data) throws {
         let output = modifyFilePath ?? self.output
 
-        if var json = try? PathExplorerFactory.make(Json.self, from: data) {
+        if var json = try? Json(data: data) {
 
             try add(pathsAndValues, to: &json)
             try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color)
 
-        } else if var plist = try? PathExplorerFactory.make(Plist.self, from: data) {
+        } else if var plist = try? Plist(data: data) {
 
             try add(pathsAndValues, to: &plist)
             try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color)
 
-        } else if var xml = try? PathExplorerFactory.make(Xml.self, from: data) {
+        } else if var xml = try? Xml(data: data) {
 
             try add(pathsAndValues, to: &xml)
             try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color)
