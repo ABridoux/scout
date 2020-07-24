@@ -16,7 +16,9 @@ final class PathTests: XCTestCase {
     let secondKeyWithNestedArray = "secondKey[1][0]"
     let secondKeyWithTwoNestedArrays = "secondKey[1][0][2]"
     let secondKeyWithFourthSeparatorAndIndex = "second$key[1]"
+    let secondKeyWithCount = "secondKey[#]"
     let thirdKey = "thirdKey"
+    let thirdKeyWithCount = "thirdKey[#].secondKey"
     let thirdKeyWithDot = "third.Key"
 
     let secondSeparator = "->"
@@ -119,6 +121,20 @@ final class PathTests: XCTestCase {
     func testRootElementNestedArrays() throws {
         let array: Path = [1, 0, firstKey, secondKey]
         let path = try Path(string: "[1][0].\(firstKey).\(secondKey)")
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testCount() throws {
+        let array: Path = [secondKey, PathElement.count]
+        let path = try Path(string: secondKeyWithCount)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testCountNotFinal() throws {
+        let array: Path = [thirdKey, PathElement.count, secondKey]
+        let path = try Path(string: thirdKeyWithCount)
 
         XCTAssertEqual(path, array)
     }
