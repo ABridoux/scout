@@ -163,7 +163,7 @@ final class PathExplorerXMLTests: XCTestCase {
     func testGetCount() throws {
         let xml = try PathExplorerXML(data: stubData2)
 
-        XCTAssertEqual(try xml.get(for: "dogs").get(pathElement: .count).int, 3)
+        XCTAssertEqual(try xml.get(for: "dogs").get(element: .count).int, 3)
     }
 
     func testGetCount_ThrowsErrorIfNotFinal() throws {

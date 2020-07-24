@@ -1,6 +1,21 @@
 import Foundation
 
-extension PathExplorerSerialization: PathExplorer {
+/// PathExplorer struct which uses a serializer to parse data: Json and Plist
+public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
+
+    // MARK: - Constants
+
+    typealias DictionaryValue = [String: Any]
+    typealias ArrayValue = [Any]
+
+    // MARK: - Properties
+
+    var value: Any
+
+    var isDictionary: Bool { value is DictionaryValue }
+    var isArray: Bool { value is ArrayValue }
+
+    // MARK: PathExplorer
 
     public var string: String? { value as? String }
     public var bool: Bool? { value as? Bool }
@@ -41,18 +56,45 @@ extension PathExplorerSerialization: PathExplorer {
 
     }
 
+    public var readingPath = Path()
+
+    // MARK: - Initialization
+
+    public init(data: Data) throws {
+        let raw = try F.serialize(data: data)
+
+        if let dict = raw as? DictionaryValue {
+            value = dict
+        } else if let array = raw as? ArrayValue {
+            value = array
+        } else {
+            throw PathExplorerError.invalidData(serializationFormat: String(describing: F.self))
+        }
+    }
+
+    public init(value: Any) {
+        self.value = value
+    }
+
+    init(value: Any, path: Path) {
+        self.value = value
+        readingPath = path
+    }
+
+    // MARK: - Functions
+
     // MARK: Get
 
-    public func get(_ pathElements: PathElementRepresentable...) throws -> Self {
-        try get(Path(pathElements))
+    public func get(_ path: PathElementRepresentable...) throws -> Self {
+        try get(Path(path))
     }
 
     public func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T {
         try T(value: get(path).value)
     }
 
-    public func get<T: KeyAllowedType>(_ pathElements: PathElementRepresentable..., as type: KeyType<T>) throws -> T {
-        try T(value: get(Path(pathElements)).value)
+    public func get<T: KeyAllowedType>(_ path: PathElementRepresentable..., as type: KeyType<T>) throws -> T {
+        try T(value: get(Path(path)).value)
     }
 
     // MARK: Set
@@ -61,24 +103,24 @@ extension PathExplorerSerialization: PathExplorer {
         try set(path, to: newValue, as: .automatic)
     }
 
-    public mutating func set<Type: KeyAllowedType>(_ pathElements: PathElementRepresentable..., to newValue: Any, as type: KeyType<Type>) throws {
-        try set(Path(pathElements), to: newValue, as: type)
+    public mutating func set<Type: KeyAllowedType>(_ path: PathElementRepresentable..., to newValue: Any, as type: KeyType<Type>) throws {
+        try set(Path(path), to: newValue, as: type)
     }
 
-    public mutating func set(_ pathElements: PathElementRepresentable..., to newValue: Any) throws {
-        try set(Path(pathElements), to: newValue, as: .automatic)
+    public mutating func set(_ path: PathElementRepresentable..., to newValue: Any) throws {
+        try set(Path(path), to: newValue, as: .automatic)
     }
 
     // -- Set key name
 
-    public mutating func set(_ pathElements: PathElementRepresentable..., keyNameTo newKeyName: String) throws {
-        try set(Path(pathElements), keyNameTo: newKeyName)
+    public mutating func set(_ path: PathElementRepresentable..., keyNameTo newKeyName: String) throws {
+        try set(Path(path), keyNameTo: newKeyName)
     }
 
     // MARK: Delete
 
-    public mutating func delete(_ pathElements: PathElementRepresentable...) throws {
-        try delete(Path(pathElements))
+    public mutating func delete(_ path: PathElementRepresentable...) throws {
+        try delete(Path(path))
     }
 
     // MARK: Add
@@ -87,12 +129,12 @@ extension PathExplorerSerialization: PathExplorer {
         try add(newValue, at: path, as: .automatic)
     }
 
-    public mutating func add(_ newValue: Any, at pathElements: PathElementRepresentable...) throws {
-        try add(newValue, at: Path(pathElements), as: .automatic)
+    public mutating func add(_ newValue: Any, at path: PathElementRepresentable...) throws {
+        try add(newValue, at: Path(path), as: .automatic)
     }
 
-    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElementRepresentable..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
-        try add(newValue, at: Path(pathElements), as: type)
+    public mutating func add<Type>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
+        try add(newValue, at: Path(path), as: type)
     }
 
     // MARK: Export

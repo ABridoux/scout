@@ -1,4 +1,16 @@
-extension PathExplorerXML: PathExplorer {
+import Foundation
+import AEXML
+
+public struct PathExplorerXML: PathExplorer {
+
+    // MARK: - Properties
+
+    var element: AEXMLElement
+
+    public var readingPath = Path()
+
+    // MARK: PathExplorer
+
     public var string: String? { element.string.trimmingCharacters(in: .whitespacesAndNewlines) == "" ? nil : element.string }
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
@@ -10,6 +22,25 @@ extension PathExplorerXML: PathExplorer {
 
     public var format: DataFormat { .xml }
 
+    // MARK: - Initialization
+
+    public init(data: Data) throws {
+        let document = try AEXMLDocument(xml: data)
+        element = document.root
+        readingPath.append(element.name)
+    }
+
+    init(element: AEXMLElement, path: Path) {
+        self.element = element
+        readingPath = path
+    }
+
+    public init(value: Any) {
+        element = AEXMLElement(name: "", value: String(describing: value), attributes: [:])
+    }
+
+    // MARK: - Functions
+
     // MARK: Get
 
     public func get(_ path: PathElementRepresentable...) throws -> Self {
@@ -20,7 +51,7 @@ extension PathExplorerXML: PathExplorer {
         var currentPathExplorer = self
 
         try path.forEach { element in
-            currentPathExplorer = try currentPathExplorer.get(pathElement: element)
+            currentPathExplorer = try currentPathExplorer.get(element: element)
         }
 
         return currentPathExplorer
@@ -30,7 +61,7 @@ extension PathExplorerXML: PathExplorer {
         let explorer = try get(path)
 
         guard let value = explorer.element.value else {
-            throw PathExplorerError.underlyingError("Program error. No value at '\(path.description)' although the path is valid.")
+            throw PathExplorerError.underlyingError("Internal error. No value at '\(path.description)' although the path is valid.")
         }
         return try T(value: value)
     }
@@ -67,5 +98,22 @@ extension PathExplorerXML: PathExplorer {
 
     public mutating func add<Type>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try add(newValue, at: Path(path))
+    }
+
+    // MARK: Export
+
+    public func exportData() throws -> Data {
+        let document = AEXMLDocument(root: element, options: .init())
+        let xmlString = document.xml
+
+        guard let data  = xmlString.data(using: .utf8) else {
+            throw PathExplorerError.stringToDataConversionError
+        }
+
+        return data
+    }
+
+    public func exportString() throws -> String {
+        AEXMLDocument(root: element, options: .init()).xml
     }
 }
