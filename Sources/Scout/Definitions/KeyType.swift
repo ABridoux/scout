@@ -48,7 +48,7 @@ public extension KeyAllowedType {
             }
         }
 
-        throw PathExplorerError.valueConversionError(value: value, type: String(describing: Self.typeDescription))
+        throw PathExplorerError.valueConversionError(value: String(describing: value), type: String(describing: Self.typeDescription))
     }
 }
 
