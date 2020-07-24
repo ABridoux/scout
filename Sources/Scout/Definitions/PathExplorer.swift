@@ -49,7 +49,7 @@ where
 
     /// Get the key at the given path, specified as variadic `PathElement`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    func get(_ pathElements: PathElement...) throws -> Self
+    func get(_ pathElements: PathElementRepresentable...) throws -> Self
 
     /// Get the key at the given path, specified as array
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
@@ -57,7 +57,7 @@ where
 
     /// Get the key at the given path, specified as variadic `PathElement`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
-    func get<T: KeyAllowedType>(_ pathElements: PathElement..., as type: KeyType<T>) throws -> T
+    func get<T: KeyAllowedType>(_ pathElements: PathElementRepresentable..., as type: KeyType<T>) throws -> T
 
     // MARK: Set
 
@@ -76,14 +76,14 @@ where
     /// Set the value of the key at the given path, specified as array
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as`
-    mutating func set(_ pathElements: PathElement..., to newValue: Any) throws
+    mutating func set(_ pathElements: PathElementRepresentable..., to newValue: Any) throws
 
     /// Set the value of the key at the given path, specified as variadic `PathElement`s
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred.
-    mutating func set<Type: KeyAllowedType>(_ pathElements: PathElement..., to newValue: Any, as type: KeyType<Type>) throws
+    mutating func set<Type: KeyAllowedType>(_ pathElements: PathElementRepresentable..., to newValue: Any, as type: KeyType<Type>) throws
 
     // - Set key name
 
@@ -93,7 +93,7 @@ where
 
     /// Set the name of the key at the given path, specified as variadic `PathElement`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws
+    mutating func set(_ pathElements: PathElementRepresentable..., keyNameTo newKeyName: String) throws
 
     // MARK: Delete
 
@@ -103,7 +103,7 @@ where
 
     /// Delete the key at the given path,specified as variadic `PathElement`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ pathElements: PathElement...) throws
+    mutating func delete(_ pathElements: PathElementRepresentable...) throws
 
     // MARK: Add
 
@@ -284,7 +284,7 @@ where
      - Throws:When trying to add a named key to an array, or a indexed key to a dictionary
      - note: To add a key at the end of an array, specify the index `-1`
     */
-    mutating func add(_ newValue: Any, at pathElements: PathElement...) throws
+    mutating func add(_ newValue: Any, at pathElements: PathElementRepresentable...) throws
 
     /**
     Add a value at the given path, specified as variadic `PathElement`s
@@ -345,7 +345,7 @@ where
      - Throws:When trying to add a named key to an array, or a indexed key to a dictionary
      - note: To add a key at the end of an array, specify the index `-1`
     */
-    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws
+    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at pathElements: PathElementRepresentable..., as type: KeyType<Type>) throws
 
     // MARK: Export
 

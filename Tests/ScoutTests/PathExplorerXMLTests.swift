@@ -73,14 +73,14 @@ final class PathExplorerXMLTests: XCTestCase {
     func testSubscriptArray() throws {
         let xml = try PathExplorerXML(data: stubData2)
 
-        let path: [PathElement] = ["dogs", 1]
+        let path = Path("dogs", 1)
 
         XCTAssertEqual(try xml.get(path).string, "Spot")
     }
 
     func testSubscriptArraySet() throws {
         var xml = try PathExplorerXML(data: stubData2)
-        let path: [PathElement] = ["dogs", 1]
+        let path = Path("dogs", 1)
 
         try xml.set(path, to: "Endo")
 
@@ -133,7 +133,7 @@ final class PathExplorerXMLTests: XCTestCase {
 
     func testAddKey1() throws {
         var xml = try PathExplorerXML(data: stubData2)
-        let path: [PathElement] = ["dogs", -1]
+        let path = Path("dogs", -1)
 
         try xml.add("Endo", at: path)
 
@@ -142,7 +142,7 @@ final class PathExplorerXMLTests: XCTestCase {
 
     func testAddKey2() throws {
         var xml = try PathExplorerXML(data: stubData2)
-        let path: [PathElement] = ["cats", -1]
+        let path = Path("cats", -1)
 
         try xml.add("Mocka", at: path)
 
@@ -151,7 +151,7 @@ final class PathExplorerXMLTests: XCTestCase {
 
     func testAddKey3() throws {
         var xml = try PathExplorerXML(data: stubData2)
-        let path: [PathElement] = ["cats", "my_cat"]
+        let path = Path("cats", "my_cat")
 
         try xml.add("Mocka", at: path)
 

@@ -1,33 +1,18 @@
 import Foundation
 
 /// Array of `PathElementRepresentable` to find a specific value in a `PathExplorer`
-public typealias Path = [PathElementRepresentable]
+//public typealias Path = [PathElementRepresentable]
 
-public extension Path {
+public struct Path: Equatable {
 
     // MARK: - Properties
 
-    var description: String {
-        var description = ""
-        forEach { element in
-            if case let .index(index) = element.pathValue {
-                // remove the point added automatically to a path element
-                if description.hasSuffix(".") {
-                    description.removeLast()
-                }
-                description.append("[\(index)]")
-            } else {
-                description.append(String(describing: element))
-            }
+    private var elements = [PathElement]()
 
-            description.append(".")
-        }
-        // remove the last point if any
-        if description.hasSuffix(".") {
-            description.removeLast()
-        }
-        return description
-    }
+    public var startIndex: Int { elements.startIndex }
+    public var endIndex: Int { elements.endIndex }
+
+    public static var empty: Path { Path([PathElement]()) }
 
     // MARK: - Initialization
 
@@ -49,7 +34,7 @@ public extension Path {
      When using a special caracter with [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
      it is required to quote it with "\\".
     */
-    init(string: String, separator: String = "\\.") throws {
+    public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
@@ -81,7 +66,23 @@ public extension Path {
             }
         }
 
-        self = elements
+        self.elements = elements
+    }
+
+    public init(_ pathElements: [PathElementRepresentable]) {
+        elements = pathElements.map { $0.pathValue }
+    }
+
+    public init(_ pathElements: PathElementRepresentable...) {
+        elements = pathElements.map { $0.pathValue }
+    }
+
+    public init(_ pathElements: PathElement...) {
+        elements = pathElements
+    }
+
+    public init(_ pathElements: [PathElement]) {
+        elements = pathElements
     }
 
     // MARK: - Functions
@@ -121,56 +122,82 @@ public extension Path {
         return elements
     }
 
-    func appending(_ element: PathElement) -> Path {
+    public func appending(_ element: PathElement) -> Path {
         var newPath = self
         newPath.append(element)
 
         return newPath
     }
 
-    func appending(_ key: String) -> Path {
+    public func appending(_ key: String) -> Path {
         var newPath = self
         newPath.append(key)
 
         return newPath
     }
 
-    func appending(_ index: Int) -> Path {
+    public func appending(_ index: Int) -> Path {
         var newPath = self
         newPath.append(index)
 
         return newPath
     }
+
+    public mutating func removeLast() -> PathElement { elements.removeLast() }
 }
 
-extension Path {
+extension Path: Collection {
+    public func index(after i: Int) -> Int {
+        return elements.index(after: i)
+    }
 
-    static func == (lhs: Path, rhs: Path) -> Bool {
-        guard lhs.count == rhs.count else { return false }
+    public subscript(elementIndex: Int) -> PathElement {
+        assert(elementIndex >= startIndex && elementIndex <= endIndex)
+        return elements[elementIndex]
+    }
 
-        for (leftElement, rightElement) in zip(lhs, rhs) {
-            switch leftElement.pathValue {
+    mutating func append(_ element: PathElementRepresentable) {
+        elements.append(element.pathValue)
+    }
 
-            case .key(let leftKey):
-                guard case let .key(rightKey) = rightElement.pathValue else {
-                    return false
-                }
-
-                if leftKey != rightKey {
-                    return false
-                }
-
-            case .index(let leftIndex):
-                guard case let .index(rightIndex) = rightElement.pathValue else {
-                    return false
-                }
-
-                if leftIndex != rightIndex {
-                    return false
-                }
-            }
+    mutating func popFirst() -> PathElement? {
+        if let firstElement = elements.first {
+            elements.removeFirst()
+            return firstElement
         }
+        return nil
+    }
+}
 
-        return true
+extension Path: CustomStringConvertible {
+
+    public var description: String {
+        var description = ""
+        elements.forEach { element in
+            if case let .index(index) = element {
+                // remove the point added automatically to a path element
+                if description.hasSuffix(".") {
+                    description.removeLast()
+                }
+                description.append("[\(index)]")
+            } else {
+                description.append(String(describing: element))
+            }
+
+            description.append(".")
+        }
+        // remove the last point if any
+        if description.hasSuffix(".") {
+            description.removeLast()
+        }
+        return description
+    }
+}
+
+extension Path: ExpressibleByArrayLiteral {
+    public typealias ArrayLiteralElement = PathElementRepresentable
+
+    public init(arrayLiteral elements: PathElementRepresentable...) {
+        self.elements = elements.map { $0.pathValue }
     }
 }

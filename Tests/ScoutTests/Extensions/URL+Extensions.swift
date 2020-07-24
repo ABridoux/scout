@@ -9,6 +9,7 @@ extension URL {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+            .deletingLastPathComponent()
             .appendingPathComponent("Playground", isDirectory: true)
             .appendingPathComponent("People")
     }()

@@ -12,8 +12,8 @@ extension PathExplorerXML: PathExplorer {
 
     // MARK: Get
 
-    public func get(_ pathElements: PathElement...) throws -> Self {
-        try get(pathElements)
+    public func get(_ pathElements: PathElementRepresentable...) throws -> Self {
+        try get(Path(pathElements))
     }
 
     public func get(_ pathElements: Path) throws  -> Self {
@@ -35,8 +35,8 @@ extension PathExplorerXML: PathExplorer {
         return try T(value: value)
     }
 
-    public func get<T>(_ pathElements: PathElement..., as type: KeyType<T>) throws -> T where T: KeyAllowedType {
-        try get(pathElements, as: type)
+    public func get<T>(_ pathElements: PathElementRepresentable..., as type: KeyType<T>) throws -> T where T: KeyAllowedType {
+        try get(Path(pathElements), as: type)
     }
 
     // MARK: Set
@@ -45,18 +45,18 @@ extension PathExplorerXML: PathExplorer {
         try set(path, to: newValue)
     }
 
-    public mutating  func set(_ pathElements: PathElement..., to newValue: Any) throws {
-        try set(pathElements, to: newValue)
+    public mutating  func set(_ pathElements: PathElementRepresentable..., to newValue: Any) throws {
+        try set(Path(pathElements), to: newValue)
     }
 
-    public mutating func set<Type>(_ pathElements: PathElement..., to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
-        try set(pathElements, to: newValue)
+    public mutating func set<Type>(_ pathElements: PathElementRepresentable..., to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
+        try set(Path(pathElements), to: newValue)
     }
 
     // -- Set key name
 
-    public mutating func set(_ pathElements: PathElement..., keyNameTo newKeyName: String) throws {
-        try set(pathElements, keyNameTo: newKeyName)
+    public mutating func set(_ pathElements: PathElementRepresentable..., keyNameTo newKeyName: String) throws {
+        try set(Path(pathElements), keyNameTo: newKeyName)
     }
 
     // MARK: Add
@@ -65,7 +65,7 @@ extension PathExplorerXML: PathExplorer {
         try add(newValue, at: path)
     }
 
-    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElement..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
-        try add(newValue, at: pathElements)
+    public mutating func add<Type>(_ newValue: Any, at pathElements: PathElementRepresentable..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
+        try add(newValue, at: Path(pathElements))
     }
 }

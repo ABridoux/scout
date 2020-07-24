@@ -5,6 +5,9 @@ public enum PathElement: Equatable {
     case key(String)
     case index(Int)
 
+    /// Placed after an array to return the array count
+    case arrayCount
+
     var key: String? {
         if case let .key(key) = self {
             return key

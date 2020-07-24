@@ -1,10 +1,12 @@
 import Foundation
 
-public enum PathExplorerError: LocalizedError {
-    case invalidData(SerializationFormat.Type)
-    case invalidValue(Any)
-    case valueConversionError(value: Any, type: String)
-    case wrongValueForKey(value: Any, element: PathElement)
+public enum PathExplorerError: LocalizedError, Equatable {
+
+    case invalidData(serializationFormat: String)
+    case invalidValue(String)
+    case valueConversionError(value: String, type: String)
+    case wrongValueForKey(value: String, element: PathElement)
+    case arrayCountWrongUsage(path: Path)
 
     case dictionarySubscript(Path)
     case subscriptMissingKey(path: Path, key: String, bestMatch: String?)
@@ -23,6 +25,7 @@ public enum PathExplorerError: LocalizedError {
         case .invalidValue(let value): return "The key value \(value) is invalid"
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
+        case .arrayCountWrongUsage(let path): return "Wrong usage of array count in '\(path.description)'. Array count should be the last path element after an array."
 
         case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.description)' with a String as it is not a Dictionary"
         case .subscriptMissingKey(let path, let key, let bestMatch):

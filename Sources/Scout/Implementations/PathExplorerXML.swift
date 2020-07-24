@@ -65,6 +65,7 @@ public struct PathExplorerXML {
         switch pathElement {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
+        case .arrayCount: return PathExplorerXML(integerLiteral: element.count)
         }
     }
 
@@ -93,11 +94,11 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0.pathValue)
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
         }
 
         guard currentPathExplorer.element.children.isEmpty else {
-            throw PathExplorerError.wrongValueForKey(value: newValueString, element: currentPathExplorer.element.name.pathValue)
+            throw PathExplorerError.wrongValueForKey(value: newValueString, element: .key(currentPathExplorer.element.name))
         }
 
         currentPathExplorer.element.value = newValueString
@@ -109,7 +110,7 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0.pathValue)
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
         }
 
         currentPathExplorer.element.name = newKeyName
@@ -121,14 +122,14 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach {
-            currentPathExplorer = try currentPathExplorer.get(pathElement: $0.pathValue)
+            currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
         }
 
         currentPathExplorer.element.removeFromParent()
     }
 
-    public mutating func delete(_ pathElements: PathElement...) throws {
-        try delete(pathElements)
+    public mutating func delete(_ pathElements: PathElementRepresentable...) throws {
+        try delete(Path(pathElements))
     }
 
     // MARK: Add
@@ -143,30 +144,30 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach { element in
-            if let pathExplorer = try? currentPathExplorer.get(pathElement: element.pathValue, negativeIndexEnabled: false) {
+            if let pathExplorer = try? currentPathExplorer.get(pathElement: element, negativeIndexEnabled: false) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
                 // the key does not exist. Add a new key to it
-                let keyName = element.pathValue.key ?? currentPathExplorer.element.childrenName
+                let keyName = element.key ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
 
-                if case let .index(index) = element.pathValue, index == -1 {
+                if case let .index(index) = element, index == -1 {
                     // get the last element
                     let childrenCount = currentPathExplorer.element.children.count - 1
-                    currentPathExplorer = try currentPathExplorer.get(pathElement: childrenCount.pathValue)
+                    currentPathExplorer = try currentPathExplorer.get(pathElement: .index(childrenCount))
                 } else {
-                    currentPathExplorer = try currentPathExplorer.get(pathElement: element.pathValue)
+                    currentPathExplorer = try currentPathExplorer.get(pathElement: element)
                 }
             }
         }
 
-        try currentPathExplorer.add(newValue, for: lastElement.pathValue)
+        try currentPathExplorer.add(newValue, for: lastElement)
 
     }
 
-    public mutating func add(_ newValue: Any, at pathElements: PathElement...) throws {
-        try add(newValue, at: pathElements)
+    public mutating func add(_ newValue: Any, at pathElements: PathElementRepresentable...) throws {
+        try add(newValue, at: Path(pathElements))
     }
 
     /// Add the new value to the array or dictionary value
@@ -215,8 +216,10 @@ public struct PathExplorerXML {
                     element = copy
                 }
             } else {
-                throw PathExplorerError.wrongValueForKey(value: newValue, element: index.pathValue)
+                throw PathExplorerError.wrongValueForKey(value: newValue, element: .index(index))
             }
+
+        case .arrayCount: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
         }
     }
 
