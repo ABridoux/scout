@@ -3,14 +3,29 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [1.3.0](https://github.com/ABridoux/scout/tree/1.3.0) (24/07/2020)
+
+### Added
+- Get array or dictionary count with `PathElement.count` after an array or a dictionary. The `count` is specified with `[#]` for the command-line tool [#76]
+
+### Changed
+- `PathElement` changed for an enum, with a `PathElementRepresentable` to initiate a `Path` [#79]
+- `Path` changed for a struct conforming to `Collection`  and `Equatable` [#76]
+- Path explorer CRUD functions moved to extensions [#85]
+
+### Deprecated
+- `PathExplorerFactory` will be removed in 2.0.0
+
+
 ## [1.2.3](https://github.com/ABridoux/scout/tree/1.2.3) (06/07/2020)
 
 ### Changed
-- Errors now sent to the standard error ouput with an error code different from 0 [#74]
+- Errors now sent to the standard error output with an error code different from 0 [#74]
 - Documentation updated [#74]
 
 ### Fixed
 - JSON empty string colorisation [#72]
+
 
 ## [1.2.2](https://github.com/ABridoux/scout/tree/1.2.2) (04/07/2020)
 
@@ -18,10 +33,11 @@ All notable changes to this project will be documented in this file. `Scout` adh
 - `--no-color`  flag to prevent colorisation when outputting
 
 ### Changed
-- Moved the documentaion in a `doc` command
+- Moved the documentation in a `doc` command
 
 ### Fixed
 - JSON escaped quotes [#68]
+
 
 ## [1.2.1](https://github.com/ABridoux/scout/tree/1.2.1) (19/06/2020)
 
@@ -29,12 +45,14 @@ All notable changes to this project will be documented in this file. `Scout` adh
 
 - [Lux](https://github.com/ABridoux/lux) updated to 0.2.1 to handle tag characters in quotes
 
+
 ## [1.2.0](https://github.com/ABridoux/scout/tree/1.2.0) (28/05/2020)
 
 ### Added
 
 - Key proposition when subscript key error [#52]
-- Custom highight colors in a plist file [#51]
+- Custom highlight colors in a plist file [#51]
+
 
 ## [1.1.0](https://github.com/ABridoux/scout/tree/1.1.0) (20/05/2020)
 
@@ -42,22 +60,26 @@ All notable changes to this project will be documented in this file. `Scout` adh
 
 - Highlight output when outputting a dictionary or array value
 
+
 ## [1.0.2](https://github.com/ABridoux/scout/tree/1.0.2) (30/03/2020)
 
 ### Fixed
 - `PathExplorerXml` string value not empty because of new line.
+
 
 ## [1.0.1](https://github.com/ABridoux/scout/tree/1.0.1) (30/03/2020)
 
 ### Fixed
 - CLT read command when other type than string was not working
 
+
 ## [1.0.0](https://github.com/ABridoux/scout/tree/1.0.0) (29/03/2020)
 
 ### Added
 - License
 - CLT: output a dictionary or an array rather than return an error
-- Json: backslashes removed when outputing the string
+- Json: backslashes removed when outputting the string
+
 
 ## [0.3.1](https://github.com/ABridoux/scout/tree/0.3.1) (29/03/2020)
 
@@ -65,6 +87,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 - Root element with nested arrays: `[0][2][1].firstKey`
 
 ## [0.3.0](https://github.com/ABridoux/scout/tree/0.3.0) (28/03/2020)
+
 
 ### Added
 - Reading path for subscript errors. A subscript error now shows precisely where the error occurs.
@@ -75,6 +98,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 ### Fixed
 - It was not possible to initialise a `Path` starting with an array subscript like '[1].key1.key2'
 
+
 ## [0.2.2](https://github.com/ABridoux/scout/tree/0.2.2) (24/03/2020)
 
 ### Added
@@ -84,6 +108,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 
 ### Fixed
 - Xml value adding when key already existed was not working
+
 
 ## [0.2.1](https://github.com/ABridoux/scout/tree/0.2.1) (22/03/2020)
 
@@ -101,6 +126,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 - Inserting a value in an empty array was possible
 - Inserting a value in a Xml only worked when the element was the root element
 
+
 ## [0.2.0](https://github.com/ABridoux/scout/tree/0.2.0) (19/03/2020)
 
 ### Added
@@ -111,6 +137,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 - CLT path to read the values: the separator was changed from `->` to `.`
 - CLT path to set the values: the separator was changed from `:` to `=`
 - CLT array subscript. Remove the separator e.g. `array.[index]` to `array[index]`
+
 
 ## [0.1.4](https://github.com/ABridoux/scout/tree/0.1.4) (19/03/2020)
 
@@ -127,6 +154,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 ### Fixed
 - Command-line tool "----input" long option to specify a file input fixed to "--input"
 
+
 ## [0.1.3](https://github.com/ABridoux/scout/tree/0.1.3) (17/03/2020)
 
 ### Changed
@@ -137,10 +165,12 @@ All notable changes to this project will be documented in this file. `Scout` adh
 ### Added
 - Instructions to download and use the executable from S3.
 
+
 ## [0.1.1](https://github.com/ABridoux/scout/tree/0.1.1) (16/03/2020)
 
 ### Fixed
 - Added missing command `clone` in Command line instructions
+
 
 ## [0.1.0](https://github.com/ABridoux/scout/tree/0.1.0) (16/03/2020)
 

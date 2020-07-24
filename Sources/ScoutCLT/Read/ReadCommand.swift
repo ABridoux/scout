@@ -62,7 +62,7 @@ struct ReadCommand: ParsableCommand {
         var injector: TextInjector
         var value: String
 
-        if let json = try? PathExplorerFactory.make(Json.self, from: data) {
+        if let json = try? Json(data: data) {
             let key = try json.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
 
@@ -72,7 +72,7 @@ struct ReadCommand: ParsableCommand {
             }
             injector = jsonInjector
 
-        } else if let plist = try? PathExplorerFactory.make(Plist.self, from: data) {
+        } else if let plist = try? Plist(data: data) {
             let key = try plist.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
 
@@ -82,7 +82,7 @@ struct ReadCommand: ParsableCommand {
             }
             injector = plistInjector
 
-        } else if let xml = try? PathExplorerFactory.make(Xml.self, from: data) {
+        } else if let xml = try? Xml(data: data) {
             let key = try xml.get(path)
             value = key.stringValue != "" ? key.stringValue : key.description
 

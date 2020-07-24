@@ -1,33 +1,23 @@
 import Foundation
 
-/// Array of `PathElement`s. Only `String` and `Int` to indicate a key name or an array index
-public typealias Path = [PathElement]
+/// Array of `PathElementRepresentable` to find a specific value in a `PathExplorer`
+//public typealias Path = [PathElementRepresentable]
 
-public extension Path {
+public struct Path: Equatable {
 
-    // MARK: - Computed properties
+    // MARK: - Constants
 
-    var description: String {
-        var description = ""
-        forEach {
-            if let int = $0 as? Int {
-                // remove the point added automatically to a path element
-                if description.hasSuffix(".") {
-                    description.removeLast()
-                }
-                description.append("[\(int)]")
-            } else {
-                description.append(String(describing: $0))
-            }
+    let defaultSeparator = "."
 
-            description.append(".")
-        }
-        // remove the last point if any
-        if description.hasSuffix(".") {
-            description.removeLast()
-        }
-        return description
-    }
+    // MARK: - Properties
+
+    private var elements = [PathElement]()
+
+    public var startIndex: Int { elements.startIndex }
+    public var endIndex: Int { elements.endIndex }
+    public var last: PathElement? { elements.last }
+
+    public static var empty: Path { Path([PathElement]()) }
 
     // MARK: - Initialization
 
@@ -36,8 +26,11 @@ public extension Path {
 
      ### Example with default separator "."
 
-     ```computers[2].name``` will make the path ["computers", 2, "name"]
-     ```computer.general.serial_number``` will make the path ["computer", "general", "serial_number"]
+     `computers[2].name` will make the path `["computers", 2, "name"]`
+
+     `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
+
+     `company.computers[#]` will make the path `["company", "computers", PathElement.arrayCount]`
 
      - parameter string: The string representing the path
      - parameter separator: The separator used to split the string. Default is "."
@@ -49,14 +42,14 @@ public extension Path {
      When using a special caracter with [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
      it is required to quote it with "\\".
     */
-    init(string: String, separator: String = "\\.") throws {
+    public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
-        let indexRegexPattern = #"(?<=\[)[0-9-]+(?=\])"#
+        let indexAndArrayCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCount)-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
-        let indexRegex = try NSRegularExpression(pattern: indexRegexPattern)
+        let indexAndArrayCountRegex = try NSRegularExpression(pattern: indexAndArrayCountRegexPattern)
         let squareBracketRegex = try NSRegularExpression(pattern: squareBracketPattern)
 
         let matches = splitRegex.matches(in: string)
@@ -68,69 +61,138 @@ public extension Path {
                 match.removeFirst()
                 match.removeLast()
             }
-            var indexMatches = indexRegex.matches(in: match, options: [], range: match.nsRange)
+            let indexMatches = indexAndArrayCountRegex.matches(in: match, options: [], range: match.nsRange)
 
             // try to get the indexes if any
-            if let indexMatch = indexMatches.first {
-                // we have a first index, so retrieve it and the array name if possible
-
-                // get the array index
-                guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
-
-                if indexMatch.range.lowerBound == 1 {
-                    // specific case: the root element is an array: there is no array name
-                    elements.append(index)
-                } else {
-                    // get the array name
-                    let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
-
-                    elements.append(arrayName)
-                    elements.append(index)
-                }
-
-                // now retrieve the remaining indexes
-                indexMatches.removeFirst()
-
-                try indexMatches.forEach { indexMatch in
-                    guard let index = Int(match[indexMatch.range]) else { throw PathExplorerError.invalidPathElement(match) }
-                    elements.append(index)
-                }
+            if let indexesMatch = try Self.extractIndexesAndCount(in: indexMatches, from: match) {
+                elements.append(contentsOf: indexesMatch)
             } else {
                 if squareBracketRegex.firstMatch(in: match, range: match.nsRange) != nil {
-                    throw PathExplorerError.invalidPathElement(match)
+                    throw PathExplorerError.invalidPathElement(match.pathValue)
                 }
-                elements.append(match)
+                elements.append(match.pathValue)
             }
         }
 
-        self = elements
+        self.elements = elements
+    }
+
+    public init(_ pathElements: [PathElementRepresentable]) {
+        elements = pathElements.map { $0.pathValue }
+    }
+
+    public init(_ pathElements: PathElementRepresentable...) {
+        elements = pathElements.map { $0.pathValue }
+    }
+
+    public init(_ pathElements: PathElement...) {
+        elements = pathElements
+    }
+
+    public init(_ pathElements: [PathElement]) {
+        elements = pathElements
     }
 
     // MARK: - Functions
 
-    static func == (lhs: Path, rhs: Path) -> Bool {
-        guard lhs.count == rhs.count else { return false }
+    static func extractIndexesAndCount(in indexMatches: [NSTextCheckingResult], from match: String) throws -> [PathElement]? {
+        var indexMatches = indexMatches
+        var elements = [PathElement]()
 
-        var isEqual = true
-        for (leftElement, rightElement) in zip(lhs, rhs) {
-            if let leftString = leftElement as? String {
-                guard let rightString = rightElement as? String else { return false }
-                isEqual = isEqual && leftString == rightString
-            } else if let leftInt = leftElement as? Int {
-                guard let rightInt = rightElement as? Int else { return false }
-                isEqual = isEqual && rightInt == leftInt
-            } else {
-                assertionFailure("Only String and Int can be PathElement")
-                return false
-            }
+        guard let indexMatch = indexMatches.first else { // we have a first index, so retrieve it and the array name if possible
+            return nil
         }
-        return isEqual
+
+        // get the first element
+        let firstElement = PathElement(from: String(match[indexMatch.range]))
+
+        guard firstElement.isArraySubscripter else {
+            throw PathExplorerError.invalidPathElement(match.pathValue)
+        }
+
+        if indexMatch.range.lowerBound == 1 {
+            // specific case: the root element is an array: there is no array name
+            elements.append(firstElement)
+        } else {
+            // get the array name
+            let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
+
+            elements.append(arrayName.pathValue)
+            elements.append(firstElement)
+        }
+
+        // now retrieve the remaining indexes
+        indexMatches.removeFirst()
+
+        try indexMatches.forEach { indexMatch in
+            let element = PathElement(from: String(match[indexMatch.range]))
+
+            guard element.isArraySubscripter else { throw PathExplorerError.invalidPathElement(match.pathValue) }
+            elements.append(element)
+        }
+
+        return elements
     }
 
-    func appending(_ element: PathElement) -> Path {
-        var newPath = self
-        newPath.append(element)
+    public func appending(_ elements: PathElementRepresentable...) -> Path { Path(self.elements + elements) }
+    public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
 
-        return newPath
+    public mutating func removeLast() -> PathElement { elements.removeLast() }
+}
+
+extension Path: Collection {
+    public func index(after i: Int) -> Int {
+        return elements.index(after: i)
+    }
+
+    public subscript(elementIndex: Int) -> PathElement {
+        assert(elementIndex >= startIndex && elementIndex <= endIndex)
+        return elements[elementIndex]
+    }
+
+    mutating func append(_ element: PathElementRepresentable) {
+        elements.append(element.pathValue)
+    }
+
+    mutating func popFirst() -> PathElement? {
+        if let firstElement = elements.first {
+            elements.removeFirst()
+            return firstElement
+        }
+        return nil
+    }
+}
+
+extension Path: CustomStringConvertible {
+
+    public var description: String {
+        var description = ""
+        elements.forEach { element in
+            switch element {
+            case .index, .count:
+                // remove the point added automatically to a path element
+                if description.hasSuffix(defaultSeparator) {
+                    description.removeLast()
+                }
+                description.append(element.description)
+
+            case .key: description.append(element.description)
+            }
+
+            description.append(defaultSeparator)
+        }
+        // remove the last point if any
+        if description.hasSuffix(defaultSeparator) {
+            description.removeLast()
+        }
+        return description
+    }
+}
+
+extension Path: ExpressibleByArrayLiteral {
+    public typealias ArrayLiteralElement = PathElementRepresentable
+
+    public init(arrayLiteral elements: PathElementRepresentable...) {
+        self.elements = elements.map { $0.pathValue }
     }
 }
