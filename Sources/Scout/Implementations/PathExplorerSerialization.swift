@@ -77,24 +77,26 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     }
 
     /// - Returns: The count of the array if  `value` is an array
-    func getArrayCount() throws -> Self {
-        guard let arrayValue = value as? ArrayValue else {
+    func getChildrenCount() throws -> Self {
+        if let arrayValue = value as? ArrayValue {
+            return PathExplorerSerialization(value: arrayValue.count, path: readingPath.appending(.count))
+        } else if let dictValue = value as? DictionaryValue {
+            return PathExplorerSerialization(value: dictValue.count, path: readingPath.appending(.count))
+        } else {
             throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
         }
-
-        return PathExplorerSerialization(value: arrayValue.count, path: readingPath.appending(.arrayCount))
     }
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(element pathElement: PathElement, negativeIndexEnabled: Bool = true) throws -> Self {
-        guard readingPath.last != .arrayCount else {
+        guard readingPath.last != .count else {
             throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
         }
 
         switch pathElement {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
-        case .arrayCount: return try getArrayCount()
+        case .count: return try getChildrenCount()
         }
     }
 
@@ -110,8 +112,8 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
     /// Explorer the path in parameter to find each `PathExplorer` in
     /// - Parameter path: The path to explore. Should not be empty
-    /// - Throws: If the path is invalid, or contains an arrayCount `PathElement`
-    /// - Returns: The explorers discovered
+    /// - Throws: If the path is invalid
+    /// - Returns: The explorers discovered, the path without the last element, and the last element
     func getExplorers(from path: Path) throws -> (explorers: [Self], path: Path, lastElement: PathElement) {
         assert(!path.isEmpty)
 
@@ -164,14 +166,11 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
     }
 
     mutating func set(element: PathElement, to newValue: Any) throws {
-        guard element != .arrayCount else {
-            throw PathExplorerError.arrayCountWrongUsage(path: readingPath.appending(element))
-        }
 
         switch element {
         case .key(let key): return try set(key: key, to: newValue)
         case .index(let index): return try set(index: index, to: newValue)
-        case .arrayCount: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath.appending(element))
         }
     }
 
@@ -280,8 +279,8 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
             array.remove(at: index)
             value = array
 
-        case .arrayCount:
-            throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        case .count:
+            throw PathExplorerError.arrayCountWrongUsage(path: readingPath.appending(element))
         }
     }
 
@@ -347,7 +346,7 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
         switch childKey {
         case .key: return DictionaryValue() //dictionary
         case .index: return ArrayValue() //array
-        case .arrayCount: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
         }
     }
 
@@ -358,6 +357,11 @@ public struct PathExplorerSerialization<F: SerializationFormat> {
 
         var craftingPath = path
         let lastElement = craftingPath.removeLast()
+
+        guard lastElement != .count else {
+            throw PathExplorerError.arrayCountWrongUsage(path: path)
+        }
+
         var currentPathExplorer = self
         var pathExplorers = [currentPathExplorer]
 

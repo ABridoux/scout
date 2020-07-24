@@ -7,7 +7,7 @@ extension XCTestCase {
                                _ expectedError: PathExplorerError,
                                file: StaticString = #file, line: UInt = #line) {
         XCTAssertThrowsError(
-        _ = try expression(), "") { error in
+        _ = try expression(), "", file: file, line: line) { error in
              guard
                 let resultPathExplorerError = error as? PathExplorerError,
                 resultPathExplorerError == expectedError

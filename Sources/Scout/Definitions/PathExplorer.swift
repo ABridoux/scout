@@ -47,7 +47,7 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     func get(_ path: Path) throws -> Self
 
-    /// Get the key at the given path, specified as variadic `PathElement`s
+    /// Get the key at the given path, specified as variadic `PathElementRepresentable`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     func get(_ pathElements: PathElementRepresentable...) throws -> Self
 
@@ -55,7 +55,7 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
     func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T
 
-    /// Get the key at the given path, specified as variadic `PathElement`s
+    /// Get the key at the given path, specified as variadic `PathElementRepresentable`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
     func get<T: KeyAllowedType>(_ pathElements: PathElementRepresentable..., as type: KeyType<T>) throws -> T
 
@@ -78,7 +78,7 @@ where
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as`
     mutating func set(_ pathElements: PathElementRepresentable..., to newValue: Any) throws
 
-    /// Set the value of the key at the given path, specified as variadic `PathElement`s
+    /// Set the value of the key at the given path, specified as variadic `PathElementRepresentable`s
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
@@ -91,7 +91,7 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary)
     mutating func set(_ path: Path, keyNameTo newKeyName: String) throws
 
-    /// Set the name of the key at the given path, specified as variadic `PathElement`s
+    /// Set the name of the key at the given path, specified as variadic `PathElementRepresentable`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func set(_ pathElements: PathElementRepresentable..., keyNameTo newKeyName: String) throws
 
@@ -101,7 +101,7 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func delete(_ path: Path) throws
 
-    /// Delete the key at the given path,specified as variadic `PathElement`s
+    /// Delete the key at the given path,specified as variadic `PathElementRepresentable`s
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func delete(_ pathElements: PathElementRepresentable...) throws
 
@@ -228,7 +228,7 @@ where
     mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws
 
     /**
-    Add a value at the given path, specified as variadic `PathElement`s
+    Add a value at the given path, specified as variadic `PathElementRepresentable`s
 
     Any non existing key encoutered in the path will be created. For example, given the following Json:
     ```json
@@ -287,7 +287,7 @@ where
     mutating func add(_ newValue: Any, at pathElements: PathElementRepresentable...) throws
 
     /**
-    Add a value at the given path, specified as variadic `PathElement`s
+    Add a value at the given path, specified as variadic `PathElementRepresentable`s
 
     Any non existing key encoutered in the path will be created. For example, given the following Json:
     ```json

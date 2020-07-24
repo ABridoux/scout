@@ -62,14 +62,14 @@ public struct PathExplorerXML {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(pathElement: PathElement, negativeIndexEnabled: Bool = true) throws  -> Self {
-        guard readingPath.last !=	 .arrayCount else {
+        guard readingPath.last != .count else {
             throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
         }
 
         switch pathElement {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
-        case .arrayCount:
+        case .count:
             return PathExplorerXML(element: .init(name: "", value: "\(element.children.count)", attributes: [:]),
                                    path: readingPath.appending(pathElement))
         }
@@ -100,7 +100,7 @@ public struct PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach { element in
-            guard element != .arrayCount else {
+            guard element != .count else {
                 throw PathExplorerError.arrayCountWrongUsage(path: path)
             }
             currentPathExplorer = try currentPathExplorer.get(pathElement: element)
@@ -122,7 +122,7 @@ public struct PathExplorerXML {
             currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
         }
 
-        guard currentPathExplorer.readingPath.last != .arrayCount else {
+        guard currentPathExplorer.readingPath.last != .count else {
             throw PathExplorerError.arrayCountWrongUsage(path: path)
         }
 
@@ -133,6 +133,10 @@ public struct PathExplorerXML {
 
     public mutating func delete(_ path: Path) throws {
         var currentPathExplorer = self
+
+        guard path.last != .count else {
+            throw PathExplorerError.arrayCountWrongUsage(path: path)
+        }
 
         try path.forEach {
             currentPathExplorer = try currentPathExplorer.get(pathElement: $0)
@@ -154,6 +158,11 @@ public struct PathExplorerXML {
 
         var path = path
         let lastElement = path.removeLast()
+
+        guard lastElement != .count else {
+            throw PathExplorerError.arrayCountWrongUsage(path: path.appending(lastElement))
+        }
+
         var currentPathExplorer = self
 
         try path.forEach { element in
@@ -232,7 +241,7 @@ public struct PathExplorerXML {
                 throw PathExplorerError.wrongValueForKey(value: newValue, element: .index(index))
             }
 
-        case .arrayCount: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
         }
     }
 

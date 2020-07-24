@@ -2,11 +2,17 @@ import Foundation
 
 /// Store the possible elements that can be used to subscript a `PathExplorer`
 public enum PathElement: Equatable {
+
+    // MARK: - Constants
+
     case key(String)
     case index(Int)
-
     /// Placed after an array to return the array count
-    case arrayCount
+    case count
+
+    static let defaultCount = "#"
+
+    // MARK: - Properties
 
     var key: String? {
         if case let .key(key) = self {
@@ -21,6 +27,26 @@ public enum PathElement: Equatable {
             return index
         } else {
             return nil
+        }
+    }
+
+    /// Can subscript an array
+    public var isArraySubscripter: Bool {
+        switch self {
+        case .count, .index: return true
+        default: return false
+        }
+    }
+
+    // MARK: - Init
+
+    init(from string: String) {
+        if let index = Int(string) {
+            self = .index(index)
+        } else if string == Self.defaultCount {
+            self = .count
+        } else {
+            self = .key(string)
         }
     }
 }
@@ -47,7 +73,7 @@ extension PathElement: CustomStringConvertible {
         switch self {
         case .key(let key): return key
         case .index(let index): return "[\(index)]"
-        case .arrayCount: return "[#]"
+        case .count: return "[\(Self.defaultCount)]"
         }
     }
 }

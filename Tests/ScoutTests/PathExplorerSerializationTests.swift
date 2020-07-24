@@ -176,38 +176,54 @@ final class PathExplorerSerializationTests: XCTestCase {
 
     // MARK: Array count
 
-    func testGetArrayCount() throws {
+    func testGetCount() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         let plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let path: Path = ["animals", "ducks", PathElement.arrayCount]
+        let path: Path = ["animals", "ducks", PathElement.count]
 
         let arrayCount = try plist.get(path).int
 
         XCTAssertEqual(arrayCount, 3)
     }
 
-    func testGetArrayCount_ThrowsErrorIfNotFinal() throws {
+    func testGetCount_ThrowsErrorIfNotFinal() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         let plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let errorPath: Path = ["animals", "ducks", PathElement.arrayCount]
+        let errorPath: Path = ["animals", "ducks", PathElement.count]
         let path = errorPath.appending(1)
 
         XCTAssertErrorsEqual(try plist.get(path), .arrayCountWrongUsage(path: errorPath))
     }
 
-    func testSetArrayCount_ThrowsError() throws {
+    func testSetCount_ThrowsError() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let path: Path = ["animals", "ducks", PathElement.arrayCount]
+        let path: Path = ["animals", "ducks", PathElement.count]
 
         XCTAssertErrorsEqual(try plist.set(path, to: "Woomy"), .arrayCountWrongUsage(path: path))
     }
 
-    func testSetKeyNameArrayCount_ThrowsError() throws {
+    func testSetKeyNameCount_ThrowsError() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
-        let path: Path = ["animals", "ducks", PathElement.arrayCount]
+        let path: Path = ["animals", "ducks", PathElement.count]
 
         XCTAssertErrorsEqual(try plist.set(path, keyNameTo: "Woomy"), .keyNameSetOnNonDictionary(path: path))
+    }
+
+    func testDeleteCount_ThrowsError() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: Path = ["animals", "ducks", PathElement.count]
+
+        XCTAssertErrorsEqual(try plist.delete(path), .arrayCountWrongUsage(path: path))
+    }
+
+    func testAddCount_ThrowsError() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try PathExplorerSerialization<PlistFormat>(data: data)
+        let path: Path = ["animals", "ducks", PathElement.count]
+
+        XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .arrayCountWrongUsage(path: path))
     }
 }

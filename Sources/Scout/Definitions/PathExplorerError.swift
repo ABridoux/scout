@@ -26,7 +26,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .invalidValue(let value): return "The key value \(value) is invalid"
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
-        case .arrayCountWrongUsage(let path): return "Wrong usage of array count in '\(path.description)'. Array count should be the last path element after an array."
+        case .arrayCountWrongUsage(let path): return "Wrong usage of count '[\(PathElement.defaultCount)]' in '\(path.description)'. '[\(PathElement.defaultCount)]' should be the last path element after an array or a dictionary."
 
         case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.description)' with a String as it is not a Dictionary"
         case .subscriptMissingKey(let path, let key, let bestMatch):

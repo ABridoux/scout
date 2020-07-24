@@ -160,31 +160,45 @@ final class PathExplorerXMLTests: XCTestCase {
 
     // MARK: Array count
 
-    func testGetArrayCount() throws {
+    func testGetCount() throws {
         let xml = try PathExplorerXML(data: stubData2)
 
-        XCTAssertEqual(try xml.get(for: "dogs").get(pathElement: .arrayCount).int, 3)
+        XCTAssertEqual(try xml.get(for: "dogs").get(pathElement: .count).int, 3)
     }
 
-    func testGetArrayCount_ThrowsErrorIfNotFinal() throws {
+    func testGetCount_ThrowsErrorIfNotFinal() throws {
         let xml = try PathExplorerXML(data: stubData2)
-        let errorPath = Path("root", "dogs", PathElement.arrayCount)
+        let errorPath = Path("root", "dogs", PathElement.count)
         let path = errorPath.appending(2)
 
         XCTAssertErrorsEqual(try xml.get(path), .arrayCountWrongUsage(path: errorPath))
     }
 
-    func testSetArrayCount_ThrowsError() throws {
+    func testSetCount_ThrowsError() throws {
         var xml = try PathExplorerXML(data: stubData2)
-        let path = Path("root", "dogs", PathElement.arrayCount)
+        let path = Path("root", "dogs", PathElement.count)
 
         XCTAssertErrorsEqual(try xml.set(path, to: "Woomy"), .arrayCountWrongUsage(path: path))
     }
 
-    func testSetKeyNameArrayCount_ThrowsError() throws {
+    func testSetKeyNameCount_ThrowsError() throws {
         var xml = try PathExplorerXML(data: stubData2)
-        let path = Path("root", "dogs", PathElement.arrayCount)
+        let path = Path("root", "dogs", PathElement.count)
 
         XCTAssertErrorsEqual(try xml.set(path, keyNameTo: "Woomy"), .arrayCountWrongUsage(path: path))
+    }
+
+    func testDeleteCount_ThrowsError() throws {
+        var xml = try PathExplorerXML(data: stubData2)
+        let path = Path("root", "dogs", PathElement.count)
+
+        XCTAssertErrorsEqual(try xml.delete(path), .arrayCountWrongUsage(path: path))
+    }
+
+    func testAddCount_ThrowsError() throws {
+        var xml = try PathExplorerXML(data: stubData2)
+        let path = Path("root", "dogs", PathElement.count)
+
+        XCTAssertErrorsEqual(try xml.add("Woomy", at: path), .arrayCountWrongUsage(path: path))
     }
 }
