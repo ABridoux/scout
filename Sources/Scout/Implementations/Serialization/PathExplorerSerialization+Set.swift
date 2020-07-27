@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 extension PathExplorerSerialization {
 
     mutating func set(key: String, to newValue: Any) throws {
@@ -43,8 +48,6 @@ extension PathExplorerSerialization {
 
     public mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws {
         guard !path.isEmpty else { return }
-
-        	
 
         let (pathExplorers, path, lastElement) = try getExplorers(from: path)
 

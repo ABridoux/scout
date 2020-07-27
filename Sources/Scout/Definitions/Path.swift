@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 import Foundation
 
 /// Array of `PathElementRepresentable` to find a specific value in a `PathExplorer`
@@ -40,7 +45,7 @@ public struct Path: Equatable {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
-        let indexAndCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCount)-]+(?=\])"#
+        let indexAndCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol)-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
         let indexAndCountRegex = try NSRegularExpression(pattern: indexAndCountRegexPattern)
@@ -139,7 +144,7 @@ extension Path: Collection {
     public var startIndex: Int { elements.startIndex }
     public var endIndex: Int { elements.endIndex }
 
-    /// Last of the elements in the Path
+    /// Last element in the Path
     public var last: PathElement? { elements.last }
 
     public func index(after i: Int) -> Int {

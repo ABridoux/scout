@@ -1,9 +1,7 @@
 //
-//  File.swift
-//
-//
-//  Created by Alexis Bridoux on 14/03/2020.
-//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
 
 import XCTest
 import AEXML

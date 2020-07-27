@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 import ArgumentParser
 import Scout
 
@@ -42,19 +47,19 @@ struct PathAndValue: ExpressibleByArgument {
         var value = String(splitted[1])
         var shouldRemoveEnds = false
 
-        if value.hasPrefix("#"), value.hasSuffix("#") {
+        if value.isEnclosed(by: "#") {
             shouldRemoveEnds = true
             changeKey = true
-        } else if value.hasSuffix("/"), value.hasPrefix("/") {
+        } else if value.isEnclosed(by: "/") {
             shouldRemoveEnds = true
             forceType = .string
-        } else if value.hasSuffix("~"), value.hasPrefix("~") {
+        } else if value.isEnclosed(by: "~") {
             shouldRemoveEnds = true
             forceType = .real
         } else if value.hasPrefix("<"), value.hasSuffix(">") {
             shouldRemoveEnds = true
             forceType = .int
-        } else if value.hasPrefix("?"), value.hasSuffix("?") {
+        } else if value.isEnclosed(by: "?") {
             shouldRemoveEnds = true
             forceType = .bool
         }

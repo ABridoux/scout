@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 import Foundation
 
 /// Store the possible elements that can be used to subscript a `PathExplorer`
@@ -5,12 +10,15 @@ public enum PathElement: Equatable {
 
     // MARK: - Constants
 
+    // -- Cases
     case key(String)
     case index(Int)
-    /// Placed after an array to return the array count
+
+    /// Placed after an array or dictionary to return the array count
     case count
 
-    static let defaultCount = "#"
+    // -- Symbols
+    static let defaultCountSymbol = "#"
 
     // MARK: - Properties
 
@@ -38,12 +46,12 @@ public enum PathElement: Equatable {
         }
     }
 
-    // MARK: - Init
+    // MARK: - Initialization
 
     init(from string: String) {
         if let index = Int(string) {
             self = .index(index)
-        } else if string == Self.defaultCount {
+        } else if string == Self.defaultCountSymbol {
             self = .count
         } else {
             self = .key(string)
@@ -73,7 +81,7 @@ extension PathElement: CustomStringConvertible {
         switch self {
         case .key(let key): return key
         case .index(let index): return "[\(index)]"
-        case .count: return "[\(Self.defaultCount)]"
+        case .count: return "[\(Self.defaultCountSymbol)]"
         }
     }
 }
