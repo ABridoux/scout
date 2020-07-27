@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 extension PathExplorerSerialization {
 
     func get(for key: String) throws -> Self {
@@ -39,14 +44,14 @@ extension PathExplorerSerialization {
         } else if let dictValue = value as? DictionaryValue {
             return PathExplorerSerialization(value: dictValue.count, path: readingPath.appending(.count))
         } else {
-            throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+            throw PathExplorerError.countWrongUsage(path: readingPath)
         }
     }
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(element: PathElement, negativeIndexEnabled: Bool = true) throws -> Self {
         guard readingPath.last != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+            throw PathExplorerError.countWrongUsage(path: readingPath)
         }
 
         switch element {

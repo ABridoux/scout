@@ -1,10 +1,15 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 extension PathExplorerXML {
 
     public mutating func delete(_ path: Path) throws {
         var currentPathExplorer = self
 
         guard path.last != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: path)
+            throw PathExplorerError.countWrongUsage(path: path)
         }
 
         try path.forEach {

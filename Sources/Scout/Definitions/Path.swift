@@ -1,8 +1,11 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 import Foundation
 
 /// Array of `PathElementRepresentable` to find a specific value in a `PathExplorer`
-//public typealias Path = [PathElementRepresentable]
-
 public struct Path: Equatable {
 
     // MARK: - Constants
@@ -12,10 +15,6 @@ public struct Path: Equatable {
     // MARK: - Properties
 
     private var elements = [PathElement]()
-
-    public var startIndex: Int { elements.startIndex }
-    public var endIndex: Int { elements.endIndex }
-    public var last: PathElement? { elements.last }
 
     public static var empty: Path { Path([PathElement]()) }
 
@@ -30,7 +29,7 @@ public struct Path: Equatable {
 
      `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
 
-     `company.computers[#]` will make the path `["company", "computers", PathElement.arrayCount]`
+     `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
 
      - parameter string: The string representing the path
      - parameter separator: The separator used to split the string. Default is "."
@@ -46,10 +45,10 @@ public struct Path: Equatable {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
-        let indexAndArrayCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCount)-]+(?=\])"#
+        let indexAndCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol)-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
-        let indexAndArrayCountRegex = try NSRegularExpression(pattern: indexAndArrayCountRegexPattern)
+        let indexAndCountRegex = try NSRegularExpression(pattern: indexAndCountRegexPattern)
         let squareBracketRegex = try NSRegularExpression(pattern: squareBracketPattern)
 
         let matches = splitRegex.matches(in: string)
@@ -61,7 +60,7 @@ public struct Path: Equatable {
                 match.removeFirst()
                 match.removeLast()
             }
-            let indexMatches = indexAndArrayCountRegex.matches(in: match, options: [], range: match.nsRange)
+            let indexMatches = indexAndCountRegex.matches(in: match, options: [], range: match.nsRange)
 
             // try to get the indexes if any
             if let indexesMatch = try Self.extractIndexesAndCount(in: indexMatches, from: match) {
@@ -141,6 +140,13 @@ public struct Path: Equatable {
 }
 
 extension Path: Collection {
+
+    public var startIndex: Int { elements.startIndex }
+    public var endIndex: Int { elements.endIndex }
+
+    /// Last element in the Path
+    public var last: PathElement? { elements.last }
+
     public func index(after i: Int) -> Int {
         return elements.index(after: i)
     }

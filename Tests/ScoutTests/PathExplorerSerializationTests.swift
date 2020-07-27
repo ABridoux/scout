@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 import XCTest
 @testable import Scout
 
@@ -192,7 +197,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         let errorPath: Path = ["animals", "ducks", PathElement.count]
         let path = errorPath.appending(1)
 
-        XCTAssertErrorsEqual(try plist.get(path), .arrayCountWrongUsage(path: errorPath))
+        XCTAssertErrorsEqual(try plist.get(path), .countWrongUsage(path: errorPath))
     }
 
     func testSetCount_ThrowsError() throws {
@@ -200,7 +205,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
         let path: Path = ["animals", "ducks", PathElement.count]
 
-        XCTAssertErrorsEqual(try plist.set(path, to: "Woomy"), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try plist.set(path, to: "Woomy"), .countWrongUsage(path: path))
     }
 
     func testSetKeyNameCount_ThrowsError() throws {
@@ -216,7 +221,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
         let path: Path = ["animals", "ducks", PathElement.count]
 
-        XCTAssertErrorsEqual(try plist.delete(path), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try plist.delete(path), .countWrongUsage(path: path))
     }
 
     func testAddCount_ThrowsError() throws {
@@ -224,6 +229,6 @@ final class PathExplorerSerializationTests: XCTestCase {
         var plist = try PathExplorerSerialization<PlistFormat>(data: data)
         let path: Path = ["animals", "ducks", PathElement.count]
 
-        XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .countWrongUsage(path: path))
     }
 }

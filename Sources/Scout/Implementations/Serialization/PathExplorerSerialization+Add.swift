@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 extension PathExplorerSerialization {
 
     /// Add the new value to the array or dictionary value
@@ -40,7 +45,7 @@ extension PathExplorerSerialization {
         switch childKey {
         case .key: return DictionaryValue() //dictionary
         case .index: return ArrayValue() //array
-        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        case .count: throw PathExplorerError.countWrongUsage(path: readingPath)
         }
     }
 
@@ -53,7 +58,7 @@ extension PathExplorerSerialization {
         let lastElement = craftingPath.removeLast()
 
         guard lastElement != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: path)
+            throw PathExplorerError.countWrongUsage(path: path)
         }
 
         var currentPathExplorer = self
