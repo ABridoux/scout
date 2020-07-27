@@ -33,7 +33,9 @@ struct ReadDocumentation: Documentation {
     private static let examples = [(#"`scout "people.Tom.hobbies[0]"`"#, #"will output Tom first hobby "cooking""#),
                                    (#"`scout "people.Arnaud.height"`"#, #"will output Arnaud's height "180""#),
                                    (#"`scout "people.Tom.hobbies[-1]"`"#, #"will output Tom last hobby: "guitar""#),
-                                   (#"`scout "people.Tom"`"#, #"will output Tom dictionary"#)]
+                                   (#"`scout "people.Tom"`"#, #"will output Tom dictionary"#),
+                                   (#"`scout "people[#]""#, #"will output the number of people: 2"#),
+                                   (#"`scout "people.Arnaud.hobbies[#]""#, #"will output Arnaud's hobbies count: 3"#)]
 
     static let text =
     """
@@ -46,6 +48,7 @@ struct ReadDocumentation: Documentation {
     - If the path is invalid, the program will return an error
     - Enclose the value with sharp signs to change the key name: #keyName#
     - When accessing an array value by its index, use the index -1 to access to the last element
+    - Get an dictionary or an array count with the '[#]' symbol
     - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
         Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
 

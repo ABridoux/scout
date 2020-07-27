@@ -171,34 +171,34 @@ final class PathExplorerXMLTests: XCTestCase {
         let errorPath = Path("root", "dogs", PathElement.count)
         let path = errorPath.appending(2)
 
-        XCTAssertErrorsEqual(try xml.get(path), .arrayCountWrongUsage(path: errorPath))
+        XCTAssertErrorsEqual(try xml.get(path), .countWrongUsage(path: errorPath))
     }
 
     func testSetCount_ThrowsError() throws {
         var xml = try PathExplorerXML(data: stubData2)
         let path = Path("root", "dogs", PathElement.count)
 
-        XCTAssertErrorsEqual(try xml.set(path, to: "Woomy"), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try xml.set(path, to: "Woomy"), .countWrongUsage(path: path))
     }
 
     func testSetKeyNameCount_ThrowsError() throws {
         var xml = try PathExplorerXML(data: stubData2)
         let path = Path("root", "dogs", PathElement.count)
 
-        XCTAssertErrorsEqual(try xml.set(path, keyNameTo: "Woomy"), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try xml.set(path, keyNameTo: "Woomy"), .countWrongUsage(path: path))
     }
 
     func testDeleteCount_ThrowsError() throws {
         var xml = try PathExplorerXML(data: stubData2)
         let path = Path("root", "dogs", PathElement.count)
 
-        XCTAssertErrorsEqual(try xml.delete(path), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try xml.delete(path), .countWrongUsage(path: path))
     }
 
     func testAddCount_ThrowsError() throws {
         var xml = try PathExplorerXML(data: stubData2)
         let path = Path("root", "dogs", PathElement.count)
 
-        XCTAssertErrorsEqual(try xml.add("Woomy", at: path), .arrayCountWrongUsage(path: path))
+        XCTAssertErrorsEqual(try xml.add("Woomy", at: path), .countWrongUsage(path: path))
     }
 }

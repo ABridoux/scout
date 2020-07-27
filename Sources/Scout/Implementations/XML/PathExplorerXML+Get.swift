@@ -33,7 +33,7 @@ extension PathExplorerXML {
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(element: PathElement, negativeIndexEnabled: Bool = true) throws  -> Self {
         guard readingPath.last != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+            throw PathExplorerError.countWrongUsage(path: readingPath)
         }
 
         switch element {

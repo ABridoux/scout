@@ -4,7 +4,7 @@ extension PathExplorerXML {
         var currentPathExplorer = self
 
         guard path.last != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: path)
+            throw PathExplorerError.countWrongUsage(path: path)
         }
 
         try path.forEach {

@@ -37,14 +37,14 @@ extension PathExplorerSerialization {
         switch element {
         case .key(let key): return try set(key: key, to: newValue)
         case .index(let index): return try set(index: index, to: newValue)
-        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath.appending(element))
+        case .count: throw PathExplorerError.countWrongUsage(path: readingPath.appending(element))
         }
     }
 
     public mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws {
         guard !path.isEmpty else { return }
 
-        let newValue = try convert(newValue, to: type)
+        	
 
         let (pathExplorers, path, lastElement) = try getExplorers(from: path)
 

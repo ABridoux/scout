@@ -42,7 +42,7 @@ extension PathExplorerXML {
 
         case .key(let key): try add(newValue: newValue, forKey: key)
         case .index(let index): try add(newValue: newValue, at: index)
-        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        case .count: throw PathExplorerError.countWrongUsage(path: readingPath)
         }
     }
 
@@ -86,7 +86,7 @@ extension PathExplorerXML {
         let lastElement = path.removeLast()
 
         guard lastElement != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: path.appending(lastElement))
+            throw PathExplorerError.countWrongUsage(path: path.appending(lastElement))
         }
 
         var currentPathExplorer = self

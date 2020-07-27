@@ -24,7 +24,7 @@ extension PathExplorerXML {
 
         try path.forEach { element in
             guard element != .count else {
-                throw PathExplorerError.arrayCountWrongUsage(path: path)
+                throw PathExplorerError.countWrongUsage(path: path)
             }
             currentPathExplorer = try currentPathExplorer.get(element: element)
         }
@@ -46,7 +46,7 @@ extension PathExplorerXML {
         }
 
         guard currentPathExplorer.readingPath.last != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: path)
+            throw PathExplorerError.countWrongUsage(path: path)
         }
 
         currentPathExplorer.element.name = newKeyName

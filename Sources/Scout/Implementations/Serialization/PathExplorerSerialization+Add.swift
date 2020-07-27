@@ -40,7 +40,7 @@ extension PathExplorerSerialization {
         switch childKey {
         case .key: return DictionaryValue() //dictionary
         case .index: return ArrayValue() //array
-        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath)
+        case .count: throw PathExplorerError.countWrongUsage(path: readingPath)
         }
     }
 
@@ -53,7 +53,7 @@ extension PathExplorerSerialization {
         let lastElement = craftingPath.removeLast()
 
         guard lastElement != .count else {
-            throw PathExplorerError.arrayCountWrongUsage(path: path)
+            throw PathExplorerError.countWrongUsage(path: path)
         }
 
         var currentPathExplorer = self

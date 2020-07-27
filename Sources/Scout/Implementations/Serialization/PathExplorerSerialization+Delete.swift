@@ -40,7 +40,7 @@ extension PathExplorerSerialization {
 
         case .key(let key): try delete(key: key)
         case .index(let index): try delete(at: index)
-        case .count: throw PathExplorerError.arrayCountWrongUsage(path: readingPath.appending(element))
+        case .count: throw PathExplorerError.countWrongUsage(path: readingPath.appending(element))
         }
     }
 
