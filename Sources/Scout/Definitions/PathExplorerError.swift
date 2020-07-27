@@ -1,3 +1,8 @@
+//
+// Scout
+// Copyright (c) Alexis Bridoux 2020
+// MIT license, see LICENSE file for details
+
 import Foundation
 
 public enum PathExplorerError: LocalizedError, Equatable {
@@ -6,7 +11,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case invalidValue(String)
     case valueConversionError(value: String, type: String)
     case wrongValueForKey(value: String, element: PathElement)
-    case arrayCountWrongUsage(path: Path)
+    case countWrongUsage(path: Path)
 
     case dictionarySubscript(Path)
     case subscriptMissingKey(path: Path, key: String, bestMatch: String?)
@@ -26,7 +31,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .invalidValue(let value): return "The key value \(value) is invalid"
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
-        case .arrayCountWrongUsage(let path): return "Wrong usage of count '[\(PathElement.defaultCount)]' in '\(path.description)'. '[\(PathElement.defaultCount)]' should be the last path element after an array or a dictionary."
+        case .countWrongUsage(let path): return "Wrong usage of count '[\(PathElement.defaultCountSymbol)]' in '\(path.description)'. '[\(PathElement.defaultCountSymbol)]' should be the last path element after an array or a dictionary."
 
         case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.description)' with a String as it is not a Dictionary"
         case .subscriptMissingKey(let path, let key, let bestMatch):
@@ -41,7 +46,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
             return "The key #\(key)# cannot be found in the Dictionary '\(path.description)'. \(bestMatchString)"
 
         case .arraySubscript(let path): return "Cannot subscript the key at '\(path.description)' with an Integer as is not an Array"
-        case .subscriptWrongIndex(let path, let index, let arrayCount): return "The index #\(index)# is not within the bounds of the Array (0...\(arrayCount - 1)) at '\(path.description)'"
+        case .subscriptWrongIndex(let path, let index, let count): return "The index #\(index)# is not within the bounds of the Array (0...\(count - 1)) at '\(path.description)'"
         case .keyNameSetOnNonDictionary(path: let path): return "'\(path.description)' is not a dictionary and cannot set the key name of its children if any"
 
         case .stringToDataConversionError: return "Unable to convert the input string into data"

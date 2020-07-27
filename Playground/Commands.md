@@ -24,8 +24,8 @@ scout "people.Tom.hobbies[1]" -i People.json
 ```bash
 scout "people.Suzanne.movies[0].title" -i People.xml
 ```
+ 
  Output Robert running records second record first value
-
 ```bash
 scout "people.Robert.running_records[1][0]" -i People.json
 ```
@@ -33,7 +33,7 @@ scout "people.Robert.running_records[1][0]" -i People.json
 The following:
 
 ```bash
-scout "people.Tom"
+scout "people.Tom" -i People.json
 ```
 outputs Tom dictionary:
 
@@ -47,6 +47,21 @@ outputs Tom dictionary:
   "height" : 175
 }
 ```
+
+### Get dictionary or array count
+
+You can get a dictionary or an array count with the `[#]` symbol.
+
+Get people count: 3
+```bash
+scout "people[#]" -i People.plist
+```
+
+Get Suzanne's movies count: 3
+```bash
+scout "people.Suzanne.movies[#]" -i People.xml
+```
+
 
 ## Set
 - Will output an error if a key in the given path does not exist.
@@ -81,7 +96,7 @@ scout set "people.Robert.running_records[0][2]"=15 -i People.xml -v
 scout set "people.Tom.height=/165/" -i People.json -v
 ```
 
-Set Tom height to the **Real** value: 165 (only usfeul for Plist files, as Json does not care about integer/real and Xml has only string values)
+Set Tom height to the **Real** value: 165 (only useful for Plist files, as Json does not care about integer/real and Xml has only string values)
 ```bash
 scout set "people.Tom.height=~165~" -i People.plist -v
 ```
@@ -150,7 +165,7 @@ scout add \
 scout add "people.Robert.running_records[1][-1]"=20 -i People.json -v
 ```
 
- (Tricky one) Add a new record to robert running records and add a new value into it: 15
+ (Tricky one) Add a new record to Robert running records and add a new value into it: 15
 
 ```bash
 scout add "people.Robert.running_records[-1][0]"=15 -i People.xml -v
