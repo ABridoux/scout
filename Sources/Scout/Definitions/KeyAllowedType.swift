@@ -10,7 +10,7 @@ public protocol KeyAllowedType: LosslessStringConvertible, Equatable {
 
     static var typeDescription: String { get }
 
-    init( value: Any) throws
+    init(value: Any) throws
 }
 
 public extension KeyAllowedType {
@@ -27,10 +27,10 @@ public extension KeyAllowedType {
             if Self.self == Bool.self {
                 // specific case for Bool values as we allow other string than "true" or "false"
                 if Bool.trueSet.contains(stringValue) {
-                    self = Self("true")!
+                    self = try Self(value: true)
                     return
                 } else if Bool.falseSet.contains(stringValue) {
-                    self = Self("false")!
+                    self = try Self(value: false)
                     return
                 }
             } else if let convertedValue = Self(stringValue) {

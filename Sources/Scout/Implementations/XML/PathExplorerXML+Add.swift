@@ -90,9 +90,7 @@ extension PathExplorerXML {
         var path = path
         let lastElement = path.removeLast()
 
-        guard lastElement != .count else {
-            throw PathExplorerError.countWrongUsage(path: path.appending(lastElement))
-        }
+        try validateLast(element: lastElement, in: path.appending(lastElement))
 
         var currentPathExplorer = self
 

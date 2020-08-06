@@ -9,7 +9,7 @@ Swift package<br>
         <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
     </a>
     <a href="https://github.com/ABridoux/scout/actions?query=workflow%3ASwift">
-        <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift" />
+        <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift?label=tests&logo=GitHub" />
     </a>
     <br/>
 Install<br>

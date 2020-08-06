@@ -63,4 +63,15 @@ extension PathExplorer {
         // otherwise, try to return the type as it is
         return try Type(value: value)
     }
+
+    /// When dealing with setting, deleting or adding operations, this method ensures the given last element is correct
+    /// - Parameters:
+    ///   - element: Last element of the path
+    ///   - path: Path where the element is
+    /// - Throws: If element cannot be used as the last element
+    func validateLast(element: PathElement?, in path: Path) throws {
+        if element == .count {
+            throw PathExplorerError.countWrongUsage(path: path)
+        }
+    }
 }

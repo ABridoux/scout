@@ -39,12 +39,30 @@ final class PathExplorerXMLTests: XCTestCase {
         XCTAssertNoThrow(try PathExplorerXML(data: stubData1))
     }
 
+    // MARK: Get
+
     func testSubscriptString() throws {
         let xml = try PathExplorerXML(data: stubData1)
 
         XCTAssertEqual(try xml.get(for: "stringValue").string, "Hello")
         XCTAssertEqual(try xml.get(for: "boolValue").bool, false)
     }
+
+    func testSubscriptInt() throws {
+        let xml = try PathExplorerXML(data: stubData2)
+
+        XCTAssertEqual(try xml.get(for: "dogs").get(at: 1).string, "Spot")
+    }
+
+    func testSubscriptArray() throws {
+        let xml = try PathExplorerXML(data: stubData2)
+
+        let path = Path("dogs", 1)
+
+        XCTAssertEqual(try xml.get(path).string, "Spot")
+    }
+
+    // MARK: Set
 
     func testSubscriptStringSet() throws {
         var xml = try PathExplorerXML(data: stubData1)
@@ -55,25 +73,11 @@ final class PathExplorerXMLTests: XCTestCase {
         XCTAssertEqual(try xml.get(for: "boolValue").bool, false)
     }
 
-    func testSubscriptInt() throws {
-        let xml = try PathExplorerXML(data: stubData2)
-
-        XCTAssertEqual(try xml.get(for: "dogs").get(at: 1).string, "Spot")
-    }
-
     func testSubscriptIntSet() throws {
         var xml = try PathExplorerXML(data: stubData2)
 
         try xml.set("dogs", 1, to: "Endo")
         XCTAssertEqual(try xml.get(for: "dogs").get(at: 1).string, "Endo")
-    }
-
-    func testSubscriptArray() throws {
-        let xml = try PathExplorerXML(data: stubData2)
-
-        let path = Path("dogs", 1)
-
-        XCTAssertEqual(try xml.get(path).string, "Spot")
     }
 
     func testSubscriptArraySet() throws {
@@ -93,6 +97,8 @@ final class PathExplorerXMLTests: XCTestCase {
         XCTAssertEqual(try xml.get(for: "kiki").string, "Hello")
     }
 
+    // MARK: Delete
+
     func testDelete() throws {
         var xml = try PathExplorerXML(data: stubData2)
 
@@ -101,6 +107,8 @@ final class PathExplorerXMLTests: XCTestCase {
         XCTAssertEqual(try xml.get("dogs", 1).string, "Betty")
         XCTAssertThrowsError(try xml.get("dogs", 2))
     }
+
+    // MARK: Add
 
     func testAddKeyDict() throws {
         var xml = try PathExplorerXML(data: stubData1)

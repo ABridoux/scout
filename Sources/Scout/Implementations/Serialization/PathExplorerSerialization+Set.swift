@@ -6,22 +6,14 @@
 extension PathExplorerSerialization {
 
     mutating func set(key: String, to newValue: Any) throws {
-        guard var dict = value as? DictionaryValue else {
-            throw PathExplorerError.dictionarySubscript(readingPath)
-        }
-
-        guard dict[key] != nil else {
-            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
-        }
+        var dict = try getDictAndValueFor(key: key).dictionary
 
         dict[key] = newValue
         value = dict
     }
 
     mutating func set(index: Int, to newValue: Any) throws {
-        guard var array = value as? ArrayValue else {
-            throw PathExplorerError.arraySubscript(readingPath)
-        }
+        var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
         if index == -1 {
             array.append(newValue)
@@ -76,17 +68,11 @@ extension PathExplorerSerialization {
     // MARK: - Key name
 
     mutating func change(key: String, nameTo newKeyName: String) throws {
-        guard var dict = value as? DictionaryValue else {
-            throw PathExplorerError.dictionarySubscript(readingPath)
-        }
+        var (dict, value) = try getDictAndValueFor(key: key)
 
-        guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
-        }
-
-        dict[newKeyName] = childValue
+        dict[newKeyName] = value
         dict.removeValue(forKey: key)
-        value = dict
+        self.value = dict
     }
 
     public mutating func set(_ path: Path, keyNameTo newKeyName: String) throws {

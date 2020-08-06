@@ -8,11 +8,6 @@ import Foundation
 /// PathExplorer struct which uses a serializer to parse data: Json and Plist
 public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
-    // MARK: - Constants
-
-    typealias DictionaryValue = [String: Any]
-    typealias ArrayValue = [Any]
-
     // MARK: - Properties
 
     var value: Any
@@ -56,11 +51,12 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         } else if F.self == PlistFormat.self {
             return .plist
         } else {
-            fatalError("Serialiation format not recognized. Allowed: Jsonformat and PlistFormat")
+            fatalError("Serialiation format not recognized. Allowed: JsonFormat and PlistFormat")
         }
 
     }
 
+    /// `Path` in the data leading to this sub path explorer
     public var readingPath = Path()
 
     // MARK: - Initialization
@@ -157,7 +153,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         guard F.self == JsonFormat.self else { return string }
 
         if #available(OSX 10.15, *) {
-            // the without backslash option is available
+            // the without-backslash option is available
             return string
         } else {
             // we have to remvove the back slashes

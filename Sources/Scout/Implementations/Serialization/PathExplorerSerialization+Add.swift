@@ -31,7 +31,7 @@ extension PathExplorerSerialization {
                 // insert the new value at the index
                 array.insert(newValue, at: index)
             } else {
-                throw PathExplorerError.wrongValueForKey(value: String(describing: value), element: .index(index))
+                throw PathExplorerError.wrongValueForKey(value: String(describing: newValue), element: .index(index))
             }
             value = array
         }
@@ -43,8 +43,8 @@ extension PathExplorerSerialization {
     /// - Returns: The newly created path explorer
     func makeDictionaryOrArray(childKey: PathElement) throws -> Any {
         switch childKey {
-        case .key: return DictionaryValue() //dictionary
-        case .index: return ArrayValue() //array
+        case .key: return DictionaryValue()
+        case .index: return ArrayValue()
         case .count: throw PathExplorerError.countWrongUsage(path: readingPath)
         }
     }
@@ -57,9 +57,7 @@ extension PathExplorerSerialization {
         var craftingPath = path
         let lastElement = craftingPath.removeLast()
 
-        guard lastElement != .count else {
-            throw PathExplorerError.countWrongUsage(path: path)
-        }
+        try validateLast(element: lastElement, in: path)
 
         var currentPathExplorer = self
         var pathExplorers = [currentPathExplorer]

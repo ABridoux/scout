@@ -32,6 +32,5 @@ public struct JsonFormat: SerializationFormat {
         } else {
             return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
         }
-
     }
 }
