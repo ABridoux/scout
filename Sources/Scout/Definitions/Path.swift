@@ -105,7 +105,7 @@ public struct Path: Equatable {
         // get the first element
         let firstElement = PathElement(from: String(match[indexMatch.range]))
 
-        guard firstElement.isArraySubscripter else {
+        guard firstElement.isGroupSubscripter else {
             throw PathExplorerError.invalidPathElement(match.pathValue)
         }
 
@@ -126,7 +126,7 @@ public struct Path: Equatable {
         try indexMatches.forEach { indexMatch in
             let element = PathElement(from: String(match[indexMatch.range]))
 
-            guard element.isArraySubscripter else { throw PathExplorerError.invalidPathElement(match.pathValue) }
+            guard element.isGroupSubscripter else { throw PathExplorerError.invalidPathElement(match.pathValue) }
             elements.append(element)
         }
 

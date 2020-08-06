@@ -5,23 +5,28 @@
 
 extension PathExplorerSerialization {
 
+    /// If `value` can be casted as a dictionary, and has the given key, return the dictionary and the key value in a tuple. Throws otherwise.
+    func getDictAndValueFor(key: String) throws -> (dictionary: DictionaryValue, value: Any) {
+        let dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
+
+        guard let value = dict[key] else {
+            throw PathExplorerError.subscriptMissingKey(path: readingPath,
+                                                        key: key,
+                                                        bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
+        }
+
+        return (dict, value)
+    }
+
     func get(for key: String) throws -> Self {
-        guard let dict = value as? DictionaryValue else {
-            throw PathExplorerError.dictionarySubscript(readingPath)
-        }
+        let value = try getDictAndValueFor(key: key).value
 
-        guard let childValue = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
-        }
-
-        return PathExplorerSerialization(value: childValue, path: readingPath.appending(key))
+        return PathExplorerSerialization(value: value, path: readingPath.appending(key))
     }
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(at index: Int, negativeIndexEnabled: Bool = true) throws -> Self {
-        guard let array = value as? ArrayValue else {
-            throw PathExplorerError.arraySubscript(readingPath)
-        }
+        let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
         if index == -1, negativeIndexEnabled {
             if array.isEmpty {
@@ -37,7 +42,7 @@ extension PathExplorerSerialization {
         return PathExplorerSerialization(value: array[index], path: readingPath.appending(index))
     }
 
-    /// - Returns: The count of the array if  `value` is an array
+    /// - Returns: The count of the array or dictionary if  `value` is an array or a dictionary
     func getChildrenCount() throws -> Self {
         if let arrayValue = value as? ArrayValue {
             return PathExplorerSerialization(value: arrayValue.count, path: readingPath.appending(.count))

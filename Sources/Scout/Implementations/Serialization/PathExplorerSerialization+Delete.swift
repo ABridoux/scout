@@ -6,22 +6,14 @@
 extension PathExplorerSerialization {
 
     mutating func delete(key: String) throws {
-        guard var dict = value as? DictionaryValue else {
-            throw PathExplorerError.dictionarySubscript(readingPath)
-        }
-
-        guard dict[key] != nil else {
-            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
-        }
+        var dict = try getDictAndValueFor(key: key).dictionary
 
         dict.removeValue(forKey: key)
         value = dict
     }
 
     mutating func delete(at index: Int) throws {
-        guard var array = value as? ArrayValue else {
-            throw PathExplorerError.arraySubscript(readingPath)
-        }
+        var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
         if index == -1 {
             guard !array.isEmpty else {

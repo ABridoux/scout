@@ -8,9 +8,7 @@ extension PathExplorerXML {
     public mutating func delete(_ path: Path) throws {
         var currentPathExplorer = self
 
-        guard path.last != .count else {
-            throw PathExplorerError.countWrongUsage(path: path)
-        }
+        try validateLast(element: path.last, in: path)
 
         try path.forEach {
             currentPathExplorer = try currentPathExplorer.get(element: $0)

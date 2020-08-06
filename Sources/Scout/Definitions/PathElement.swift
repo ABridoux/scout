@@ -14,7 +14,7 @@ public enum PathElement: Equatable {
     case key(String)
     case index(Int)
 
-    /// Placed after an array or dictionary to return the array count
+    /// Placed after an array or dictionary to return its count
     case count
 
     // -- Symbols
@@ -22,6 +22,7 @@ public enum PathElement: Equatable {
 
     // MARK: - Properties
 
+    /// String value if self is a `key`
     var key: String? {
         if case let .key(key) = self {
             return key
@@ -30,6 +31,7 @@ public enum PathElement: Equatable {
         }
     }
 
+    /// Int value if self is an `index`
     var index: Int? {
         if case let .index(index) = self {
             return index
@@ -38,11 +40,11 @@ public enum PathElement: Equatable {
         }
     }
 
-    /// Can subscript an array
-    public var isArraySubscripter: Bool {
+    /// Can subscript an array or a dictionay
+    public var isGroupSubscripter: Bool {
         switch self {
         case .count, .index: return true
-        default: return false
+        case .key: return false
         }
     }
 
