@@ -352,6 +352,11 @@ where
     */
     mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws
 
+    // MARK: Conversion
+
+    /// Try to convert the value held by the PathExplorer to the given type
+    func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type
+
     // MARK: Export
 
     func exportData() throws -> Data

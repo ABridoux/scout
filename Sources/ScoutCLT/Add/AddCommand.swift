@@ -11,18 +11,18 @@ struct AddCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "add",
         abstract: "Add value at a given path",
-        discussion: "To find examples and advanced explanations, please type `scout doc add`")
+        discussion: "To find examples and advanced explanations, please type `scout doc -c add`")
 
     @Argument(help: PathAndValue.help)
     var pathsAndValues = [PathAndValue]()
 
-    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
+    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
-    @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
+    @Option(name: [.short, .long], help: "Write the modified data into the file at the given path", completion: .file())
     var output: String?
 
-    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path")
+    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path", completion: .file())
     var modifyFilePath: String?
 
     @Flag(name: [.short, .long], inversion: .prefixedNo, help: "Output the modified data")
