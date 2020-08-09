@@ -156,14 +156,22 @@ extension Path: Collection {
         return elements[elementIndex]
     }
 
-    mutating func append(_ element: PathElementRepresentable) {
+    public mutating func append(_ element: PathElementRepresentable) {
         elements.append(element.pathValue)
     }
 
-    mutating func popFirst() -> PathElement? {
+    public mutating func popFirst() -> PathElement? {
         if let firstElement = elements.first {
             elements.removeFirst()
             return firstElement
+        }
+        return nil
+    }
+
+    public mutating func popLast() -> PathElement? {
+        if let lastElement = elements.last {
+            elements.removeLast()
+            return lastElement
         }
         return nil
     }

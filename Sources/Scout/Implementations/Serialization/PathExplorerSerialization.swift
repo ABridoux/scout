@@ -160,4 +160,14 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
             return string.replacingOccurrences(of: "\\", with: "")
         }
     }
+
+    // MARK: Conversion
+
+    public func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type {
+        if let value = value as? Type {
+            return value
+        } else {
+            throw PathExplorerError.valueConversionError(value: String(describing: value), type: String(describing: Type.self))
+        }
+    }
 }

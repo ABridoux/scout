@@ -121,4 +121,14 @@ public struct PathExplorerXML: PathExplorer {
     public func exportString() throws -> String {
         AEXMLDocument(root: element, options: .init()).xml
     }
+
+    // MARK: Conversion
+
+    public func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type {
+        if let value = Type(stringValue) {
+            return value
+        } else {
+            throw PathExplorerError.valueConversionError(value: stringValue, type: String(describing: Type.self))
+        }
+    }
 }

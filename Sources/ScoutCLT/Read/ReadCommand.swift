@@ -15,14 +15,14 @@ struct ReadCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "read",
         abstract: "Read a value at a given path",
-        discussion: "To find examples and advanced explanations, please type `scout doc read`")
+        discussion: "To find examples and advanced explanations, please type `scout doc -c read`")
 
     // MARK: - Properties
 
     @Argument(help: .readingPath)
     var readingPath: Path?
 
-    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
+    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
     @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")

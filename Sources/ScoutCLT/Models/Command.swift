@@ -5,7 +5,7 @@
 
 import ArgumentParser
 
-enum Command: String, ExpressibleByArgument {
+enum Command: String, ExpressibleByArgument, CaseIterable {
     case read, set, delete, add
 
     static var documentationDescription: String {

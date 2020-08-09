@@ -111,7 +111,7 @@ static let configuration = CommandConfiguration(
     commandName: "doc",
     abstract: "Rich examples and advanced explanations")
 
-    @Argument(help: "Command specific documentation")
+    @Option(name: [.short, .long], help: "Command specific documentation: \(Command.documentationDescription)")
     var command: Command?
 
     func run() throws {
