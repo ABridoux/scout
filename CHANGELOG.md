@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [1.3.2](https://github.com/ABridoux/scout/tree/1.3.1) (09/08/2020)
+
+### Fixed
+- Setting a value was always writing a String rather than inferring the type for JSON and Plist [#96]
+
 ## [1.3.1](https://github.com/ABridoux/scout/tree/1.3.1) (27/07/2020)
 
 ### Added
