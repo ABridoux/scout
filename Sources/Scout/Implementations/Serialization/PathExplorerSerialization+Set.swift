@@ -49,6 +49,8 @@ extension PathExplorerSerialization {
     public mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws {
         guard !path.isEmpty else { return }
 
+        let newValue = try convert(newValue, to: type)
+
         let (pathExplorers, path, lastElement) = try getExplorers(from: path)
 
         guard var currentExplorer = pathExplorers.last else {
