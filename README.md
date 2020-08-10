@@ -135,21 +135,23 @@ It will **download the notarized executable** from the [latest release](https://
 
 You can download the [latest version of the executable](https://github.com/ABridoux/scout/releases/latest/download/scout.zip) from the [releases](https://github.com/ABridoux/scout/releases). Note that the **executable is notarized**. Also, a notarized [scout package](https://github.com/ABridoux/scout/releases/latest/download/scout.pkg) is provided.
 
-After having unzipped the file, you can install it if you want to:
+After having unzipped the file, you can install it if you want to. The second line lets you install the script to auto-complete the commands.
 
 ```bash
-install scout /usr/local/bin/ 
+$ install scout /usr/local/bin/ 
+$ scout install-completion-script
 ```
 
 Here is a command which downloads the latest version of the program and install it in */usr/local/bin*. 
-Run it to download and install the latest version of the program. It erases the current version you may have.
+Run it to download and install the latest version of the program. It erases the current version you may have. Uncomment the last line to install the script to auto-complete the commands.
 
 ```bash
 curl -LO https://github.com/ABridoux/scout/releases/latest/download/scout.zip && \
 unzip scout.zip && \
 rm scout.zip && \
 install scout /usr/local/bin && \
-rm scout
+rm scout && \
+scout install-completion-script
 ```
 
 ##### Note
@@ -158,12 +160,13 @@ rm scout
 
 #### Git
 
-Use the following lines to clone the repository and to install **scout** (requires Swift 5.2 toolchain to be installed). You can check the *Makefile* to see the commands used to build and install the executable.
+Use the following lines to clone the repository and to install **scout** (requires Swift 5.2 toolchain to be installed). You can check the *Makefile* to see the commands used to build and install the executable. The last line is optional and lets you install the script to auto-complete the commands.
 
 ```bash
 $ git clone https://github.com/ABridoux/scout
 $ cd scout
 $ make
+$ scout install-completion-script
 ```
 
 The program should be install in */usr/local/bin*. You can then remove the repository if you do not want to keep it:
