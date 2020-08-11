@@ -24,6 +24,8 @@ Written by Alexis Bridoux.
 
 struct ScoutCommand: ParsableCommand {
 
+    // MARK: - Constants
+
     static let configuration = CommandConfiguration(
             commandName: "scout",
             abstract: abstract,
@@ -34,8 +36,11 @@ struct ScoutCommand: ParsableCommand {
                 DeleteCommand.self,
                 AddCommand.self,
                 DocCommand.self,
-                VersionCommand.self],
+                VersionCommand.self,
+                InstallCompletionScriptCommand.self],
             defaultSubcommand: ReadCommand.self)
+
+    // MARK: - Functions
 
     static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool, colorise: Bool) throws {
         if let output = output?.replacingTilde {

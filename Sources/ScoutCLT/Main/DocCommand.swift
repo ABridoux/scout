@@ -69,7 +69,7 @@ struct HomeDocumentation: Documentation {
     \u{001B}[0;0m
 
     Here is an overview of scout subcommands: \(Command.documentationDescription).
-    To get more insights for a specific command, please type `scout doc \("[command]".mainColor)`.
+    To get more insights for a specific command, please type `scout doc -c \("[command]".mainColor)`.
 
     To indicate what value to target, a reading path should be indicated.
     \(ArgumentHelp.readingPath.discussion)
