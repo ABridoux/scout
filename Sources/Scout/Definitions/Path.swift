@@ -45,7 +45,7 @@ public struct Path: Equatable {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
-        let indexAndCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol)-]+(?=\])"#
+        let indexAndCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
         let indexAndCountRegex = try NSRegularExpression(pattern: indexAndCountRegexPattern)
@@ -63,7 +63,7 @@ public struct Path: Equatable {
             let indexMatches = indexAndCountRegex.matches(in: match, options: [], range: match.nsRange)
 
             // try to get the indexes if any
-            if let indexesMatch = try Self.extractIndexesAndCount(in: indexMatches, from: match) {
+            if let indexesMatch = try Self.extractGroupSubscripters(in: indexMatches, from: match) {
                 elements.append(contentsOf: indexesMatch)
             } else {
                 if squareBracketRegex.firstMatch(in: match, range: match.nsRange) != nil {
@@ -84,17 +84,23 @@ public struct Path: Equatable {
         elements = pathElements.map { $0.pathValue }
     }
 
-    public init(_ pathElements: PathElement...) {
+    public init(pathElements: PathElement...) {
         elements = pathElements
     }
 
-    public init(_ pathElements: [PathElement]) {
+    public init( pathElements: [PathElement]) {
         elements = pathElements
     }
 
     // MARK: - Functions
 
-    static func extractIndexesAndCount(in indexMatches: [NSTextCheckingResult], from match: String) throws -> [PathElement]? {
+    /// Extract group subscripters [] in an element
+    /// - Parameters:
+    ///   - indexMatches: Results of a `NSRegularExpression` where the pattern [] is found
+    ///   - match: The match from which to extract the subscripters
+    /// - Throws: If a found subscripter is invalid
+    /// - Returns: The associated `PathElement`s of the subscripters
+    static func extractGroupSubscripters(in indexMatches: [NSTextCheckingResult], from match: String) throws -> [PathElement]? {
         var indexMatches = indexMatches
         var elements = [PathElement]()
 
@@ -183,7 +189,7 @@ extension Path: CustomStringConvertible {
         var description = ""
         elements.forEach { element in
             switch element {
-            case .index, .count:
+            case .index, .count, .slice:
                 // remove the point added automatically to a path element
                 if description.hasSuffix(defaultSeparator) {
                     description.removeLast()

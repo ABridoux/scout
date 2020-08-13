@@ -17,6 +17,8 @@ public enum PathElement: Equatable {
     /// Placed after an array or dictionary to return its count
     case count
 
+    case slice(Bounds)
+
     // -- Symbols
     static let defaultCountSymbol = "#"
 
@@ -43,8 +45,17 @@ public enum PathElement: Equatable {
     /// Can subscript an array or a dictionay
     public var isGroupSubscripter: Bool {
         switch self {
-        case .count, .index: return true
+        case .count, .index, .slice: return true
         case .key: return false
+        }
+    }
+
+    public var usage: String {
+        switch self {
+        case .key: return "A key subscript a dictionary and is specified with a dot '.' then the key name like 'dictionary.keyName'"
+        case .index: return "An index subscript an array and is specified as an integer enclosed with square brackets like '[1]'"
+        case .count: return "A count element is specified as a sharp sign enclosed with square brackets '[#]'. It should be the last path element after an array or a dictionary."
+        case .slice: return "A slice is specified with lower and upper bounds. It is enclosed by square brackets and the bounds are specified separated by ':' like '[lower:upper]'"
         }
     }
 
@@ -55,6 +66,8 @@ public enum PathElement: Equatable {
             self = .index(index)
         } else if string == Self.defaultCountSymbol {
             self = .count
+        } else if let range = string.range {
+            self = range
         } else {
             self = .key(string)
         }
@@ -84,6 +97,28 @@ extension PathElement: CustomStringConvertible {
         case .key(let key): return key
         case .index(let index): return "[\(index)]"
         case .count: return "[\(Self.defaultCountSymbol)]"
+        case .slice(let bounds):
+            let lowerBound = bounds.lower == 0 ? "" : String(bounds.lower)
+            let upperBound = bounds.upper == .lastIndex ? "" : String(bounds.upper)
+            return "[\(lowerBound):\(upperBound)]"
         }
+    }
+}
+
+private extension String {
+
+    var range: PathElement? {
+        let splitted = components(separatedBy: ":")
+
+        guard
+            splitted.count == 2,
+            let lower = splitted[0] == "" ? 0 : Int(splitted[0]),
+            let upper = splitted[1] == "" ? .lastIndex : Int(splitted[1])
+        else {
+            return nil
+        }
+
+        return .slice(Bounds(lower: lower, upper: upper))
+
     }
 }

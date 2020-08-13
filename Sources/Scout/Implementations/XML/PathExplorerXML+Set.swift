@@ -30,7 +30,7 @@ extension PathExplorerXML {
 
         try path.forEach { element in
             guard element != .count else {
-                throw PathExplorerError.countWrongUsage(path: path)
+                throw PathExplorerError.wrongUsage(of: .count, in: path)
             }
             currentPathExplorer = try currentPathExplorer.get(element: element)
         }

@@ -15,7 +15,7 @@ extension PathExplorerSerialization {
     mutating func set(index: Int, to newValue: Any) throws {
         var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
-        if index == -1 {
+        if index == .lastIndex {
             array.append(newValue)
             value = array
             return
@@ -34,7 +34,7 @@ extension PathExplorerSerialization {
         switch element {
         case .key(let key): return try set(key: key, to: newValue)
         case .index(let index): return try set(index: index, to: newValue)
-        case .count: throw PathExplorerError.countWrongUsage(path: readingPath.appending(element))
+        case .count, .slice: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
         }
     }
 

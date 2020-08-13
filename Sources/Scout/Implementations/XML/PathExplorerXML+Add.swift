@@ -20,7 +20,7 @@ extension PathExplorerXML {
     mutating func add(newValue: String, at index: Int) throws {
         let keyName = element.childrenName
 
-        if index == -1 || element.children.isEmpty {
+        if index == .lastIndex || element.children.isEmpty {
             // no children so add the child as the first one
             element.addChild(name: keyName, value: newValue, attributes: [:])
 
@@ -47,7 +47,7 @@ extension PathExplorerXML {
 
         case .key(let key): try add(newValue: newValue, forKey: key)
         case .index(let index): try add(newValue: newValue, at: index)
-        case .count: throw PathExplorerError.countWrongUsage(path: readingPath)
+        case .count, .slice: throw PathExplorerError.wrongUsage(of: pathElement, in: readingPath)
         }
     }
 
@@ -103,7 +103,7 @@ extension PathExplorerXML {
                 let keyName = element.key ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
 
-                if case let .index(index) = element, index == -1 {
+                if case let .index(index) = element, index == .lastIndex {
                     // get the last element
                     let childrenCount = currentPathExplorer.element.children.count - 1
                     currentPathExplorer = try currentPathExplorer.get(element: .index(childrenCount))
