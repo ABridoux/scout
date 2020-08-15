@@ -38,7 +38,7 @@ extension PathExplorerXML {
     }
 
     /// Returns a slice of value is it is an array
-    func getArraySlice(for bounds: Bounds) throws -> PathExplorerXML {
+    func getArraySlice(within bounds: Bounds) throws -> PathExplorerXML {
         // we have to copy the element as we cannot modify its children
         let copy = AEXMLElement(name: element.name, value: element.value, attributes: element.attributes)
         let slice = PathElement.slice(bounds)
@@ -67,7 +67,7 @@ extension PathExplorerXML {
                                    path: readingPath.appending(element))
 
         case .slice(let bounds):
-            return try getArraySlice(for: bounds)
+            return try getArraySlice(within: bounds)
         }
     }
 }

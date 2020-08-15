@@ -17,6 +17,7 @@ public enum PathElement: Equatable {
     /// Placed after an array or dictionary to return its count
     case count
 
+    /// Placed after an array to slice it with a `Bounds` value
     case slice(Bounds)
 
     // -- Symbols
@@ -55,7 +56,7 @@ public enum PathElement: Equatable {
         case .key: return "A key subscript a dictionary and is specified with a dot '.' then the key name like 'dictionary.keyName'"
         case .index: return "An index subscript an array and is specified as an integer enclosed with square brackets like '[1]'"
         case .count: return "A count element is specified as a sharp sign enclosed with square brackets '[#]'. It should be the last path element after an array or a dictionary."
-        case .slice: return "A slice is specified with lower and upper bounds. It is enclosed by square brackets and the bounds are specified separated by ':' like '[lower:upper]'"
+        case .slice: return "A slice is specified after an array with lower and upper bounds. It is enclosed by square brackets and the bounds are specified separated by ':' like '[lower:upper]'"
         }
     }
 

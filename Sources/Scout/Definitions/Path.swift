@@ -45,10 +45,10 @@ public struct Path: Equatable {
         var elements = [PathElement]()
 
         let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
-        let indexAndCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
+        let groupSubscripterRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
-        let indexAndCountRegex = try NSRegularExpression(pattern: indexAndCountRegexPattern)
+        let groupSubscripterRegex = try NSRegularExpression(pattern: groupSubscripterRegexPattern)
         let squareBracketRegex = try NSRegularExpression(pattern: squareBracketPattern)
 
         let matches = splitRegex.matches(in: string)
@@ -60,7 +60,7 @@ public struct Path: Equatable {
                 match.removeFirst()
                 match.removeLast()
             }
-            let indexMatches = indexAndCountRegex.matches(in: match, options: [], range: match.nsRange)
+            let indexMatches = groupSubscripterRegex.matches(in: match, options: [], range: match.nsRange)
 
             // try to get the indexes if any
             if let indexesMatch = try Self.extractGroupSubscripters(in: indexMatches, from: match) {

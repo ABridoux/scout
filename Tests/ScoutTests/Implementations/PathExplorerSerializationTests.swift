@@ -117,7 +117,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         let path: Path = [PathElement.slice(.init(lower: 0, upper: 1))]
 
         plist = try plist.get(path)
-        
+
         let resultValue = try XCTUnwrap(plist.value as? [String])
         XCTAssertEqual(Array(ducks[0...1]), resultValue)
     }
@@ -211,6 +211,17 @@ final class PathExplorerSerializationTests: XCTestCase {
         let deletePath = Path(-1)
 
         XCTAssertErrorsEqual(try plist.delete(deletePath), .subscriptWrongIndex(path: path, index: -1, arrayCount: 0))
+    }
+
+    func testDeleteSlice() throws {
+        let data = try PropertyListEncoder().encode(ducks)
+        var plist = try Plist(data: data)
+        let path: Path = [PathElement.slice(.init(lower: 0, upper: 1))]
+
+        try plist.delete(path)
+
+        let resultValue = try XCTUnwrap(plist.value as? [String])
+        XCTAssertEqual(Array(ducks[2...2]), resultValue)
     }
 
     // MARK: Add

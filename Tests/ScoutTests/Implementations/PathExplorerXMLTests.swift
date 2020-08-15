@@ -119,6 +119,15 @@ final class PathExplorerXMLTests: XCTestCase {
         XCTAssertThrowsError(try xml.get("dogs", 2))
     }
 
+    func testDeleteSlice() throws {
+        var xml = try Xml(data: stubData2)
+
+        try xml.delete(["dogs", PathElement.slice(.init(lower: 0, upper: 1))])
+
+        let resultValue = xml.element.children.first?.children.map { $0.string }
+        XCTAssertEqual(resultValue, ["Betty"])
+    }
+
     // MARK: Add
 
     func testAddKeyDict() throws {

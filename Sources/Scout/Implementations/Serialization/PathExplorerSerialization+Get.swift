@@ -54,7 +54,7 @@ extension PathExplorerSerialization {
     }
 
     /// Returns a slice of value is it is an array
-    func getArraySlice(for bounds: Bounds) throws -> Self {
+    func getArraySlice(within bounds: Bounds) throws -> Self {
         let slice = PathElement.slice(bounds)
         let path = readingPath.appending(slice)
         let array = try cast(value, as: .array, orThrow: .wrongUsage(of: slice, in: path))
@@ -75,7 +75,7 @@ extension PathExplorerSerialization {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         case .count: return try getChildrenCount()
-        case .slice(let bounds): return try getArraySlice(for: bounds)
+        case .slice(let bounds): return try getArraySlice(within: bounds)
         }
     }
 
