@@ -8,13 +8,26 @@ extension PathExplorerXML {
     public mutating func delete(_ path: Path) throws {
         var currentPathExplorer = self
 
-        try validateLast(element: path.last, in: path)
+        var pathCopy = path
+        guard !path.isEmpty else { return }
+        let last = pathCopy.removeLast()
 
-        try path.forEach {
+        try validateLast(element: last, in: path)
+
+        try pathCopy.forEach {
             currentPathExplorer = try currentPathExplorer.get(element: $0)
         }
 
-        currentPathExplorer.element.removeFromParent()
+        switch last {
+        case .slice(let bounds):
+            let currentElement = currentPathExplorer.element
+            let range = try bounds.range(lastValidIndex: currentElement.children.count - 1, path: path)
+            let childrenToRemove = currentElement.children[range]
+            childrenToRemove.forEach { $0.removeFromParent() }
+        default:
+            currentPathExplorer = try currentPathExplorer.get(element: last)
+            currentPathExplorer.element.removeFromParent()
+        }
     }
 
     public mutating func delete(_ path: PathElementRepresentable...) throws {

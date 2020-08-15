@@ -111,6 +111,17 @@ final class PathExplorerSerializationTests: XCTestCase {
         XCTAssertEqual(try plist.get(last).string, "Loulou")
     }
 
+    func testGetArraySlice() throws {
+        let data = try PropertyListEncoder().encode(ducks)
+        var plist = try Plist(data: data)
+        let path: Path = [PathElement.slice(.init(lower: 0, upper: 1))]
+
+        plist = try plist.get(path)
+
+        let resultValue = try XCTUnwrap(plist.value as? [String])
+        XCTAssertEqual(Array(ducks[0...1]), resultValue)
+    }
+
     // MARK: Set
 
     func testSubscriptDictSet() throws {
@@ -200,6 +211,17 @@ final class PathExplorerSerializationTests: XCTestCase {
         let deletePath = Path(-1)
 
         XCTAssertErrorsEqual(try plist.delete(deletePath), .subscriptWrongIndex(path: path, index: -1, arrayCount: 0))
+    }
+
+    func testDeleteSlice() throws {
+        let data = try PropertyListEncoder().encode(ducks)
+        var plist = try Plist(data: data)
+        let path: Path = [PathElement.slice(.init(lower: 0, upper: 1))]
+
+        try plist.delete(path)
+
+        let resultValue = try XCTUnwrap(plist.value as? [String])
+        XCTAssertEqual(Array(ducks[2...2]), resultValue)
     }
 
     // MARK: Add
@@ -306,7 +328,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         let errorPath: Path = ["animals", "ducks", PathElement.count]
         let path = errorPath.appending(1)
 
-        XCTAssertErrorsEqual(try plist.get(path), .countWrongUsage(path: errorPath))
+        XCTAssertErrorsEqual(try plist.get(path), .wrongUsage(of: .count, in: errorPath))
     }
 
     func testSetCount_ThrowsError() throws {
@@ -314,7 +336,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         var plist = try Plist(data: data)
         let path: Path = ["animals", "ducks", PathElement.count]
 
-        XCTAssertErrorsEqual(try plist.set(path, to: "Woomy"), .countWrongUsage(path: path))
+        XCTAssertErrorsEqual(try plist.set(path, to: "Woomy"), .wrongUsage(of: .count, in: path))
     }
 
     func testSetKeyNameCount_ThrowsError() throws {
@@ -330,7 +352,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         var plist = try Plist(data: data)
         let path: Path = ["animals", "ducks", PathElement.count]
 
-        XCTAssertErrorsEqual(try plist.delete(path), .countWrongUsage(path: path))
+        XCTAssertErrorsEqual(try plist.delete(path), .wrongUsage(of: .count, in: path))
     }
 
     func testAddCount_ThrowsError() throws {
@@ -338,6 +360,6 @@ final class PathExplorerSerializationTests: XCTestCase {
         var plist = try Plist(data: data)
         let path: Path = ["animals", "ducks", PathElement.count]
 
-        XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .countWrongUsage(path: path))
+        XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
 }

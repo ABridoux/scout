@@ -71,7 +71,7 @@ extension PathExplorer {
     /// - Throws: If element cannot be used as the last element
     func validateLast(element: PathElement?, in path: Path) throws {
         if element == .count {
-            throw PathExplorerError.countWrongUsage(path: path)
+            throw PathExplorerError.wrongUsage(of: .count, in: path)
         }
     }
 }

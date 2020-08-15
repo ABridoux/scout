@@ -15,7 +15,7 @@ extension PathExplorerSerialization {
     mutating func delete(at index: Int) throws {
         var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
-        if index == -1 {
+        if index == .lastIndex {
             guard !array.isEmpty else {
                 throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
             }
@@ -32,12 +32,23 @@ extension PathExplorerSerialization {
         value = array
     }
 
+    mutating func deleteSlice(within bounds: Bounds) throws {
+        let slice = PathElement.slice(bounds)
+        let path = readingPath.appending(slice)
+        let array = try cast(value, as: .array, orThrow: .wrongUsage(of: .slice(bounds), in: path))
+
+        let range = try bounds.range(lastValidIndex: array.count - 1, path: path)
+        let newArray = array.remove(in: range)
+        value = newArray
+    }
+
     mutating func delete(element: PathElement) throws {
         switch element {
 
         case .key(let key): try delete(key: key)
         case .index(let index): try delete(at: index)
-        case .count: throw PathExplorerError.countWrongUsage(path: readingPath.appending(element))
+        case .count: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
+        case .slice(let bounds): try deleteSlice(within: bounds)
         }
     }
 

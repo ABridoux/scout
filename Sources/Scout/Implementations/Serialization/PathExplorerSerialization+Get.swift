@@ -28,7 +28,7 @@ extension PathExplorerSerialization {
     func get(at index: Int, negativeIndexEnabled: Bool = true) throws -> Self {
         let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
-        if index == -1, negativeIndexEnabled {
+        if index == .lastIndex, negativeIndexEnabled {
             if array.isEmpty {
                 throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
             }
@@ -49,20 +49,33 @@ extension PathExplorerSerialization {
         } else if let dictValue = value as? DictionaryValue {
             return PathExplorerSerialization(value: dictValue.count, path: readingPath.appending(.count))
         } else {
-            throw PathExplorerError.countWrongUsage(path: readingPath)
+            throw PathExplorerError.wrongUsage(of: .count, in: readingPath)
         }
+    }
+
+    /// Returns a slice of value is it is an array
+    func getArraySlice(within bounds: Bounds) throws -> Self {
+        let slice = PathElement.slice(bounds)
+        let path = readingPath.appending(slice)
+        let array = try cast(value, as: .array, orThrow: .wrongUsage(of: slice, in: path))
+
+        let sliceRange = try bounds.range(lastValidIndex: array.count - 1, path: path)
+
+        let newValue = Array(array[sliceRange])
+        return PathExplorerSerialization(value: newValue, path: path)
     }
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(element: PathElement, negativeIndexEnabled: Bool = true) throws -> Self {
         guard readingPath.last != .count else {
-            throw PathExplorerError.countWrongUsage(path: readingPath)
+            throw PathExplorerError.wrongUsage(of: .count, in: readingPath)
         }
 
         switch element {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         case .count: return try getChildrenCount()
+        case .slice(let bounds): return try getArraySlice(within: bounds)
         }
     }
 

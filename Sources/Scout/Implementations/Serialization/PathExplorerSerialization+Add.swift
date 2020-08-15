@@ -24,7 +24,7 @@ extension PathExplorerSerialization {
                 throw PathExplorerError.arraySubscript(readingPath)
             }
 
-            if index == -1 || array.isEmpty {
+            if index == .lastIndex || array.isEmpty {
                 // add the new value at the end of the array
                 array.append(newValue)
             } else if index >= 0, array.count >= index {
@@ -45,7 +45,7 @@ extension PathExplorerSerialization {
         switch childKey {
         case .key: return DictionaryValue()
         case .index: return ArrayValue()
-        case .count: throw PathExplorerError.countWrongUsage(path: readingPath)
+        case .count, .slice: throw PathExplorerError.wrongUsage(of: childKey, in: readingPath)
         }
     }
 
