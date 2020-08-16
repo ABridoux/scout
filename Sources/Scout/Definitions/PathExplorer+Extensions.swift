@@ -29,6 +29,33 @@ extension PathExplorer {
     }
 }
 
+// MARK: Properties
+
+extension PathExplorer {
+
+    /// `true` if the path leading to this `PAthExplorer` contains a `slice` element
+    var isArraySlice: Bool {
+        readingPath.contains {
+            if case .slice = $0 {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    /// Used when the value is an array slice to know if subscripting with an index is possible
+    /// or rather if the index in the path indicates to target an element in the array slice
+    var precedeKeyOrSliceAfterSlicing: Bool {
+        if !isArraySlice { return false }
+
+        switch readingPath.last {
+        case .key, .slice: return true
+        default: return false
+        }
+    }
+}
+
 // MARK: Data validation
 
 extension PathExplorer {

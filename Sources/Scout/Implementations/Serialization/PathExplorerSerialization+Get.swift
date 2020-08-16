@@ -10,23 +10,53 @@ extension PathExplorerSerialization {
         let dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
 
         guard let value = dict[key] else {
-            throw PathExplorerError.subscriptMissingKey(path: readingPath,
-                                                        key: key,
-                                                        bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys)))
+            let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(dict.keys))
+            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: bestMatch)
         }
 
         return (dict, value)
     }
 
     func get(for key: String) throws -> Self {
-        let value = try getDictAndValueFor(key: key).value
+        let newValue: Any
 
-        return PathExplorerSerialization(value: value, path: readingPath.appending(key))
+        if isArray, isArraySlice {
+            // array slice. Try to find the common key in the array
+            let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.appending(key)))
+            var newArray = [Any]()
+
+            for (index, element) in array.enumerated() {
+                let path = readingPath.appending(.index(index))
+                let pathExplorer = PathExplorerSerialization(value: element, path: path)
+                let value = try pathExplorer.getDictAndValueFor(key: key).value
+                newArray.append(value)
+            }
+
+            newValue = newArray
+        } else {
+            newValue = try getDictAndValueFor(key: key).value
+        }
+
+        return PathExplorerSerialization(value: newValue, path: readingPath.appending(key))
     }
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     func get(at index: Int, negativeIndexEnabled: Bool = true) throws -> Self {
         let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+
+        if precedeKeyOrSliceAfterSlicing {
+            // array slice. Try to find the common index in the array
+            var newArray = [Any]()
+
+            for (elementIndex, element) in array.enumerated() {
+                let path = readingPath.appending(.index(elementIndex))
+                let pathExplorer = PathExplorerSerialization(value: element, path: path)
+                let value = try pathExplorer.get(at: index).value
+                newArray.append(value)
+            }
+
+            return PathExplorerSerialization(value: newArray, path: readingPath.appending(index))
+        }
 
         if index == .lastIndex, negativeIndexEnabled {
             if array.isEmpty {

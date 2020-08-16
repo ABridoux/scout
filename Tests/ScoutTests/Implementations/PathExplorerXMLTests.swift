@@ -9,6 +9,18 @@ import AEXML
 
 final class PathExplorerXMLTests: XCTestCase {
 
+    // MARK: - Constants
+
+    struct Character: Encodable {
+        let name: String
+        let quote: String
+        let episodes = [1, 2, 3]
+
+        static let toybox = [Character(name: "Woody", quote: "I got a snake in my boot"),
+                             Character(name: "Buzz", quote: "To infinity and beyond"),
+                             Character(name: "Zurg", quote: "Destroy Buzz Lightyear")]
+    }
+
     let stubData1: Data = {
         let document = AEXMLDocument()
         let root = AEXMLElement(name: "root")
@@ -29,6 +41,27 @@ final class PathExplorerXMLTests: XCTestCase {
                         ])
         root.addChild(dogs)
         document.addChild(root)
+
+        return document.xml.data(using: .utf8)!
+    }()
+
+    var toyBox: Data = {
+        let document = AEXMLDocument()
+        let root = AEXMLElement(name: "toybox")
+        document.addChild(root)
+        let characters = AEXMLElement(name: "characters")
+        root.addChild(characters)
+        Character.toybox.forEach { character in
+            let characterElement = AEXMLElement(name: "character")
+            characterElement.addChild(name: "name", value: character.name)
+            characterElement.addChild(name: "quote", value: character.quote)
+            let episodes = AEXMLElement(name: "episodes")
+            episodes.addChild(name: "episode", value: "1")
+            episodes.addChild(name: "episode", value: "2")
+            episodes.addChild(name: "episode", value: "3")
+            characterElement.addChild(episodes)
+            characters.addChild(characterElement)
+        }
 
         return document.xml.data(using: .utf8)!
     }()
@@ -71,6 +104,28 @@ final class PathExplorerXMLTests: XCTestCase {
         let resultValue = xml.element.children.map { $0.string }
 
         XCTAssertEqual(["Villy", "Spot"], resultValue)
+    }
+
+    func testGetArraySliceKey() throws {
+        var xml = try Xml(data: toyBox)
+
+        let path = Path(pathElements: .key("toybox"), .key("characters"), .slice(.init(lower: 0, upper: 1)), .key("name"))
+        xml = try xml.get(path)
+
+        let resultValue = xml.element.children.map { $0.value }
+
+        XCTAssertEqual(resultValue, Character.toybox[0...1].map { $0.name })
+    }
+
+    func testGetArraySliceIndex() throws {
+        var xml = try Xml(data: toyBox)
+
+        let path = Path(pathElements: .key("toybox"), .key("characters"), .slice(.init(lower: 0, upper: 1)), .key("episodes"), .index(0))
+        xml = try xml.get(path)
+
+        let resultValue = xml.element.children.map { $0.int }
+
+        XCTAssertEqual(resultValue, [1, 1])
     }
 
     // MARK: Set
@@ -126,6 +181,26 @@ final class PathExplorerXMLTests: XCTestCase {
 
         let resultValue = xml.element.children.first?.children.map { $0.string }
         XCTAssertEqual(resultValue, ["Betty"])
+    }
+
+    func testDeleteSliceKey() throws {
+        var xml = try Xml(data: toyBox)
+
+        try xml.delete(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes"])
+
+        for index in 0...1 {
+            let path = Path("toybox", "characters", index)
+            XCTAssertErrorsEqual(try xml.get(path.appending("episodes")), .subscriptMissingKey(path: path, key: "episodes", bestMatch: nil))
+        }
+    }
+
+    func testDeleteSliceIndex() throws {
+        var xml = try Xml(data: toyBox)
+
+        try xml.delete(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes", 1])
+
+        let path = Path("toybox", "characters", 0, "episodes")
+        XCTAssertErrorsEqual(try xml.get(path.appending("episodes", 2)), .subscriptWrongIndex(path: path, index: 2, arrayCount: 2))
     }
 
     // MARK: Add

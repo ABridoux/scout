@@ -6,30 +6,58 @@
 extension PathExplorerSerialization {
 
     mutating func delete(key: String) throws {
-        var dict = try getDictAndValueFor(key: key).dictionary
 
-        dict.removeValue(forKey: key)
-        value = dict
+        if isArray, isArraySlice {
+            // array slice. Try to find the common key in the dictionaries and delete it
+            var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.appending(key)))
+
+            for (index, oldDict) in array.enumerated() {
+                let path = readingPath.appending(.index(index))
+                var pathExplorer = PathExplorerSerialization(value: oldDict, path: path)
+                try? pathExplorer.delete(key: key) // preferable to ignore a key which is already missing 
+                array[index] = pathExplorer.value
+            }
+
+            value = array
+        } else {
+            var dict = try getDictAndValueFor(key: key).dictionary
+            dict.removeValue(forKey: key)
+            value = dict
+        }
     }
 
     mutating func delete(at index: Int) throws {
         var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
-        if index == .lastIndex {
-            guard !array.isEmpty else {
+        if precedeKeyOrSliceAfterSlicing {
+            // array slice. Try to delete index in the arrays
+
+            for (indexElement, oldArray) in array.enumerated() {
+                let path = readingPath.appending(.index(indexElement))
+                var pathExplorer = PathExplorerSerialization(value: oldArray, path: path)
+                try? pathExplorer.delete(at: index) // preferable to ignore an index which is already missing
+                array[indexElement] = pathExplorer.value
+            }
+
+            value = array
+
+        } else {
+            if index == .lastIndex {
+                guard !array.isEmpty else {
+                    throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
+                }
+                array.removeLast()
+                value = array
+                return
+            }
+
+            guard 0 <= index, index < array.count else {
                 throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
             }
-            array.removeLast()
+
+            array.remove(at: index)
             value = array
-            return
         }
-
-        guard 0 <= index, index < array.count else {
-            throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
-        }
-
-        array.remove(at: index)
-        value = array
     }
 
     mutating func deleteSlice(within bounds: Bounds) throws {

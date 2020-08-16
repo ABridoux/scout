@@ -23,7 +23,11 @@ public struct PathExplorerXML: PathExplorer {
 
     public var stringValue: String { element.string.trimmingCharacters(in: .whitespacesAndNewlines) }
 
-    public var description: String { element.xml }
+    public var description: String {
+        let copy = AEXMLElement(name: element.name, value: element.value, attributes: element.attributes)
+        copy.addChildren(element.children)
+        return copy.xmlSpaces
+    }
 
     public var format: DataFormat { .xml }
 
@@ -119,7 +123,7 @@ public struct PathExplorerXML: PathExplorer {
     }
 
     public func exportString() throws -> String {
-        AEXMLDocument(root: element, options: .init()).xml
+        AEXMLDocument(root: element).xmlSpaces
     }
 
     // MARK: Conversion

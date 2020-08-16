@@ -11,6 +11,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case invalidValue(String)
     case valueConversionError(value: String, type: String)
     case wrongValueForKey(value: String, element: PathElement)
+    case wrongArrayValueForKey(value: String, element: PathElement)
     case wrongUsage(of: PathElement, in: Path)
 
     case dictionarySubscript(Path)
@@ -32,9 +33,10 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .invalidValue(let value): return "The key value \(value) is invalid"
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
+        case .wrongArrayValueForKey(let value, let element): return "Cannot set `\(value)` to array #\(element)# which is a an Array"
         case .wrongUsage(let element, let path): return "Wrong usage of \(element.description) in '\(path.description)'. \(element.usage)"
 
-        case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.description)' with a String as it is not a Dictionary"
+        case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.removingSlicings().description)' with a String as it is not a Dictionary"
         case .subscriptMissingKey(let path, let key, let bestMatch):
             let bestMatchString: String
 
@@ -44,10 +46,10 @@ public enum PathExplorerError: LocalizedError, Equatable {
                 bestMatchString = "No best match found"
             }
 
-            return "The key #\(key)# cannot be found in the Dictionary '\(path.description)'. \(bestMatchString)"
+            return "The key #\(key)# cannot be found in the Dictionary '\(path.removingSlicings().description)'.\n\(bestMatchString)"
 
-        case .arraySubscript(let path): return "Cannot subscript the key at '\(path.description)' with an Integer as is not an Array"
-        case .subscriptWrongIndex(let path, let index, let count): return "The index #\(index)# is not within the bounds of the Array (0...\(count - 1)) at '\(path.description)'"
+        case .arraySubscript(let path): return "Cannot subscript the key at '\(path.removingSlicings().description)' with an Integer as is not an Array"
+        case .subscriptWrongIndex(let path, let index, let count): return "The index [\(index)] is not within the bounds (0...\(count - 1)) of the Array  at '\(path.removingSlicings().description)'"
         case .keyNameSetOnNonDictionary(path: let path): return "'\(path.description)' is not a dictionary and cannot set the key name of its children if any"
 
         case .wrongBounds(let bounds, let path): return "Wrong slice '[\(bounds.lower):\(bounds.upper)] in '\(path.description)'.\nValid range: 0 <= lowerBound < upperBound <= lastIndex. You can use -1 or [lowerBound:] to use the last index."
