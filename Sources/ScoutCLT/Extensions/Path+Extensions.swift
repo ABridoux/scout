@@ -9,11 +9,17 @@ import Foundation
 
 extension Path: ExpressibleByArgument {
 
+    // MARK: - Constants
+
+    //    public static var defaultCompletionKind: CompletionKind { .custom(evaluatePath) }
+
+    // MARK: - Initialization
+
     public init?(argument: String) {
         try? self.init(string: argument)
     }
 
-//    public static var defaultCompletionKind: CompletionKind { .custom(evaluatePath) }
+    // MARK: - Functions
 
     /// Functions which could be used to complete a path.
     /// The arguments completions does not work well with several arguments though, which prevent to use this completion

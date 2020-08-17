@@ -19,11 +19,21 @@ final class PathExplorerSerializationTests: XCTestCase {
         let ducks = ["Riri", "Fifi", "Loulou"]
     }
 
+    struct Character: Encodable {
+        let name: String
+        let quote: String
+        let episodes = [1, 2, 3]
+    }
+
     struct StubStruct: Codable {
         let animals = Animals()
     }
 
     let ducks = ["Riri", "Fifi", "Loulou"]
+
+    let characters = [Character(name: "Woody", quote: "I got a snake in my boot"),
+                      Character(name: "Buzz", quote: "To infinity and beyond"),
+                      Character(name: "Zurg", quote: "Destroy Buzz Lightyear")]
 
     // MARK: - Functions
 
@@ -120,6 +130,39 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         let resultValue = try XCTUnwrap(plist.value as? [String])
         XCTAssertEqual(Array(ducks[0...1]), resultValue)
+    }
+
+    func testGetArraySliceKey() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("name"))
+
+        plist = try plist.get(path)
+
+        let resultValue = try XCTUnwrap(plist.value as? [String])
+        XCTAssertEqual(Array(characters[0...1].map { $0.name }), resultValue)
+    }
+
+    func testGetArraySliceIndex() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .index(1))
+
+        plist = try plist.get(path)
+
+        let resultValue = try XCTUnwrap(plist.value as? [Int])
+        XCTAssertEqual(Array(characters[0...1].map { $0.episodes[1] }), resultValue)
+    }
+
+    func testGetArraySliceCount() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .count)
+
+        plist = try plist.get(path)
+
+        let resultValue = try XCTUnwrap(plist.value as? [Int])
+        XCTAssertEqual([3, 3], resultValue)
     }
 
     // MARK: Set
@@ -222,6 +265,30 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         let resultValue = try XCTUnwrap(plist.value as? [String])
         XCTAssertEqual(Array(ducks[2...2]), resultValue)
+    }
+
+    func testDeleteSliceKey() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("name"))
+
+        try plist.delete(path)
+
+        XCTAssertErrorsEqual(try plist.get(0, "name"), .subscriptMissingKey(path: Path(0), key: "name", bestMatch: nil))
+        XCTAssertErrorsEqual(try plist.get(1, "name"), .subscriptMissingKey(path: Path(1), key: "name", bestMatch: nil))
+        XCTAssertEqual(try plist.get(2, "name").string, characters[2].name)
+    }
+
+    func testDeleteSliceIndex() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .index(0))
+
+        try plist.delete(path)
+
+        XCTAssertEqual(try plist.get(0, "episodes", PathElement.count).int, 2)
+        XCTAssertEqual(try plist.get(1, "episodes", PathElement.count).int, 2)
+        XCTAssertEqual(try plist.get(2, "episodes", PathElement.count).int, 3)
     }
 
     // MARK: Add
