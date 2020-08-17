@@ -154,6 +154,17 @@ final class PathExplorerSerializationTests: XCTestCase {
         XCTAssertEqual(Array(characters[0...1].map { $0.episodes[1] }), resultValue)
     }
 
+    func testGetArraySliceCount() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .count)
+
+        plist = try plist.get(path)
+
+        let resultValue = try XCTUnwrap(plist.value as? [Int])
+        XCTAssertEqual([3, 3], resultValue)
+    }
+
     // MARK: Set
 
     func testSubscriptDictSet() throws {

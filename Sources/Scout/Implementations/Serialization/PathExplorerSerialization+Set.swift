@@ -26,6 +26,7 @@ extension PathExplorerSerialization {
             }
 
             value = array
+
         } else {
             var dict = try getDictAndValueFor(key: key).dictionary
             dict[key] = newValue
@@ -52,6 +53,7 @@ extension PathExplorerSerialization {
                 try pathExplorer.set(index: index, to: newValue)
                 array[index] = pathExplorer.value
             }
+
             value = array
 
         } else {

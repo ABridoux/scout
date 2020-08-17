@@ -62,6 +62,25 @@ extension PathExplorerXML {
         }
     }
 
+    func getChildrenCount() throws -> Self {
+        if precedeKeyOrSliceAfterSlicing {
+            let copy = AEXMLElement(name: element.name + PathElement.count.description)
+
+            for (index, child) in element.children.enumerated() {
+                let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(index))
+                guard let count = try pathExplorer.getChildrenCount().int else {
+                    throw PathExplorerError.wrongUsage(of: .count, in: readingPath.appending(index))
+                }
+                let countChild = AEXMLElement(name: "count", value: count.description)
+                copy.addChild(countChild)
+            }
+            return PathExplorerXML(element: copy, path: readingPath.appending(.count))
+        }
+
+        return PathExplorerXML(element: .init(name: "", value: "\(self.element.children.count)", attributes: [:]),
+                               path: readingPath.appending(.count))
+    }
+
     /// Returns a slice of value is it is an array
     func getArraySlice(within bounds: Bounds) throws -> PathExplorerXML {
         let slice = PathElement.slice(bounds)
@@ -89,8 +108,7 @@ extension PathExplorerXML {
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
 
         case .count:
-            return PathExplorerXML(element: .init(name: "", value: "\(self.element.children.count)", attributes: [:]),
-                                   path: readingPath.appending(element))
+            return try getChildrenCount()
 
         case .slice(let bounds):
             return try getArraySlice(within: bounds)

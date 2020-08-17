@@ -128,6 +128,16 @@ final class PathExplorerXMLTests: XCTestCase {
         XCTAssertEqual(resultValue, [1, 1])
     }
 
+    func testGetSliceCount() throws {
+        var xml = try Xml(data: toyBox)
+
+        xml = try xml.get(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes", PathElement.count])
+
+        let resultValue = xml.element.children.map { $0.int }
+
+        XCTAssertEqual(resultValue, [3, 3])
+    }
+
     // MARK: Set
 
     func testSubscriptStringSet() throws {

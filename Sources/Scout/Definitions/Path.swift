@@ -94,6 +94,8 @@ public struct Path: Equatable {
 
     // MARK: - Functions
 
+    // MARK: Initialization helpers
+
     /// Extract group subscripters [] in an element
     /// - Parameters:
     ///   - indexMatches: Results of a `NSRegularExpression` where the pattern [] is found
@@ -139,12 +141,14 @@ public struct Path: Equatable {
         return elements
     }
 
+    // MARK: Path manipulations
+
     public func appending(_ elements: PathElementRepresentable...) -> Path { Path(self.elements + elements) }
     public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
 
     public mutating func removeLast() -> PathElement { elements.removeLast() }
 
-    /// Remove the `.slice` path elements in the array . Useful when pritting the array description in an error.
+    /// Remove the `.slice` path elements in the array while incrementing the indexes if necessary. Useful when printing the array description in an error.
     func removingSlicings() -> Self {
         var lastLowerBound: Int?
         var newPath = Path()

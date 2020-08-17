@@ -45,7 +45,7 @@ extension PathExplorerSerialization {
         let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
         if precedeKeyOrSliceAfterSlicing {
-            // array slice. Try to find the common index in the array
+            // array slice. Try to find the common index in the arrays
             var newArray = [Any]()
 
             for (elementIndex, element) in array.enumerated() {
@@ -74,6 +74,21 @@ extension PathExplorerSerialization {
 
     /// - Returns: The count of the array or dictionary if  `value` is an array or a dictionary
     func getChildrenCount() throws -> Self {
+        if precedeKeyOrSliceAfterSlicing {
+            // Array slicing. Retrieve the count path element for all values in the arrays or dictionaries
+            let array  = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+            var countsArray = [Int]()
+
+            for (index, value) in array.enumerated() {
+                let pathExplorer = PathExplorerSerialization(value: value, path: readingPath.appending(index))
+                guard let count = try pathExplorer.getChildrenCount().int else {
+                    throw PathExplorerError.wrongUsage(of: .count, in: readingPath.appending(index))
+                }
+                countsArray.append(count)
+            }
+            return PathExplorerSerialization(value: countsArray, path: readingPath.appending(.count))
+        }
+
         if let arrayValue = value as? ArrayValue {
             return PathExplorerSerialization(value: arrayValue.count, path: readingPath.appending(.count))
         } else if let dictValue = value as? DictionaryValue {

@@ -33,7 +33,7 @@ extension PathExplorer {
 
 extension PathExplorer {
 
-    /// `true` if the path leading to this `PAthExplorer` contains a `slice` element
+    /// `true` if the path leading to this `PathExplorer` contains a `slice` element
     var isArraySlice: Bool {
         readingPath.contains {
             if case .slice = $0 {
