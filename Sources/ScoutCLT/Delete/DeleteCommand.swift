@@ -36,6 +36,9 @@ struct DeleteCommand: ParsableCommand {
     @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
     var color = true
 
+    @Option(name: [.short, .long], help: "Fold the data at the given depth level")
+    var level: Int?
+
     // MARK: - Functions
 
     func run() throws {
@@ -57,17 +60,17 @@ struct DeleteCommand: ParsableCommand {
         if var json = try? Json(data: data) {
 
             try readingPaths.forEach { try json.delete($0) }
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color, level: level)
 
         } else if var plist = try? Plist(data: data) {
 
             try readingPaths.forEach { try plist.delete($0) }
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color, level: level)
 
         } else if var xml = try? Xml(data: data) {
 
             try readingPaths.forEach { try xml.delete($0) }
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color, level: level)
 
         } else {
             if let filePath = inputFilePath {

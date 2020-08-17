@@ -312,4 +312,16 @@ final class PathExplorerXMLTests: XCTestCase {
 
         XCTAssertErrorsEqual(try xml.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
+
+    // MARK: Folded
+
+    func testFolded() throws {
+        var xml = try Xml(data: toyBox)
+
+        xml.fold(upTo: 2)
+
+        let value = try xml.get("characters", 0, "episodes", 0).string
+
+        XCTAssertEqual(value, "~~SCOUT_FOLDED~~")
+    }
 }

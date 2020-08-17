@@ -15,6 +15,9 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     var isDictionary: Bool { value is DictionaryValue }
     var isArray: Bool { value is ArrayValue }
 
+    /// `true` if the explorer has been folded
+    var isFolded = false
+
     // MARK: PathExplorer
 
     public var string: String? { value as? String }
@@ -146,8 +149,13 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     public func exportString() throws -> String {
         let data = try exportData()
-        guard let string = String(data: data, encoding: .utf8) else {
+
+        guard var string = String(data: data, encoding: .utf8) else {
             throw PathExplorerError.stringToDataConversionError
+        }
+
+        if isFolded {
+            string = string.replacingOccurrences(of: F.foldedRegexPattern, with: "...", options: .regularExpression)
         }
 
         guard F.self == JsonFormat.self else { return string }
@@ -158,6 +166,40 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         } else {
             // we have to remvove the back slashes
             return string.replacingOccurrences(of: "\\", with: "")
+        }
+    }
+
+    public mutating func fold(upTo level: Int) {
+        isFolded = true
+
+        guard level >= 0 else {
+            if isArray {
+                value = [Self.foldedMark]
+            } else if isDictionary {
+                value = [Self.foldedKey: Self.foldedMark]
+            }
+            return
+        }
+
+        if let array = value as? ArrayValue {
+            var newArray = [Any]()
+            for (index, element) in array.enumerated() {
+                var pathExplorer = PathExplorerSerialization(value: element, path: readingPath.appending(index))
+                pathExplorer.fold(upTo: level - 1)
+                newArray.append(pathExplorer.value)
+            }
+
+            value = newArray
+
+        } else if let dict = value as? DictionaryValue {
+            var newDict = [String: Any]()
+            for (key, element) in dict {
+                var pathExplorer = PathExplorerSerialization(value: element, path: readingPath.appending(key))
+                pathExplorer.fold(upTo: level - 1)
+                newDict[key] = pathExplorer.value
+            }
+
+            value = newDict
         }
     }
 

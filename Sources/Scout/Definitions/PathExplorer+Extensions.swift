@@ -54,6 +54,12 @@ extension PathExplorer {
         default: return false
         }
     }
+
+    /// Use to name the single key when folding a dictionary
+    static var foldedKey: String { "Folded" }
+
+    /// Use to replace the content of a dicionary or array when folding it
+    static var foldedMark: String { "~~SCOUT_FOLDED~~" }
 }
 
 // MARK: Data validation

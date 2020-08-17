@@ -429,4 +429,17 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
+
+    // MARK: Folded
+
+    func testFolded() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+
+        plist.fold(upTo: 1)
+
+        let value = try plist.get(0, "episodes", 0).string
+
+        XCTAssertEqual(value, "~~SCOUT_FOLDED~~")
+    }
 }

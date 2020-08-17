@@ -42,7 +42,7 @@ struct ScoutCommand: ParsableCommand {
 
     // MARK: - Functions
 
-    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool, colorise: Bool) throws {
+    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool, colorise: Bool, level: Int? = nil) throws {
         if let output = output?.replacingTilde {
             let fm = FileManager.default
             try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
@@ -73,6 +73,12 @@ struct ScoutCommand: ParsableCommand {
                 xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
             }
             injector = xmlInjector
+        }
+
+        var pathExplorer = pathExplorer
+
+        if let level = level {
+            pathExplorer.fold(upTo: level)
         }
 
         var output = try pathExplorer.exportString()
