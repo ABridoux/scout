@@ -28,10 +28,21 @@ public struct PathExplorerXML: PathExplorer {
         // which is unwanted so remove the parent by copying the element (parent setter is internal)
         let copy = AEXMLElement(name: element.name, value: element.value, attributes: element.attributes)
         copy.addChildren(element.children)
-        return copy.xml
+        var description = copy.xml
+
+        if isFolded {
+            description = description.replacingOccurrences(of: Self.foldedRegexPattern, with: "...", options: .regularExpression)
+        }
+
+        return description
     }
 
     public var format: DataFormat { .xml }
+
+    /// `true` if the explorer has been folded
+    var isFolded = false
+
+    static let foldedRegexPattern = #"(?<=>)\s*<\#(foldedKey)>\#(foldedMark)</\#(foldedKey)>\s*(?=<)"#
 
     // MARK: - Initialization
 
@@ -124,7 +135,26 @@ public struct PathExplorerXML: PathExplorer {
         return data
     }
 
-    public func exportString() throws -> String { AEXMLDocument(root: element).xml }
+    public func exportString() throws -> String { description }
+
+    public mutating func fold(upTo level: Int) {
+        guard level >= 0 else {
+            if !element.children.isEmpty {
+                element.children.forEach { $0.removeFromParent() }
+                let foldedElement = AEXMLElement(name: Self.foldedKey, value: Self.foldedMark)
+                element.addChild(foldedElement)
+            }
+
+            return
+        }
+
+        isFolded = true
+
+        for (index, child) in element.children.enumerated() {
+            var pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(index))
+            pathExplorer.fold(upTo: level - 1)
+        }
+    }
 
     // MARK: Conversion
 

@@ -361,4 +361,8 @@ where
 
     func exportData() throws -> Data
     func exportString() throws -> String
+
+    /// Replace the group values (array or dictionaries) sub values by a unique one
+    /// holding a fold mark to be replaced when exporting the string
+    mutating func fold(upTo level: Int)
 }

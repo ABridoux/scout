@@ -28,6 +28,9 @@ struct ReadCommand: ParsableCommand {
     @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
     var color = true
 
+    @Option(name: [.short, .long], help: "Fold the data at the given depth level")
+    var level: Int?
+
     // MARK: - Functions
 
     func run() throws {
@@ -68,8 +71,11 @@ struct ReadCommand: ParsableCommand {
         var value: String
 
         if let json = try? Json(data: data) {
-            let key = try json.get(path)
-            value = key.stringValue != "" ? key.stringValue : key.description
+            var json = try json.get(path)
+            if let level = level {
+                json.fold(upTo: level)
+            }
+            value = json.stringValue != "" ? json.stringValue : json.description
 
             let jsonInjector = JSONInjector(type: .terminal)
             if let colors = try ScoutCommand.getColorFile()?.json {
@@ -78,8 +84,11 @@ struct ReadCommand: ParsableCommand {
             injector = jsonInjector
 
         } else if let plist = try? Plist(data: data) {
-            let key = try plist.get(path)
-            value = key.stringValue != "" ? key.stringValue : key.description
+            var plist = try plist.get(path)
+            if let level = level {
+                plist.fold(upTo: level)
+            }
+            value = plist.stringValue != "" ? plist.stringValue : plist.description
 
             let plistInjector = PlistInjector(type: .terminal)
             if let colors = try ScoutCommand.getColorFile()?.plist {
@@ -88,8 +97,11 @@ struct ReadCommand: ParsableCommand {
             injector = plistInjector
 
         } else if let xml = try? Xml(data: data) {
-            let key = try xml.get(path)
-            value = key.stringValue != "" ? key.stringValue : key.description
+            var xml = try xml.get(path)
+            if let level = level {
+                xml.fold(upTo: level)
+            }
+            value = xml.stringValue != "" ? xml.stringValue : xml.description
 
             let xmlInjector = XMLEnhancedInjector(type: .terminal)
             if let colors = try ScoutCommand.getColorFile()?.xml {
