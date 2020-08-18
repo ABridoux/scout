@@ -1,0 +1,26 @@
+os: osx
+language: swift
+osx_image: xcode11.6
+xcode_sdk: iphonesimulator11.4
+
+env:
+  global:
+    - PROJECT_NAME: "Scout"
+    - PROJECT_ROLES: "Scout"
+
+stages:
+  - name: build
+    if: type != pull_request AND branch != master
+
+  - name: test
+    if: type = pull_request AND branch != master
+
+jobs:
+  include:
+    - stage: build
+      name: "Build"
+      script: bundle exec fastlane build
+
+    - stage: test
+      name: "Test"
+      script: bundle exec fastlane test
