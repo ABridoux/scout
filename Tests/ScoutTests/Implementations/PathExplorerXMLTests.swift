@@ -14,7 +14,7 @@ final class PathExplorerXMLTests: XCTestCase {
     struct Character: Encodable {
         let name: String
         let quote: String
-        let episodes = [1, 2, 3]
+        var episodes = [1, 2, 3]
 
         static let toybox = [Character(name: "Woody", quote: "I got a snake in my boot"),
                              Character(name: "Buzz", quote: "To infinity and beyond"),
@@ -59,6 +59,25 @@ final class PathExplorerXMLTests: XCTestCase {
             episodes.addChild(name: "episode", value: "1")
             episodes.addChild(name: "episode", value: "2")
             episodes.addChild(name: "episode", value: "3")
+            characterElement.addChild(episodes)
+            characters.addChild(characterElement)
+        }
+
+        return document.xml.data(using: .utf8)!
+    }()
+
+    var toyBoxWithOneEpisode: Data = {
+        let document = AEXMLDocument()
+        let root = AEXMLElement(name: "toybox")
+        document.addChild(root)
+        let characters = AEXMLElement(name: "characters")
+        root.addChild(characters)
+        Character.toybox.forEach { character in
+            let characterElement = AEXMLElement(name: "character")
+            characterElement.addChild(name: "name", value: character.name)
+            characterElement.addChild(name: "quote", value: character.quote)
+            let episodes = AEXMLElement(name: "episodes")
+            episodes.addChild(name: "episode", value: "1")
             characterElement.addChild(episodes)
             characters.addChild(characterElement)
         }
@@ -211,6 +230,15 @@ final class PathExplorerXMLTests: XCTestCase {
 
         let path = Path("toybox", "characters", 0, "episodes")
         XCTAssertErrorsEqual(try xml.get(path.appending("episodes", 2)), .subscriptWrongIndex(path: path, index: 2, arrayCount: 2))
+    }
+
+    func testDeleteIfEmpty() throws {
+        var xml = try Xml(data: toyBoxWithOneEpisode)
+        let path = Path("characters", 0, "episodes", 0)
+
+        try xml.delete(path, deleteIfEmpty: true)
+
+        XCTAssertErrorsEqual(try xml.get("characters", 0, "episodes"), .subscriptMissingKey(path: Path("toybox", "characters", 0), key: "episodes", bestMatch: nil))
     }
 
     // MARK: Add

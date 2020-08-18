@@ -15,6 +15,17 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     var isDictionary: Bool { value is DictionaryValue }
     var isArray: Bool { value is ArrayValue }
 
+    /// `true` if the value is an array or a dictionary and is empty
+    var isEmpty: Bool {
+        if let array = value as? ArrayValue {
+            return array.isEmpty
+        } else if let dict = value as? DictionaryValue {
+            return dict.isEmpty
+        } else {
+            return false
+        }
+    }
+
     /// `true` if the explorer has been folded
     var isFolded = false
 
@@ -123,8 +134,8 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: Delete
 
-    public mutating func delete(_ path: PathElementRepresentable...) throws {
-        try delete(Path(path))
+    public mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool = false) throws {
+        try delete(Path(path), deleteIfEmpty: deleteIfEmpty)
     }
 
     // MARK: Add

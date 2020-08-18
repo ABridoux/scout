@@ -80,7 +80,7 @@ extension PathExplorerSerialization {
         }
     }
 
-    public mutating func delete(_ path: Path) throws {
+    public mutating func delete(_ path: Path, deleteIfEmpty: Bool = false) throws {
         guard !path.isEmpty else { return }
 
         let (pathExplorers, path, lastElement) = try getExplorers(from: path)
@@ -93,7 +93,11 @@ extension PathExplorerSerialization {
 
         for (pathExplorer, element) in zip(pathExplorers, path).reversed() {
             var pathExplorer = pathExplorer
-            try pathExplorer.set(element: element, to: currentExplorer.value)
+            if deleteIfEmpty, currentExplorer.isEmpty {
+                try pathExplorer.delete(element: element)
+            } else {
+                try pathExplorer.set(element: element, to: currentExplorer.value)
+            }
             currentExplorer = pathExplorer
         }
 

@@ -22,7 +22,7 @@ final class PathExplorerSerializationTests: XCTestCase {
     struct Character: Encodable {
         let name: String
         let quote: String
-        let episodes = [1, 2, 3]
+        var episodes = [1, 2, 3]
     }
 
     struct StubStruct: Codable {
@@ -289,6 +289,19 @@ final class PathExplorerSerializationTests: XCTestCase {
         XCTAssertEqual(try plist.get(0, "episodes", PathElement.count).int, 2)
         XCTAssertEqual(try plist.get(1, "episodes", PathElement.count).int, 2)
         XCTAssertEqual(try plist.get(2, "episodes", PathElement.count).int, 3)
+    }
+
+    func testDeleteIfEmpty() throws {
+        var characters = self.characters
+        characters[0].episodes.removeLast(2)
+
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(0, "episodes", 0)
+
+        try plist.delete(path, deleteIfEmpty: true)
+
+        XCTAssertErrorsEqual(try plist.get(0, "episodes"), .subscriptMissingKey(path: Path(0), key: "episodes", bestMatch: nil))
     }
 
     // MARK: Add

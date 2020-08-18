@@ -103,12 +103,14 @@ where
     // MARK: Delete
 
     /// Delete the key at the given path, specified as array.
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ path: Path) throws
+    mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws
 
     /// Delete the key at the given path,specified as variadic `PathElementRepresentable`s
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ path: PathElementRepresentable...) throws
+    mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool) throws
 
     // MARK: Add
 
