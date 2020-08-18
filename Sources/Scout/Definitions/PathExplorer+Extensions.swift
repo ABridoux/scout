@@ -62,6 +62,23 @@ extension PathExplorer {
     static var foldedMark: String { "~~SCOUT_FOLDED~~" }
 }
 
+// MARK: Helpers
+
+public extension PathExplorer {
+
+    /// Delete the key at the given path, specified as array.
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    mutating func delete(_ path: Path) throws {
+        try delete(path, deleteIfEmpty: false)
+    }
+
+    /// Delete the key at the given path, specified as array.
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    mutating func delete(_ path: PathElementRepresentable) throws {
+        try delete(path, deleteIfEmpty: false)
+    }
+}
+
 // MARK: Data validation
 
 extension PathExplorer {

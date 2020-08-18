@@ -5,9 +5,11 @@
 
 extension PathExplorerXML {
 
-    public mutating func delete(_ path: Path) throws {
+    public mutating func delete(_ path: Path, deleteIfEmpty: Bool = false) throws {
         var currentPath = Path()
 
+        // for each encountered slice, we'll add the sliced explorers in the array to then
+        // delete the common key in each of them
         var elementsToDelete = [self]
 
         try path.forEach { pathElement in
@@ -49,6 +51,10 @@ extension PathExplorerXML {
 
         elementsToDelete.forEach { pathExplorer in
             pathExplorer.element.removeFromParent()
+
+            if deleteIfEmpty, pathExplorer.element.parent?.children.isEmpty ?? false {
+                pathExplorer.element.parent?.removeFromParent()
+            }
         }
     }
 
@@ -76,9 +82,5 @@ extension PathExplorerXML {
         }
 
         child.removeFromParent()
-    }
-
-    public mutating func delete(_ path: PathElementRepresentable...) throws {
-        try delete(Path(path))
     }
 }
