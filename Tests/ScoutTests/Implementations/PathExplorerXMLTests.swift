@@ -16,9 +16,13 @@ final class PathExplorerXMLTests: XCTestCase {
         let quote: String
         var episodes = [1, 2, 3]
 
-        static let toybox = [Character(name: "Woody", quote: "I got a snake in my boot"),
-                             Character(name: "Buzz", quote: "To infinity and beyond"),
-                             Character(name: "Zurg", quote: "Destroy Buzz Lightyear")]
+        static let woody = Character(name: "Woody", quote: "I got a snake in my boot")
+        static let buzz = Character(name: "Buzz", quote: "To infinity and beyond")
+        static let zurg = Character(name: "Zurg", quote: "Destroy Buzz Lightyear")
+
+        static let toybox = [woody, buzz, zurg]
+
+        static var charactersByName = ["Woody": woody, "Buzz": buzz, "Zurg": zurg]
     }
 
     let stubData1: Data = {
@@ -53,6 +57,27 @@ final class PathExplorerXMLTests: XCTestCase {
         root.addChild(characters)
         Character.toybox.forEach { character in
             let characterElement = AEXMLElement(name: "character")
+            characterElement.addChild(name: "name", value: character.name)
+            characterElement.addChild(name: "quote", value: character.quote)
+            let episodes = AEXMLElement(name: "episodes")
+            episodes.addChild(name: "episode", value: "1")
+            episodes.addChild(name: "episode", value: "2")
+            episodes.addChild(name: "episode", value: "3")
+            characterElement.addChild(episodes)
+            characters.addChild(characterElement)
+        }
+
+        return document.xml.data(using: .utf8)!
+    }()
+
+    var toyBoxByName: Data = {
+        let document = AEXMLDocument()
+        let root = AEXMLElement(name: "toybox")
+        document.addChild(root)
+        let characters = AEXMLElement(name: "characters")
+        root.addChild(characters)
+        Character.toybox.forEach { character in
+            let characterElement = AEXMLElement(name: character.name)
             characterElement.addChild(name: "name", value: character.name)
             characterElement.addChild(name: "quote", value: character.quote)
             let episodes = AEXMLElement(name: "episodes")
@@ -155,6 +180,47 @@ final class PathExplorerXMLTests: XCTestCase {
         let resultValue = xml.element.children.map { $0.int }
 
         XCTAssertEqual(resultValue, [3, 3])
+    }
+
+    func testGetDictionaryFilter() throws {
+        let xml = try Xml(data: toyBoxByName)
+        let path = Path("toybox", "characters", PathElement.filter(".*(z|Z).*"))
+
+        let value = try xml.get(path).element
+
+        XCTAssertEqual(value.children.count, 2)
+        XCTAssertEqual(value["Buzz"]["name"].string, Character.buzz.name)
+        XCTAssertEqual(value["Buzz"]["quote"].string, Character.buzz.quote)
+        XCTAssertEqual(value["Zurg"]["name"].string, Character.zurg.name)
+        XCTAssertEqual(value["Zurg"]["quote"].string, Character.zurg.quote)
+    }
+
+    func testGetDictionaryFilterKey() throws {
+        let xml = try Xml(data: toyBoxByName)
+        let path = Path("toybox", "characters", PathElement.filter(".*(z|Z).*"), "quote")
+        var value = [String: String]()
+
+        try xml.get(path).element.children.forEach { value[$0.name] = $0.value }
+
+        var quotes = [String: String]()
+        Character.charactersByName.forEach { quotes[$0.key + ".quote"] = $0.value.quote }
+        quotes.removeValue(forKey: "Woody.quote")
+
+        XCTAssertEqual(quotes, value)
+    }
+
+    func testGetDictionaryFilterIndex() throws {
+        let xml = try Xml(data: toyBoxByName)
+        let path = Path("toybox", "characters", PathElement.filter(".*(z|Z).*"), "episodes", 1)
+        var value = [String: Int]()
+
+        try xml.get(path).element.children.forEach { value[$0.name] = $0.int }
+
+        var episodes = [String: Int]()
+        Character.charactersByName.forEach { episodes[$0.key + ".episodes[1]"] = $0.value.episodes[1] }
+        episodes.removeValue(forKey: "Woody.episodes[1]")
+
+        XCTAssertEqual(episodes, value)
     }
 
     // MARK: Set

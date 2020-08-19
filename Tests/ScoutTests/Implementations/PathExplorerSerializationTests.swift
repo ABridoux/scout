@@ -19,10 +19,14 @@ final class PathExplorerSerializationTests: XCTestCase {
         let ducks = ["Riri", "Fifi", "Loulou"]
     }
 
-    struct Character: Encodable {
+    struct Character: Encodable, Equatable {
         let name: String
         let quote: String
         var episodes = [1, 2, 3]
+
+        static let woody = Character(name: "Woody", quote: "I got a snake in my boot")
+        static let buzz = Character(name: "Buzz", quote: "To infinity and beyond")
+        static let zurg = Character(name: "Zurg", quote: "Destroy Buzz Lightyear")
     }
 
     struct StubStruct: Codable {
@@ -31,9 +35,11 @@ final class PathExplorerSerializationTests: XCTestCase {
 
     let ducks = ["Riri", "Fifi", "Loulou"]
 
-    let characters = [Character(name: "Woody", quote: "I got a snake in my boot"),
-                      Character(name: "Buzz", quote: "To infinity and beyond"),
-                      Character(name: "Zurg", quote: "Destroy Buzz Lightyear")]
+    let characters: [Character] = [.woody, .buzz, .zurg]
+
+    let temperatures = ["Paris": 23, "Dublin": 19, "Berlin": 21, "Madrid": 26]
+
+    let charactersByName: [String: Character] = ["Woody": .woody, "Buzz": .buzz, "Zurg": .zurg]
 
     // MARK: - Functions
 
@@ -163,6 +169,54 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         let resultValue = try XCTUnwrap(plist.value as? [Int])
         XCTAssertEqual([3, 3], resultValue)
+    }
+
+    func testGetDictionaryFilter() throws {
+        let data = try PropertyListEncoder().encode(temperatures)
+        let plist = try Plist(data: data)
+
+        let value = try plist.getKeys(with: "[A-Z]{1}[a-z]*n").value
+
+        let keys = try XCTUnwrap(value as? [String: Int])
+        XCTAssertEqual(keys, ["Dublin": 19, "Berlin": 21])
+    }
+
+    func testArrayStringFilter() throws {
+        let data = try PropertyListEncoder().encode(ducks)
+        let plist = try Plist(data: data)
+
+        let value = try plist.getKeys(with: "[A-Z]{1}i[a-z]{1}i").value
+
+        let keys = try XCTUnwrap(value as? [String])
+        XCTAssertEqual(keys, ["Riri", "Fifi"])
+    }
+
+    func testGetDictionaryFilterKey() throws {
+        let data = try PropertyListEncoder().encode(charactersByName)
+        let plist = try Plist(data: data)
+        let path = Path(PathElement.filter(".*(z|Z).*"), "name")
+        let value = try plist.get(path).value
+
+        let keys = try XCTUnwrap(value as? [String: String])
+        var copy = [String: String]()
+        charactersByName.forEach { copy[$0.key + ".name"] = $0.value.name }
+        
+        copy.removeValue(forKey: "Woody.name")
+
+        XCTAssertEqual(keys, copy)
+    }
+
+    func testGetDictionaryFilterIndex() throws {
+        let data = try PropertyListEncoder().encode(charactersByName)
+        let plist = try Plist(data: data)
+        let path = Path(PathElement.filter(".*"), "episodes", 1)
+        let value = try plist.get(path).value
+
+        let keys = try XCTUnwrap(value as? [String: Int])
+        var copy  = [String: Int]()
+        charactersByName.forEach { copy[$0.key + ".episodes[1]"] = $0.value.episodes[1] }
+
+        XCTAssertEqual(keys, copy)
     }
 
     // MARK: Set

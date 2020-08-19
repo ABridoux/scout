@@ -13,6 +13,9 @@ extension PathExplorerSerialization {
         static var dictionary: GroupValue<DictionaryValue> { GroupValue<DictionaryValue>() }
         static var array: GroupValue<ArrayValue> { GroupValue<ArrayValue>() }
 
+        static func dictionary<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[String: Value]> { GroupValue<[String: Value]>() }
+        static func array<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[Value]> { GroupValue<[Value]>() }
+
         private init() {}
     }
 

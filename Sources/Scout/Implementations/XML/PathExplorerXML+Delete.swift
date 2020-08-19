@@ -3,6 +3,8 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
+import AEXML
+
 extension PathExplorerXML {
 
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool = false) throws {
@@ -10,52 +12,75 @@ extension PathExplorerXML {
 
         // for each encountered slice, we'll add the sliced explorers in the array to then
         // delete the common key in each of them
-        var elementsToDelete = [self]
+        var explorers = [self]
 
         try path.forEach { pathElement in
             currentPath.append(pathElement)
 
             switch pathElement {
             case .key(let key):
-                for (index, pathExplorer) in elementsToDelete.enumerated() {
-                    elementsToDelete[index] = try pathExplorer.get(for: key, ignoreArraySlicing: true)
-                }
+                try delete(key: key, in: &explorers, in: currentPath)
 
-            case .index(let elementIndex):
-                for (index, pathExplorer) in elementsToDelete.enumerated() {
-                    elementsToDelete[index] = try pathExplorer.get(at: elementIndex, negativeIndexEnabled: true, ignoreArraySlicing: true)
-                }
+            case .index(let index):
+                try delete(index: index, in: &explorers, in: currentPath)
 
             case .slice(let bounds):
-                var newElementsToDelete = [PathExplorerXML]()
+                try deleteSlice(within: bounds, in: &explorers, path: currentPath)
 
-                try elementsToDelete.forEach { pathExplorer in
-                    let element = pathExplorer.element
-                    let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: currentPath)
-                    let newChildren = element.children[sliceRange]
-                    var newPathExplorers = [PathExplorerXML]()
-
-                    for (index, element) in newChildren.enumerated() {
-                        let pathExplorer = PathExplorerXML(element: element, path: currentPath.appending(index))
-                        newPathExplorers.append(pathExplorer)
-                    }
-                    newElementsToDelete.append(contentsOf: newPathExplorers)
-                }
-
-                elementsToDelete = newElementsToDelete
+            case .filter(let pattern):
+                try deleteFilter(with: pattern, in: &explorers, path: currentPath)
 
             case .count:
                 throw PathExplorerError.wrongUsage(of: .count, in: currentPath)
             }
         }
 
-        elementsToDelete.forEach { pathExplorer in
+        explorers.forEach { pathExplorer in
             pathExplorer.element.removeFromParent()
 
             if deleteIfEmpty, pathExplorer.element.parent?.children.isEmpty ?? false {
                 pathExplorer.element.parent?.removeFromParent()
             }
         }
+    }
+
+    func delete(key: String, in explorers: inout [Self], in path: Path) throws {
+        for (index, pathExplorer) in explorers.enumerated() {
+            let element = try pathExplorer.getSimple(key: key)
+            let newPathExplorer = PathExplorerXML(element: element, path: path)
+            explorers[index] = newPathExplorer
+        }
+    }
+
+    func delete(index: Int, in explorers: inout [Self], in path: Path) throws {
+        for (explorerIndex, pathExplorer) in explorers.enumerated() {
+            let element = try pathExplorer.getSimple(index: index)
+            let newPathExplorer = PathExplorerXML(element: element, path: path)
+            explorers[explorerIndex] = newPathExplorer
+        }
+    }
+
+    func deleteSlice(within bounds: Bounds, in explorers: inout [Self], path: Path) throws {
+        var newElementsToDelete = [PathExplorerXML]()
+
+        try explorers.forEach { pathExplorer in
+            let element = pathExplorer.element
+            let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: path)
+            let newChildren = element.children[sliceRange]
+            var newPathExplorers = [PathExplorerXML]()
+
+            for (index, element) in newChildren.enumerated() {
+                let pathExplorer = PathExplorerXML(element: element, path: path.appending(index))
+                newPathExplorers.append(pathExplorer)
+            }
+            newElementsToDelete.append(contentsOf: newPathExplorers)
+        }
+
+        explorers = newElementsToDelete
+    }
+    
+    func deleteFilter(with pattern: String, in explorers: inout [Self], path: Path) throws {
+        #warning("To be implemented")
     }
 
     mutating func delete(at index: Int, negativeIndexEnabled: Bool = false) throws {

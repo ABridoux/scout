@@ -24,7 +24,29 @@ public protocol PathElementRepresentable {
 }
 
 extension String: PathElementRepresentable {
-    public var pathValue: PathElement { .key(self) }
+    public var pathValue: PathElement { slice ?? filter ?? .key(self) }
+
+    var slice: PathElement? {
+        let splitted = components(separatedBy: ":")
+
+        guard
+            splitted.count == 2,
+            let lower = splitted[0] == "" ? 0 : Int(splitted[0]),
+            let upper = splitted[1] == "" ? .lastIndex : Int(splitted[1])
+        else {
+            return nil
+        }
+
+        return .slice(Bounds(lower: lower, upper: upper))
+    }
+
+    var filter: PathElement? {
+        guard isEnclosed(by: "#")  else { return nil }
+        var copy = self
+        copy.removeFirst()
+        copy.removeLast()
+        return .filter(copy)
+    }
 }
 
 extension Int: PathElementRepresentable {

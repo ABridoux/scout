@@ -55,6 +55,21 @@ extension PathExplorer {
         }
     }
 
+    /// The last array slice or dictionary filter found in the path if any
+    var lastGroupElement: GroupSample? {
+        var lastGroupElement: GroupSample?
+
+        readingPath.forEach { element in
+            switch element {
+            case .slice: lastGroupElement = .arraySlice
+            case .filter: lastGroupElement = .dictionaryFilter
+            default: break
+            }
+        }
+
+        return lastGroupElement
+    }
+
     /// Use to name the single key when folding a dictionary
     static var foldedKey: String { "Folded" }
 
@@ -77,6 +92,12 @@ public extension PathExplorer {
     mutating func delete(_ path: PathElementRepresentable) throws {
         try delete(path, deleteIfEmpty: false)
     }
+}
+
+// MARK: Debug
+
+public extension PathExplorer {
+    var debugDescription: String { description }
 }
 
 // MARK: Data validation

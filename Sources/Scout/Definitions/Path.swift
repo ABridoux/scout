@@ -44,7 +44,7 @@ public struct Path: Equatable {
     public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
-        let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
+        let splitRegexPattern = #"\(.+\)|#.+#|[^\#(separator)]+"#
         let groupSubscripterRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
@@ -62,7 +62,7 @@ public struct Path: Equatable {
             }
             let indexMatches = groupSubscripterRegex.matches(in: match, options: [], range: match.nsRange)
 
-            // try to get the indexes if any
+            // try to get the group subscripters if any
             if let indexesMatch = try Self.extractGroupSubscripters(in: indexMatches, from: match) {
                 elements.append(contentsOf: indexesMatch)
             } else {
@@ -205,7 +205,7 @@ extension Path: Collection {
     }
 }
 
-extension Path: CustomStringConvertible {
+extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
     public var description: String {
         var description = ""
@@ -218,6 +218,7 @@ extension Path: CustomStringConvertible {
                 }
                 description.append(element.description)
 
+            case .filter(let pattern): description.append("#\(pattern)#")
             case .key: description.append(element.description)
             }
 
@@ -229,6 +230,8 @@ extension Path: CustomStringConvertible {
         }
         return description
     }
+
+    public var debugDescription: String { description }
 }
 
 extension Path: ExpressibleByArrayLiteral {

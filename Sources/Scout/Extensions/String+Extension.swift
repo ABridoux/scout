@@ -23,4 +23,8 @@ extension String {
 
         return self[sliceStartIndex...sliceEndIndex]
     }
+
+    func isEnclosed(by string: String) -> Bool {
+        return hasPrefix(string) && hasSuffix(string)
+    }
 }

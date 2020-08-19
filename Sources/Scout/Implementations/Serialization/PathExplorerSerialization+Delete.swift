@@ -5,62 +5,114 @@
 
 extension PathExplorerSerialization {
 
+    // MARK: - Dictionary
+
     mutating func delete(key: String) throws {
 
-        if isArray, isArraySlice {
-            // array slice. Try to find the common key in the dictionaries and delete it
-            var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.appending(key)))
+        let groupDescription = lastGroupElement?.description ?? ""
+        let valueDescription = String(describing: value)
 
-            for (index, oldDict) in array.enumerated() {
-                let path = readingPath.appending(.index(index))
-                var pathExplorer = PathExplorerSerialization(value: oldDict, path: path)
-                try? pathExplorer.delete(key: key) // preferable to ignore a key which is already missing 
-                array[index] = pathExplorer.value
-            }
+        switch lastGroupElement {
 
+        case .arraySlice:
+            var array = try cast(value, as: .array,
+                                 orThrow: .wrongGroupValueForKey(group: groupDescription, value: valueDescription, element: .key(key)))
+            try delete(key: key, inArraySlice: &array)
             value = array
-        } else {
-            var dict = try getDictAndValueFor(key: key).dictionary
-            dict.removeValue(forKey: key)
-            value = dict
+
+        case .dictionaryFilter:
+            var dictionary = try cast(value, as: .dictionary,
+                                      orThrow: .wrongGroupValueForKey(group: groupDescription, value: valueDescription, element: .key(key)))
+            try delete(key: key, inDictionaryFilter: &dictionary)
+            value = dictionary
+
+        case nil:
+            value = try deleteSimple(key: key)
         }
     }
+
+    func deleteSimple(key: String) throws -> DictionaryValue {
+        var dict = try getDictAndValueFor(key: key).dictionary
+        dict.removeValue(forKey: key)
+        return dict
+    }
+
+    func delete(key: String, inArraySlice array: inout ArrayValue) throws {
+        for (index, oldValue) in array.enumerated() {
+            let path = readingPath.appending(index)
+            let pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            array[index] = try pathExplorer.deleteSimple(key: key)
+        }
+    }
+
+    func delete(key: String, inDictionaryFilter dictionary: inout DictionaryValue) throws {
+        try dictionary.forEach { (keyValue, oldValue) in
+            let path = readingPath.appending(keyValue)
+            let pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            dictionary[keyValue] = try pathExplorer.deleteSimple(key: key)
+        }
+    }
+
+    // MARK: - Array
 
     mutating func delete(at index: Int) throws {
-        var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
 
-        if precedeKeyOrSliceAfterSlicing {
-            // array slice. Try to delete index in the arrays
-
-            for (indexElement, oldArray) in array.enumerated() {
-                let path = readingPath.appending(.index(indexElement))
-                var pathExplorer = PathExplorerSerialization(value: oldArray, path: path)
-                try? pathExplorer.delete(at: index) // preferable to ignore an index which is already missing
-                array[indexElement] = pathExplorer.value
-            }
-
+        switch lastGroupElement {
+        case .arraySlice:
+            var array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
+            try delete(index: index, inArarySlice: &array)
             value = array
 
-        } else {
-            if index == .lastIndex {
-                guard !array.isEmpty else {
-                    throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
-                }
-                array.removeLast()
-                value = array
-                return
-            }
+        case .dictionaryFilter:
+            var dictionary = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
+            try delete(index: index, inDictionaryFilter: &dictionary)
+            value = dictionary
 
-            guard 0 <= index, index < array.count else {
-                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
-            }
-
-            array.remove(at: index)
-            value = array
+        case nil:
+            value = try deleteSimple(index: index)
         }
     }
 
+    func deleteSimple(index: Int) throws -> ArrayValue {
+        var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+
+        if index == .lastIndex {
+            if array.isEmpty {
+                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
+            }
+            array.removeLast()
+            return array
+        }
+
+        guard 0 <= index, index < array.count else {
+            throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
+        }
+
+        array.remove(at: index)
+
+        return array
+    }
+
+    func delete(index: Int, inArarySlice array: inout ArrayValue) throws {
+        for (valueIndex, oldValue) in array.enumerated() {
+            let path = readingPath.appending(valueIndex)
+            let pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            array[valueIndex] = try pathExplorer.deleteSimple(index: index)
+        }
+    }
+
+    func delete(index: Int, inDictionaryFilter dictionary: inout DictionaryValue) throws {
+        try dictionary.forEach { (keyValue, oldValue) in
+            let path = readingPath.appending(keyValue)
+            let pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            dictionary[keyValue] = try pathExplorer.deleteSimple(index: index)
+        }
+    }
+
+    // MARK: - Group
+
     mutating func deleteSlice(within bounds: Bounds) throws {
+        #warning("Handles group")
         let slice = PathElement.slice(bounds)
         let path = readingPath.appending(slice)
         let array = try cast(value, as: .array, orThrow: .wrongUsage(of: .slice(bounds), in: path))
@@ -70,6 +122,12 @@ extension PathExplorerSerialization {
         value = newArray
     }
 
+    mutating func deleteKeys(with pattern: String) throws {
+        #warning("To be implemented")
+    }
+
+    // MARK: - General
+
     mutating func delete(element: PathElement) throws {
         switch element {
 
@@ -77,6 +135,7 @@ extension PathExplorerSerialization {
         case .index(let index): try delete(at: index)
         case .count: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
         case .slice(let bounds): try deleteSlice(within: bounds)
+        case .filter(let pattern): try deleteKeys(with: pattern)
         }
     }
 
