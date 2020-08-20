@@ -26,6 +26,7 @@ final class PathTests: XCTestCase {
     let secondKeyWithPartialRangeLeft = "secondKey[:4]"
     let secondKeyWithPartialRangeRight = "secondKey[1:]"
     let secondKeyWithFilter = "secondKey.#Halo.*#"
+    let secondKeyWithFilterAndCount = "secondKey.#Halo.*#[#]"
 
     let thirdKey = "thirdKey"
     let thirdKeyWithCount = "thirdKey[#].secondKey"
@@ -179,6 +180,13 @@ final class PathTests: XCTestCase {
     func testFilter() throws {
         let array = Path(secondKey, PathElement.filter("Halo.*"))
         let path = try Path(string: secondKeyWithFilter)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testFilterAndCount() throws {
+        let array = Path(secondKey, PathElement.filter("Halo.*"), PathElement.count)
+        let path = try Path(string: secondKeyWithFilterAndCount)
 
         XCTAssertEqual(path, array)
     }

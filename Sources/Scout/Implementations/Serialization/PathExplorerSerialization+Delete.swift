@@ -3,26 +3,23 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
+import Foundation
+
 extension PathExplorerSerialization {
 
     // MARK: - Dictionary
 
     mutating func delete(key: String) throws {
 
-        let groupDescription = lastGroupElement?.description ?? ""
-        let valueDescription = String(describing: value)
-
         switch lastGroupElement {
 
         case .arraySlice:
-            var array = try cast(value, as: .array,
-                                 orThrow: .wrongGroupValueForKey(group: groupDescription, value: valueDescription, element: .key(key)))
+            var array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
             try delete(key: key, inArraySlice: &array)
             value = array
 
         case .dictionaryFilter:
-            var dictionary = try cast(value, as: .dictionary,
-                                      orThrow: .wrongGroupValueForKey(group: groupDescription, value: valueDescription, element: .key(key)))
+            var dictionary = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
             try delete(key: key, inDictionaryFilter: &dictionary)
             value = dictionary
 
@@ -58,6 +55,7 @@ extension PathExplorerSerialization {
     mutating func delete(at index: Int) throws {
 
         switch lastGroupElement {
+
         case .arraySlice:
             var array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
             try delete(index: index, inArarySlice: &array)
@@ -111,19 +109,95 @@ extension PathExplorerSerialization {
 
     // MARK: - Group
 
-    mutating func deleteSlice(within bounds: Bounds) throws {
-        #warning("Handles group")
+    mutating func deleteSimple(_ groupSample: GroupSample) throws  {
+        switch groupSample {
+        case .arraySlice(let bounds): try deleteSimpleArraySlice(within: bounds)
+        case .dictionaryFilter(let pattern): try deleteSimpleDictionaryFilter(with: pattern)
+        }
+    }
+
+    mutating func deleteSimpleArraySlice(within bounds: Bounds) throws {
         let slice = PathElement.slice(bounds)
         let path = readingPath.appending(slice)
-        let array = try cast(value, as: .array, orThrow: .wrongUsage(of: .slice(bounds), in: path))
+        let array = try cast(value, as: .array, orThrow: .wrongUsage(of: slice, in: path))
 
         let range = try bounds.range(lastValidIndex: array.count - 1, path: path)
         let newArray = array.remove(in: range)
         value = newArray
     }
 
-    mutating func deleteKeys(with pattern: String) throws {
-        #warning("To be implemented")
+    mutating func deleteSimpleDictionaryFilter(with pattern: String) throws {
+        let filter = PathElement.filter(pattern)
+        let regex = try NSRegularExpression(pattern: pattern, path: readingPath)
+        let path = readingPath.appending(filter)
+
+        if isArray {
+            let array = try cast(value, as: .array(.string), orThrow: .wrongUsage(of: filter, in: path))
+            value = array.filter { !regex.validate($0) }
+            return
+        }
+
+        var dict = try cast(value, as: .dictionary, orThrow: .wrongUsage(of: filter, in: path))
+
+        for key in dict.keys where regex.validate(key) {
+            dict.removeValue(forKey: key)
+        }
+
+        value = dict
+    }
+
+    func delete(_ groupSample: GroupSample, inArraySlice array: inout ArrayValue) throws {
+        for (index, element) in array.enumerated() {
+            let path = readingPath.appending(index)
+            var pathExplorer = PathExplorerSerialization(value: element, path: path)
+            try pathExplorer.deleteSimple(groupSample)
+            array[index] = pathExplorer.value
+        }
+    }
+
+    func delete(_ groupSample: GroupSample, inDictionaryFilter dictionary: inout DictionaryValue) throws {
+        try dictionary.forEach { (key, value) in
+            let path = readingPath.appending(key)
+            var pathExplorer = PathExplorerSerialization(value: value, path: path)
+            try pathExplorer.deleteSimple(groupSample)
+            dictionary[key] = pathExplorer.value
+        }
+    }
+
+    mutating func deleteArraySlice(within bounds: Bounds) throws {
+        switch lastGroupElement {
+
+        case .arraySlice:
+            var arraySlice = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
+            try delete(.arraySlice(bounds), inArraySlice: &arraySlice)
+            value = arraySlice
+
+        case .dictionaryFilter:
+            var dictionaryFilter = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
+            try delete(.arraySlice(bounds), inDictionaryFilter: &dictionaryFilter)
+            value = dictionaryFilter
+
+        case nil:
+            try deleteSimpleArraySlice(within: bounds)
+        }
+    }
+
+    mutating func deleteDictionaryFilter(with pattern: String) throws {
+        switch lastGroupElement {
+        case .arraySlice:
+            var arraySlice = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
+            try delete(.dictionaryFilter(pattern), inArraySlice: &arraySlice)
+            value = arraySlice
+
+        case .dictionaryFilter:
+            var dictionaryFilter = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
+            try delete(.dictionaryFilter(pattern), inDictionaryFilter: &dictionaryFilter)
+            value = dictionaryFilter
+
+        case nil:
+            try deleteSimpleDictionaryFilter(with: pattern)
+
+        }
     }
 
     // MARK: - General
@@ -134,8 +208,8 @@ extension PathExplorerSerialization {
         case .key(let key): try delete(key: key)
         case .index(let index): try delete(at: index)
         case .count: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
-        case .slice(let bounds): try deleteSlice(within: bounds)
-        case .filter(let pattern): try deleteKeys(with: pattern)
+        case .slice(let bounds): try deleteArraySlice(within: bounds)
+        case .filter(let pattern): try deleteDictionaryFilter(with: pattern)
         }
     }
 
@@ -152,11 +226,8 @@ extension PathExplorerSerialization {
 
         for (pathExplorer, element) in zip(pathExplorers, path).reversed() {
             var pathExplorer = pathExplorer
-            if deleteIfEmpty, currentExplorer.isEmpty {
-                try pathExplorer.delete(element: element)
-            } else {
-                try pathExplorer.set(element: element, to: currentExplorer.value)
-            }
+            pathExplorer.allowEmptyGroups = !deleteIfEmpty
+            try pathExplorer.set(element: element, to: currentExplorer.value)
             currentExplorer = pathExplorer
         }
 

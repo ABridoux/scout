@@ -61,8 +61,8 @@ extension PathExplorer {
 
         readingPath.forEach { element in
             switch element {
-            case .slice: lastGroupElement = .arraySlice
-            case .filter: lastGroupElement = .dictionaryFilter
+            case .slice(let bounds): lastGroupElement = .arraySlice(bounds)
+            case .filter(let pattern): lastGroupElement = .dictionaryFilter(pattern)
             default: break
             }
         }

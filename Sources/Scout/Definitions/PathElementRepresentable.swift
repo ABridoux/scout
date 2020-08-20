@@ -45,6 +45,7 @@ extension String: PathElementRepresentable {
         var copy = self
         copy.removeFirst()
         copy.removeLast()
+        copy = copy.replacingOccurrences(of: "\\#", with: "#")
         return .filter(copy)
     }
 }

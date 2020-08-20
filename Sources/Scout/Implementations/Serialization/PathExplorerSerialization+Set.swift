@@ -3,6 +3,8 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
+import Foundation
+
 extension PathExplorerSerialization {
 
     // MARK: - Array
@@ -42,14 +44,19 @@ extension PathExplorerSerialization {
             throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
         }
 
-        array[index] = newValue
+        if !allowEmptyGroups, isValueEmpty(newValue) {
+            array.remove(at: index)
+        } else {
+            array[index] = newValue
+        }
+
         return array
     }
 
     /// Set the given index in the array slice by browsing all the arrays in the slice
     func set(index: Int, inArraySlice array: inout ArrayValue, to newValues: ArrayValue) throws {
         guard array.count == newValues.count else {
-            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySlice.description,
+            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description,
                                                           value: String(describing: newValues),
                                                           element: .index(index))
         }
@@ -58,7 +65,8 @@ extension PathExplorerSerialization {
             let oldArray = array[indexElement]
             let newValue = newValues[indexElement]
             let path = readingPath.appending(indexElement)
-            let pathExplorer = PathExplorerSerialization(value: oldArray, path: path)
+            var pathExplorer = PathExplorerSerialization(value: oldArray, path: path)
+            pathExplorer.allowEmptyGroups = allowEmptyGroups
             array[index] = try pathExplorer.setSimple(index: index, to: newValue)
         }
     }
@@ -68,7 +76,8 @@ extension PathExplorerSerialization {
         for (subKey, newValue) in newValues {
             guard let oldValue = dictionary[subKey] else { continue } // ignore non already present keys
             let path = readingPath.appending(index)
-            let pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            var pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            pathExplorer.allowEmptyGroups = allowEmptyGroups
             dictionary[subKey] = try pathExplorer.setSimple(index: index, to: newValue)
         }
     }
@@ -99,6 +108,12 @@ extension PathExplorerSerialization {
 
     func setSimple(key: String, to newValue: Any) throws -> DictionaryValue {
         var dict = try getDictAndValueFor(key: key).dictionary
+
+        if !allowEmptyGroups, isValueEmpty(newValue ) {
+            dict.removeValue(forKey: key)
+            return dict
+        }
+
         dict[key] = newValue
         return dict
     }
@@ -106,7 +121,7 @@ extension PathExplorerSerialization {
     /// Set the given key in the array slice by browsing all the arrays in the slice
     func set(key: String, inArraySlice array: inout ArrayValue, to newValues: ArrayValue) throws {
         guard array.count == newValues.count else {
-            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySlice.description,
+            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description,
                                                           value: String(describing: newValues),
                                                           element: .key(key))
         }
@@ -115,7 +130,8 @@ extension PathExplorerSerialization {
             let oldValue = array[index]
             let newValue = newValues[index]
             let path = readingPath.appending(index)
-            let pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            var pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            pathExplorer.allowEmptyGroups = allowEmptyGroups
             array[index] = try pathExplorer.setSimple(key: key, to: newValue)
         }
     }
@@ -124,27 +140,63 @@ extension PathExplorerSerialization {
     func set(key: String, inDictionaryFilter dictionary: inout DictionaryValue, to newValues: DictionaryValue) throws {
         for (subKey, newValue) in newValues {
             guard let oldValue = dictionary[subKey] else { continue } // ignore non already present keys
-            var oldDict = try cast(oldValue, as: .dictionary, orThrow: .wrongGroupValueForKey(group: GroupSample.dictionaryFilter.description, value: String(describing: oldValue), element: .key(key)))
-
-            oldDict[key] = newValue
-            dictionary[subKey] = oldDict
+            let path = readingPath.appending(subKey)
+            var pathExplorer = PathExplorerSerialization(value: oldValue, path: path)
+            pathExplorer.allowEmptyGroups = allowEmptyGroups
+            dictionary[subKey] = try pathExplorer.setSimple(key: key, to: newValue)
         }
     }
 
     // MARK: - Group
 
-    mutating func setSlice(within bounds: Bounds, to newValue: Any) throws {
-        #warning("Handle groups")
+    mutating func setArraySlice(within bounds: Bounds, to newValue: Any) throws {
         let slice = PathElement.slice(bounds)
-        var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
         let range = try bounds.range(lastValidIndex: array.count - 1, path: readingPath.appending(slice))
-        let newSlice = try cast(newValue, as: .array, orThrow: .wrongGroupValueForKey(group: GroupSample.arraySlice.description, value: String(describing: newValue), element: slice))
-        array.replaceSubrange(range, with: newSlice)
-        value = array
+
+        let newSlice = try cast(newValue, as: .array,
+                                orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description, value: String(describing: newValue), element: slice))
+
+        let leftRange = bounds.lower > 0 ? 0...bounds.lower - 1 : nil
+        let rightRange = bounds.upper < array.count - 1 ? bounds.upper + 1...array.count - 1 : nil
+
+        var newArray = ArrayValue()
+
+        if let range = leftRange {
+            // array[range] does not play good with any
+            range.forEach { newArray.append(array[$0]) }
+        }
+
+        // if empty groups are forbidden, avoid to add them
+        newSlice.forEach { value in
+            if allowEmptyGroups || !isValueEmpty(value) {
+                newArray.append(value)
+            }
+        }
+
+        if let range = rightRange {
+            // array[range] does not play good with any
+            range.forEach { newArray.append(array[$0]) }
+        }
+
+        value = newArray
     }
 
-    mutating func setKeys(with pattern: String, to newValue: Any) throws {
-        #warning("To be implemented")
+    mutating func setDictionaryFilter(with pattern: String, to newValue: Any) throws {
+        let filter = PathElement.filter(pattern)
+        var dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
+
+        let newDict = try cast(newValue, as: .dictionary,
+                                orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description, value: String(describing: newValue), element: filter))
+
+        newDict.forEach { (key, value) in
+            if !allowEmptyGroups, PathExplorerSerialization(value: value).isEmpty {
+                dict.removeValue(forKey: key)
+            } else {
+                dict[key] = value
+            }
+        }
+        value = dict
     }
 
     // MARK: - Key name
@@ -188,8 +240,8 @@ extension PathExplorerSerialization {
         case .key(let key): return try set(key: key, to: newValue)
         case .index(let index): return try set(index: index, to: newValue)
         case .count: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
-        case .slice(let bounds): try setSlice(within: bounds, to: newValue)
-        case .filter(let pattern): try setKeys(with: pattern, to: newValue)
+        case .slice(let bounds): try setArraySlice(within: bounds, to: newValue)
+        case .filter(let pattern): try setDictionaryFilter(with: pattern, to: newValue)
         }
     }
 

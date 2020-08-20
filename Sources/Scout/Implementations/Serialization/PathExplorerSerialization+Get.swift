@@ -10,7 +10,8 @@ extension PathExplorerSerialization {
     // MARK: - Array
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
-    func get(at index: Int, negativeIndexEnabled: Bool = true) throws -> Self {
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func get(at index: Int, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws -> Self {
         let newValue: Any
 
         switch lastGroupElement {
@@ -21,7 +22,7 @@ extension PathExplorerSerialization {
 
         case .dictionaryFilter:
             let dict = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
-            newValue = try get(index: index, inDictionaryFilter: dict)
+            newValue = try get(index: index, inDictionaryFilter: dict, detailedName: detailedName)
 
         case nil:
             newValue = try getSimple(index: index, negativeIndexEnabled: negativeIndexEnabled)
@@ -61,13 +62,15 @@ extension PathExplorerSerialization {
     }
 
     /// Get the given index in the dictionary filter by browsing all the arrays in the slice
-    func get(index: Int, inDictionaryFilter dictionary: DictionaryValue) throws -> DictionaryValue {
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func get(index: Int, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> DictionaryValue {
         var newDict = DictionaryValue()
 
         try dictionary.forEach { (key, value) in
             let pathExplorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
             let newValue = try pathExplorer.getSimple(index: index)
-            newDict[key + "[\(index)]"] = newValue
+            let newName = detailedName ? key + "[\(index)]" : key
+            newDict[newName] = newValue
         }
 
         return newDict
@@ -75,7 +78,7 @@ extension PathExplorerSerialization {
 
     // MARK: - Dictionary
 
-    func get(for key: String) throws -> Self {
+    func get(for key: String, detailedName: Bool = true) throws -> Self {
         let newValue: Any
 
         switch lastGroupElement {
@@ -86,7 +89,7 @@ extension PathExplorerSerialization {
 
         case .dictionaryFilter:
             let dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
-            newValue = try get(key: key, inDictionaryFilter: dict)
+            newValue = try get(key: key, inDictionaryFilter: dict, detailedName: detailedName)
 
         case nil:
             newValue = try getDictAndValueFor(key: key).value
@@ -122,13 +125,15 @@ extension PathExplorerSerialization {
     }
 
     /// Get the given key in the dictionary filter by browsing all the dictionaries in the filter
-    func get(key: String, inDictionaryFilter dictionary: DictionaryValue) throws -> DictionaryValue {
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func get(key: String, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> DictionaryValue {
         var newDict = DictionaryValue()
 
         try dictionary.forEach { (keyValue, value) in
             let pathExplorer = PathExplorerSerialization(value: value, path: readingPath.appending(keyValue))
             let value = try pathExplorer.getDictAndValueFor(key: key).value
-            newDict[keyValue + "." + key] = value
+            let newName = detailedName ? keyValue + "." + key : keyValue
+            newDict[newName] = value
         }
 
         return newDict
@@ -138,23 +143,14 @@ extension PathExplorerSerialization {
 
     /// - Returns: The count of the array or dictionary if  `value` is an array or a dictionary
     func getChildrenCount() throws -> Self {
-        #warning("Handle dictionaries filter")
-
-        if precedeKeyOrSliceAfterSlicing {
-            // Array slicing. Retrieve the count path element for all values in the arrays or dictionaries
-            let array  = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
-            var countsArray = [Int]()
-
-            for (index, value) in array.enumerated() {
-                let pathExplorer = PathExplorerSerialization(value: value, path: readingPath.appending(index))
-                guard let count = try pathExplorer.getChildrenCount().int else {
-                    throw PathExplorerError.wrongUsage(of: .count, in: readingPath.appending(index))
-                }
-                countsArray.append(count)
-            }
-            return PathExplorerSerialization(value: countsArray, path: readingPath.appending(.count))
+        switch lastGroupElement {
+        case .arraySlice: return  try getChildrenCountInArraySlice()
+        case .dictionaryFilter: return try getChildrenCountInDictionaryFilter()
+        case nil: return try getChildrenCountSimple()
         }
+    }
 
+    func getChildrenCountSimple() throws -> Self {
         if let arrayValue = value as? ArrayValue {
             return PathExplorerSerialization(value: arrayValue.count, path: readingPath.appending(.count))
         } else if let dictValue = value as? DictionaryValue {
@@ -164,11 +160,65 @@ extension PathExplorerSerialization {
         }
     }
 
+    func getChildrenCountInArraySlice() throws -> Self {
+        let dict  = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        var countsArray = [Int]()
+
+        for (index, value) in dict.enumerated() {
+            let pathExplorer = PathExplorerSerialization(value: value, path: readingPath.appending(index))
+            guard let count = try pathExplorer.getChildrenCountSimple().int else {
+                throw PathExplorerError.wrongUsage(of: .count, in: readingPath.appending(index))
+            }
+            countsArray.append(count)
+        }
+        return PathExplorerSerialization(value: countsArray, path: readingPath.appending(.count))
+    }
+
+    func getChildrenCountInDictionaryFilter() throws -> Self {
+        let dict  = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
+        var countsDict = [String: Int]()
+
+       try  dict.forEach { (key, value) in
+            let path = readingPath.appending(key)
+            let pathExplorer = PathExplorerSerialization(value: value, path: path)
+            guard let count = try pathExplorer.getChildrenCountSimple().int else {
+                throw PathExplorerError.wrongUsage(of: .count, in: path)
+            }
+            countsDict[key + "[#]"] = count
+        }
+        return PathExplorerSerialization(value: countsDict, path: readingPath.appending(.count))
+    }
+
     // MARK: - Group
 
+    func getSimple(_ groupSample: GroupSample) throws -> Self {
+        switch groupSample {
+        case .arraySlice(let bounds): return try getArraySliceSimple(within: bounds)
+        case .dictionaryFilter(let pattern): return try getDictionaryFilterSimple(with: pattern)
+        }
+    }
+
+    // MARK: Array slice
+
     /// Returns a slice of value is it is an array
-    func getArraySlice(within bounds: Bounds) throws -> Self {
-        #warning("Handle group elements")
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func getArraySlice(within bounds: Bounds, detailedName: Bool = true) throws -> Self {
+
+        switch lastGroupElement {
+        case .arraySlice:
+            let slicedArray = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
+            return try get(.arraySlice(bounds), inArraySlice: slicedArray)
+
+        case .dictionaryFilter:
+            let dict = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
+            return try get(.arraySlice(bounds), inDictionaryFilter: dict)
+
+        case nil:
+        return try getArraySliceSimple(within: bounds)
+        }
+    }
+
+    func getArraySliceSimple(within bounds: Bounds) throws -> Self {
         let slice = PathElement.slice(bounds)
         let path = readingPath.appending(slice)
         let array = try cast(value, as: .array, orThrow: .wrongUsage(of: slice, in: path))
@@ -179,8 +229,37 @@ extension PathExplorerSerialization {
         return PathExplorerSerialization(value: newValue, path: path)
     }
 
-    func getKeys(with pattern: String) throws -> Self {
-        #warning("Handle group elements")
+    func get(_ groupSample: GroupSample, inArraySlice array: ArrayValue) throws -> Self {
+        var newArray = ArrayValue()
+
+        for (index, element) in array.enumerated() {
+            let path = readingPath.appending(index)
+            let pathExplorer = PathExplorerSerialization(value: element, path: path)
+            let slicedArray = try pathExplorer.getSimple(groupSample).value
+            newArray.append(slicedArray)
+        }
+
+        return PathExplorerSerialization(value: newArray, path: readingPath.appending(groupSample.pathElement))
+    }
+
+    // MARK: Dictionary filter
+
+    func getDictionaryFilter(with pattern: String) throws -> Self {
+        switch lastGroupElement {
+        case .arraySlice:
+            let array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
+            return try get(.dictionaryFilter(pattern), inArraySlice: array)
+
+        case .dictionaryFilter:
+            let dict = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
+            return try get(.dictionaryFilter(pattern), inDictionaryFilter: dict)
+
+        case nil:
+            return try getDictionaryFilterSimple(with: pattern)
+        }
+    }
+
+    func getDictionaryFilterSimple(with pattern: String) throws -> Self {
         let path = readingPath.appending(.filter(pattern))
         let regex = try NSRegularExpression(pattern: pattern, path: readingPath)
 
@@ -196,20 +275,35 @@ extension PathExplorerSerialization {
         return PathExplorerSerialization(value: filteredDict, path: path)
     }
 
+    func get(_ groupSample: GroupSample, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> Self {
+        var newDict = DictionaryValue()
+
+        try dictionary.forEach { (key, value) in
+            let path = readingPath.appending(key)
+            let pathExplorer = PathExplorerSerialization(value: value, path: path)
+            let filteredDict = try pathExplorer.getSimple(groupSample).value
+            let newName = detailedName ? key + groupSample.pathElement.description : key
+            newDict[newName] = filteredDict
+        }
+
+        return PathExplorerSerialization(value: newDict, path: readingPath.appending(groupSample.pathElement))
+    }
+
     // MARK: - General
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
-    func get(element: PathElement, negativeIndexEnabled: Bool = true) throws -> Self {
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func get(element: PathElement, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws -> Self {
         guard readingPath.last != .count else {
             throw PathExplorerError.wrongUsage(of: .count, in: readingPath)
         }
 
         switch element {
-        case .key(let key): return try get(for: key)
+        case .key(let key): return try get(for: key, detailedName: detailedName)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         case .count: return try getChildrenCount()
-        case .slice(let bounds): return try getArraySlice(within: bounds)
-        case .filter(let pattern): return try getKeys(with: pattern)
+        case .slice(let bounds): return try getArraySlice(within: bounds, detailedName: detailedName)
+        case .filter(let pattern): return try getDictionaryFilter(with: pattern)
         }
     }
 
@@ -234,7 +328,7 @@ extension PathExplorerSerialization {
         let lastElement = craftingPath.removeLast()
 
         let explorers = try craftingPath.reduce([self]) { (explorers, element) in
-            guard let currentExplorer = try explorers.last?.get(element: element) else {
+            guard let currentExplorer = try explorers.last?.get(element: element, detailedName: false) else {
                 return explorers // should not happen
             }
 

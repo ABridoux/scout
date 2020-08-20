@@ -44,7 +44,7 @@ public struct Path: Equatable {
     public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
-        let splitRegexPattern = #"\(.+\)|#.+#|[^\#(separator)]+"#
+        let splitRegexPattern = #"\(.+\)|#(\x5C#|[^#])+#|[^\#(separator)]+"#
         let groupSubscripterRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
