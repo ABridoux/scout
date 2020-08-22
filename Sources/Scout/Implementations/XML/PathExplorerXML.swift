@@ -143,6 +143,10 @@ public struct PathExplorerXML: PathExplorer {
 
     public func exportString() throws -> String { description }
 
+    public func exportCSV(separator: String = ";") throws -> String {
+        ""
+    }
+
     public mutating func fold(upTo level: Int) {
         guard level >= 0 else {
             if !element.children.isEmpty {

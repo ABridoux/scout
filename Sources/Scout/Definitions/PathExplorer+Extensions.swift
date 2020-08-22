@@ -124,3 +124,11 @@ extension PathExplorer {
         }
     }
 }
+
+// MARK: Export
+
+extension PathExplorer {
+    public func exportCSV() throws -> String {
+        try exportCSV(separator: ";")
+    }
+}

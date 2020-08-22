@@ -28,6 +28,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
     case underlyingError(String)
     case groupSampleConversionError(Path)
+    case csvExportNoArray
 
     public var errorDescription: String? {
         switch self {
@@ -64,6 +65,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
         case .underlyingError(let description): return description
         case .groupSampleConversionError(let path): return "Internal error. Group sample conversion error in '\(path.description)'"
+        case .csvExportNoArray: return "CSV export requires first object to be an array"
         }
     }
 }

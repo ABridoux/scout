@@ -61,4 +61,59 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         XCTAssertEqual(value, "~~SCOUT_FOLDED~~")
     }
+
+    // MARK: CSV
+
+    func testCSVSingleValues() throws {
+        let data = try PropertyListEncoder().encode(ducks)
+        let plist = try Plist(data: data)
+
+        let csv = try plist.exportCSV()
+
+        XCTAssertEqual(csv, "Riri; Fifi; Loulou;")
+    }
+
+    func testCSVDictionaryValues() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        let plist = try Plist(data: data)
+
+        let csv = try plist.exportCSVDictionaryValues()
+        let expectedHeaders = ["episodes[0]", "episodes[1]", "episodes[2]", "name", "quote"]
+        let expectedValues = [["1", "2", "3", "Woody", "I got a snake in my boot"],
+                              ["1", "2", "3", "Buzz", "To infinity and beyond"],
+                              ["1", "2", "3", "Zurg", "Destroy Buzz Lightyear"]]
+
+        XCTAssertEqual(csv.headers, expectedHeaders)
+        XCTAssertEqual(csv.values, expectedValues)
+    }
+
+    func testCSV_Integration() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        let plist = try Plist(data: data)
+
+        let csv = try plist.exportCSV()
+
+        let expected =
+        """
+        episodes[0]; episodes[1]; episodes[2]; name; quote;
+        1; 2; 3; Woody; I got a snake in my boot;
+        1; 2; 3; Buzz; To infinity and beyond;
+        1; 2; 3; Zurg; Destroy Buzz Lightyear;
+        """
+
+        XCTAssertEqual(csv, expected)
+    }
+
+    func testExplore1() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        let plist = try Plist(data: data)
+        var names = Set<String>()
+
+        plist.exploreGroup(value: plist.value) { (key, value) in
+            names.insert(key)
+        }
+
+
+        XCTAssertEqual(names, Set(arrayLiteral: "name", "quote", "episodes[0]", "episodes[1]", "episodes[2]"))
+    }
 }
