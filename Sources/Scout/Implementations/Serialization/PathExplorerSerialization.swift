@@ -188,7 +188,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         }
 
         if let array = value as? ArrayValue {
-            var newArray = [Any]()
+            var newArray = ArrayValue()
             for (index, element) in array.enumerated() {
                 var pathExplorer = PathExplorerSerialization(value: element, path: readingPath.appending(index))
                 pathExplorer.fold(upTo: level - 1)
@@ -221,6 +221,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: Helpers
 
+    /// If the given value is an array or a dictionary, check it's emptyness. Returns `false` otherwise.
     func isValueEmpty(_ value: Any) -> Bool {
         if let array = value as? ArrayValue {
             return array.isEmpty

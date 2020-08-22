@@ -11,7 +11,7 @@ extension PathExplorerXMLTests {
     func testSubscriptStringSet() throws {
         var xml = try Xml(data: stubData1)
 
-        try xml.set(key: "stringValue", to: "world")
+        try xml.set(for: "stringValue", to: "world")
 
         XCTAssertEqual(try xml.get(for: "stringValue").string, "world")
         XCTAssertEqual(try xml.get(for: "boolValue").bool, false)

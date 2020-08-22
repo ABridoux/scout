@@ -63,7 +63,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .invalidPathElement(let element): return "Invalid path element: '\(element)'"
 
         case .underlyingError(let description): return description
-        case .groupSampleConversionError(let path): return "Internal error. Group extract conversion error in '\(path.description)'"
+        case .groupSampleConversionError(let path): return "Internal error. Group sample conversion error in '\(path.description)'"
         }
     }
 }

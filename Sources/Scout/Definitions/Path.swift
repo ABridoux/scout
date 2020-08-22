@@ -10,7 +10,7 @@ public struct Path: Equatable {
 
     // MARK: - Constants
 
-    let defaultSeparator = "."
+    static let defaultSeparator = "."
 
     // MARK: - Properties
 
@@ -219,7 +219,7 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
             switch element {
             case .index, .count, .slice:
                 // remove the point added automatically to a path element
-                if description.hasSuffix(defaultSeparator) {
+                if description.hasSuffix(Self.defaultSeparator) {
                     description.removeLast()
                 }
                 description.append(element.description)
@@ -228,10 +228,10 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
             case .key: description.append(element.description)
             }
 
-            description.append(defaultSeparator)
+            description.append(Self.defaultSeparator)
         }
         // remove the last point if any
-        if description.hasSuffix(defaultSeparator) {
+        if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
         }
         return description

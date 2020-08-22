@@ -7,7 +7,7 @@ import AEXML
 
 extension PathExplorerXML {
 
-    mutating func add(newValue: String, forKey key: String) throws {
+    mutating func add(newValue: String, for key: String) throws {
         if let existingChild = element.firstDescendant(where: { $0.name == key }) {
             // set the value of the child if one exists with the given key
             existingChild.value = newValue
@@ -45,7 +45,7 @@ extension PathExplorerXML {
 
         switch pathElement {
 
-        case .key(let key): try add(newValue: newValue, forKey: key)
+        case .key(let key): try add(newValue: newValue, for: key)
         case .index(let index): try add(newValue: newValue, at: index)
         case .count, .slice, .filter: throw PathExplorerError.wrongUsage(of: pathElement, in: readingPath)
         }

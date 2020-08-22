@@ -20,10 +20,10 @@ extension PathExplorerXML {
 
             switch pathElement {
             case .key(let key):
-                try delete(key: key, in: &explorers, in: currentPath)
+                try delete(for: key, in: &explorers, in: currentPath)
 
             case .index(let index):
-                try delete(index: index, in: &explorers, in: currentPath)
+                try delete(at: index, in: &explorers, in: currentPath)
 
             case .slice(let bounds):
                 try delete(.arraySlice(bounds), in: &explorers, path: currentPath)
@@ -45,17 +45,17 @@ extension PathExplorerXML {
         }
     }
 
-    func delete(key: String, in explorers: inout [Self], in path: Path) throws {
+    func delete(for key: String, in explorers: inout [Self], in path: Path) throws {
         for (index, pathExplorer) in explorers.enumerated() {
-            let element = try pathExplorer.getSimple(key: key)
+            let element = try pathExplorer.getSingle(for: key)
             let newPathExplorer = PathExplorerXML(element: element, path: path)
             explorers[index] = newPathExplorer
         }
     }
 
-    func delete(index: Int, in explorers: inout [Self], in path: Path) throws {
+    func delete(at index: Int, in explorers: inout [Self], in path: Path) throws {
         for (explorerIndex, pathExplorer) in explorers.enumerated() {
-            let element = try pathExplorer.getSimple(index: index)
+            let element = try pathExplorer.getSingle(at: index)
             let newPathExplorer = PathExplorerXML(element: element, path: path)
             explorers[explorerIndex] = newPathExplorer
         }

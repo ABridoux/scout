@@ -16,15 +16,15 @@ extension PathExplorerXML {
         let copy: AEXMLElement
 
         switch lastGroupSample {
-        case .arraySlice: copy = try getInArraySlice(index: index)
-        case .dictionaryFilter: copy = try getInDictionaryFilter(index: index)
-        case nil: copy = try getSimple(index: index, negativeIndexEnabled: negativeIndexEnabled)
+        case .arraySlice: copy = try getInArraySlice(at: index)
+        case .dictionaryFilter: copy = try getInDictionaryFilter(at: index)
+        case nil: copy = try getSingle(at: index, negativeIndexEnabled: negativeIndexEnabled)
         }
 
         return PathExplorerXML(element: copy, path: readingPath.appending(index))
     }
 
-    func getSimple(index: Int, negativeIndexEnabled: Bool = true) throws -> AEXMLElement {
+    func getSingle(at index: Int, negativeIndexEnabled: Bool = true) throws -> AEXMLElement {
         if negativeIndexEnabled, index == .lastIndex {
             guard let last = element.children.last else {
                 throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: element.children.count)
@@ -39,25 +39,25 @@ extension PathExplorerXML {
         }
     }
 
-    func getInArraySlice(index: Int) throws -> AEXMLElement {
-        let copy = AEXMLElement(name: element.name + "[\(index)]")
+    func getInArraySlice(at index: Int) throws -> AEXMLElement {
+        let copy = AEXMLElement(name: element.name + PathElement.index(index).description)
 
         for (elementIndex, child) in element.children.enumerated() {
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(elementIndex))
-            let newChild = try pathExplorer.getSimple(index: index)
+            let newChild = try pathExplorer.getSingle(at: index)
             copy.addChild(newChild)
         }
 
         return copy
     }
 
-    func getInDictionaryFilter(index: Int) throws -> AEXMLElement {
-        let copy = AEXMLElement(name: element.name + "[\(index)]")
+    func getInDictionaryFilter(at index: Int) throws -> AEXMLElement {
+        let copy = AEXMLElement(name: element.name + PathElement.index(index).description)
 
         try element.children.forEach { child in
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(child.name))
-            let newChild = try pathExplorer.getSimple(index: index)
-            newChild.name = child.name + "[\(index)]"
+            let newChild = try pathExplorer.getSingle(at: index)
+            newChild.name = child.name + PathElement.index(index).description
             copy.addChild(newChild)
         }
 
@@ -73,15 +73,15 @@ extension PathExplorerXML {
         guard element.name != key else { return self } // trying to get a root element
 
         switch lastGroupSample {
-        case .arraySlice: copy = try getInArraySlice(key: key)
-        case .dictionaryFilter: copy = try getInDictionaryFilter(key: key)
-        case nil: copy = try getSimple(key: key)
+        case .arraySlice: copy = try getInArraySlice(for: key)
+        case .dictionaryFilter: copy = try getInDictionaryFilter(for: key)
+        case nil: copy = try getSingle(for: key)
         }
 
         return PathExplorerXML(element: copy, path: readingPath.appending(key))
     }
 
-    func getSimple(key: String) throws -> AEXMLElement {
+    func getSingle(for key: String) throws -> AEXMLElement {
 
         guard element.name != key else { return element } // trying to get a root element
 
@@ -95,24 +95,24 @@ extension PathExplorerXML {
         return child
     }
 
-    func getInArraySlice(key: String) throws -> AEXMLElement {
-        let copy = AEXMLElement(name: element.name  + ".\(key.description)")
+    func getInArraySlice(for key: String) throws -> AEXMLElement {
+        let copy = AEXMLElement(name: element.name + Path.defaultSeparator + PathElement.key(key).description)
 
         for (index, child) in element.children.enumerated() {
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(index))
-            let newChild = try pathExplorer.getSimple(key: key)
+            let newChild = try pathExplorer.getSingle(for: key)
             copy.addChild(newChild)
         }
         return copy
     }
 
-    func getInDictionaryFilter(key: String) throws -> AEXMLElement {
-        let copy = AEXMLElement(name: element.name  + ".\(key.description)")
+    func getInDictionaryFilter(for key: String) throws -> AEXMLElement {
+        let copy = AEXMLElement(name: element.name + Path.defaultSeparator + PathElement.key(key).description)
 
         try element.children.forEach { child in
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(child.name))
-            let newChild = try pathExplorer.getSimple(key: key)
-            newChild.name = child.name + "." + newChild.name
+            let newChild = try pathExplorer.getSingle(for: key)
+            newChild.name = child.name + Path.defaultSeparator + newChild.name
             copy.addChild(newChild)
         }
         return copy
@@ -174,7 +174,7 @@ extension PathExplorerXML {
         let filter = PathElement.filter(pattern)
         let path = readingPath.appending(filter)
         let regex = try NSRegularExpression(pattern: pattern, path: path)
-        let filterName = "." + PathElement.filter(pattern).description
+        let filterName = Path.defaultSeparator + PathElement.filter(pattern).description
 
         var filteredChildren = [AEXMLElement]()
 

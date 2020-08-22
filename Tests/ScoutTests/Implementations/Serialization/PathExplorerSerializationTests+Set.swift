@@ -14,7 +14,7 @@ extension PathExplorerSerializationTests {
 
         var plist = try Plist(data: data)
 
-        try plist.set(key: "stringValue", to: newValue)
+        try plist.set(for: "stringValue", to: newValue)
         XCTAssertEqual(try plist.get(for: "stringValue").string, newValue)
     }
 
@@ -25,7 +25,7 @@ extension PathExplorerSerializationTests {
 
         var plist = try Plist(data: data)
 
-        try plist.set(index: 2, to: newValue)
+        try plist.set(at: 2, to: newValue)
         XCTAssertEqual(try plist.get(at: 2).string, newValue)
     }
 

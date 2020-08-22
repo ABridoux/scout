@@ -32,7 +32,7 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertErrorsEqual(try plist.getDictAndValueFor(key: "key"), .subscriptMissingKey(path: plist.readingPath, key: "key", bestMatch: nil))
+        XCTAssertErrorsEqual(try plist.getDictAndValueFor(for: "key"), .subscriptMissingKey(path: plist.readingPath, key: "key", bestMatch: nil))
     }
 
     func testGetDictAndValue_ThrowsIfKeyHasTypoMiswrote() throws {
@@ -40,7 +40,7 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertErrorsEqual(try plist.getDictAndValueFor(key: "docks"), .subscriptMissingKey(path: plist.readingPath, key: "docks", bestMatch: "ducks"))
+        XCTAssertErrorsEqual(try plist.getDictAndValueFor(for: "docks"), .subscriptMissingKey(path: plist.readingPath, key: "docks", bestMatch: "ducks"))
     }
 
     func testSubscriptArray() throws {
