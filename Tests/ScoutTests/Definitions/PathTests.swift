@@ -25,6 +25,8 @@ final class PathTests: XCTestCase {
     let secondKeyWithFullRange = "secondKey[2:4]"
     let secondKeyWithPartialRangeLeft = "secondKey[:4]"
     let secondKeyWithPartialRangeRight = "secondKey[1:]"
+    let secondKeyWithFilter = "secondKey.#Halo.*#"
+    let secondKeyWithFilterAndCount = "secondKey.#Halo.*#[#]"
 
     let thirdKey = "thirdKey"
     let thirdKeyWithCount = "thirdKey[#].secondKey"
@@ -134,6 +136,8 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(path, array)
     }
 
+    // MARK: Count
+
     func testCount() throws {
         let array: Path = [secondKey, PathElement.count]
         let path = try Path(string: secondKeyWithCount)
@@ -148,23 +152,41 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(path, array)
     }
 
-    func testFullRange() throws {
+    // MARK: Slice
+
+    func testFullSlice() throws {
         let array = Path(secondKey, PathElement.slice(.init(lower: 2, upper: 4)))
         let path = try Path(string: secondKeyWithFullRange)
 
         XCTAssertEqual(path, array)
     }
 
-    func testPartialRangeLeft() throws {
+    func testPartialSliceLeft() throws {
         let array = Path(secondKey, PathElement.slice(.init(lower: 0, upper: 4)))
         let path = try Path(string: secondKeyWithPartialRangeLeft)
 
         XCTAssertEqual(path, array)
     }
 
-    func testPartialRangeRight() throws {
+    func testPartialSliceRight() throws {
         let array = Path(secondKey, PathElement.slice(.init(lower: 1, upper: .lastIndex)))
         let path = try Path(string: secondKeyWithPartialRangeRight)
+
+        XCTAssertEqual(path, array)
+    }
+
+    // MARK: Filter
+
+    func testFilter() throws {
+        let array = Path(secondKey, PathElement.filter("Halo.*"))
+        let path = try Path(string: secondKeyWithFilter)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testFilterAndCount() throws {
+        let array = Path(secondKey, PathElement.filter("Halo.*"), PathElement.count)
+        let path = try Path(string: secondKeyWithFilterAndCount)
 
         XCTAssertEqual(path, array)
     }

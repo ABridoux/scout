@@ -11,7 +11,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case invalidValue(String)
     case valueConversionError(value: String, type: String)
     case wrongValueForKey(value: String, element: PathElement)
-    case wrongArrayValueForKey(value: String, element: PathElement)
+    case wrongGroupValueForKey(group: String, value: String, element: PathElement)
     case wrongUsage(of: PathElement, in: Path)
 
     case dictionarySubscript(Path)
@@ -20,12 +20,14 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case subscriptWrongIndex(path: Path, index: Int, arrayCount: Int)
     case keyNameSetOnNonDictionary(path: Path)
     case wrongBounds(Bounds, in: Path)
+    case wrongRegularExpression(pattern: String, in: Path)
 
     case stringToDataConversionError
     case dataToStringConversionError
     case invalidPathElement(PathElement)
 
     case underlyingError(String)
+    case groupSampleConversionError(Path)
 
     public var errorDescription: String? {
         switch self {
@@ -33,8 +35,8 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .invalidValue(let value): return "The key value \(value) is invalid"
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
-        case .wrongArrayValueForKey(let value, let element): return "Cannot set `\(value)` to array #\(element)# which is a an Array"
-        case .wrongUsage(let element, let path): return "Wrong usage of \(element.description) in '\(path.description)'. \(element.usage)"
+        case .wrongGroupValueForKey(let group, let value, let element): return "Cannot set `\(value)` to array #\(element)# which is \(group)"
+        case .wrongUsage(let element, let path): return "Wrong usage of \(element.description) in '\(path.removingSlicings().description)'. \(element.usage)"
 
         case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.removingSlicings().description)' with a String as it is not a Dictionary"
         case .subscriptMissingKey(let path, let key, let bestMatch):
@@ -54,11 +56,14 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
         case .wrongBounds(let bounds, let path): return "Wrong slice '[\(bounds.lower):\(bounds.upper)] in '\(path.description)'.\nValid range: 0 <= lowerBound < upperBound <= lastIndex. You can use -1 or [lowerBound:] to use the last index."
 
+        case .wrongRegularExpression(let pattern, let path): return "Wrong regular expression pattern '\(pattern.description)' in '\(path.description)'."
+
         case .stringToDataConversionError: return "Unable to convert the input string into data"
         case .dataToStringConversionError: return "Unable to convert the data to a string"
         case .invalidPathElement(let element): return "Invalid path element: '\(element)'"
 
         case .underlyingError(let description): return description
+        case .groupSampleConversionError(let path): return "Internal error. Group sample conversion error in '\(path.description)'"
         }
     }
 }

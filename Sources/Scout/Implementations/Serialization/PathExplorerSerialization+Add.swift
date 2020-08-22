@@ -45,7 +45,7 @@ extension PathExplorerSerialization {
         switch childKey {
         case .key: return DictionaryValue()
         case .index: return ArrayValue()
-        case .count, .slice: throw PathExplorerError.wrongUsage(of: childKey, in: readingPath)
+        case .count, .slice, .filter: throw PathExplorerError.wrongUsage(of: childKey, in: readingPath)
         }
     }
 

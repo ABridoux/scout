@@ -10,7 +10,7 @@ public struct Path: Equatable {
 
     // MARK: - Constants
 
-    let defaultSeparator = "."
+    static let defaultSeparator = "."
 
     // MARK: - Properties
 
@@ -44,7 +44,7 @@ public struct Path: Equatable {
     public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
-        let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
+        let splitRegexPattern = #"\(.+\)|#(\x5C#|[^#])+#|[^\#(separator)]+"#
         let groupSubscripterRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
         let squareBracketPattern = #"\[|\]"#
         let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
@@ -62,7 +62,7 @@ public struct Path: Equatable {
             }
             let indexMatches = groupSubscripterRegex.matches(in: match, options: [], range: match.nsRange)
 
-            // try to get the indexes if any
+            // try to get the group subscripters if any
             if let indexesMatch = try Self.extractGroupSubscripters(in: indexMatches, from: match) {
                 elements.append(contentsOf: indexesMatch)
             } else {
@@ -154,11 +154,17 @@ public struct Path: Equatable {
         var newPath = Path()
         for element in self {
             switch element {
+
             case .slice(let bounds):
                 lastLowerBound = bounds.lower
+
+            case .filter:
+                continue
+
             case .index(let index):
                 newPath.append(index + (lastLowerBound ?? 0))
                 lastLowerBound = nil
+
             default: newPath.append(element)
             }
         }
@@ -205,7 +211,7 @@ extension Path: Collection {
     }
 }
 
-extension Path: CustomStringConvertible {
+extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
     public var description: String {
         var description = ""
@@ -213,22 +219,25 @@ extension Path: CustomStringConvertible {
             switch element {
             case .index, .count, .slice:
                 // remove the point added automatically to a path element
-                if description.hasSuffix(defaultSeparator) {
+                if description.hasSuffix(Self.defaultSeparator) {
                     description.removeLast()
                 }
                 description.append(element.description)
 
+            case .filter(let pattern): description.append("#\(pattern)#")
             case .key: description.append(element.description)
             }
 
-            description.append(defaultSeparator)
+            description.append(Self.defaultSeparator)
         }
         // remove the last point if any
-        if description.hasSuffix(defaultSeparator) {
+        if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
         }
         return description
     }
+
+    public var debugDescription: String { description }
 }
 
 extension Path: ExpressibleByArrayLiteral {

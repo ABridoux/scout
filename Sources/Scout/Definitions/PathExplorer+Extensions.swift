@@ -33,26 +33,19 @@ extension PathExplorer {
 
 extension PathExplorer {
 
-    /// `true` if the path leading to this `PathExplorer` contains a `slice` element
-    var isArraySlice: Bool {
-        readingPath.contains {
-            if case .slice = $0 {
-                return true
-            } else {
-                return false
+    /// The last array slice or dictionary filter found in the path if any
+    var lastGroupSample: GroupSample? {
+        var lastGroupElement: GroupSample?
+
+        readingPath.forEach { element in
+            switch element {
+            case .slice(let bounds): lastGroupElement = .arraySlice(bounds)
+            case .filter(let pattern): lastGroupElement = .dictionaryFilter(pattern)
+            default: break
             }
         }
-    }
 
-    /// Used when the value is an array slice to know if subscripting with an index is possible
-    /// or rather if the index in the path indicates to target an element in the array slice
-    var precedeKeyOrSliceAfterSlicing: Bool {
-        if !isArraySlice { return false }
-
-        switch readingPath.last {
-        case .key, .slice: return true
-        default: return false
-        }
+        return lastGroupElement
     }
 
     /// Use to name the single key when folding a dictionary
@@ -77,6 +70,12 @@ public extension PathExplorer {
     mutating func delete(_ path: PathElementRepresentable) throws {
         try delete(path, deleteIfEmpty: false)
     }
+}
+
+// MARK: Debug
+
+public extension PathExplorer {
+    var debugDescription: String { description }
 }
 
 // MARK: Data validation

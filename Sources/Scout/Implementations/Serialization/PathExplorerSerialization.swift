@@ -16,15 +16,10 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     var isArray: Bool { value is ArrayValue }
 
     /// `true` if the value is an array or a dictionary and is empty
-    var isEmpty: Bool {
-        if let array = value as? ArrayValue {
-            return array.isEmpty
-        } else if let dict = value as? DictionaryValue {
-            return dict.isEmpty
-        } else {
-            return false
-        }
-    }
+    var isEmpty: Bool { isValueEmpty(value) }
+
+    /// If `false`, the empty dicitionaries or array will be removed rather than set. Default is `true`
+    var allowEmptyGroups = true
 
     /// `true` if the explorer has been folded
     var isFolded = false
@@ -169,7 +164,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
             string = string.replacingOccurrences(of: F.foldedRegexPattern, with: "...", options: .regularExpression)
         }
 
-        guard F.self == JsonFormat.self else { return string }
+        guard format == .json else { return string }
 
         if #available(OSX 10.15, *) {
             // the without-backslash option is available
@@ -193,7 +188,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         }
 
         if let array = value as? ArrayValue {
-            var newArray = [Any]()
+            var newArray = ArrayValue()
             for (index, element) in array.enumerated() {
                 var pathExplorer = PathExplorerSerialization(value: element, path: readingPath.appending(index))
                 pathExplorer.fold(upTo: level - 1)
@@ -221,6 +216,19 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
             return value
         } else {
             throw PathExplorerError.valueConversionError(value: String(describing: value), type: String(describing: Type.self))
+        }
+    }
+
+    // MARK: Helpers
+
+    /// If the given value is an array or a dictionary, check it's emptyness. Returns `false` otherwise.
+    func isValueEmpty(_ value: Any) -> Bool {
+        if let array = value as? ArrayValue {
+            return array.isEmpty
+        } else if let dict = value as? DictionaryValue {
+            return dict.isEmpty
+        } else {
+            return false
         }
     }
 }
