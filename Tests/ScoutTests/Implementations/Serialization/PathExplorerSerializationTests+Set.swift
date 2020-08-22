@@ -7,7 +7,7 @@ import XCTest
 @testable import Scout
 
 extension PathExplorerSerializationTests {
-    
+
     func testSubscriptDictSet() throws {
         let data = try PropertyListEncoder().encode(StubPlistStruct())
         let newValue = "world"

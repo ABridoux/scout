@@ -56,7 +56,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
         case .wrongBounds(let bounds, let path): return "Wrong slice '[\(bounds.lower):\(bounds.upper)] in '\(path.description)'.\nValid range: 0 <= lowerBound < upperBound <= lastIndex. You can use -1 or [lowerBound:] to use the last index."
 
-        case .wrongRegularExpression(let pattern,let path): return "Wrong regular expression pattern '\(pattern.description)' in '\(path.description)'."
+        case .wrongRegularExpression(let pattern, let path): return "Wrong regular expression pattern '\(pattern.description)' in '\(path.description)'."
 
         case .stringToDataConversionError: return "Unable to convert the input string into data"
         case .dataToStringConversionError: return "Unable to convert the data to a string"

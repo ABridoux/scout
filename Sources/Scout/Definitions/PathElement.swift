@@ -73,7 +73,7 @@ public enum PathElement: Equatable {
             self = .count
         } else if let range = string.slice {
             self = range
-        }  else if let filter = string.filter {
+        } else if let filter = string.filter {
             self = filter
         } else {
             self = .key(string)

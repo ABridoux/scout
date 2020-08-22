@@ -48,7 +48,7 @@ final class PathExplorerSerializationTests: XCTestCase {
 
         XCTAssertNoThrow(try Plist(data: data))
     }
-    
+
     // MARK: Folded
 
     func testFolded() throws {

@@ -296,5 +296,4 @@ extension PathExplorerSerializationTests {
         XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
 
-
 }

@@ -11,7 +11,7 @@ extension PathExplorerSerialization {
 
     mutating func delete(key: String) throws {
 
-        switch lastGroupElement {
+        switch lastGroupSample {
 
         case .arraySlice:
             var array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -54,7 +54,7 @@ extension PathExplorerSerialization {
 
     mutating func delete(at index: Int) throws {
 
-        switch lastGroupElement {
+        switch lastGroupSample {
 
         case .arraySlice:
             var array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -109,7 +109,7 @@ extension PathExplorerSerialization {
 
     // MARK: - Group
 
-    mutating func deleteSimple(_ groupSample: GroupSample) throws  {
+    mutating func deleteSimple(_ groupSample: GroupSample) throws {
         switch groupSample {
         case .arraySlice(let bounds): try deleteSimpleArraySlice(within: bounds)
         case .dictionaryFilter(let pattern): try deleteSimpleDictionaryFilter(with: pattern)
@@ -165,7 +165,7 @@ extension PathExplorerSerialization {
     }
 
     mutating func deleteArraySlice(within bounds: Bounds) throws {
-        switch lastGroupElement {
+        switch lastGroupSample {
 
         case .arraySlice:
             var arraySlice = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -183,7 +183,7 @@ extension PathExplorerSerialization {
     }
 
     mutating func deleteDictionaryFilter(with pattern: String) throws {
-        switch lastGroupElement {
+        switch lastGroupSample {
         case .arraySlice:
             var arraySlice = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
             try delete(.dictionaryFilter(pattern), inArraySlice: &arraySlice)

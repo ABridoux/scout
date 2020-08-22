@@ -56,7 +56,7 @@ extension PathExplorer {
     }
 
     /// The last array slice or dictionary filter found in the path if any
-    var lastGroupElement: GroupSample? {
+    var lastGroupSample: GroupSample? {
         var lastGroupElement: GroupSample?
 
         readingPath.forEach { element in

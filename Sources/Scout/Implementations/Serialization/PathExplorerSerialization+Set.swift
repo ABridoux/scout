@@ -11,7 +11,7 @@ extension PathExplorerSerialization {
 
     mutating func set(index: Int, to newValue: Any) throws {
 
-        switch lastGroupElement {
+        switch lastGroupSample {
         case .arraySlice:
             var array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
             let newValues = try cast(newValue, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -87,7 +87,7 @@ extension PathExplorerSerialization {
     /// Set the key in the given dictionary to the new value
     mutating func set(key: String, to newValue: Any) throws {
 
-        switch lastGroupElement {
+        switch lastGroupSample {
 
         case .arraySlice:
             var array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -152,8 +152,6 @@ extension PathExplorerSerialization {
     mutating func setArraySlice(within bounds: Bounds, to newValue: Any) throws {
         let slice = PathElement.slice(bounds)
         let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
-        let range = try bounds.range(lastValidIndex: array.count - 1, path: readingPath.appending(slice))
-
         let newSlice = try cast(newValue, as: .array,
                                 orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description, value: String(describing: newValue), element: slice))
 

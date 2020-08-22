@@ -15,7 +15,7 @@ extension PathExplorerXML {
     func get(at index: Int, negativeIndexEnabled: Bool = false) throws -> Self {
         let copy: AEXMLElement
 
-        switch lastGroupElement {
+        switch lastGroupSample {
         case .arraySlice: copy = try getInArraySlice(index: index)
         case .dictionaryFilter: copy = try getInDictionaryFilter(index: index)
         case nil: copy = try getSimple(index: index, negativeIndexEnabled: negativeIndexEnabled)
@@ -30,7 +30,7 @@ extension PathExplorerXML {
                 throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: element.children.count)
             }
             return last
-            
+
         } else {
             guard element.children.count > index, index >= 0 else {
                 throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: element.children.count)
@@ -72,7 +72,7 @@ extension PathExplorerXML {
 
         guard element.name != key else { return self } // trying to get a root element
 
-        switch lastGroupElement {
+        switch lastGroupSample {
         case .arraySlice: copy = try getInArraySlice(key: key)
         case .dictionaryFilter: copy = try getInDictionaryFilter(key: key)
         case nil: copy = try getSimple(key: key)
@@ -119,17 +119,18 @@ extension PathExplorerXML {
     }
 
     func getChildrenCount() throws -> Self {
-        #warning("Handle dictionaries")
-
-        if precedeKeyOrSliceAfterSlicing {
+        if let sample = lastGroupSample {
             let copy = AEXMLElement(name: element.name + PathElement.count.description)
 
-            for (index, child) in element.children.enumerated() {
-                let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(index))
-                guard let count = try pathExplorer.getChildrenCount().int else {
-                    throw PathExplorerError.wrongUsage(of: .count, in: readingPath.appending(index))
+            element.children.forEach { child in
+                let name: String
+
+                switch sample {
+                case .dictionaryFilter: name = child.name + PathElement.count.description
+                case .arraySlice: name = child.name
                 }
-                let countChild = AEXMLElement(name: "count", value: count.description)
+
+                let countChild = AEXMLElement(name: name, value: child.children.count.description)
                 copy.addChild(countChild)
             }
             return PathExplorerXML(element: copy, path: readingPath.appending(.count))
@@ -143,31 +144,62 @@ extension PathExplorerXML {
 
     /// Returns a slice of value is it is an array
     func getArraySlice(within bounds: Bounds) throws -> PathExplorerXML {
-        #warning("Handle group elements")
-
         let slice = PathElement.slice(bounds)
         // we have to copy the element as we cannot modify its children
         let copy = AEXMLElement(name: element.name + slice.description, value: element.value, attributes: element.attributes)
         let path = readingPath.appending(slice)
         let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: path)
 
-        let slicedChildren = Array(element.children[sliceRange])
+        var slicedChildren = [AEXMLElement]()
+
+        if lastGroupSample != nil {
+            slicedChildren = [AEXMLElement]()
+            element.children.forEach { child in
+                let newChild = AEXMLElement(name: child.name, value: child.value, attributes: child.attributes)
+                let newSlicedChildren = Array(child.children[sliceRange])
+                newChild.addChildren(newSlicedChildren)
+                slicedChildren.append(newChild)
+            }
+        } else {
+            slicedChildren = Array(element.children[sliceRange])
+        }
+
         // add the sliced chilren to copy
         copy.addChildren(slicedChildren)
 
         return PathExplorerXML(element: copy, path: path)
     }
 
-    func getKeys(with pattern: String) throws -> Self {
-        #warning("Handle group elements")
-        
+    func getDictionaryFilter(with pattern: String) throws -> Self {
         let filter = PathElement.filter(pattern)
         let path = readingPath.appending(filter)
         let regex = try NSRegularExpression(pattern: pattern, path: path)
-        let children = element.children.filter { regex.validate($0.name) }
+        let filterName = "." + PathElement.filter(pattern).description
 
-        let copy = AEXMLElement(name: element.name + "#\(pattern)#", value: element.value, attributes: element.attributes)
-        copy.addChildren(children)
+        var filteredChildren = [AEXMLElement]()
+
+        if let sample = lastGroupSample {
+            filteredChildren = [AEXMLElement]()
+
+            element.children.forEach { child in
+                let newName: String
+                switch sample {
+                case .dictionaryFilter: newName = child.name + filterName
+                case .arraySlice: newName = child.name
+                }
+
+                let newChild = AEXMLElement(name: newName, value: child.value, attributes: child.attributes)
+                let newSlicedChildren = child.children.filter { regex.validate($0.name) }
+                newChild.addChildren(newSlicedChildren)
+                filteredChildren.append(newChild)
+            }
+        } else {
+            filteredChildren = element.children.filter { regex.validate($0.name) }
+        }
+
+        let copy = AEXMLElement(name: element.name + filterName, value: element.value, attributes: element.attributes)
+
+        copy.addChildren(filteredChildren)
 
         return PathExplorerXML(element: copy, path: path)
     }
@@ -185,7 +217,7 @@ extension PathExplorerXML {
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         case .count: return try getChildrenCount()
         case .slice(let bounds): return try getArraySlice(within: bounds)
-        case .filter(let pattern): return try getKeys(with: pattern)
+        case .filter(let pattern): return try getDictionaryFilter(with: pattern)
         }
     }
 }

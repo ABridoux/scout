@@ -154,11 +154,17 @@ public struct Path: Equatable {
         var newPath = Path()
         for element in self {
             switch element {
+
             case .slice(let bounds):
                 lastLowerBound = bounds.lower
+
+            case .filter:
+                continue
+
             case .index(let index):
                 newPath.append(index + (lastLowerBound ?? 0))
                 lastLowerBound = nil
+
             default: newPath.append(element)
             }
         }

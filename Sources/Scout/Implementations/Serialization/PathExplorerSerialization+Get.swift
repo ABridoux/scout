@@ -14,7 +14,7 @@ extension PathExplorerSerialization {
     func get(at index: Int, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws -> Self {
         let newValue: Any
 
-        switch lastGroupElement {
+        switch lastGroupSample {
 
         case .arraySlice:
             let array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -81,7 +81,7 @@ extension PathExplorerSerialization {
     func get(for key: String, detailedName: Bool = true) throws -> Self {
         let newValue: Any
 
-        switch lastGroupElement {
+        switch lastGroupSample {
 
         case .arraySlice:
             let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.appending(key)))
@@ -143,7 +143,7 @@ extension PathExplorerSerialization {
 
     /// - Returns: The count of the array or dictionary if  `value` is an array or a dictionary
     func getChildrenCount() throws -> Self {
-        switch lastGroupElement {
+        switch lastGroupSample {
         case .arraySlice: return  try getChildrenCountInArraySlice()
         case .dictionaryFilter: return try getChildrenCountInDictionaryFilter()
         case nil: return try getChildrenCountSimple()
@@ -204,7 +204,7 @@ extension PathExplorerSerialization {
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
     func getArraySlice(within bounds: Bounds, detailedName: Bool = true) throws -> Self {
 
-        switch lastGroupElement {
+        switch lastGroupSample {
         case .arraySlice:
             let slicedArray = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
             return try get(.arraySlice(bounds), inArraySlice: slicedArray)
@@ -245,7 +245,7 @@ extension PathExplorerSerialization {
     // MARK: Dictionary filter
 
     func getDictionaryFilter(with pattern: String) throws -> Self {
-        switch lastGroupElement {
+        switch lastGroupSample {
         case .arraySlice:
             let array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
             return try get(.dictionaryFilter(pattern), inArraySlice: array)

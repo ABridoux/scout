@@ -17,6 +17,10 @@ extension PathExplorerXMLTests {
         XCTAssertThrowsError(try xml.get("dogs", 2))
     }
 
+    // MARK: - Group samples
+
+    // MARK: Array slice
+
     func testDeleteSlice() throws {
         var xml = try Xml(data: stubData2)
 
@@ -45,6 +49,39 @@ extension PathExplorerXMLTests {
         let path = Path("toybox", "characters", 0, "episodes")
         XCTAssertErrorsEqual(try xml.get(path.appending("episodes", 2)), .subscriptWrongIndex(path: path, index: 2, arrayCount: 2))
     }
+
+    // MARK: Dictionary filter
+
+    func testDeleteDictionaryFilter() throws {
+        var xml = try Xml(data: toyBoxByName)
+
+        try xml.delete("characters", PathElement.filter(".*(z|Z).*"))
+
+        XCTAssertEqual(xml.element.children.count, 1)
+        XCTAssertEqual(xml.element["characters"].children.first?.name, "Woody")
+    }
+
+    func testDeleteDictionaryFilterKey() throws {
+        var xml = try Xml(data: toyBoxByName)
+
+        try xml.delete("characters", PathElement.filter(".*(z|Z).*"), "episodes")
+
+        XCTAssertEqual(xml.element["characters"]["Woody"].children.count, 3)
+        XCTAssertEqual(xml.element["characters"]["Zurg"].children.count, 2)
+        XCTAssertEqual(xml.element["characters"]["Buzz"].children.count, 2)
+    }
+
+    func testDeleteDictionaryFilterIndex() throws {
+        var xml = try Xml(data: toyBoxByName)
+
+        try xml.delete("characters", PathElement.filter(".*(z|Z).*"), "episodes", 0)
+
+        XCTAssertEqual(xml.element["characters"]["Woody"]["episodes"].children.count, 3)
+        XCTAssertEqual(xml.element["characters"]["Zurg"]["episodes"].children.count, 2)
+        XCTAssertEqual(xml.element["characters"]["Buzz"]["episodes"].children.count, 2)
+    }
+
+    // MARK: - Delete if empty
 
     func testDeleteIfEmpty() throws {
         var xml = try Xml(data: toyBoxWithOneEpisode)

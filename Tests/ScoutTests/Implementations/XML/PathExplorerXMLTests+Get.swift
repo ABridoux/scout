@@ -78,6 +78,16 @@ extension PathExplorerXMLTests {
         XCTAssertEqual(resultValue, [3, 3])
     }
 
+    func testGetSliceGroupSample() throws {
+        var xml = try Xml(data: toyBox)
+
+        xml = try xml.get(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes", PathElement.slice(Bounds(lower: 0, upper: 1))])
+
+        let resultValue = xml.element.children.flatMap { $0.children }.map { $0.int }
+
+        XCTAssertEqual(resultValue, [1, 2, 1, 2])
+    }
+
     // MARK: Dictionary filter
 
     func testGetDictionaryFilter() throws {
@@ -119,6 +129,16 @@ extension PathExplorerXMLTests {
         episodes.removeValue(forKey: "Woody.episodes[1]")
 
         XCTAssertEqual(episodes, value)
+    }
+
+    func testGetFilterGroupSample() throws {
+        let xml = try Xml(data: toyBoxByName)
+        let path = Path("toybox", "characters", PathElement.filter(".*(z|Z).*"), PathElement.filter("episodes"))
+
+        let element = try xml.get(path).element
+
+        XCTAssertEqual(element["Buzz.#episodes#"]["episodes"].children.count, 3)
+        XCTAssertEqual(element["Zurg.#episodes#"]["episodes"].children.count, 3)
     }
 
     // MARK: Array count
