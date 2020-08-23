@@ -8,7 +8,8 @@ import Lux
 
 struct DeleteDocumentation: Documentation {
     private static let jsonInjector = JSONInjector(type: .terminal)
-    private static let zshInjector = ZshInjector(type: .terminal)
+
+    static let recursive = zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-r")
 
     private static let jsonExample =
     """
@@ -37,7 +38,11 @@ struct DeleteDocumentation: Documentation {
 
     private static let examples = [(#"`scout delete "people.Tom.height"`"#, #"will delete Tom height"#),
                                    (#"`scout delete "people.Tom.hobbies[0]"`"#, #"will delete Tom first hobby"#),
-                                   (#"`scout delete "people.Tom.hobbies[-1]"`"#, #"will delete Tom last hobby"#)]
+                                   (#"`scout delete "people.Tom.hobbies[-1]"`"#, #"will delete Tom last hobby"#),
+                                   (#"`scout delete "people.Arnaud.#h.*#"`"#, #"will delete Arnaud's height and hobbies"#),
+                                   (#"`scout delete "people.Arnaud.hobbies[-2:]"`"#, #"will delete Arnaud's last two hobbies"#),
+                                   (#"`scout delete "people.#.*#.hobbies[:1]`""#, #"will delete Tom's and Arnaud's first two hobbies"#),
+                                   (#"`scout delete -r "people.#.*#.hobbies[:1]"`"#, #"will delete Arnaud's first two hobbies and Tom hobbies"#)]
 
     static let text =
     """
@@ -47,13 +52,19 @@ struct DeleteDocumentation: Documentation {
 
     Notes
     -----
-    - If the path is invalid, the program will return an error
-    - You can delete multiple values in one command
-    - Specify the \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v")) flag to see the modified data
-    - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
-        Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
-
     - When accessing an array value by its index, use the index -1 to access to the last element
+    - Use the flag \(recursive) to delete an array or a dictionary key when left empty
+    - Target a slice in an array with square brackets and a double point ':' between the bounds: [lower:upper]
+        - No lower means 0 like [:10] and no upper means the last index like [10:].
+        - Use a negative index for the lower bound to target the last nth elements like [-4:] to target the last 4 elements
+    - Target specific keys with a regular expression by enclosing it with sharp signs: #.*device.*# to target all the keys containing the word device
+
+    - You can delete multiple values in one command
+    - If the path is invalid, the program will return an error
+    - Specify the \(verbose) flag to see the modified data
+    - Deactivate the output colorization with \(noColor) or \(nc).
+        Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
+    - Output an array or a dictionary of arrays with the \(csv) flag or \(csvSep) option
 
     Examples
     --------

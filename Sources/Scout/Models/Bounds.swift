@@ -10,8 +10,18 @@ public struct Bounds: Equatable {
 
     // MARK: - Properties
 
-    public let lower: Int
-    public let upper: Int
+    /// Use the `range(lastValidIndex:path)` function to access to the lower bound
+    private let lower: Int
+    /// Use the `range(lastValidIndex:path)` function to access to the upper bound
+    private let upper: Int
+
+    /// Description of the lower bound.
+    /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the lower bound
+    var lowerString: String { lower == 0 ? "" : String(lower) }
+
+    /// Description of the upper bound.
+    /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the upper bound
+    var upperString: String { upper == .lastIndex ? "" : String(upper)}
 
     // MARK: - Initialization
 
@@ -28,11 +38,13 @@ public struct Bounds: Equatable {
     /// - Throws: If the bounds are invalid
     /// - Returns: A range made from the lower and upper bounds
     public func range(lastValidIndex: Int, path: Path) throws -> ClosedRange<Int> {
+        let lower = self.lower < 0 ? lastValidIndex + self.lower + 1 : self.lower
+
         guard
             lower >= 0, upper <= lastValidIndex,
             (lower < upper || lower < lastValidIndex && upper == .lastIndex)
         else {
-                throw PathExplorerError.wrongBounds(self, in: path)
+            throw PathExplorerError.wrongBounds(self, in: path, lastValidIndex: lastValidIndex)
         }
 
         // transform .maxIndex into the array last index

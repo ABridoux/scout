@@ -8,7 +8,6 @@ import Lux
 
 struct SetDocumentation: Documentation {
     private static let xmlInjector = XMLEnhancedInjector(type: .terminal)
-    private static let zshInjector = ZshInjector(type: .terminal)
 
     private static let xmlExample =
     """
@@ -48,11 +47,6 @@ struct SetDocumentation: Documentation {
 
     Notes
     -----
-    - You can set multiple values in one command.
-    - Specify the \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v")) flag to see the modified data
-    - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
-        Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
-
     - If the path is invalid, the program will return an error
     - Enclose the value with sharp signs to change the key name: #keyName#
     - Enclose the value with slash signs to force the value as a string: /valueAsString/ (Plist, Json)
@@ -60,6 +54,12 @@ struct SetDocumentation: Documentation {
     - Enclose the value with tilde signs to force the value as a real: ~valueToReal~ (Plist)
     - Enclose the value with chevron signs to force the value as a integer: <valueToInteger> (Plist)
     - When accessing an array value by its index, use the index -1 to access to the last element
+
+    - You can set multiple values in one command.
+    - Specify the \(verbose) flag to see the modified data
+    - Deactivate the output colorization with \(noColor) or \(nc).
+        Useful to export the data or if you encounter slowdowns when dealing with large files ((although it is not recommended to ouput large files in the terminal).
+    - Output an array or a dictionary of arrays with the \(csv) flag or \(csvSep) option
 
     Examples
     --------
