@@ -35,8 +35,8 @@ struct SetCommand: ParsableCommand {
     @Flag(name: [.short, .long], inversion: .prefixedNo, help: "Output the modified data")
     var verbose = false
 
-    @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
-    var color = true
+    @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
+    var color = ColorFlag.color
 
     @Option(name: [.short, .long], help: "Fold the data at the given depth level")
     var level: Int?
@@ -69,17 +69,17 @@ struct SetCommand: ParsableCommand {
         if var json = try? Json(data: data) {
 
             try set(pathsAndValues, in: &json)
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
 
         } else if var plist = try? Plist(data: data) {
 
             try set(pathsAndValues, in: &plist)
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
 
         } else if var xml = try? Xml(data: data) {
 
             try set(pathsAndValues, in: &xml)
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
 
         } else {
             if let filePath = inputFilePath {

@@ -20,7 +20,7 @@ struct ReadCommand: ParsableCommand {
     // MARK: - Properties
 
     /// Colorize the output
-    var colorise: Bool { color && csvSeparator == nil && csv == false }
+    var colorise: Bool { color.colorise && csvSeparator == nil && csv == false }
 
     // MARK: ParsableCommand
 
@@ -30,13 +30,13 @@ struct ReadCommand: ParsableCommand {
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
-    @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
-    var color = true
+    @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
+    var color = ColorFlag.color
 
     @Option(name: [.short, .long], help: "Fold the data at the given depth level")
     var level: Int?
 
-    @Flag(name: [.customLong("csv")], help: "Convert the array data into CSV with the standard separator ';'")
+    @Flag(help: "Convert the array data into CSV with the standard separator ';'")
     var csv = false
 
     @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
@@ -66,7 +66,7 @@ struct ReadCommand: ParsableCommand {
                 throw RuntimeError.noValueAt(path: readingPath.description)
             }
 
-            let output = colorise ? value : injector.inject(in: value)
+            let output = colorise ? injector.inject(in: value) : value
 
             print(output)
         }
