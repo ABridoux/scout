@@ -105,8 +105,8 @@ extension PathElement: CustomStringConvertible {
         case .index(let index): return "[\(index)]"
         case .count: return "[\(Self.defaultCountSymbol)]"
         case .slice(let bounds):
-            let lowerBound = bounds.lower == 0 ? "" : String(bounds.lower)
-            let upperBound = bounds.upper == .lastIndex ? "" : String(bounds.upper)
+            let lowerBound = bounds.lowerString
+            let upperBound = bounds.upperString
             return "[\(lowerBound):\(upperBound)]"
 
         case .filter(let filter):

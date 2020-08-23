@@ -147,30 +147,6 @@ public struct Path: Equatable {
     public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
 
     public mutating func removeLast() -> PathElement { elements.removeLast() }
-
-    /// Remove the `.slice` path elements in the array while incrementing the indexes if necessary. Useful when printing the array description in an error.
-    func removingSlicings() -> Self {
-        var lastLowerBound: Int?
-        var newPath = Path()
-        for element in self {
-            switch element {
-
-            case .slice(let bounds):
-                lastLowerBound = bounds.lower
-
-            case .filter:
-                continue
-
-            case .index(let index):
-                newPath.append(index + (lastLowerBound ?? 0))
-                lastLowerBound = nil
-
-            default: newPath.append(element)
-            }
-        }
-
-        return newPath
-    }
 }
 
 extension Path: Collection {
