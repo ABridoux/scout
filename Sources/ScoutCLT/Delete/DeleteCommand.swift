@@ -42,6 +42,12 @@ struct DeleteCommand: ParsableCommand {
     @Flag(name: [.short, .long], help: "When the deleted value leaves the array or dictionary holding it empty, delete it too")
     var recursive = false
 
+    @Flag(name: [.customLong("csv")], help: "Convert the array data into CSV with the standard separator ';'")
+    var csv = false
+
+    @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
+    var csvSeparator: String?
+
     // MARK: - Functions
 
     func run() throws {
@@ -59,21 +65,22 @@ struct DeleteCommand: ParsableCommand {
 
     func delete(from data: Data) throws {
         let output = modifyFilePath ?? self.output
+        let separator = csvSeparator ?? (csv ? ";" : nil)
 
         if var json = try? Json(data: data) {
 
             try readingPaths.forEach { try json.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color, level: level)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color, level: level, csv: separator)
 
         } else if var plist = try? Plist(data: data) {
 
             try readingPaths.forEach { try plist.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color, level: level)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color, level: level, csv: separator)
 
         } else if var xml = try? Xml(data: data) {
 
             try readingPaths.forEach { try xml.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color, level: level)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color, level: level, csv: separator)
 
         } else {
             if let filePath = inputFilePath {

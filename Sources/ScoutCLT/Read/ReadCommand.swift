@@ -19,6 +19,11 @@ struct ReadCommand: ParsableCommand {
 
     // MARK: - Properties
 
+    /// Colorize the output
+    var colorise: Bool { color && csvSeparator == nil && csv == false }
+
+    // MARK: ParsableCommand
+
     @Argument(help: .readingPath)
     var readingPath: Path?
 
@@ -31,7 +36,10 @@ struct ReadCommand: ParsableCommand {
     @Option(name: [.short, .long], help: "Fold the data at the given depth level")
     var level: Int?
 
-    @Option(name: [.customLong("csv")], help: "Convert the array data into CSV")
+    @Flag(name: [.customLong("csv")], help: "Convert the array data into CSV with the standard separator ';'")
+    var csv = false
+
+    @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
     var csvSeparator: String?
 
     // MARK: - Functions
@@ -58,7 +66,8 @@ struct ReadCommand: ParsableCommand {
                 throw RuntimeError.noValueAt(path: readingPath.description)
             }
 
-            let output = color && csvSeparator == nil ? injector.inject(in: value) : value
+            let output = colorise ? value : injector.inject(in: value)
+
             print(output)
         }
     }
@@ -75,10 +84,6 @@ struct ReadCommand: ParsableCommand {
 
         if let json = try? Json(data: data) {
             var json = try json.get(path)
-//            if let level = level {
-//                json.fold(upTo: level)
-//            }
-//            value = json.stringValue != "" ? json.stringValue : json.description
 
             value = try getValue(from: &json)
 
@@ -90,10 +95,6 @@ struct ReadCommand: ParsableCommand {
 
         } else if let plist = try? Plist(data: data) {
             var plist = try plist.get(path)
-//            if let level = level {
-//                plist.fold(upTo: level)
-//            }
-//            value = plist.stringValue != "" ? plist.stringValue : plist.description
 
             value = try getValue(from: &plist)
 
@@ -105,10 +106,6 @@ struct ReadCommand: ParsableCommand {
 
         } else if let xml = try? Xml(data: data) {
             var xml = try xml.get(path)
-//            if let level = level {
-//                xml.fold(upTo: level)
-//            }
-//            value = xml.stringValue != "" ? xml.stringValue : xml.description
 
             value = try getValue(from: &xml)
 
@@ -121,7 +118,7 @@ struct ReadCommand: ParsableCommand {
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
-            } else {
+    } else {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
             }
         }
@@ -134,6 +131,11 @@ struct ReadCommand: ParsableCommand {
 
         if let separator = csvSeparator {
             value = try explorer.exportCSV(separator: separator)
+            return value
+        }
+
+        if csv {
+            value = try explorer.exportCSV()
             return value
         }
 

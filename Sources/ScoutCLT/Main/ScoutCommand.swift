@@ -42,7 +42,7 @@ struct ScoutCommand: ParsableCommand {
 
     // MARK: - Functions
 
-    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool, colorise: Bool, level: Int? = nil) throws {
+    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool, colorise: Bool, level: Int? = nil, csv: String? = nil) throws {
         if let output = output?.replacingTilde {
             let fm = FileManager.default
             try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
@@ -81,10 +81,12 @@ struct ScoutCommand: ParsableCommand {
             pathExplorer.fold(upTo: level)
         }
 
-        var output = try pathExplorer.exportString()
-        output = colorise ? injector.inject(in: output) : output
-
-        if verbose {
+        if let separator = csv {
+            let output = try pathExplorer.exportCSV(separator: separator)
+            print(output)
+        } else if verbose {
+            var output = try pathExplorer.exportString()
+            output = colorise ? injector.inject(in: output) : output
             print(output)
         }
     }
