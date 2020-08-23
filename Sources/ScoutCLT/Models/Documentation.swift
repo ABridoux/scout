@@ -11,6 +11,13 @@ protocol Documentation {
 }
 
 extension Documentation {
+    static var  zshInjector: ZshInjector<String, TerminalModifier, InjectorType<String, TerminalModifier>> { ZshInjector(type: .terminal) }
+
+    static var noColor: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color") }
+    static var nc: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--nc") }
+    static var csv: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv") }
+    static var csvSep: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv-sep") }
+    static var verbose: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v") }
 
     /// Get one example per line
     /// - Parameters:

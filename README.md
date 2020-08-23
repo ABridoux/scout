@@ -143,7 +143,7 @@ $ scout install-completion-script
 ```
 
 Here is a command which downloads the latest version of the program and install it in */usr/local/bin*. 
-Run it to download and install the latest version of the program. It erases the current version you may have. Uncomment the last line to install the script to auto-complete the commands.
+Run it to download and install the latest version of the program. It erases the current version you may have. The last line is optional and installs the script to auto-complete the commands.
 
 ```bash
 curl -LO https://github.com/ABridoux/scout/releases/latest/download/scout.zip && \
