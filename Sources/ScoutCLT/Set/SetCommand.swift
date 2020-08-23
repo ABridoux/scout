@@ -8,10 +8,17 @@ import Scout
 import Foundation
 
 struct SetCommand: ParsableCommand {
+
+    // MARK: - Constants
+
     static let configuration = CommandConfiguration(
         commandName: "set",
         abstract: "Change a value at a given path.",
         discussion: "To find examples and advanced explanations, please type `scout doc -c set`")
+
+    // MARK: - Properties
+
+    // MARK: ParsableCommand
 
     @Argument(help: PathAndValue.help)
     var pathsAndValues = [PathAndValue]()
@@ -34,6 +41,14 @@ struct SetCommand: ParsableCommand {
     @Option(name: [.short, .long], help: "Fold the data at the given depth level")
     var level: Int?
 
+    @Flag(name: [.customLong("csv")], help: "Convert the array data into CSV with the standard separator ';'")
+    var csv = false
+
+    @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
+    var csvSeparator: String?
+
+    // MARK: - Functions
+
     func run() throws {
 
         do {
@@ -49,21 +64,22 @@ struct SetCommand: ParsableCommand {
 
     func set(from data: Data) throws {
         let output = modifyFilePath ?? self.output
+        let separator = csvSeparator ?? (csv ? ";" : nil)
 
         if var json = try? Json(data: data) {
 
             try set(pathsAndValues, in: &json)
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color, level: level)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color, level: level, csv: separator)
 
         } else if var plist = try? Plist(data: data) {
 
             try set(pathsAndValues, in: &plist)
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color, level: level)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color, level: level, csv: separator)
 
         } else if var xml = try? Xml(data: data) {
 
             try set(pathsAndValues, in: &xml)
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color, level: level)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color, level: level, csv: separator)
 
         } else {
             if let filePath = inputFilePath {

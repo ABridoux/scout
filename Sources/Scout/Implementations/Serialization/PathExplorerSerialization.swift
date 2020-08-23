@@ -231,4 +231,8 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
             return false
         }
     }
+
+    func isGroup(value: Any) -> Bool {
+        value is ArrayValue || value is DictionaryValue || false
+    }
 }

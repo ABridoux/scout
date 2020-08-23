@@ -110,6 +110,21 @@ final class PathExplorerXMLTests: XCTestCase {
         return document.xml.data(using: .utf8)!
     }()
 
+    var stubArray: Data = {
+        let root = AEXMLElement(name: "root")
+        let document = AEXMLDocument(root: root)
+        for i in 0...2 {
+            let row = AEXMLElement(name: "row")
+            for j in 1...3 {
+                let column = AEXMLElement(name: "column", value: String(j + i*3))
+                row.addChild(column)
+            }
+            root.addChild(row)
+        }
+
+        return document.xml.data(using: .utf8)!
+    }()
+
     // MARK: - Functions
 
     func testInitNotThrows() {
@@ -126,5 +141,71 @@ final class PathExplorerXMLTests: XCTestCase {
         let value = try xml.get("characters", 0, "episodes", 0).string
 
         XCTAssertEqual(value, "~~SCOUT_FOLDED~~")
+    }
+
+    // MARK: CSV
+
+    func testExplore() throws {
+        let xml = try Xml(data: toyBox)
+        var names = Set<String>()
+
+        try xml.get("characters").exploreGroup(element: xml.element) { (key, _) in
+            names.insert(key)
+        }
+
+        XCTAssertEqual(names, Set(arrayLiteral: "quote", "name", "episodes[0]", "episodes[1]", "episodes[2]"))
+    }
+
+    func testExportCSVHeadersAndValues() throws {
+        let xml = try Xml(data: toyBox)
+
+        let (headers, values) = try xml.get("characters").exportCSVHeadersAndValues(separator: ";")
+
+        let expectedHeaders = ["episodes[0]", "episodes[1]", "episodes[2]", "name", "quote"]
+        let expectedValues = [["1", "2", "3", "Woody", "I got a snake in my boot"],
+                              ["1", "2", "3", "Buzz", "To infinity and beyond"],
+                              ["1", "2", "3", "Zurg", "Destroy Buzz Lightyear"]]
+
+        XCTAssertEqual(headers, expectedHeaders)
+        XCTAssertEqual(values, expectedValues)
+    }
+
+    func testExportCSVArray() throws {
+        let xml = try Xml(data: toyBox)
+
+        let (headers, values) = try xml.get("characters", PathElement.slice(Bounds(lower: 0, upper: .lastIndex)), "episodes").exportCSVHeadersAndValues(separator: ";")
+
+        let expectedValues = [["1", "2", "3"],
+                              ["1", "2", "3"],
+                              ["1", "2", "3"]]
+
+        XCTAssertTrue(headers.isEmpty)
+        XCTAssertEqual(values, expectedValues)
+    }
+
+    func testExportCSVDictionaryOfArrays() throws {
+        let xml = try Xml(data: toyBoxByName)
+
+        let (headers, values) = try xml.get("characters", PathElement.filter(".*"), "episodes").exportCSVHeadersAndValues(separator: ";")
+
+        let expectedValues = [["1", "2", "3"],
+                              ["1", "2", "3"],
+                              ["1", "2", "3"]]
+
+        XCTAssertTrue(headers.isEmpty)
+        XCTAssertEqual(values, expectedValues)
+    }
+
+    func testExportCSVArrayOfArrays() throws {
+        let xml = try Xml(data: stubArray)
+
+        let (headers, values) = try xml.exportCSVHeadersAndValues(separator: ";")
+
+        let expectedValues = [["1", "2", "3"],
+                              ["4", "5", "6"],
+                              ["7", "8", "9"]]
+
+        XCTAssertTrue(headers.isEmpty)
+        XCTAssertEqual(values, expectedValues)
     }
 }

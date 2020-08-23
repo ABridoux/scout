@@ -28,6 +28,8 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
     case underlyingError(String)
     case groupSampleConversionError(Path)
+    case csvExportWrongGroupValue
+    case csvExportAmbiguous(expected: String, path: Path)
 
     public var errorDescription: String? {
         switch self {
@@ -64,6 +66,8 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
         case .underlyingError(let description): return description
         case .groupSampleConversionError(let path): return "Internal error. Group sample conversion error in '\(path.description)'"
+        case .csvExportWrongGroupValue: return "CSV export requires either first object to be an array or a dictionary of arrays"
+        case .csvExportAmbiguous(let expectedType, let path): return "Ambiguous type for value at '\(path.removingSlicings().description). Expected \(expectedType) as the first value is of type \(expectedType)"
         }
     }
 }
