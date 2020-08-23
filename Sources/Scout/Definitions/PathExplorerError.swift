@@ -19,7 +19,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case arraySubscript(Path)
     case subscriptWrongIndex(path: Path, index: Int, arrayCount: Int)
     case keyNameSetOnNonDictionary(path: Path)
-    case wrongBounds(Bounds, in: Path)
+    case wrongBounds(Bounds, in: Path, lastValidIndex: Int)
     case wrongRegularExpression(pattern: String, in: Path)
 
     case stringToDataConversionError
@@ -38,9 +38,9 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
         case .wrongGroupValueForKey(let group, let value, let element): return "Cannot set `\(value)` to array #\(element)# which is \(group)"
-        case .wrongUsage(let element, let path): return "Wrong usage of \(element.description) in '\(path.removingSlicings().description)'. \(element.usage)"
+        case .wrongUsage(let element, let path): return "Wrong usage of \(element.description) in '\(path.description)'. \(element.usage)"
 
-        case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.removingSlicings().description)' with a String as it is not a Dictionary"
+        case .dictionarySubscript(let path): return "Cannot subscript the key at '\(path.description)' with a String as it is not a Dictionary"
         case .subscriptMissingKey(let path, let key, let bestMatch):
             let bestMatchString: String
 
@@ -50,13 +50,13 @@ public enum PathExplorerError: LocalizedError, Equatable {
                 bestMatchString = "No best match found"
             }
 
-            return "The key #\(key)# cannot be found in the Dictionary '\(path.removingSlicings().description)'.\n\(bestMatchString)"
+            return "The key #\(key)# cannot be found in the Dictionary '\(path.description)'.\n\(bestMatchString)"
 
-        case .arraySubscript(let path): return "Cannot subscript the key at '\(path.removingSlicings().description)' with an Integer as is not an Array"
-        case .subscriptWrongIndex(let path, let index, let count): return "The index [\(index)] is not within the bounds (0...\(count - 1)) of the Array  at '\(path.removingSlicings().description)'"
+        case .arraySubscript(let path): return "Cannot subscript the key at '\(path.description)' with an Integer as is not an Array"
+        case .subscriptWrongIndex(let path, let index, let count): return "The index [\(index)] is not within the bounds (0...\(count - 1)) of the Array  at '\(path.description)'"
         case .keyNameSetOnNonDictionary(path: let path): return "'\(path.description)' is not a dictionary and cannot set the key name of its children if any"
 
-        case .wrongBounds(let bounds, let path): return "Wrong slice '[\(bounds.lower):\(bounds.upper)] in '\(path.description)'.\nValid range: 0 <= lowerBound < upperBound <= lastIndex. You can use -1 or [lowerBound:] to use the last index."
+        case .wrongBounds(let bounds, let path, let lastValidIndex): return "Wrong slice '[\(bounds.lowerString):\(bounds.upperString)] in '\(path.description)' Array count: \(lastValidIndex + 1).\nValid slice: 0 <= lowerBound < upperBound <= lastIndex or -lastIndex < lowerBound < 0 and upperBound = lastIndex. Use -1 to specify the last index."
 
         case .wrongRegularExpression(let pattern, let path): return "Wrong regular expression pattern '\(pattern.description)' in '\(path.description)'."
 
@@ -67,7 +67,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .underlyingError(let description): return description
         case .groupSampleConversionError(let path): return "Internal error. Group sample conversion error in '\(path.description)'"
         case .csvExportWrongGroupValue: return "CSV export requires either first object to be an array or a dictionary of arrays"
-        case .csvExportAmbiguous(let expectedType, let path): return "Ambiguous type for value at '\(path.removingSlicings().description). Expected \(expectedType) as the first value is of type \(expectedType)"
+        case .csvExportAmbiguous(let expectedType, let path): return "Ambiguous type for value at '\(path.description). Expected \(expectedType) as the first value is of type \(expectedType)"
         }
     }
 }

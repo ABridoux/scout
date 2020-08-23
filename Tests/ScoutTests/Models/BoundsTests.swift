@@ -8,6 +8,20 @@ import Scout
 
 final class BoundsTests: XCTestCase {
 
+    func testGetArraySlice_LastIndex() throws {
+        let bounds = Bounds(lower: 2, upper: -1)
+        let path = Path("flower", "power", PathElement.slice(bounds))
+
+        XCTAssertEqual(try bounds.range(lastValidIndex: 5, path: path), 2...5)
+    }
+
+    func testGetArraySlice_LowerLesserThan0() throws {
+        let bounds = Bounds(lower: -2, upper: -1)
+        let path = Path("flower", "power", PathElement.slice(bounds))
+
+        XCTAssertEqual(try bounds.range(lastValidIndex: 5, path: path), 4...5)
+    }
+
     func testRange_ThrowsIfLowerLesserThan0() throws {
         let bounds = Bounds(lower: -2, upper: 1)
         let path = Path("flower", "power", PathElement.slice(bounds))

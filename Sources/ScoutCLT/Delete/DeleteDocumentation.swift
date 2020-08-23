@@ -55,7 +55,8 @@ struct DeleteDocumentation: Documentation {
     - When accessing an array value by its index, use the index -1 to access to the last element
     - Use the flag \(recursive) to delete an array or a dictionary key when left empty
     - Target a slice in an array with square brackets and a double point ':' between the bounds: [lower:upper]
-        No lower means 0 like [:10] and no upper means the last index like [10:]
+        - No lower means 0 like [:10] and no upper means the last index like [10:].
+        - Use a negative index for the lower bound to target the last nth elements like [-4:] to target the last 4 elements
     - Target specific keys with a regular expression by enclosing it with sharp signs: #.*device.*# to target all the keys containing the word device
 
     - You can delete multiple values in one command
