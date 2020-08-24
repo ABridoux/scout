@@ -32,7 +32,7 @@ extension String: PathElementRepresentable {
         guard
             splitted.count == 2,
             let lower = splitted[0] == "" ? 0 : Int(splitted[0]),
-            let upper = splitted[1] == "" ? .lastIndex : Int(splitted[1])
+            let upper = splitted[1] == "" ? (lower < 0 ? .lastNegativeIndex : .lastIndex) : Int(splitted[1])
         else {
             return nil
         }
