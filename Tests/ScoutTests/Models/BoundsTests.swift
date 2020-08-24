@@ -16,7 +16,7 @@ final class BoundsTests: XCTestCase {
     }
 
     func testGetArraySlice_LowerLesserThan0() throws {
-        let bounds = Bounds(lower: -2, upper: -1)
+        let bounds = Bounds(lower: -2, upper: 0)
         let path = Path("flower", "power", PathElement.slice(bounds))
 
         XCTAssertEqual(try bounds.range(lastValidIndex: 5, path: path), 4...5)

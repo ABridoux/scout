@@ -104,11 +104,11 @@ final class PathExplorerSerializationTests: XCTestCase {
         let plist = try Plist(data: data)
 
         let csv = try plist.get(PathElement.filter(".*"), "episodes").exportCSVDictionary(separator: ";")
-        let expectedValues = [["1", "2", "3"],
-                              ["1", "2", "3"],
-                              ["1", "2", "3"]]
+        let expectedValues = [["Buzz.episodes", "1", "2", "3"],
+                              ["Woody.episodes", "1", "2", "3"],
+                              ["Zurg.episodes", "1", "2", "3"]]
 
-        XCTAssertEqual(csv, expectedValues)
+        XCTAssertEqual(csv.sorted { $0[0] < $1[0] }, expectedValues)
     }
 
     func testCSVArrayOfArrays() throws {

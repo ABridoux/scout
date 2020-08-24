@@ -129,9 +129,10 @@ extension PathExplorerSerialization {
         let dict = try cast(value, as: .dictionary, orThrow: .csvExportWrongGroupValue)
         var values = [[String]]()
 
-        try dict.forEach { (_, value) in
+        try dict.forEach { (key, value) in
             let array = try cast(value, as: .array, orThrow: .csvExportWrongGroupValue)
-            values.append(array.map { String(describing: $0).escapingCSV(separator) })
+            let arrayWithLabel = [key] + array.map { String(describing: $0).escapingCSV(separator) }
+            values.append(arrayWithLabel)
         }
 
         return values

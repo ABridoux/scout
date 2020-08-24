@@ -47,6 +47,19 @@ extension PathExplorerXML {
         element.children.forEach { child in
             var valuesLine = headersCount > 0 ? Array(repeating: "NULL", count: headersCount) : [String]()
 
+            let pathContainsDictFilter = readingPath.contains { element in
+                if case .filter = element {
+                    return true
+                } else {
+                    return false
+                }
+            }
+
+            if valuesLine.isEmpty, pathContainsDictFilter {
+                // dictionary of arrays so add the label
+                valuesLine.append(child.name)
+            }
+
             exploreGroup(element: child) { (key, value) in
                 let value = value.escapingCSV(separator)
                 if let index = headersIndexes[key] {
