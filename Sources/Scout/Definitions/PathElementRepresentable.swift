@@ -29,11 +29,25 @@ extension String: PathElementRepresentable {
     var slice: PathElement? {
         let splitted = components(separatedBy: ":")
 
-        guard
-            splitted.count == 2,
-            let lower = splitted[0] == "" ? 0 : Int(splitted[0]),
-            let upper = splitted[1] == "" ? (lower < 0 ? .lastNegativeIndex : .lastIndex) : Int(splitted[1])
-        else {
+        guard splitted.count == 2 else {
+            return nil
+        }
+
+        var lowerBound: Bounds.Bound?
+        if splitted[0] == "" {
+            lowerBound = .first
+        } else if let lowerValue = Int(splitted[0]) {
+            lowerBound = .init(lowerValue)
+        }
+
+        var upperBound: Bounds.Bound?
+        if splitted[1] == "" {
+            upperBound = .last
+        } else if let upperValue = Int(splitted[1]) {
+            upperBound = .init(upperValue)
+        }
+
+        guard let lower = lowerBound, let upper = upperBound else {
             return nil
         }
 
