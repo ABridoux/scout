@@ -11,21 +11,21 @@ public struct Bounds: Equatable {
     // MARK: - Properties
 
     /// Use the `range(lastValidIndex:path)` function to access to the lower bound
-    private let lower: Int
+    private let lower: Bound
     /// Use the `range(lastValidIndex:path)` function to access to the upper bound
-    private let upper: Int
+    private let upper: Bound
 
     /// Description of the lower bound.
     /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the lower bound
-    var lowerString: String { lower == 0 ? "" : String(lower) }
+    var lowerString: String { lower == .first ? "" : String(lower.value) }
 
     /// Description of the upper bound.
     /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the upper bound
-    var upperString: String { (upper == .lastIndex || upper == .lastNegativeIndex) ? "" : String(upper) }
+    var upperString: String { upper == .last ? "" : String(upper.value) }
 
     // MARK: - Initialization
 
-    public init(lower: Int, upper: Int) {
+    public init(lower: Bound, upper: Bound) {
         self.lower = lower
         self.upper = upper
     }
@@ -38,20 +38,45 @@ public struct Bounds: Equatable {
     /// - Throws: If the bounds are invalid
     /// - Returns: A range made from the lower and upper bounds
     public func range(lastValidIndex: Int, path: Path) throws -> ClosedRange<Int> {
-        let lower = self.lower < 0 ? lastValidIndex + self.lower + 1 : self.lower
+        let lower = self.lower.value < 0 ? lastValidIndex + self.lower.value : self.lower.value
 
         let upper: Int
-        if self.lower < 0 && self.upper <= 0 { // deal with negative indexes
-            upper = lastValidIndex + self.upper
-        } else if self.upper == .lastIndex {
+        if self.upper == .last {
             upper = lastValidIndex
+        } else if self.upper.value < 0 { // deal with negative indexes
+            upper = lastValidIndex + self.upper.value
         } else {
-            upper = self.upper
+            upper = self.upper.value
         }
 
-        guard 0 <= lower, lower < upper, upper <= lastValidIndex else {
+        guard 0 <= lower, lower <= upper, upper <= lastValidIndex else {
             throw PathExplorerError.wrongBounds(self, in: path, lastValidIndex: lastValidIndex)
         }
         return lower...upper
+    }
+}
+
+public extension Bounds {
+
+    struct Bound: ExpressibleByIntegerLiteral, Equatable {
+        public typealias IntegerLiteralType = Int
+        public static let first = Bound(0, identifier: "first")
+        public static let last = Bound(0, identifier: "last")
+
+        var value: Int
+        var identifier: String?
+
+        public init(integerLiteral value: Int) {
+            self.value = value
+        }
+
+        public init(_ value: Int) {
+            self.value = value
+        }
+
+        private init(_ value: Int, identifier: String) {
+            self.value = value
+            self.identifier = identifier
+        }
     }
 }

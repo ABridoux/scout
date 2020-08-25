@@ -173,7 +173,7 @@ final class PathExplorerXMLTests: XCTestCase {
     func testExportCSVArray() throws {
         let xml = try Xml(data: toyBox)
 
-        let (headers, values) = try xml.get("characters", PathElement.slice(Bounds(lower: 0, upper: .lastIndex)), "episodes").exportCSVHeadersAndValues(separator: ";")
+        let (headers, values) = try xml.get("characters", PathElement.slice(Bounds(lower: 0, upper: .last)), "episodes").exportCSVHeadersAndValues(separator: ";")
 
         let expectedValues = [["1", "2", "3"],
                               ["1", "2", "3"],

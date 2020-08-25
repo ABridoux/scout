@@ -77,7 +77,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         let data = try PropertyListEncoder().encode(characters)
         let plist = try Plist(data: data)
 
-        let csv = try plist.get(PathElement.slice(Bounds(lower: 0, upper: .lastIndex)), "episodes").exportCSVArrayOfArrays(separator: ";")
+        let csv = try plist.get(PathElement.slice(Bounds(lower: 0, upper: .last)), "episodes").exportCSVArrayOfArrays(separator: ";")
         let expectedValues = [["1", "2", "3"],
                               ["1", "2", "3"],
                               ["1", "2", "3"]]

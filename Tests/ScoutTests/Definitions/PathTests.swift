@@ -162,14 +162,14 @@ final class PathTests: XCTestCase {
     }
 
     func testPartialSliceLeft() throws {
-        let array = Path(secondKey, PathElement.slice(.init(lower: 0, upper: 4)))
+        let array = Path(secondKey, PathElement.slice(.init(lower: .first, upper: 4)))
         let path = try Path(string: secondKeyWithPartialRangeLeft)
 
         XCTAssertEqual(path, array)
     }
 
     func testPartialSliceRight() throws {
-        let array = Path(secondKey, PathElement.slice(.init(lower: 1, upper: .lastIndex)))
+        let array = Path(secondKey, PathElement.slice(.init(lower: 1, upper: .last)))
         let path = try Path(string: secondKeyWithPartialRangeRight)
 
         XCTAssertEqual(path, array)
