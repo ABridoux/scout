@@ -17,6 +17,9 @@ public enum PathElement: Equatable {
     /// Placed after an array or dictionary to return its count
     case count
 
+    /// Placed after a dictionary to returns its keys as an array
+    case keysList
+
     /// Placed after an array to slice it with a `Bounds` value
     case slice(Bounds)
 
@@ -25,6 +28,7 @@ public enum PathElement: Equatable {
 
     // -- Symbols
     static let defaultCountSymbol = "#"
+    static let defaultKeysListSymbol = "#"
 
     // MARK: - Properties
 
@@ -50,7 +54,7 @@ public enum PathElement: Equatable {
     public var isGroupSubscripter: Bool {
         switch self {
         case .count, .index, .slice, .filter: return true
-        case .key: return false
+        case .key, .keysList: return false
         }
     }
 
@@ -59,6 +63,7 @@ public enum PathElement: Equatable {
         case .key: return "A key subscript a dictionary and is specified with a dot '.' then the key name like 'dictionary.keyName'"
         case .index: return "An index subscript an array and is specified as an integer enclosed with square brackets like '[1]'"
         case .count: return "A count element is specified as a sharp sign enclosed with square brackets '[#]'. It should be the last path element after an array or a dictionary."
+        case .keysList: return "A keys list element is specified as a sharp sign enclosed by curl brackets '{#}'. It is placed after a dictionary to get its keys as an array"
         case .slice: return "A slice is specified after an array with lower and upper bounds. It is enclosed by square brackets and the bounds are specified separated by ':' like '[lower:upper]'"
         case .filter: return "A filter is a regular expression placed after a dictionary to filter the keys to target. It is enclosed by sharp signs like '#[a-zA-Z]*#'"
         }
@@ -104,6 +109,7 @@ extension PathElement: CustomStringConvertible {
         case .key(let key): return key
         case .index(let index): return "[\(index)]"
         case .count: return "[\(Self.defaultCountSymbol)]"
+        case .keysList: return "{\(Self.defaultKeysListSymbol)}"
         case .slice(let bounds):
             let lowerBound = bounds.lowerString
             let upperBound = bounds.upperString

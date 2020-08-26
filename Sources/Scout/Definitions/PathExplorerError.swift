@@ -56,7 +56,12 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .subscriptWrongIndex(let path, let index, let count): return "The index [\(index)] is not within the bounds (0...\(count - 1)) of the Array  at '\(path.description)'"
         case .keyNameSetOnNonDictionary(path: let path): return "'\(path.description)' is not a dictionary and cannot set the key name of its children if any"
 
-        case .wrongBounds(let bounds, let path, let lastValidIndex): return "Wrong slice '[\(bounds.lowerString):\(bounds.upperString)] in '\(path.description)' Last index : \(lastValidIndex).\nValid slice: 0 <= lowerBound <= upperBound <= lastIndex or -lastIndex <= lowerBound <= upperBound <= 0. Omit lower to target first index. Omit upper to target last index"
+        case .wrongBounds(let bounds, let path, let lastValidIndex): return
+            """
+            Wrong slice '[\(bounds.lowerString):\(bounds.upperString)]' in '\(path.description)' Last index : \(lastValidIndex).
+            Valid slice: 0 <= lowerBound <= upperBound <= lastIndex. Negative bounds are substracted to the last index (-bound -> lastIndex - bound).
+            Omit lower to target first index. Omit upper to target last index
+            """
 
         case .wrongRegularExpression(let pattern, let path): return "Wrong regular expression pattern '\(pattern.description)' in '\(path.description)'."
 

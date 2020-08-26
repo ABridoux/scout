@@ -7,6 +7,9 @@ import AEXML
 
 extension AEXMLElement {
 
+    /// Copy of the element, without the children
+    func copy() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
+
     /// xml keys have to have a key name. If the key has existing children,
     /// we will take the name of the first child. Otherwise we will remove the "s" from the parent key name
     var childrenName: String {

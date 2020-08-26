@@ -31,8 +31,8 @@ extension PathExplorerXML {
             case .filter(let pattern):
                 try delete(.dictionaryFilter(pattern), in: &explorers, path: currentPath)
 
-            case .count:
-                throw PathExplorerError.wrongUsage(of: .count, in: currentPath)
+            case .count, .keysList:
+                throw PathExplorerError.wrongUsage(of: pathElement, in: currentPath)
             }
         }
 

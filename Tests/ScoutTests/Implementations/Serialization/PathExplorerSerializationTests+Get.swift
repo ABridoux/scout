@@ -296,4 +296,21 @@ extension PathExplorerSerializationTests {
         XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
 
+    // MARK: - Keys list
+
+    func testGetKeysListDict() throws {
+        let data = try PropertyListEncoder().encode(charactersByName)
+        let plist = try Plist(data: data)
+        let path: Path = [PathElement.keysList]
+
+        XCTAssertEqual(try plist.get(path).value as? [String], ["Buzz", "Woody", "Zurg"])
+    }
+
+    func testGetKeysListSubDict() throws {
+        let data = try PropertyListEncoder().encode(charactersByName)
+        let plist = try Plist(data: data)
+        let path: Path = ["Woody", PathElement.keysList]
+
+        XCTAssertEqual(try plist.get(path).value as? [String], ["episodes", "name", "quote"])
+    }
 }

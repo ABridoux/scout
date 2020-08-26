@@ -184,4 +184,35 @@ extension PathExplorerXMLTests {
 
         XCTAssertErrorsEqual(try xml.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
+
+    // MARK: - Keys list
+
+    func testGetKeysListDict() throws {
+        let xml = try Xml(data: toyBoxByName)
+        let path = Path("toybox", "characters", PathElement.keysList)
+
+        let element = try xml.get(path).element
+
+        let names = ["Buzz", "Woody", "Zurg"]
+
+        XCTAssertEqual(element.name, "characters{#}")
+        for i in 0...2 {
+            XCTAssertEqual(element.children[i].name, "key")
+            XCTAssertEqual(element.children[i].string, names[i])
+        }
+    }
+
+    func testGetKeysListSubDict() throws {
+        let xml = try Xml(data: toyBoxByName)
+        let path = Path("toybox", "characters", "Woody", PathElement.keysList)
+
+        let element = try xml.get(path).element
+
+        let names = ["episodes", "name", "quote"]
+
+        for i in 0...2 {
+            XCTAssertEqual(element.children[i].name, "key")
+            XCTAssertEqual(element.children[i].string, names[i])
+        }
+    }
 }

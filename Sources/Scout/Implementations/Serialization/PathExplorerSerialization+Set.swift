@@ -236,7 +236,7 @@ extension PathExplorerSerialization {
         switch element {
         case .key(let key): return try set(for: key, to: newValue)
         case .index(let index): return try set(at: index, to: newValue)
-        case .count: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
+        case .count, .keysList: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
         case .slice(let bounds): try setArraySlice(within: bounds, to: newValue)
         case .filter(let pattern): try setDictionaryFilter(with: pattern, to: newValue)
         }
