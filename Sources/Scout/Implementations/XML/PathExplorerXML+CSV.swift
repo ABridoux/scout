@@ -84,10 +84,10 @@ extension PathExplorerXML {
         let childrenName = element.commonChildrenName
         for (index, child) in element.children.enumerated() {
             let newKey: String
-            if child.name.components(separatedBy: Path.defaultSeparator).last == childrenName { // array
+            if child.name.components(separatedBy: GroupSample.keySeparator).last == childrenName { // array
                 newKey = key == "" ? key : key + PathElement.index(index).description
             } else { // dictionary
-                newKey = key == "" ? child.name : key + Path.defaultSeparator + child.name
+                newKey = key == "" ? child.name : key + GroupSample.keySeparator + child.name
             }
 
             exploreGroup(key: newKey, element: child, toExecute: block)

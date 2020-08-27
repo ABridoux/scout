@@ -18,6 +18,7 @@ extension Documentation {
     static var csv: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv") }
     static var csvSep: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv-sep") }
     static var verbose: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v") }
+    static var level: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-l") }
 
     /// Get one example per line
     /// - Parameters:

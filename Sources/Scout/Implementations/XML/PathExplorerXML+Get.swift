@@ -57,7 +57,7 @@ extension PathExplorerXML {
         try element.children.forEach { child in
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(child.name))
             let newChild = try pathExplorer.getSingle(at: index)
-            newChild.name = child.name + PathElement.index(index).description
+            newChild.name = child.name + GroupSample.keySeparator + "index(\(index))"
             copy.addChild(newChild)
         }
 
@@ -96,7 +96,7 @@ extension PathExplorerXML {
     }
 
     func getInArraySlice(for key: String) throws -> AEXMLElement {
-        let copy = AEXMLElement(name: element.name + Path.defaultSeparator + PathElement.key(key).description)
+        let copy = AEXMLElement(name: element.name + GroupSample.keySeparator + key)
 
         for (index, child) in element.children.enumerated() {
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(index))
@@ -107,12 +107,12 @@ extension PathExplorerXML {
     }
 
     func getInDictionaryFilter(for key: String) throws -> AEXMLElement {
-        let copy = AEXMLElement(name: element.name + Path.defaultSeparator + PathElement.key(key).description)
+        let copy = AEXMLElement(name: element.name + GroupSample.keySeparator + key)
 
         try element.children.forEach { child in
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(child.name))
             let newChild = try pathExplorer.getSingle(for: key)
-            newChild.name = child.name + Path.defaultSeparator + newChild.name
+            newChild.name = child.name + GroupSample.keySeparator + newChild.name
             copy.addChild(newChild)
         }
         return copy
@@ -162,7 +162,8 @@ extension PathExplorerXML {
     func getArraySlice(within bounds: Bounds) throws -> PathExplorerXML {
         let slice = PathElement.slice(bounds)
         // we have to copy the element as we cannot modify its children
-        let copy = AEXMLElement(name: element.name + slice.description, value: element.value, attributes: element.attributes)
+        let newKeyName = element.name + GroupSample.keySeparator + GroupSample.arraySlice(bounds).description
+        let copy = AEXMLElement(name: newKeyName, value: element.value, attributes: element.attributes)
         let path = readingPath.appending(slice)
         let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: path)
 
@@ -171,7 +172,7 @@ extension PathExplorerXML {
         if lastGroupSample != nil {
             slicedChildren = [AEXMLElement]()
             element.children.forEach { child in
-                let newChild = AEXMLElement(name: child.name, value: child.value, attributes: child.attributes)
+                let newChild = child.copy()
                 let newSlicedChildren = Array(child.children[sliceRange])
                 newChild.addChildren(newSlicedChildren)
                 slicedChildren.append(newChild)
@@ -190,7 +191,7 @@ extension PathExplorerXML {
         let filter = PathElement.filter(pattern)
         let path = readingPath.appending(filter)
         let regex = try NSRegularExpression(pattern: pattern, path: path)
-        let filterName = Path.defaultSeparator + PathElement.filter(pattern).description
+        let filterName = GroupSample.keySeparator + GroupSample.dictionaryFilter(pattern).description
 
         var filteredChildren = [AEXMLElement]()
 

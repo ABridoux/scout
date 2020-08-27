@@ -70,17 +70,17 @@ struct DeleteCommand: ParsableCommand {
         if var json = try? Json(data: data) {
 
             try readingPaths.forEach { try json.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else if var plist = try? Plist(data: data) {
 
             try readingPaths.forEach { try plist.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else if var xml = try? Xml(data: data) {
 
             try readingPaths.forEach { try xml.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else {
             if let filePath = inputFilePath {

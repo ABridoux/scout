@@ -111,8 +111,8 @@ extension PathExplorerXMLTests {
         try xml.get(path).element.children.forEach { value[$0.name] = $0.value }
 
         var quotes = [String: String]()
-        Character.charactersByName.forEach { quotes[$0.key + ".quote"] = $0.value.quote }
-        quotes.removeValue(forKey: "Woody.quote")
+        Character.charactersByName.forEach { quotes[$0.key + "_quote"] = $0.value.quote }
+        quotes.removeValue(forKey: "Woody_quote")
 
         XCTAssertEqual(quotes, value)
     }
@@ -125,8 +125,8 @@ extension PathExplorerXMLTests {
         try xml.get(path).element.children.forEach { value[$0.name] = $0.int }
 
         var episodes = [String: Int]()
-        Character.charactersByName.forEach { episodes[$0.key + ".episodes[1]"] = $0.value.episodes[1] }
-        episodes.removeValue(forKey: "Woody.episodes[1]")
+        Character.charactersByName.forEach { episodes[$0.key + "_episodes_index(1)"] = $0.value.episodes[1] }
+        episodes.removeValue(forKey: "Woody_episodes_index(1)")
 
         XCTAssertEqual(episodes, value)
     }
@@ -137,8 +137,8 @@ extension PathExplorerXMLTests {
 
         let element = try xml.get(path).element
 
-        XCTAssertEqual(element["Buzz.#episodes#"]["episodes"].children.count, 3)
-        XCTAssertEqual(element["Zurg.#episodes#"]["episodes"].children.count, 3)
+        XCTAssertEqual(element["Buzz_filter(episodes)"]["episodes"].children.count, 3)
+        XCTAssertEqual(element["Zurg_filter(episodes)"]["episodes"].children.count, 3)
     }
 
     // MARK: Array count
