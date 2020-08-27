@@ -60,7 +60,6 @@ struct AddDocumentation: Documentation {
     - When adding an element in an array, use the index -1 to add the element at the end of the array
 
     - You can add multiple values in one command
-    - Specify the \(verbose) flag to see the modified data
     - Deactivate the output colorization with \(noColor) or \(nc).
         Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
     - Output an array or a dictionary of arrays with the \(csv) flag or \(csvSep) option

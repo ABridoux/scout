@@ -153,7 +153,7 @@ extension PathExplorerSerialization {
             }
         } else if let array = value as? ArrayValue {
             for (index, value) in array.enumerated() {
-                let newKey = key == "" ? key : key + GroupSample.keySeparator + "index(\(index))"
+                let newKey = key == "" ? key : key + GroupSample.keySeparator + GroupSample.indexDescription(index)
 
                 if key != "" && !isGroup(value: value) {
                     block(newKey, value)

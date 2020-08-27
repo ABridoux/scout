@@ -32,4 +32,6 @@ enum GroupSample: CustomStringConvertible {
         case .dictionaryFilter(let pattern): return .filter(pattern)
         }
     }
+
+    static func indexDescription(_ index: Int) -> String { "index(\(index))" }
 }

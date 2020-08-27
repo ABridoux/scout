@@ -57,7 +57,7 @@ extension PathExplorerXML {
         try element.children.forEach { child in
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(child.name))
             let newChild = try pathExplorer.getSingle(at: index)
-            newChild.name = child.name + GroupSample.keySeparator + "index(\(index))"
+            newChild.name = child.name + GroupSample.keySeparator + GroupSample.indexDescription(index)
             copy.addChild(newChild)
         }
 

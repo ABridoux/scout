@@ -56,7 +56,6 @@ struct SetDocumentation: Documentation {
     - When accessing an array value by its index, use the index -1 to access to the last element
 
     - You can set multiple values in one command.
-    - Specify the \(verbose) flag to see the modified data
     - Deactivate the output colorization with \(noColor) or \(nc).
         Useful to export the data or if you encounter slowdowns when dealing with large files ((although it is not recommended to ouput large files in the terminal).
     - Output an array or a dictionary of arrays with the \(csv) flag or \(csvSep) option
