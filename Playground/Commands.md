@@ -62,12 +62,31 @@ Get Suzanne's movies count: 3
 scout read "people.Suzanne.movies[#]" -i People.xml
 ```
 
+### Get a dictionary keys
+
+You can get a dictionary or an array count with the `{#}` symbol. The keys are returned as an array.
+
+Get "people" dictionary keys list
+```bash
+scout read -i People.plist "people{#}"
+```
+
+Useful to iterate over a dictionary:
+
+```bash
+keys=(`scout read -i People.json ”people{#}” —csv-sep ” ”`)
+
+for key in $keys;  do
+	scout read -i People.json ”people.$key”;
+done
+```
+
 ### Get a group sample
 #### Array slicing
 - Target a slice in an array with square brackets and a double point ':' between the bounds: [lower:upper]
 - No lower means 0 like [:10] equals to [0:10]
 - No upper means the last index like [10:] equals to [10:-1]
-- Use a negative index for the lower bound to target the last nth elements like [-4:] to target the last 4 elements
+- Use a negative index target the last nth elements like [-3:] to target the last 4 elements, [:-2] to target all but the last two elements and [-3:-2] to target between the last 4th and last 3rd elements
 
 Get Robert first two hobbies
 ```bash
@@ -76,7 +95,7 @@ scout read -i People.json "people.Robert.hobbies[:1]"
 
 Get Robert last two hobbies
 ```bash
-scout read -i People.json "people.Robert.hobbies[-2:]"
+scout read -i People.json "people.Robert.hobbies[-1:]"
 ```
 
 Get Suzanne movies titles
@@ -178,7 +197,7 @@ scout delete "people.Robert.hobbies" -i People.plist -v
 scout delete "people.Robert.running_records[0][2]" -i People.plist -v
 ```
 
-### Get a group sample
+### Delete a group sample
 #### Array slicing
 - Target a slice in an array with square brackets and a double point ':' between the bounds: [lower:upper]
 - No lower means 0 like [:10] equals to [0:10]
@@ -192,7 +211,7 @@ scout delete -iv People.json "people.Robert.hobbies[:1]"
 
 Delete Robert last two hobbies
 ```bash
-scout delete -iv People.xml "people.Robert.hobbies[-2:]"
+scout delete -iv People.xml "people.Robert.hobbies[-1:]"
 ```
 
 Delete Suzanne movies titles

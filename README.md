@@ -58,12 +58,21 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
   - Set a key name
   - Force a type
   - Dictionary and array count
+  - Dictionary keys (**2.0.0**)
+  - Delete array or dictionary when deleting all its values (**2.0.0**)
+  - Array slicing for *read* and *delete* commands (**2.0.0**)
+  - Dictionary filtering for *read* and *delete* commands (**2.0.0**)
 - Use paths to specify the target value
 - Stream or file input
 - Find best match in case of a typo
 - Syntax highlighting
+- CSV export for arrays and dictionaries of arrays (**2.0.0**)
+- Folding at a depth level (**2.0.0**)
+- Auto-completion for commands (**2.0.0**)
 
-### Details
+### Insights
+
+See the wiki ([Sswift package](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package), [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)) to in in details how to use those features.
 
 #### CRUD functions for JSON, Plist and XML data format
 - add a value (Create)
@@ -71,19 +80,37 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 - set a value (Update)
 - delete a value (Delete)
 
-See the [usage example](#usage).
-
 ##### Set key name
-Set a key name rather than its value. See the [usage example](#usage).
+Set a key name rather than its value.
 
 ##### Try to force a type
-Prevent the automatic inferring of a type and try to force one when setting or adding a value. See the [usage example](#usage).
+Prevent the automatic inferring of a type and try to force one when setting or adding a value.
 
 ##### Dictionary and array count
-Get a dictionary or an array count with the `[#]` symbol. See the [usage example](#usage).
+Get a dictionary or an array count with the `[#]` symbol
+
+##### Dictionary keys list
+Get a dictionary keys list with the `{#}` symbol. Bash/Zsh: useful when combined with the `csv-sep " "` export to iterate over the keys:
+
+```zsh
+keys=(`scout read -i People.json "people{#}" —csv-sep " "`)
+
+for key in $keys;  do
+	scout read -i People.json ”people.$key”;
+done
+```
+
+##### Delete arrays or dictionaries when left empty (2.0.0)
+With the *delete* command, it is possible to specify that a dictionary or an array should be deleted when all its keys are also being deleted.
+
+##### Array slicing (2.0.0)
+Specify a slice of an array to read it or to delete it with `[lower:upper]` syntax. Omitting lower bound ~ 0, omitting upper bound ~ last index. Works with negative indexes like `[-4:-3]` to specify a slice from the last 5th to the last 3rd element. With negative slice, omitting the upper bound ~ last index like `[-3:]` to get the last 4 elements of the array.
+
+##### Dictionary filtering (2.0.0)
+Specify a regular expression between sharp signs '#' to filter the keys of a dictionary, like `people.#h.*#` to target all the keys starting with "h" in the dictionary 'people'. A key is a valid match when it is entirely validated by the regular expression.
 
 #### Use paths to specify the value to target
-A path is a sequence of keys or symbols to navigate through the data. See the [usage example](#usage).
+A path is a sequence of keys or symbols to navigate through the data.
 
 #### Stream or file input
 Set the input as a file with the input option `-i | --input` or as the last process/command output with a pipe:
@@ -111,10 +138,19 @@ Another example with one of the playground files and the following command:
 scout -i People.plist "people.Robert.age=2" -v
 ```
 
-When dealing with large files (although it is not recommended to ouput large files in the terminal), colorising the ouput might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color`.
+When dealing with large files (although it is not recommended to ouput large files in the terminal), colorising the ouput might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color` or `--nc`.
 
 ##### Customise colors
 You can specify your own color set as explained [here](https://github.com/ABridoux/scout/wiki/%5B30%5D-Syntax-highlighting:-custom-colors). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
+
+#### CSV export (2.0.0)
+Export data when dealing with arrays or a dictionary of arrays. Default separator ';' or customisable.
+
+#### Folding (2.0.0)
+Fold arrays or dictionaries at a certain depth level to make the data more readable
+
+#### Auto-completion of commands (2.0.0)
+When auto-completion is enabled on the shell, use `scout install-completion-script`, then the `source` command if needed to get auto-completion for scout commands.
 
 <br>
 
@@ -156,7 +192,7 @@ scout install-completion-script
 
 ##### Note
 - To find all scout versions, please browse the [releases](https://github.com/ABridoux/scout/releases) page.
-- When deploying a package (with a MDM for example), it might be useful to add the version to the name. To get scout latest version: simply run `scout version` to get your **installed scout version**, or ` curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | scout tag_name` to get the latest version **available on the Github repository**.
+- When deploying a package (with a MDM for example), it might be useful to add the version to the name. To get scout latest version: simply run `scout version` for version < 2.0.0_alpha01 and `scout --version`  for version >= 2.0.0_alpha01 to get your **installed scout version**, or ` curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | scout tag_name` to get the latest version **available on the Github repository**.
 
 #### Git
 
