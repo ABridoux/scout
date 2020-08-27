@@ -71,7 +71,7 @@ extension PathExplorerSerialization {
         try dictionary.forEach { (key, value) in
             let pathExplorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
             let newValue = try pathExplorer.getSingle(at: index)
-            let newName = detailedName ? key + PathElement.index(index).description : key
+            let newName = detailedName ? key + GroupSample.keySeparator + GroupSample.indexDescription(index) : key
             newDictFilter[newName] = newValue
         }
 
@@ -134,7 +134,7 @@ extension PathExplorerSerialization {
         try dictionary.forEach { (keyValue, value) in
             let pathExplorer = PathExplorerSerialization(value: value, path: readingPath.appending(keyValue))
             let value = try pathExplorer.getDictAndValueFor(for: key).value
-            let newName = detailedName ? keyValue + Path.defaultSeparator + key : keyValue
+            let newName = detailedName ? keyValue + GroupSample.keySeparator + key : keyValue
             newDictFilter[newName] = value
         }
 
@@ -293,7 +293,7 @@ extension PathExplorerSerialization {
             let path = readingPath.appending(key)
             let pathExplorer = PathExplorerSerialization(value: value, path: path)
             let filteredDict = try pathExplorer.getSingle(groupSample).value
-            let newName = detailedName ? key + groupSample.pathElement.description : key
+            let newName = detailedName ? key + GroupSample.keySeparator + groupSample.description : key
             newDict[newName] = filteredDict
         }
 

@@ -64,6 +64,7 @@ struct ReadDocumentation: Documentation {
     - Deactivate the output colorization with \(noColor) or \(nc).
         Useful to export the data or if you encounter slowdowns when dealing with large files ((although it is not recommended to ouput large files in the terminal).
     - Output an array or a dictionary of arrays with the \(csv) flag or \(csvSep) option
+    - Fold the arrays and dictionaries at a certain depth level with the \(level) option
 
     Examples
     --------

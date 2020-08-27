@@ -153,7 +153,7 @@ extension PathExplorerSerializationTests {
         plist = try plist.get(path)
 
         let resultValue = try XCTUnwrap(plist.value as? [String: [Int]])
-        XCTAssertEqual(["Buzz.episodes[1:2]": [2, 3], "Zurg.episodes[1:2]": [2, 3]], resultValue)
+        XCTAssertEqual(["Buzz_episodes_slice(1,2)": [2, 3], "Zurg_episodes_slice(1,2)": [2, 3]], resultValue)
     }
 
     func testGetDictionaryFilter() throws {
@@ -186,9 +186,9 @@ extension PathExplorerSerializationTests {
 
         let keys = try XCTUnwrap(value as? [String: String])
         var copy = [String: String]()
-        charactersByName.forEach { copy[$0.key + ".name"] = $0.value.name }
+        charactersByName.forEach { copy[$0.key + "_name"] = $0.value.name }
 
-        copy.removeValue(forKey: "Woody.name")
+        copy.removeValue(forKey: "Woody_name")
 
         XCTAssertEqual(keys, copy)
     }
@@ -201,7 +201,7 @@ extension PathExplorerSerializationTests {
 
         let keys = try XCTUnwrap(value as? [String: Int])
         var copy  = [String: Int]()
-        charactersByName.forEach { copy[$0.key + ".episodes[1]"] = $0.value.episodes[1] }
+        charactersByName.forEach { copy[$0.key + "_episodes_index(1)"] = $0.value.episodes[1] }
 
         XCTAssertEqual(keys, copy)
     }
@@ -236,9 +236,9 @@ extension PathExplorerSerializationTests {
         plist = try plist.get(path)
 
         let resultValue = try XCTUnwrap(plist.value as? [String: [String: [Int]]])
-        XCTAssertEqual(["Buzz#episodes#":
+        XCTAssertEqual(["Buzz_filter(episodes)":
                             ["episodes": [1, 2, 3]],
-                        "Zurg#episodes#":
+                        "Zurg_filter(episodes)":
                             ["episodes": [1, 2, 3]]],
                        resultValue)
     }

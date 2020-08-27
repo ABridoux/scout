@@ -188,9 +188,9 @@ final class PathExplorerXMLTests: XCTestCase {
 
         let (headers, values) = try xml.get("characters", PathElement.filter(".*"), "episodes").exportCSVHeadersAndValues(separator: ";")
 
-        let expectedValues = [["Buzz.episodes", "1", "2", "3"],
-                              ["Woody.episodes", "1", "2", "3"],
-                              ["Zurg.episodes", "1", "2", "3"]]
+        let expectedValues = [["Buzz_episodes", "1", "2", "3"],
+                              ["Woody_episodes", "1", "2", "3"],
+                              ["Zurg_episodes", "1", "2", "3"]]
 
         XCTAssertTrue(headers.isEmpty)
         XCTAssertEqual(values.sorted { $0[0] < $1[0] }, expectedValues)

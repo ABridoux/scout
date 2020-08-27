@@ -25,9 +25,6 @@ struct AddCommand: ParsableCommand {
     @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path", completion: .file())
     var modifyFilePath: String?
 
-    @Flag(name: [.short, .long], inversion: .prefixedNo, help: "Output the modified data")
-    var verbose = false
-
     @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
     var color = ColorFlag.color
 
@@ -60,17 +57,17 @@ struct AddCommand: ParsableCommand {
         if var json = try? Json(data: data) {
 
             try add(pathsAndValues, to: &json)
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: json, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else if var plist = try? Plist(data: data) {
 
             try add(pathsAndValues, to: &plist)
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: plist, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else if var xml = try? Xml(data: data) {
 
             try add(pathsAndValues, to: &xml)
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color.colorise, level: level, csv: separator)
+            try ScoutCommand.output(output, dataWith: xml, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else {
             if let filePath = inputFilePath {

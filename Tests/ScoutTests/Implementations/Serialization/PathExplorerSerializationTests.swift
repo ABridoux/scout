@@ -90,7 +90,7 @@ final class PathExplorerSerializationTests: XCTestCase {
         let plist = try Plist(data: data)
 
         let csv = try plist.exportCSVArrayOfDictionaries(separator: ";")
-        let expectedHeaders = ["episodes[0]", "episodes[1]", "episodes[2]", "name", "quote"]
+        let expectedHeaders = ["episodes_index(0)", "episodes_index(1)", "episodes_index(2)", "name", "quote"]
         let expectedValues = [["1", "2", "3", "Woody", "I got a snake in my boot"],
                               ["1", "2", "3", "Buzz", "To infinity and beyond"],
                               ["1", "2", "3", "Zurg", "Destroy Buzz Lightyear"]]
@@ -104,9 +104,9 @@ final class PathExplorerSerializationTests: XCTestCase {
         let plist = try Plist(data: data)
 
         let csv = try plist.get(PathElement.filter(".*"), "episodes").exportCSVDictionary(separator: ";")
-        let expectedValues = [["Buzz.episodes", "1", "2", "3"],
-                              ["Woody.episodes", "1", "2", "3"],
-                              ["Zurg.episodes", "1", "2", "3"]]
+        let expectedValues = [["Buzz_episodes", "1", "2", "3"],
+                              ["Woody_episodes", "1", "2", "3"],
+                              ["Zurg_episodes", "1", "2", "3"]]
 
         XCTAssertEqual(csv.sorted { $0[0] < $1[0] }, expectedValues)
     }
@@ -139,6 +139,6 @@ final class PathExplorerSerializationTests: XCTestCase {
             names.insert(key)
         }
 
-        XCTAssertEqual(names, Set(arrayLiteral: "name", "quote", "episodes[0]", "episodes[1]", "episodes[2]"))
+        XCTAssertEqual(names, Set(arrayLiteral: "name", "quote", "episodes_index(0)", "episodes_index(1)", "episodes_index(2)"))
     }
 }

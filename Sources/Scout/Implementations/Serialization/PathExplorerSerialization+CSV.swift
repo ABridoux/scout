@@ -144,7 +144,7 @@ extension PathExplorerSerialization {
             dict.forEach { (keyValue, value) in
                 var newKey = keyValue
                 if key != "" {
-                    newKey = key + Path.defaultSeparator + keyValue
+                    newKey = key + GroupSample.keySeparator + keyValue
                 }
                 if !isGroup(value: value) {
                     block(newKey, value)
@@ -153,7 +153,7 @@ extension PathExplorerSerialization {
             }
         } else if let array = value as? ArrayValue {
             for (index, value) in array.enumerated() {
-                let newKey = key == "" ? key : key + PathElement.index(index).description
+                let newKey = key == "" ? key : key + GroupSample.keySeparator + GroupSample.indexDescription(index)
 
                 if key != "" && !isGroup(value: value) {
                     block(newKey, value)

@@ -30,6 +30,9 @@ struct ReadCommand: ParsableCommand {
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
+    @Option(name: [.short, .long], help: "Write the read data into the file at the given path", completion: .file())
+    var output: String?
+
     @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
     var color = ColorFlag.color
 
@@ -66,6 +69,12 @@ struct ReadCommand: ParsableCommand {
                 throw RuntimeError.noValueAt(path: readingPath.description)
             }
 
+            if let output = output?.replacingTilde, let contents = value.data(using: .utf8) {
+                let fm = FileManager.default
+                fm.createFile(atPath: output, contents: contents, attributes: nil)
+                return
+            }
+
             let output = colorise ? injector.inject(in: value) : value
 
             print(output)
@@ -78,7 +87,6 @@ struct ReadCommand: ParsableCommand {
     /// - Throws: If the path is invalid or the values does not exist
     /// - Returns: The value, and the corresponding
     func readValue(at path: Path, in data: Data) throws -> (value: String, injector: TextInjector) {
-
         var injector: TextInjector
         var value: String
 
@@ -139,7 +147,7 @@ struct ReadCommand: ParsableCommand {
             return value
         }
 
-        if let level = level {
+        if let level = level, output == nil { // ignore folding when writing in a file
             explorer.fold(upTo: level)
         }
 

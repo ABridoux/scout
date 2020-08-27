@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Array of `PathElementRepresentable` to find a specific value in a `PathExplorer`
+/// Collection of `PathElement`s to subscript a `PathExplorer`
 public struct Path: Equatable {
 
     // MARK: - Constants

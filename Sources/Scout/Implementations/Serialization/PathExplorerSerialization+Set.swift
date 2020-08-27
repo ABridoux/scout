@@ -56,7 +56,7 @@ extension PathExplorerSerialization {
     /// Set the given index in the array slice by browsing all the arrays in the slice
     func set(at index: Int, inArraySlice array: inout ArrayValue, to newValues: ArrayValue) throws {
         guard array.count == newValues.count else {
-            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description,
+            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.name,
                                                           value: String(describing: newValues),
                                                           element: .index(index))
         }
@@ -120,7 +120,7 @@ extension PathExplorerSerialization {
     /// Set the given key in the array slice by browsing all the arrays in the slice
     func set(for key: String, inArraySlice array: inout ArrayValue, to newValues: ArrayValue) throws {
         guard array.count == newValues.count else {
-            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description,
+            throw PathExplorerError.wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.name,
                                                           value: String(describing: newValues),
                                                           element: .key(key))
         }
@@ -152,7 +152,7 @@ extension PathExplorerSerialization {
         let slice = PathElement.slice(bounds)
         let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
         let newSlice = try cast(newValue, as: .array,
-                                orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description, value: String(describing: newValue), element: slice))
+                                orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.name, value: String(describing: newValue), element: slice))
 
         let range = try bounds.range(lastValidIndex: array.count - 1, path: readingPath)
         let leftRange = range.lowerBound > 0 ? 0...range.lowerBound - 1 : nil
@@ -184,7 +184,7 @@ extension PathExplorerSerialization {
         var newDictFilter = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
 
         let newDict = try cast(newValue, as: .dictionary,
-                                orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.description, value: String(describing: newValue), element: filter))
+                                orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.name, value: String(describing: newValue), element: filter))
 
         newDict.forEach { (key, value) in
             if !allowEmptyGroups, PathExplorerSerialization(value: value).isEmpty {

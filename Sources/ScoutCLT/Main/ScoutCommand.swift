@@ -43,14 +43,24 @@ struct ScoutCommand: ParsableCommand {
 
     // MARK: - Functions
 
-    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, verbose: Bool, colorise: Bool, level: Int? = nil, csv: String? = nil) throws {
-        if let output = output?.replacingTilde {
-            let fm = FileManager.default
-            try fm.createFile(atPath: output, contents: pathExplorer.exportData(), attributes: nil)
+    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, colorise: Bool, level: Int? = nil, csvSeparator: String? = nil) throws {
+
+        var csv: String?
+        if let separator = csvSeparator {
+            csv = try pathExplorer.exportCSV(separator: separator)
         }
 
-        let injector: TextInjector
+        if let output = output?.replacingTilde {
+            let fm = FileManager.default
+            let contents = try csv?.data(using: .utf8) ?? pathExplorer.exportData()
+            fm.createFile(atPath: output, contents: contents, attributes: nil)
+            return
+        }
 
+        // remaining part to output the data
+
+        // get the injector to inject color if necessary
+        let injector: TextInjector
         switch pathExplorer.format {
 
         case .json:
@@ -76,20 +86,22 @@ struct ScoutCommand: ParsableCommand {
             injector = xmlInjector
         }
 
+        if let csvOutput = csv {
+            print(csvOutput)
+            return
+        }
+
+        // shadow variable to fold if necessary
         var pathExplorer = pathExplorer
 
+        // fold if specified
         if let level = level {
             pathExplorer.fold(upTo: level)
         }
-
-        if let separator = csv {
-            let output = try pathExplorer.exportCSV(separator: separator)
-            print(output)
-        } else if verbose {
-            var output = try pathExplorer.exportString()
-            output = colorise ? injector.inject(in: output) : output
-            print(output)
-        }
+        
+        var output = try pathExplorer.exportString()
+        output = colorise ? injector.inject(in: output) : output
+        print(output)
     }
 
     static func getColorFile() throws -> ColorFile? {
