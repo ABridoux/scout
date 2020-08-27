@@ -207,7 +207,7 @@ extension PathExplorerSerialization {
 
         case .key(let key): try delete(for: key)
         case .index(let index): try delete(at: index)
-        case .count: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
+        case .count, .keysList: throw PathExplorerError.wrongUsage(of: element, in: readingPath.appending(element))
         case .slice(let bounds): try deleteArraySlice(within: bounds)
         case .filter(let pattern): try deleteDictionaryFilter(with: pattern)
         }

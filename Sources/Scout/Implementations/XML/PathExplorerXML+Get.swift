@@ -140,6 +140,22 @@ extension PathExplorerXML {
                                path: readingPath.appending(.count))
     }
 
+    func getKeysList() throws -> Self {
+        var keyChildren = [AEXMLElement]()
+
+        // get the keys names
+        element.children.forEach { child in
+            let keyChild = AEXMLElement(name: "key", value: child.name)
+            keyChildren.append(keyChild)
+        }
+
+        // new element
+        let copy = element.copy()
+        copy.name = copy.name + PathElement.keysList.description
+        copy.addChildren(keyChildren.sorted { $0.string < $1.string })
+        return PathExplorerXML(element: copy, path: readingPath.appending(.keysList))
+    }
+
     // MARK: - Group
 
     /// Returns a slice of value is it is an array
@@ -216,6 +232,7 @@ extension PathExplorerXML {
         case .key(let key): return try get(for: key)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         case .count: return try getChildrenCount()
+        case .keysList: return try getKeysList()
         case .slice(let bounds): return try getArraySlice(within: bounds)
         case .filter(let pattern): return try getDictionaryFilter(with: pattern)
         }

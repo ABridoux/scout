@@ -26,7 +26,7 @@ public struct PathExplorerXML: PathExplorer {
     public var description: String {
         // when priting out an element which has a parent, the identation will remain the same
         // which is unwanted so remove the parent by copying the element (parent setter is internal)
-        let copy = AEXMLElement(name: element.name, value: element.value, attributes: element.attributes)
+        let copy = element.copy()
         copy.addChildren(element.children)
         var description = copy.xml
 

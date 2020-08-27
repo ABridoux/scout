@@ -47,13 +47,13 @@ extension PathExplorerXML {
 
         case .key(let key): try add(newValue: newValue, for: key)
         case .index(let index): try add(newValue: newValue, at: index)
-        case .count, .slice, .filter: throw PathExplorerError.wrongUsage(of: pathElement, in: readingPath)
+        case .count, .keysList, .slice, .filter: throw PathExplorerError.wrongUsage(of: pathElement, in: readingPath)
         }
     }
 
     mutating func insertChild(named keyName: String, withValue value: String, at index: Int) {
         // we have to copy the element as we cannot modify its children
-        let copy = AEXMLElement(name: element.name, value: element.value, attributes: element.attributes)
+        let copy = element.copy()
 
         // parse the children and just adding them until we reach index to insert the new child
         for childIndex in 0...element.children.count {

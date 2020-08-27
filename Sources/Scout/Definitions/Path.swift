@@ -11,6 +11,9 @@ public struct Path: Equatable {
     // MARK: - Constants
 
     static let defaultSeparator = "."
+    static func splitRegexPattern(separator: String) -> String { #"\(.+\)|#(\x5C#|[^#])+#|[^\#(separator)]+"# }
+    static let groupSubscripterRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
+    static let squareBracketPattern = #"\[|\]"#
 
     // MARK: - Properties
 
@@ -44,12 +47,10 @@ public struct Path: Equatable {
     public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
 
-        let splitRegexPattern = #"\(.+\)|#(\x5C#|[^#])+#|[^\#(separator)]+"#
-        let groupSubscripterRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
-        let squareBracketPattern = #"\[|\]"#
-        let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
-        let groupSubscripterRegex = try NSRegularExpression(pattern: groupSubscripterRegexPattern)
-        let squareBracketRegex = try NSRegularExpression(pattern: squareBracketPattern)
+        // setup the regular expressions
+        let splitRegex = try NSRegularExpression(pattern: Self.splitRegexPattern(separator: separator))
+        let groupSubscripterRegex = try NSRegularExpression(pattern: Self.groupSubscripterRegexPattern)
+        let squareBracketRegex = try NSRegularExpression(pattern: Self.squareBracketPattern)
 
         let matches = splitRegex.matches(in: string)
         for match in matches {
@@ -66,9 +67,18 @@ public struct Path: Equatable {
             if let indexesMatch = try Self.extractGroupSubscripters(in: indexMatches, from: match) {
                 elements.append(contentsOf: indexesMatch)
             } else {
-                if squareBracketRegex.firstMatch(in: match, range: match.nsRange) != nil {
+                guard squareBracketRegex.firstMatch(in: match, range: match.nsRange) == nil else {
                     throw PathExplorerError.invalidPathElement(match.pathValue)
                 }
+
+                if let keyName = Self.extractKeyName(from: match) {
+                    if !keyName.isEmpty {
+                        elements.append(keyName.pathValue)
+                    }
+                    elements.append(.keysList)
+                    continue
+                }
+
                 elements.append(match.pathValue)
             }
         }
@@ -124,7 +134,17 @@ public struct Path: Equatable {
             // get the array name
             let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
 
-            elements.append(arrayName.pathValue)
+            if let keyName = Self.extractKeyName(from: arrayName) {
+                // keys list element
+                if !keyName.isEmpty {
+                    elements.append(keyName.pathValue)
+                }
+                elements.append(.keysList)
+            } else {
+                // standard key name
+                elements.append(arrayName.pathValue)
+            }
+
             elements.append(firstElement)
         }
 
@@ -139,6 +159,17 @@ public struct Path: Equatable {
         }
 
         return elements
+    }
+
+    /// - Parameter match: Match where to searck for a keys list element
+    /// - Returns: Nil if no keys list elemnt was found. The returned string is the key name in front, which is empty if none was found.
+    static func extractKeyName(from match: String) -> String? {
+        guard match.hasSuffix(PathElement.keysList.description) else {
+            return nil
+        }
+        var keyName = match
+        keyName.removeLast(PathElement.keysList.description.count)
+        return keyName
     }
 
     // MARK: Path manipulations
@@ -193,7 +224,7 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
         var description = ""
         elements.forEach { element in
             switch element {
-            case .index, .count, .slice:
+            case .index, .count, .slice, .keysList:
                 // remove the point added automatically to a path element
                 if description.hasSuffix(Self.defaultSeparator) {
                     description.removeLast()

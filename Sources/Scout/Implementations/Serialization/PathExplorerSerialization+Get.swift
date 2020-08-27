@@ -191,6 +191,15 @@ extension PathExplorerSerialization {
         return PathExplorerSerialization(value: countsDict, path: readingPath.appending(.count))
     }
 
+    // MARK: - Keys list
+
+    func getKeysList() throws -> Self {
+        let dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
+        let keys = Array(dict.keys).sorted()
+
+        return PathExplorerSerialization(value: keys, path: readingPath.appending(.keysList))
+    }
+
     // MARK: - Group
 
     func getSingle(_ groupSample: GroupSample) throws -> Self {
@@ -304,6 +313,7 @@ extension PathExplorerSerialization {
         case .key(let key): return try get(for: key, detailedName: detailedName)
         case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
         case .count: return try getChildrenCount()
+        case .keysList: return try getKeysList()
         case .slice(let bounds): return try getArraySlice(within: bounds, detailedName: detailedName)
         case .filter(let pattern): return try getDictionaryFilter(with: pattern)
         }

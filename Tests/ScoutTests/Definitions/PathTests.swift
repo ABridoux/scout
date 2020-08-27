@@ -22,6 +22,7 @@ final class PathTests: XCTestCase {
     let secondKeyWithTwoNestedArrays = "secondKey[1][0][2]"
     let secondKeyWithFourthSeparatorAndIndex = "second$key[1]"
     let secondKeyWithCount = "secondKey[#]"
+    let secondKeyWithKeysList = "secondKey{#}"
     let secondKeyWithFullRange = "secondKey[2:4]"
     let secondKeyWithPartialRangeLeft = "secondKey[:4]"
     let secondKeyWithPartialRangeRight = "secondKey[1:]"
@@ -148,6 +149,22 @@ final class PathTests: XCTestCase {
     func testCountNotFinal() throws {
         let array: Path = [thirdKey, PathElement.count, secondKey]
         let path = try Path(string: thirdKeyWithCount)
+
+        XCTAssertEqual(path, array)
+    }
+
+    // MARK: - Keys list
+
+    func testKeysList() throws {
+        let array: Path = [secondKey, PathElement.keysList]
+        let path = try Path(string: secondKeyWithKeysList)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testKeysListFirstElement() throws {
+        let array: Path = [PathElement.keysList, 1]
+        let path = try Path(string: "{#}[1]")
 
         XCTAssertEqual(path, array)
     }
