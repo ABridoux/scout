@@ -149,6 +149,16 @@ extension PathExplorerXMLTests {
         XCTAssertEqual(try xml.get(for: "dogs").get(element: .count).int, 3)
     }
 
+    func testGetCountDictionaryFilter() throws {
+        let xml = try Xml(data: toyBoxByName)
+
+        let element = try xml.get("characters", PathElement.filter(".*"), PathElement.count).element
+
+        XCTAssertEqual(element["Woody_count"].int, 3)
+        XCTAssertEqual(element["Buzz_count"].int, 3)
+        XCTAssertEqual(element["Zurg_count"].int, 3)
+    }
+
     func testGetCount_ThrowsErrorIfNotFinal() throws {
         let xml = try Xml(data: stubData2)
         let errorPath = Path("root", "dogs", PathElement.count)

@@ -11,9 +11,18 @@ public struct Path: Equatable {
     // MARK: - Constants
 
     static let defaultSeparator = "."
-    static func splitRegexPattern(separator: String) -> String { #"\(.+\)|#(\x5C#|[^#])+#|[^\#(separator)]+"# }
-    static let groupSubscripterRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol):-]+(?=\])"#
-    static let squareBracketPattern = #"\[|\]"#
+    private static let countSymbol = PathElement.defaultCountSymbol
+    private static let keysListSymbol = PathElement.defaultKeysListSymbol
+
+    static func splitRegexPattern(separator: String) -> String {
+        var regex = #"\(.+\)"# // anything between brackets is allowed
+        regex += #"|\[[0-9\#(countSymbol):-]+\]"# // indexes and count
+        regex += #"|\{\#(keysListSymbol)\}"# // keys list
+        regex += #"|#(\x5C#|[^#])+#"# // dictionary filter
+        regex += #"|[^\#(separator)^\[^\]^\{^\}]+"# // standard key
+
+        return regex
+    }
 
     // MARK: - Properties
 
@@ -46,11 +55,8 @@ public struct Path: Equatable {
     */
     public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
-
         // setup the regular expressions
         let splitRegex = try NSRegularExpression(pattern: Self.splitRegexPattern(separator: separator))
-        let groupSubscripterRegex = try NSRegularExpression(pattern: Self.groupSubscripterRegexPattern)
-        let squareBracketRegex = try NSRegularExpression(pattern: Self.squareBracketPattern)
 
         let matches = splitRegex.matches(in: string)
         for match in matches {
@@ -61,26 +67,9 @@ public struct Path: Equatable {
                 match.removeFirst()
                 match.removeLast()
             }
-            let indexMatches = groupSubscripterRegex.matches(in: match, options: [], range: match.nsRange)
 
-            // try to get the group subscripters if any
-            if let indexesMatch = try Self.extractGroupSubscripters(in: indexMatches, from: match) {
-                elements.append(contentsOf: indexesMatch)
-            } else {
-                guard squareBracketRegex.firstMatch(in: match, range: match.nsRange) == nil else {
-                    throw PathExplorerError.invalidPathElement(match.pathValue)
-                }
-
-                if let keyName = Self.extractKeyName(from: match) {
-                    if !keyName.isEmpty {
-                        elements.append(keyName.pathValue)
-                    }
-                    elements.append(.keysList)
-                    continue
-                }
-
-                elements.append(match.pathValue)
-            }
+            let element = PathElement(from: match)
+            elements.append(element)
         }
 
         self.elements = elements
@@ -103,74 +92,6 @@ public struct Path: Equatable {
     }
 
     // MARK: - Functions
-
-    // MARK: Initialization helpers
-
-    /// Extract group subscripters [] in an element
-    /// - Parameters:
-    ///   - indexMatches: Results of a `NSRegularExpression` where the pattern [] is found
-    ///   - match: The match from which to extract the subscripters
-    /// - Throws: If a found subscripter is invalid
-    /// - Returns: The associated `PathElement`s of the subscripters
-    static func extractGroupSubscripters(in indexMatches: [NSTextCheckingResult], from match: String) throws -> [PathElement]? {
-        var indexMatches = indexMatches
-        var elements = [PathElement]()
-
-        guard let indexMatch = indexMatches.first else { // we have a first index, so retrieve it and the array name if possible
-            return nil
-        }
-
-        // get the first element
-        let firstElement = PathElement(from: String(match[indexMatch.range]))
-
-        guard firstElement.isGroupSubscripter else {
-            throw PathExplorerError.invalidPathElement(match.pathValue)
-        }
-
-        if indexMatch.range.lowerBound == 1 {
-            // specific case: the root element is an array: there is no array name
-            elements.append(firstElement)
-        } else {
-            // get the array name
-            let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
-
-            if let keyName = Self.extractKeyName(from: arrayName) {
-                // keys list element
-                if !keyName.isEmpty {
-                    elements.append(keyName.pathValue)
-                }
-                elements.append(.keysList)
-            } else {
-                // standard key name
-                elements.append(arrayName.pathValue)
-            }
-
-            elements.append(firstElement)
-        }
-
-        // now retrieve the remaining indexes
-        indexMatches.removeFirst()
-
-        try indexMatches.forEach { indexMatch in
-            let element = PathElement(from: String(match[indexMatch.range]))
-
-            guard element.isGroupSubscripter else { throw PathExplorerError.invalidPathElement(match.pathValue) }
-            elements.append(element)
-        }
-
-        return elements
-    }
-
-    /// - Parameter match: Match where to searck for a keys list element
-    /// - Returns: Nil if no keys list elemnt was found. The returned string is the key name in front, which is empty if none was found.
-    static func extractKeyName(from match: String) -> String? {
-        guard match.hasSuffix(PathElement.keysList.description) else {
-            return nil
-        }
-        var keyName = match
-        keyName.removeLast(PathElement.keysList.description.count)
-        return keyName
-    }
 
     // MARK: Path manipulations
 

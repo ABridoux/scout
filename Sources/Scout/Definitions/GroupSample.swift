@@ -4,7 +4,7 @@
 // MIT license, see LICENSE file for details
 
 /// Array slice or dictionary filter found in a `Path`
-enum GroupSample: CustomStringConvertible {
+enum GroupSample {
     case arraySlice(Bounds)
     case dictionaryFilter(String)
 
@@ -16,13 +16,6 @@ enum GroupSample: CustomStringConvertible {
         switch self {
         case .arraySlice: return "an Array"
         case .dictionaryFilter: return "a Dictionary"
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .arraySlice(let bounds): return "slice(\(bounds.lowerString),\(bounds.upperString))"
-        case .dictionaryFilter(let pattern): return "filter(\(pattern))"
         }
     }
 

@@ -24,10 +24,45 @@ public protocol PathElementRepresentable {
 }
 
 extension String: PathElementRepresentable {
-    public var pathValue: PathElement { slice ?? filter ?? .key(self) }
+    public var pathValue: PathElement { index ?? count ?? keysList ?? slice ?? filter ?? .key(self) }
+
+    var index: PathElement? {
+        guard self.hasPrefix("["), self.hasSuffix("]") else {
+            return nil
+        }
+
+        var copy = self
+        copy.removeFirst()
+        copy.removeLast()
+
+        guard let index = Int(copy) else { return nil }
+        return PathElement.index(index)
+    }
+
+    var count: PathElement? {
+        if self == PathElement.count.description {
+            return .count
+        }
+        return nil
+    }
+
+    var keysList: PathElement? {
+        if self == PathElement.keysList.description {
+            return .keysList
+        }
+        return nil
+    }
 
     var slice: PathElement? {
-        let splitted = components(separatedBy: ":")
+        guard self.hasPrefix("["), self.hasSuffix("]") else {
+            return nil
+        }
+
+        var copy = self
+        copy.removeFirst()
+        copy.removeLast()
+
+        let splitted = copy.components(separatedBy: ":")
 
         guard splitted.count == 2 else {
             return nil

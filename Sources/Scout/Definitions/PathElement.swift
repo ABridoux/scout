@@ -53,8 +53,8 @@ public enum PathElement: Equatable {
     /// Can subscript an array or a dictionay
     public var isGroupSubscripter: Bool {
         switch self {
-        case .count, .index, .slice, .filter: return true
-        case .key, .keysList: return false
+        case .count, .keysList, .index, .slice, .filter: return true
+        case .key: return false
         }
     }
 
@@ -72,8 +72,12 @@ public enum PathElement: Equatable {
     // MARK: - Initialization
 
     init(from string: String) {
-        if let index = Int(string) {
-            self = .index(index)
+        if let index = string.index {
+            self = index
+        } else if let count = string.count {
+            self = count
+        } else if let keysList = string.keysList {
+            self = keysList
         } else if string == Self.defaultCountSymbol {
             self = .count
         } else if let range = string.slice {
@@ -117,6 +121,18 @@ extension PathElement: CustomStringConvertible {
 
         case .filter(let filter):
             return "#\(filter)#"
+        }
+    }
+
+    /// Name of the path element when used a key
+    var keyName: String {
+        switch self {
+        case .key(let key): return key
+        case .index(let index): return "index\(index))"
+        case .count: return "count"
+        case .keysList: return "keysList"
+        case .slice(let bounds): return "slice(\(bounds.lowerString),\(bounds.upperString))"
+        case .filter(let pattern): return "filter(\(pattern))"
         }
     }
 }

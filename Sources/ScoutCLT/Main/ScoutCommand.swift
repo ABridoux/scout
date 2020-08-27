@@ -98,7 +98,7 @@ struct ScoutCommand: ParsableCommand {
         if let level = level {
             pathExplorer.fold(upTo: level)
         }
-        
+
         var output = try pathExplorer.exportString()
         output = colorise ? injector.inject(in: output) : output
         print(output)

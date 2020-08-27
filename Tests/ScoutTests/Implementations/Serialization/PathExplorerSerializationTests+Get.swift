@@ -214,7 +214,7 @@ extension PathExplorerSerializationTests {
         plist = try plist.get(path)
 
         let resultValue = try XCTUnwrap(plist.value as? [String: Int])
-        XCTAssertEqual(["Buzz[#]": 3, "Zurg[#]": 3], resultValue)
+        XCTAssertEqual(["Buzz_count": 3, "Zurg_count": 3], resultValue)
     }
 
     func testGetDictionaryFilterArraySlice() throws {
