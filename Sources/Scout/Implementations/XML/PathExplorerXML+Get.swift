@@ -118,6 +118,8 @@ extension PathExplorerXML {
         return copy
     }
 
+    // MARK: - Count
+
     func getChildrenCount() throws -> Self {
         if let sample = lastGroupSample {
             let copy = AEXMLElement(name: element.name + PathElement.count.description)
@@ -126,7 +128,7 @@ extension PathExplorerXML {
                 let name: String
 
                 switch sample {
-                case .dictionaryFilter: name = child.name + PathElement.count.description
+                case .dictionaryFilter: name = child.name + GroupSample.keySeparator + PathElement.count.keyName
                 case .arraySlice: name = child.name
                 }
 
@@ -139,6 +141,8 @@ extension PathExplorerXML {
         return PathExplorerXML(element: .init(name: "", value: "\(self.element.children.count)", attributes: [:]),
                                path: readingPath.appending(.count))
     }
+
+    // MARK: - Keys list
 
     func getKeysList() throws -> Self {
         var keyChildren = [AEXMLElement]()
@@ -162,7 +166,7 @@ extension PathExplorerXML {
     func getArraySlice(within bounds: Bounds) throws -> PathExplorerXML {
         let slice = PathElement.slice(bounds)
         // we have to copy the element as we cannot modify its children
-        let newKeyName = element.name + GroupSample.keySeparator + GroupSample.arraySlice(bounds).description
+        let newKeyName = element.name + GroupSample.keySeparator + slice.keyName
         let copy = AEXMLElement(name: newKeyName, value: element.value, attributes: element.attributes)
         let path = readingPath.appending(slice)
         let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: path)
@@ -191,7 +195,7 @@ extension PathExplorerXML {
         let filter = PathElement.filter(pattern)
         let path = readingPath.appending(filter)
         let regex = try NSRegularExpression(pattern: pattern, path: path)
-        let filterName = GroupSample.keySeparator + GroupSample.dictionaryFilter(pattern).description
+        let filterName = GroupSample.keySeparator + filter.keyName
 
         var filteredChildren = [AEXMLElement]()
 

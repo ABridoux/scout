@@ -186,7 +186,7 @@ extension PathExplorerSerialization {
             guard let count = try pathExplorer.getChildrenCountSimple().int else {
                 throw PathExplorerError.wrongUsage(of: .count, in: path)
             }
-            countsDict[key + PathElement.count.description] = count
+        countsDict[key + GroupSample.keySeparator + PathElement.count.keyName] = count
         }
         return PathExplorerSerialization(value: countsDict, path: readingPath.appending(.count))
     }
@@ -293,7 +293,7 @@ extension PathExplorerSerialization {
             let path = readingPath.appending(key)
             let pathExplorer = PathExplorerSerialization(value: value, path: path)
             let filteredDict = try pathExplorer.getSingle(groupSample).value
-            let newName = detailedName ? key + GroupSample.keySeparator + groupSample.description : key
+            let newName = detailedName ? key + GroupSample.keySeparator + groupSample.pathElement.keyName : key
             newDict[newName] = filteredDict
         }
 
