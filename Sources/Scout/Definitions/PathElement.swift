@@ -72,8 +72,12 @@ public enum PathElement: Equatable {
     // MARK: - Initialization
 
     init(from string: String) {
-        if let index = Int(string) {
-            self = .index(index)
+        if let index = string.index {
+            self = index
+        } else if let count = string.count {
+            self = count
+        } else if let keysList = string.keysList {
+            self = keysList
         } else if string == Self.defaultCountSymbol {
             self = .count
         } else if let range = string.slice {

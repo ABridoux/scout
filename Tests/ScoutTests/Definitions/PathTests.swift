@@ -15,12 +15,11 @@ final class PathTests: XCTestCase {
     let index = 1
     let secondKeyWithIndex = "secondKey[1]"
     let secondKeyWithNegativeIndex = "secondKey[-1]"
-    let secondKeyWithdot = "second.key"
+    let secondKeyWithDot = "second.key"
     let secondKeyWithDotAndIndex = "second.key[1]"
     let secondKeyWithFourthSeparator = "second$key"
     let secondKeyWithNestedArray = "secondKey[1][0]"
     let secondKeyWithTwoNestedArrays = "secondKey[1][0][2]"
-    let secondKeyWithFourthSeparatorAndIndex = "second$key[1]"
     let secondKeyWithCount = "secondKey[#]"
     let secondKeyWithKeysList = "secondKey{#}"
     let secondKeyWithFullRange = "secondKey[2:4]"
@@ -75,8 +74,8 @@ final class PathTests: XCTestCase {
     }
 
     func testKeysWithBracketsAndIndex() throws {
-        let array: Path = [firstKey, secondKeyWithdot, 1, thirdKey]
-        let path = try Path(string: "\(firstKey).(\(secondKeyWithDotAndIndex)).\(thirdKey)")
+        let array: Path = [firstKey, secondKeyWithDot, 1, thirdKey]
+        let path = try Path(string: "\(firstKey).(\(secondKeyWithDot))[1]\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
@@ -118,7 +117,7 @@ final class PathTests: XCTestCase {
 
     func testSeparator3WithBracketAndIndex() throws {
         let array: Path = [firstKey, secondKeyWithFourthSeparator, index, thirdKey]
-        let path = try Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparatorAndIndex))$\(thirdKey)", separator: fourthSeparator)
+        let path = try Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparator))[\(index)]$\(thirdKey)", separator: fourthSeparator)
 
         XCTAssertEqual(path, array)
     }
@@ -165,6 +164,13 @@ final class PathTests: XCTestCase {
     func testKeysListFirstElement() throws {
         let array: Path = [PathElement.keysList, 1]
         let path = try Path(string: "{#}[1]")
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testKeysListAfterIndex() throws {
+        let array: Path = ["hello", 1, PathElement.keysList]
+        let path = try Path(string: "hello[1]{#}")
 
         XCTAssertEqual(path, array)
     }
