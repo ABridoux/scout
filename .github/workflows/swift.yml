@@ -13,3 +13,5 @@ jobs:
       run: xcodebuild -scheme Scout
     - name: Run tests
       run: xcodebuild test -scheme Scout
+    - name: Code coverage
+      run: bash <(curl -s https://codecov.io/bash)

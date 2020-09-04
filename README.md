@@ -11,6 +11,9 @@ Swift package<br>
     <a href="https://github.com/ABridoux/scout/actions?query=workflow%3ASwift">
         <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift?label=tests&logo=GitHub" />
     </a>
+    <a href="https://codecov.io/gh/ABridoux/scout">
+      <img src="https://codecov.io/gh/ABridoux/scout/branch/feature%2Fcodecov/graph/badge.svg" />
+    </a>
     <br/>
 Install<br>
     <a href="#">
