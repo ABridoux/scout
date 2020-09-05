@@ -12,12 +12,14 @@ Swift package<br>
         <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift?label=tests&logo=GitHub" />
     </a>
     <a href="https://codecov.io/gh/ABridoux/scout">
-      <img src="https://codecov.io/gh/ABridoux/scout/branch/feature%2Fcodecov/graph/badge.svg" />
+        <img src="https://codecov.io/gh/ABridoux/scout/branch/master/graph/badge.svg" />
     </a>
     <br/>
 Install<br>
     <a href="#">
         <img src="https://img.shields.io/badge/platforms-mac+linux-brightgreen.svg?style=flat" alt="Mac + Linux" />
+    </a>
+    <a href="https://github.com/ABridoux/scout/releases">														<img src="https://img.shields.io/badge/cli-tool-informational">
     </a>
      <a href="https://github.com/ABridoux/scout/releases">
         <img src="https://img.shields.io/badge/install-pkg%2Bzip-blue" />
@@ -75,7 +77,7 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 ### Insights
 
-See the wiki ([Sswift package](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package), [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)) to in in details how to use those features.
+See the wiki ([Swift package](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package), [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)) to see in details how to use those features.
 
 #### CRUD functions for JSON, Plist and XML data format
 - add a value (Create)
