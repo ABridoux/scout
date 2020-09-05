@@ -23,9 +23,26 @@ public struct PathExplorerXML: PathExplorer {
 
     public var stringValue: String { element.string.trimmingCharacters(in: .whitespacesAndNewlines) }
 
-    public var description: String { element.xml }
+    public var description: String {
+        // when priting out an element which has a parent, the identation will remain the same
+        // which is unwanted so remove the parent by copying the element (parent setter is internal)
+        let copy = element.copy()
+        copy.addChildren(element.children)
+        var description = copy.xml
+
+        if isFolded {
+            description = description.replacingOccurrences(of: Self.foldedRegexPattern, with: "...", options: .regularExpression)
+        }
+
+        return description
+    }
 
     public var format: DataFormat { .xml }
+
+    /// `true` if the explorer has been folded
+    var isFolded = false
+
+    static let foldedRegexPattern = #"(?<=>)\s*<\#(foldedKey)>\#(foldedMark)</\#(foldedKey)>\s*(?=<)"#
 
     // MARK: - Initialization
 
@@ -95,6 +112,12 @@ public struct PathExplorerXML: PathExplorer {
         try set(Path(path), keyNameTo: newKeyName)
     }
 
+    // MARK: Delete
+
+    public mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool = false) throws {
+        try delete(Path(path), deleteIfEmpty: deleteIfEmpty)
+    }
+
     // MARK: Add
 
     public mutating func add<Type>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws where Type: KeyAllowedType {
@@ -118,7 +141,34 @@ public struct PathExplorerXML: PathExplorer {
         return data
     }
 
-    public func exportString() throws -> String {
-        AEXMLDocument(root: element, options: .init()).xml
+    public func exportString() throws -> String { description }
+
+    public mutating func fold(upTo level: Int) {
+        guard level >= 0 else {
+            if !element.children.isEmpty {
+                element.children.forEach { $0.removeFromParent() }
+                let foldedElement = AEXMLElement(name: Self.foldedKey, value: Self.foldedMark)
+                element.addChild(foldedElement)
+            }
+
+            return
+        }
+
+        isFolded = true
+
+        for (index, child) in element.children.enumerated() {
+            var pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(index))
+            pathExplorer.fold(upTo: level - 1)
+        }
+    }
+
+    // MARK: Conversion
+
+    public func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type {
+        if let value = Type(stringValue) {
+            return value
+        } else {
+            throw PathExplorerError.valueConversionError(value: stringValue, type: String(describing: Type.self))
+        }
     }
 }

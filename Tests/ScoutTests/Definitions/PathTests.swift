@@ -15,13 +15,19 @@ final class PathTests: XCTestCase {
     let index = 1
     let secondKeyWithIndex = "secondKey[1]"
     let secondKeyWithNegativeIndex = "secondKey[-1]"
-    let secondKeyWithdot = "second.key"
+    let secondKeyWithDot = "second.key"
     let secondKeyWithDotAndIndex = "second.key[1]"
     let secondKeyWithFourthSeparator = "second$key"
     let secondKeyWithNestedArray = "secondKey[1][0]"
     let secondKeyWithTwoNestedArrays = "secondKey[1][0][2]"
-    let secondKeyWithFourthSeparatorAndIndex = "second$key[1]"
     let secondKeyWithCount = "secondKey[#]"
+    let secondKeyWithKeysList = "secondKey{#}"
+    let secondKeyWithFullRange = "secondKey[2:4]"
+    let secondKeyWithPartialRangeLeft = "secondKey[:4]"
+    let secondKeyWithPartialRangeRight = "secondKey[1:]"
+    let secondKeyWithFilter = "secondKey.#Halo.*#"
+    let secondKeyWithFilterAndCount = "secondKey.#Halo.*#[#]"
+
     let thirdKey = "thirdKey"
     let thirdKeyWithCount = "thirdKey[#].secondKey"
     let thirdKeyWithDot = "third.Key"
@@ -68,8 +74,8 @@ final class PathTests: XCTestCase {
     }
 
     func testKeysWithBracketsAndIndex() throws {
-        let array: Path = [firstKey, secondKeyWithdot, 1, thirdKey]
-        let path = try Path(string: "\(firstKey).(\(secondKeyWithDotAndIndex)).\(thirdKey)")
+        let array: Path = [firstKey, secondKeyWithDot, 1, thirdKey]
+        let path = try Path(string: "\(firstKey).(\(secondKeyWithDot))[1]\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
@@ -111,7 +117,7 @@ final class PathTests: XCTestCase {
 
     func testSeparator3WithBracketAndIndex() throws {
         let array: Path = [firstKey, secondKeyWithFourthSeparator, index, thirdKey]
-        let path = try Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparatorAndIndex))$\(thirdKey)", separator: fourthSeparator)
+        let path = try Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparator))[\(index)]$\(thirdKey)", separator: fourthSeparator)
 
         XCTAssertEqual(path, array)
     }
@@ -130,6 +136,8 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(path, array)
     }
 
+    // MARK: Count
+
     func testCount() throws {
         let array: Path = [secondKey, PathElement.count]
         let path = try Path(string: secondKeyWithCount)
@@ -140,6 +148,68 @@ final class PathTests: XCTestCase {
     func testCountNotFinal() throws {
         let array: Path = [thirdKey, PathElement.count, secondKey]
         let path = try Path(string: thirdKeyWithCount)
+
+        XCTAssertEqual(path, array)
+    }
+
+    // MARK: - Keys list
+
+    func testKeysList() throws {
+        let array: Path = [secondKey, PathElement.keysList]
+        let path = try Path(string: secondKeyWithKeysList)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testKeysListFirstElement() throws {
+        let array: Path = [PathElement.keysList, 1]
+        let path = try Path(string: "{#}[1]")
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testKeysListAfterIndex() throws {
+        let array: Path = ["hello", 1, PathElement.keysList]
+        let path = try Path(string: "hello[1]{#}")
+
+        XCTAssertEqual(path, array)
+    }
+
+    // MARK: Slice
+
+    func testFullSlice() throws {
+        let array = Path(secondKey, PathElement.slice(.init(lower: 2, upper: 4)))
+        let path = try Path(string: secondKeyWithFullRange)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testPartialSliceLeft() throws {
+        let array = Path(secondKey, PathElement.slice(.init(lower: .first, upper: 4)))
+        let path = try Path(string: secondKeyWithPartialRangeLeft)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testPartialSliceRight() throws {
+        let array = Path(secondKey, PathElement.slice(.init(lower: 1, upper: .last)))
+        let path = try Path(string: secondKeyWithPartialRangeRight)
+
+        XCTAssertEqual(path, array)
+    }
+
+    // MARK: Filter
+
+    func testFilter() throws {
+        let array = Path(secondKey, PathElement.filter("Halo.*"))
+        let path = try Path(string: secondKeyWithFilter)
+
+        XCTAssertEqual(path, array)
+    }
+
+    func testFilterAndCount() throws {
+        let array = Path(secondKey, PathElement.filter("Halo.*"), PathElement.count)
+        let path = try Path(string: secondKeyWithFilterAndCount)
 
         XCTAssertEqual(path, array)
     }

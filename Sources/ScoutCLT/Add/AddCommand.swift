@@ -11,25 +11,31 @@ struct AddCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "add",
         abstract: "Add value at a given path",
-        discussion: "To find examples and advanced explanations, please type `scout doc add`")
+        discussion: "To find examples and advanced explanations, please type `scout doc -c add`")
 
     @Argument(help: PathAndValue.help)
     var pathsAndValues = [PathAndValue]()
 
-    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data")
+    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
-    @Option(name: [.short, .long], help: "Write the modified data into the file at the given path")
+    @Option(name: [.short, .long], help: "Write the modified data into the file at the given path", completion: .file())
     var output: String?
 
-    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path")
+    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path", completion: .file())
     var modifyFilePath: String?
 
-    @Flag(name: [.short, .long], inversion: .prefixedNo, help: "Output the modified data")
-    var verbose = false
+    @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
+    var color = ColorFlag.color
 
-    @Flag(name: [.long], inversion: .prefixedNo, help: "Colorise the ouput")
-    var color = true
+    @Option(name: [.short, .long], help: "Fold the data at the given depth level")
+    var level: Int?
+
+    @Flag(name: [.customLong("csv")], help: "Convert the array data into CSV with the standard separator ';'")
+    var csv = false
+
+    @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
+    var csvSeparator: String?
 
     func run() throws {
 
@@ -46,21 +52,22 @@ struct AddCommand: ParsableCommand {
 
     func add(from data: Data) throws {
         let output = modifyFilePath ?? self.output
+        let separator = csvSeparator ?? (csv ? ";" : nil)
 
         if var json = try? Json(data: data) {
 
             try add(pathsAndValues, to: &json)
-            try ScoutCommand.output(output, dataWith: json, verbose: verbose, colorise: color)
+            try ScoutCommand.output(output, dataWith: json, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else if var plist = try? Plist(data: data) {
 
             try add(pathsAndValues, to: &plist)
-            try ScoutCommand.output(output, dataWith: plist, verbose: verbose, colorise: color)
+            try ScoutCommand.output(output, dataWith: plist, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else if var xml = try? Xml(data: data) {
 
             try add(pathsAndValues, to: &xml)
-            try ScoutCommand.output(output, dataWith: xml, verbose: verbose, colorise: color)
+            try ScoutCommand.output(output, dataWith: xml, colorise: color.colorise, level: level, csvSeparator: separator)
 
         } else {
             if let filePath = inputFilePath {

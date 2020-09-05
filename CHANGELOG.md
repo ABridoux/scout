@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [2.0.0](https://github.com/ABridoux/scout/tree/2.0.0) (05/09/2020)
+
+### Added
+- Auto-completion for commands [#94]
+- Array slicing [#66]
+- Array and dictionaries folding at a certain level [#107]
+- Delete empty dictionaries and arrays when left empty [#109]
+- Dictionary filtering [#112]
+- CSV export [#103]
+- Commands.md new examples [#117]
+- CLT scout command help license [#117]
+- Get a dictionary keys [#121]
+- CLT *read* command new `--output` option to export the read data or the CSV export into a file.
+
+### Changed
+- In-line documentation updated [#117]
+- Color bool flag changed for an enumerable flag [#117]
+- ArgumentParser updated to 0.3.0 [#117]
+- CLT Version command changed for the `--version` `ParsableCommand` parameter [#117]
+
+### Removed
+- `-v|--verbose` flag removed. **Breaking change**. The *delete*, *set*, and *add* commands will output the data by default when no `--output` or `--modify` options are specified.
+
 ## [1.3.2](https://github.com/ABridoux/scout/tree/1.3.1) (09/08/2020)
 
 ### Fixed
@@ -15,7 +38,6 @@ All notable changes to this project will be documented in this file. `Scout` adh
 
 ### Changed
 - Documentation updated [#89]
-
 
 ## [1.3.0](https://github.com/ABridoux/scout/tree/1.3.0) (24/07/2020)
 

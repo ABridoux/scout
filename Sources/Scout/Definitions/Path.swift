@@ -5,12 +5,24 @@
 
 import Foundation
 
-/// Array of `PathElementRepresentable` to find a specific value in a `PathExplorer`
+/// Collection of `PathElement`s to subscript a `PathExplorer`
 public struct Path: Equatable {
 
     // MARK: - Constants
 
-    let defaultSeparator = "."
+    static let defaultSeparator = "."
+    private static let countSymbol = PathElement.defaultCountSymbol
+    private static let keysListSymbol = PathElement.defaultKeysListSymbol
+
+    static func splitRegexPattern(separator: String) -> String {
+        var regex = #"\(.+\)"# // anything between brackets is allowed
+        regex += #"|\[[0-9\#(countSymbol):-]+\]"# // indexes and count
+        regex += #"|\{\#(keysListSymbol)\}"# // keys list
+        regex += #"|#(\x5C#|[^#])+#"# // dictionary filter
+        regex += #"|[^\#(separator)^\[^\]^\{^\}]+"# // standard key
+
+        return regex
+    }
 
     // MARK: - Properties
 
@@ -43,13 +55,8 @@ public struct Path: Equatable {
     */
     public init(string: String, separator: String = "\\.") throws {
         var elements = [PathElement]()
-
-        let splitRegexPattern = #"\(.+\)|[^\#(separator)]+"#
-        let indexAndCountRegexPattern = #"(?<=\[)[0-9\#(PathElement.defaultCountSymbol)-]+(?=\])"#
-        let squareBracketPattern = #"\[|\]"#
-        let splitRegex = try NSRegularExpression(pattern: splitRegexPattern)
-        let indexAndCountRegex = try NSRegularExpression(pattern: indexAndCountRegexPattern)
-        let squareBracketRegex = try NSRegularExpression(pattern: squareBracketPattern)
+        // setup the regular expressions
+        let splitRegex = try NSRegularExpression(pattern: Self.splitRegexPattern(separator: separator))
 
         let matches = splitRegex.matches(in: string)
         for match in matches {
@@ -60,17 +67,9 @@ public struct Path: Equatable {
                 match.removeFirst()
                 match.removeLast()
             }
-            let indexMatches = indexAndCountRegex.matches(in: match, options: [], range: match.nsRange)
 
-            // try to get the indexes if any
-            if let indexesMatch = try Self.extractIndexesAndCount(in: indexMatches, from: match) {
-                elements.append(contentsOf: indexesMatch)
-            } else {
-                if squareBracketRegex.firstMatch(in: match, range: match.nsRange) != nil {
-                    throw PathExplorerError.invalidPathElement(match.pathValue)
-                }
-                elements.append(match.pathValue)
-            }
+            let element = PathElement(from: match)
+            elements.append(element)
         }
 
         self.elements = elements
@@ -84,54 +83,17 @@ public struct Path: Equatable {
         elements = pathElements.map { $0.pathValue }
     }
 
-    public init(_ pathElements: PathElement...) {
+    public init(pathElements: PathElement...) {
         elements = pathElements
     }
 
-    public init(_ pathElements: [PathElement]) {
+    public init( pathElements: [PathElement]) {
         elements = pathElements
     }
 
     // MARK: - Functions
 
-    static func extractIndexesAndCount(in indexMatches: [NSTextCheckingResult], from match: String) throws -> [PathElement]? {
-        var indexMatches = indexMatches
-        var elements = [PathElement]()
-
-        guard let indexMatch = indexMatches.first else { // we have a first index, so retrieve it and the array name if possible
-            return nil
-        }
-
-        // get the first element
-        let firstElement = PathElement(from: String(match[indexMatch.range]))
-
-        guard firstElement.isArraySubscripter else {
-            throw PathExplorerError.invalidPathElement(match.pathValue)
-        }
-
-        if indexMatch.range.lowerBound == 1 {
-            // specific case: the root element is an array: there is no array name
-            elements.append(firstElement)
-        } else {
-            // get the array name
-            let arrayName = String(match[0..<indexMatch.range.lowerBound - 1])
-
-            elements.append(arrayName.pathValue)
-            elements.append(firstElement)
-        }
-
-        // now retrieve the remaining indexes
-        indexMatches.removeFirst()
-
-        try indexMatches.forEach { indexMatch in
-            let element = PathElement(from: String(match[indexMatch.range]))
-
-            guard element.isArraySubscripter else { throw PathExplorerError.invalidPathElement(match.pathValue) }
-            elements.append(element)
-        }
-
-        return elements
-    }
+    // MARK: Path manipulations
 
     public func appending(_ elements: PathElementRepresentable...) -> Path { Path(self.elements + elements) }
     public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
@@ -156,43 +118,54 @@ extension Path: Collection {
         return elements[elementIndex]
     }
 
-    mutating func append(_ element: PathElementRepresentable) {
+    public mutating func append(_ element: PathElementRepresentable) {
         elements.append(element.pathValue)
     }
 
-    mutating func popFirst() -> PathElement? {
+    public mutating func popFirst() -> PathElement? {
         if let firstElement = elements.first {
             elements.removeFirst()
             return firstElement
         }
         return nil
     }
+
+    public mutating func popLast() -> PathElement? {
+        if let lastElement = elements.last {
+            elements.removeLast()
+            return lastElement
+        }
+        return nil
+    }
 }
 
-extension Path: CustomStringConvertible {
+extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
     public var description: String {
         var description = ""
         elements.forEach { element in
             switch element {
-            case .index, .count:
+            case .index, .count, .slice, .keysList:
                 // remove the point added automatically to a path element
-                if description.hasSuffix(defaultSeparator) {
+                if description.hasSuffix(Self.defaultSeparator) {
                     description.removeLast()
                 }
                 description.append(element.description)
 
+            case .filter(let pattern): description.append("#\(pattern)#")
             case .key: description.append(element.description)
             }
 
-            description.append(defaultSeparator)
+            description.append(Self.defaultSeparator)
         }
         // remove the last point if any
-        if description.hasSuffix(defaultSeparator) {
+        if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
         }
         return description
     }
+
+    public var debugDescription: String { description }
 }
 
 extension Path: ExpressibleByArrayLiteral {

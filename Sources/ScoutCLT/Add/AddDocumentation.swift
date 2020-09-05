@@ -8,7 +8,6 @@ import Lux
 
 struct AddDocumentation: Documentation {
     private static let jsonInjector = JSONInjector(type: .terminal)
-    private static let zshInjector = ZshInjector(type: .terminal)
 
     private static let jsonExample =
     """
@@ -53,17 +52,18 @@ struct AddDocumentation: Documentation {
 
     Notes
     -----
-    - You can add multiple values in one command
-    - Specify the \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-v")) flag to see the modified data
-    - Deactivate the output colorization with \(zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--no-color")).
-        Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
-
     - All the keys which do not exist in the path will be created
     - Enclose the value with slash signs to force the value as a string: /valueAsString/ (Plist, Json)
     - Enclose the value with interrogative signs to force the value as a boolean: ?valueToBoolean? (Plist, Json)
     - Enclose the value with tilde signs to force the value as a real: ~valueToReal~ (Plist)
     - Enclose the value with chevron signs to force the value as a integer: <valueToInteger> (Plist)
     - When adding an element in an array, use the index -1 to add the element at the end of the array
+
+    - You can add multiple values in one command
+    - Deactivate the output colorization with \(noColor) or \(nc).
+        Useful if you encounter slowdowns when dealing with large files although it is not recommended to ouput large files in the terminal.
+    - Output an array or a dictionary of arrays with the \(csv) flag or \(csvSep) option
+    - Fold the arrays and dictionaries at a certain depth level with the \(level) option
 
     Examples
     --------

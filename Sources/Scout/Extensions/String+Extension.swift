@@ -23,4 +23,17 @@ extension String {
 
         return self[sliceStartIndex...sliceEndIndex]
     }
+
+    func isEnclosed(by string: String) -> Bool {
+        return hasPrefix(string) && hasSuffix(string)
+    }
+
+    /// Escape the given string for a CSV export
+    func escapingCSV(_ string: String) -> String {
+        if contains(string) {
+            return #""\#(self)""#
+        } else {
+            return self
+        }
+    }
 }

@@ -30,7 +30,9 @@ extension PathExplorerTestsIntegration {
     func testSet<Explorer: PathExplorer, Value: KeyAllowedType>(path: Path, explorer: Explorer, value: Value, file: StaticString = #file, line: UInt = #line) {
         var explorer = explorer
         do {
-            try explorer.set(path, to: value)
+            try explorer.set(path, to: value.description)
+            let resultValue = try explorer.get(path).convertValue(to: KeyType(Value.self))
+            XCTAssertEqual(resultValue, value, file: file, line: line)
         } catch {
             XCTFail("\(explorer.format): \(error.localizedDescription)", file: file, line: line)
             return

@@ -6,7 +6,7 @@
 import Foundation
 
 /// Wrap different structs to explore several format: Json, Plist and Xml
-public protocol PathExplorer: CustomStringConvertible,
+public protocol PathExplorer: CustomStringConvertible, CustomDebugStringConvertible,
     ExpressibleByStringLiteral,
     ExpressibleByBooleanLiteral,
     ExpressibleByIntegerLiteral,
@@ -103,12 +103,14 @@ where
     // MARK: Delete
 
     /// Delete the key at the given path, specified as array.
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ path: Path) throws
+    mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws
 
     /// Delete the key at the given path,specified as variadic `PathElementRepresentable`s
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ path: PathElementRepresentable...) throws
+    mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool) throws
 
     // MARK: Add
 
@@ -352,8 +354,18 @@ where
     */
     mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws
 
+    // MARK: Conversion
+
+    /// Try to convert the value held by the PathExplorer to the given type
+    func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type
+
     // MARK: Export
 
     func exportData() throws -> Data
     func exportString() throws -> String
+    func exportCSV(separator: String) throws -> String
+
+    /// Replace the group values (array or dictionaries) sub values by a unique one
+    /// holding a fold mark to be replaced when exporting the string
+    mutating func fold(upTo level: Int)
 }

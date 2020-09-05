@@ -12,4 +12,17 @@ extension Array {
 
         return self[index]
     }
+
+    func remove(in range: ClosedRange<Int>) -> Self {
+        assert(range.lowerBound >= 0)
+        assert(range.upperBound < count)
+
+        let leftPart = self[0..<range.lowerBound]
+        if range.upperBound < count - 1 {
+            let rightPart = self[range.upperBound + 1...count - 1]
+            return Array(leftPart + rightPart)
+        } else {
+            return Array(leftPart)
+        }
+    }
 }

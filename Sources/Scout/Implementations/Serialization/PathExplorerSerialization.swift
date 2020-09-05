@@ -8,17 +8,21 @@ import Foundation
 /// PathExplorer struct which uses a serializer to parse data: Json and Plist
 public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
-    // MARK: - Constants
-
-    typealias DictionaryValue = [String: Any]
-    typealias ArrayValue = [Any]
-
     // MARK: - Properties
 
     var value: Any
 
     var isDictionary: Bool { value is DictionaryValue }
     var isArray: Bool { value is ArrayValue }
+
+    /// `true` if the value is an array or a dictionary and is empty
+    var isEmpty: Bool { isValueEmpty(value) }
+
+    /// If `false`, the empty dicitionaries or array will be removed rather than set. Default is `true`
+    var allowEmptyGroups = true
+
+    /// `true` if the explorer has been folded
+    var isFolded = false
 
     // MARK: PathExplorer
 
@@ -56,11 +60,12 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         } else if F.self == PlistFormat.self {
             return .plist
         } else {
-            fatalError("Serialiation format not recognized. Allowed: Jsonformat and PlistFormat")
+            fatalError("Serialiation format not recognized. Allowed: JsonFormat and PlistFormat")
         }
 
     }
 
+    /// `Path` in the data leading to this sub path explorer
     public var readingPath = Path()
 
     // MARK: - Initialization
@@ -124,8 +129,8 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: Delete
 
-    public mutating func delete(_ path: PathElementRepresentable...) throws {
-        try delete(Path(path))
+    public mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool = false) throws {
+        try delete(Path(path), deleteIfEmpty: deleteIfEmpty)
     }
 
     // MARK: Add
@@ -150,18 +155,84 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     public func exportString() throws -> String {
         let data = try exportData()
-        guard let string = String(data: data, encoding: .utf8) else {
+
+        guard var string = String(data: data, encoding: .utf8) else {
             throw PathExplorerError.stringToDataConversionError
         }
 
-        guard F.self == JsonFormat.self else { return string }
+        if isFolded {
+            string = string.replacingOccurrences(of: F.foldedRegexPattern, with: "...", options: .regularExpression)
+        }
+
+        guard format == .json else { return string }
 
         if #available(OSX 10.15, *) {
-            // the without backslash option is available
+            // the without-backslash option is available
             return string
         } else {
             // we have to remvove the back slashes
             return string.replacingOccurrences(of: "\\", with: "")
         }
+    }
+
+    public mutating func fold(upTo level: Int) {
+        isFolded = true
+
+        guard level >= 0 else {
+            if isArray {
+                value = [Self.foldedMark]
+            } else if isDictionary {
+                value = [Self.foldedKey: Self.foldedMark]
+            }
+            return
+        }
+
+        if let array = value as? ArrayValue {
+            var newArray = ArrayValue()
+            for (index, element) in array.enumerated() {
+                var pathExplorer = PathExplorerSerialization(value: element, path: readingPath.appending(index))
+                pathExplorer.fold(upTo: level - 1)
+                newArray.append(pathExplorer.value)
+            }
+
+            value = newArray
+
+        } else if let dict = value as? DictionaryValue {
+            var newDict = [String: Any]()
+            for (key, element) in dict {
+                var pathExplorer = PathExplorerSerialization(value: element, path: readingPath.appending(key))
+                pathExplorer.fold(upTo: level - 1)
+                newDict[key] = pathExplorer.value
+            }
+
+            value = newDict
+        }
+    }
+
+    // MARK: Conversion
+
+    public func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type {
+        if let value = value as? Type {
+            return value
+        } else {
+            throw PathExplorerError.valueConversionError(value: String(describing: value), type: String(describing: Type.self))
+        }
+    }
+
+    // MARK: Helpers
+
+    /// If the given value is an array or a dictionary, check it's emptyness. Returns `false` otherwise.
+    func isValueEmpty(_ value: Any) -> Bool {
+        if let array = value as? ArrayValue {
+            return array.isEmpty
+        } else if let dict = value as? DictionaryValue {
+            return dict.isEmpty
+        } else {
+            return false
+        }
+    }
+
+    func isGroup(value: Any) -> Bool {
+        value is ArrayValue || value is DictionaryValue || false
     }
 }

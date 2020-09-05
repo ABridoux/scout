@@ -7,7 +7,7 @@ import AEXML
 
 extension PathExplorerXML {
 
-    mutating func add(newValue: String, forKey key: String) throws {
+    mutating func add(newValue: String, for key: String) throws {
         if let existingChild = element.firstDescendant(where: { $0.name == key }) {
             // set the value of the child if one exists with the given key
             existingChild.value = newValue
@@ -20,7 +20,7 @@ extension PathExplorerXML {
     mutating func add(newValue: String, at index: Int) throws {
         let keyName = element.childrenName
 
-        if index == -1 || element.children.isEmpty {
+        if index == .lastIndex || element.children.isEmpty {
             // no children so add the child as the first one
             element.addChild(name: keyName, value: newValue, attributes: [:])
 
@@ -45,15 +45,15 @@ extension PathExplorerXML {
 
         switch pathElement {
 
-        case .key(let key): try add(newValue: newValue, forKey: key)
+        case .key(let key): try add(newValue: newValue, for: key)
         case .index(let index): try add(newValue: newValue, at: index)
-        case .count: throw PathExplorerError.countWrongUsage(path: readingPath)
+        case .count, .keysList, .slice, .filter: throw PathExplorerError.wrongUsage(of: pathElement, in: readingPath)
         }
     }
 
     mutating func insertChild(named keyName: String, withValue value: String, at index: Int) {
         // we have to copy the element as we cannot modify its children
-        let copy = AEXMLElement(name: element.name, value: element.value, attributes: element.attributes)
+        let copy = element.copy()
 
         // parse the children and just adding them until we reach index to insert the new child
         for childIndex in 0...element.children.count {
@@ -90,9 +90,7 @@ extension PathExplorerXML {
         var path = path
         let lastElement = path.removeLast()
 
-        guard lastElement != .count else {
-            throw PathExplorerError.countWrongUsage(path: path.appending(lastElement))
-        }
+        try validateLast(element: lastElement, in: path.appending(lastElement))
 
         var currentPathExplorer = self
 
@@ -105,7 +103,7 @@ extension PathExplorerXML {
                 let keyName = element.key ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
 
-                if case let .index(index) = element, index == -1 {
+                if case let .index(index) = element, index == .lastIndex {
                     // get the last element
                     let childrenCount = currentPathExplorer.element.children.count - 1
                     currentPathExplorer = try currentPathExplorer.get(element: .index(childrenCount))

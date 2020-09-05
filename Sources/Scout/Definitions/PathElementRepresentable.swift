@@ -24,7 +24,79 @@ public protocol PathElementRepresentable {
 }
 
 extension String: PathElementRepresentable {
-    public var pathValue: PathElement { .key(self) }
+    public var pathValue: PathElement { index ?? count ?? keysList ?? slice ?? filter ?? .key(self) }
+
+    var index: PathElement? {
+        guard self.hasPrefix("["), self.hasSuffix("]") else {
+            return nil
+        }
+
+        var copy = self
+        copy.removeFirst()
+        copy.removeLast()
+
+        guard let index = Int(copy) else { return nil }
+        return PathElement.index(index)
+    }
+
+    var count: PathElement? {
+        if self == PathElement.count.description {
+            return .count
+        }
+        return nil
+    }
+
+    var keysList: PathElement? {
+        if self == PathElement.keysList.description {
+            return .keysList
+        }
+        return nil
+    }
+
+    var slice: PathElement? {
+        guard self.hasPrefix("["), self.hasSuffix("]") else {
+            return nil
+        }
+
+        var copy = self
+        copy.removeFirst()
+        copy.removeLast()
+
+        let splitted = copy.components(separatedBy: ":")
+
+        guard splitted.count == 2 else {
+            return nil
+        }
+
+        var lowerBound: Bounds.Bound?
+        if splitted[0] == "" {
+            lowerBound = .first
+        } else if let lowerValue = Int(splitted[0]) {
+            lowerBound = .init(lowerValue)
+        }
+
+        var upperBound: Bounds.Bound?
+        if splitted[1] == "" {
+            upperBound = .last
+        } else if let upperValue = Int(splitted[1]) {
+            upperBound = .init(upperValue)
+        }
+
+        guard let lower = lowerBound, let upper = upperBound else {
+            return nil
+        }
+
+        return .slice(Bounds(lower: lower, upper: upper))
+    }
+
+    var filter: PathElement? {
+        guard isEnclosed(by: "#")  else { return nil }
+        var copy = self
+        copy.removeFirst()
+        copy.removeLast()
+        copy = copy.replacingOccurrences(of: "\\#", with: "#")
+        return .filter(copy)
+    }
 }
 
 extension Int: PathElementRepresentable {

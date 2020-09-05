@@ -5,7 +5,8 @@
 
 extension PathExplorerXML {
 
-    mutating func set(index: Int, to newValue: String) throws {
+    mutating func set(at index: Int, to newValue: String) throws {
+
         guard element.children.count > index, index >= 0 else {
             throw PathExplorerError.arraySubscript(readingPath)
         }
@@ -13,7 +14,7 @@ extension PathExplorerXML {
         element.children[index].value = newValue
     }
 
-    mutating func set(key: String, to newValue: String) throws {
+    mutating func set(for key: String, to newValue: String) throws {
 
         guard element[key].children.isEmpty else {
             throw PathExplorerError.invalidValue(newValue)
@@ -29,7 +30,7 @@ extension PathExplorerXML {
 
         try path.forEach { element in
             guard element != .count else {
-                throw PathExplorerError.countWrongUsage(path: path)
+                throw PathExplorerError.wrongUsage(of: .count, in: path)
             }
             currentPathExplorer = try currentPathExplorer.get(element: element)
         }
@@ -50,9 +51,7 @@ extension PathExplorerXML {
             currentPathExplorer = try currentPathExplorer.get(element: $0)
         }
 
-        guard currentPathExplorer.readingPath.last != .count else {
-            throw PathExplorerError.countWrongUsage(path: path)
-        }
+        try validateLast(element: currentPathExplorer.readingPath.last, in: path)
 
         currentPathExplorer.element.name = newKeyName
     }

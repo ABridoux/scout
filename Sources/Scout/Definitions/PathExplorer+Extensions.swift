@@ -29,6 +29,55 @@ extension PathExplorer {
     }
 }
 
+// MARK: Properties
+
+extension PathExplorer {
+
+    /// The last array slice or dictionary filter found in the path if any
+    var lastGroupSample: GroupSample? {
+        var lastGroupElement: GroupSample?
+
+        readingPath.forEach { element in
+            switch element {
+            case .slice(let bounds): lastGroupElement = .arraySlice(bounds)
+            case .filter(let pattern): lastGroupElement = .dictionaryFilter(pattern)
+            default: break
+            }
+        }
+
+        return lastGroupElement
+    }
+
+    /// Use to name the single key when folding a dictionary
+    static var foldedKey: String { "Folded" }
+
+    /// Use to replace the content of a dicionary or array when folding it
+    static var foldedMark: String { "~~SCOUT_FOLDED~~" }
+}
+
+// MARK: Helpers
+
+public extension PathExplorer {
+
+    /// Delete the key at the given path, specified as array.
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    mutating func delete(_ path: Path) throws {
+        try delete(path, deleteIfEmpty: false)
+    }
+
+    /// Delete the key at the given path, specified as array.
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    mutating func delete(_ path: PathElementRepresentable) throws {
+        try delete(path, deleteIfEmpty: false)
+    }
+}
+
+// MARK: Debug
+
+public extension PathExplorer {
+    var debugDescription: String { description }
+}
+
 // MARK: Data validation
 
 extension PathExplorer {
@@ -62,5 +111,24 @@ extension PathExplorer {
 
         // otherwise, try to return the type as it is
         return try Type(value: value)
+    }
+
+    /// When dealing with setting, deleting or adding operations, this method ensures the given last element is correct
+    /// - Parameters:
+    ///   - element: Last element of the path
+    ///   - path: Path where the element is
+    /// - Throws: If element cannot be used as the last element
+    func validateLast(element: PathElement?, in path: Path) throws {
+        if element == .count {
+            throw PathExplorerError.wrongUsage(of: .count, in: path)
+        }
+    }
+}
+
+// MARK: Export
+
+extension PathExplorer {
+    public func exportCSV() throws -> String {
+        try exportCSV(separator: ";")
     }
 }

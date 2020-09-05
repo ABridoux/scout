@@ -69,7 +69,7 @@ struct HomeDocumentation: Documentation {
     \u{001B}[0;0m
 
     Here is an overview of scout subcommands: \(Command.documentationDescription).
-    To get more insights for a specific command, please type `scout doc \("[command]".mainColor)`.
+    To get more insights for a specific command, please type `scout doc -c \("[command]".mainColor)`.
 
     To indicate what value to target, a reading path should be indicated.
     \(ArgumentHelp.readingPath.discussion)
@@ -111,7 +111,7 @@ static let configuration = CommandConfiguration(
     commandName: "doc",
     abstract: "Rich examples and advanced explanations")
 
-    @Argument(help: "Command specific documentation")
+    @Option(name: [.short, .long], help: "Command specific documentation: \(Command.documentationDescription)")
     var command: Command?
 
     func run() throws {
