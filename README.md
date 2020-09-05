@@ -52,7 +52,7 @@ I have been working with many Mac admins recently, and many had to deal with Jso
 You can use a library for each format. But I am not aware today of a library that unifies all of them. So, what you learnt with [jq](https://stedolan.github.io/jq/) cannot be reused to parse Plist data. You would have to learn to use **PlistBuddy** or the **defaults** command. With Scout, you can parse the same way Json, Plist and Xml data.
 
 #### Using a generic text-processing tool
-Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is really easy to use, as we will see.
+Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is [really easy to use](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line).
 
 <br>
 
@@ -61,12 +61,21 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
   - Set a key name
   - Force a type
   - Dictionary and array count
+  - Dictionary keys
+  - Delete array or dictionary when deleting all its values 
+  - Array slicing for *read* and *delete* commands 
+  - Dictionary filtering for *read* and *delete* commands 
 - Use paths to specify the target value
 - Stream or file input
 - Find best match in case of a typo
 - Syntax highlighting
+- CSV export for arrays and dictionaries of arrays 
+- Folding at a depth level 
+- Auto-completion for commands 
 
-### Details
+### Insights
+
+See the wiki ([Sswift package](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package), [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)) to in in details how to use those features.
 
 #### CRUD functions for JSON, Plist and XML data format
 - add a value (Create)
@@ -74,19 +83,38 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 - set a value (Update)
 - delete a value (Delete)
 
-See the [usage example](#usage).
-
 ##### Set key name
-Set a key name rather than its value. See the [usage example](#usage).
+Set a key name rather than its value.
 
 ##### Try to force a type
-Prevent the automatic inferring of a type and try to force one when setting or adding a value. See the [usage example](#usage).
+Prevent the automatic inferring of a type and try to force one when setting or adding a value.
 
 ##### Dictionary and array count
-Get a dictionary or an array count with the `[#]` symbol. See the [usage example](#usage).
+Get a dictionary or an array count with the `[#]` symbol
+
+##### Dictionary keys list
+Get a dictionary keys list with the `{#}` symbol.
+Bash/Zsh: useful when combined with `csv-sep " "` to iterate over the keys:
+
+```zsh
+keys=(`scout read -i People.json "people{#}" —csv-sep " "`)
+
+for key in $keys;  do
+	scout read -i People.json ”people.$key”;
+done
+```
+
+##### Delete arrays or dictionaries when left empty
+With the *delete* command, it is possible to specify that a dictionary or an array should be deleted when all its keys are also being deleted.
+
+##### Array slicing
+Specify a slice of an array to read it or to delete it with `[lower:upper]` syntax. Omitting lower bound ~ 0, omitting upper bound ~ last index. Works with negative indexes like `[-4:-3]` to specify a slice from the last 5th to the last 3rd element. With negative slice, omitting the upper bound ~ last index like `[-3:]` to get the last 4 elements of the array.
+
+##### Dictionary filtering
+Specify a regular expression between sharp signs '#' to filter the keys of a dictionary, like `people.#h.*#` to target all the keys starting with "h" in the dictionary 'people'. A key is a valid match when it is entirely validated by the regular expression.
 
 #### Use paths to specify the value to target
-A path is a sequence of keys or symbols to navigate through the data. See the [usage example](#usage).
+A path is a sequence of keys or symbols to navigate through the data.
 
 #### Stream or file input
 Set the input as a file with the input option `-i | --input` or as the last process/command output with a pipe:
@@ -114,10 +142,19 @@ Another example with one of the playground files and the following command:
 scout -i People.plist "people.Robert.age=2" -v
 ```
 
-When dealing with large files (although it is not recommended to ouput large files in the terminal), colorising the ouput might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color`.
+When dealing with large files (although it is not recommended to ouput large files in the terminal), colorising the ouput might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color` or `--nc`.
 
 ##### Customise colors
 You can specify your own color set as explained [here](https://github.com/ABridoux/scout/wiki/%5B30%5D-Syntax-highlighting:-custom-colors). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
+
+#### CSV export
+Export data when dealing with arrays or a dictionary of arrays. Default separator ';' or customisable.
+
+#### Folding
+Fold arrays or dictionaries at a certain depth level to make the data more readable
+
+#### Auto-completion of commands
+When auto-completion is enabled on the shell, use `scout install-completion-script`, then the `source` command if needed to get auto-completion for scout commands.
 
 <br>
 
@@ -131,18 +168,17 @@ Use the following command.
 ```bash
 brew install ABridoux/formulae/scout
 ```
-It will **download the notarized executable** from the [latest release](https://github.com/ABridoux/scout/releases/latest/download/scout.zip). I believe that most Homebrew users do not really care about building the program themselves. If I am wrong, please let me know (by opening an [issue](https://github.com/ABridoux/scout/issues) for example). Note that you can still build the program by cloning this git as explained below.
+It will **download the notarized executable** from the [latest release](https://github.com/ABridoux/scout/releases/latest/download/scout.zip)
 
 
 #### Download
 
 You can download the [latest version of the executable](https://github.com/ABridoux/scout/releases/latest/download/scout.zip) from the [releases](https://github.com/ABridoux/scout/releases). Note that the **executable is notarized**. Also, a notarized [scout package](https://github.com/ABridoux/scout/releases/latest/download/scout.pkg) is provided.
 
-After having unzipped the file, you can install it if you want to. The second line lets you install the script to auto-complete the commands.
+After having unzipped the file, you can install it if you want to.
 
 ```bash
-$ install scout /usr/local/bin/ 
-$ scout install-completion-script
+$ install scout /usr/local/bin/
 ```
 
 Here is a command which downloads the latest version of the program and install it in */usr/local/bin*. 
@@ -153,13 +189,12 @@ curl -LO https://github.com/ABridoux/scout/releases/latest/download/scout.zip &&
 unzip scout.zip && \
 rm scout.zip && \
 install scout /usr/local/bin && \
-rm scout && \
-scout install-completion-script
+rm scout
 ```
 
 ##### Note
 - To find all scout versions, please browse the [releases](https://github.com/ABridoux/scout/releases) page.
-- When deploying a package (with a MDM for example), it might be useful to add the version to the name. To get scout latest version: simply run `scout version` to get your **installed scout version**, or ` curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | scout tag_name` to get the latest version **available on the Github repository**.
+- When deploying a package (with a MDM for example), it might be useful to add the version to the name. To get scout latest version: simply run `scout --version` (`scout version` version < 2.0.0)  to get your **installed scout version**, or ` curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | scout tag_name` to get the latest version **available on the Github repository**.
 
 #### Git
 
@@ -169,7 +204,6 @@ Use the following lines to clone the repository and to install **scout** (requir
 $ git clone https://github.com/ABridoux/scout
 $ cd scout
 $ make
-$ scout install-completion-script
 ```
 
 The program should be install in */usr/local/bin*. You can then remove the repository if you do not want to keep it:
@@ -178,6 +212,12 @@ The program should be install in */usr/local/bin*. You can then remove the repos
 $ cd ..
 $ rm -r Scout
 ```
+
+#### Auto-completion
+You can run `scout install-completion-script` to install the script to auto-complete commands depending on your shell. After this command, you might want to run the `source` command for the changes to be effective.
+
+Bash: `source ~/.bashrc` <br />
+Zsh: `source ~/.zshrc`
 
 ### Swift package
 

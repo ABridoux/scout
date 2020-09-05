@@ -40,7 +40,7 @@ struct DeleteDocumentation: Documentation {
                                    (#"`scout delete "people.Tom.hobbies[0]"`"#, #"will delete Tom first hobby"#),
                                    (#"`scout delete "people.Tom.hobbies[-1]"`"#, #"will delete Tom last hobby"#),
                                    (#"`scout delete "people.Arnaud.#h.*#"`"#, #"will delete Arnaud's height and hobbies"#),
-                                   (#"`scout delete "people.Arnaud.hobbies[-2:]"`"#, #"will delete Arnaud's last two hobbies"#),
+                                   (#"`scout delete "people.Arnaud.hobbies[-1:]"`"#, #"will delete Arnaud's last two hobbies"#),
                                    (#"`scout delete "people.#.*#.hobbies[:1]`""#, #"will delete Tom's and Arnaud's first two hobbies"#),
                                    (#"`scout delete -r "people.#.*#.hobbies[:1]"`"#, #"will delete Arnaud's first two hobbies and Tom hobbies"#)]
 
@@ -56,7 +56,7 @@ struct DeleteDocumentation: Documentation {
     - Use the flag \(recursive) to delete an array or a dictionary key when left empty
     - Target a slice in an array with square brackets and a double point ':' between the bounds: [lower:upper]
         - No lower means 0 like [:10] and no upper means the last index like [10:].
-        - Use a negative index for the lower bound to target the last nth elements like [-4:] to target the last 4 elements
+        - Use a negative index for the lower bound to target the last nth elements like [-3:] to target the last 4 elements
     - Target specific keys with a regular expression by enclosing it with sharp signs: #.*device.*# to target all the keys containing the word device
 
     - You can delete multiple values in one command
