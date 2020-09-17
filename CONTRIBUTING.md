@@ -82,10 +82,12 @@ Testing errors is heavily recommended to make sure the correct error is thrown w
 ## Linting ##
 
 Currently, Scout uses `SwiftLint` before each push to enforce a general quality of the code.
+
 ## Issue checklist ##
 
 - [ ] Issue tracker does not already contain the same (or a very similar) issue
 - [ ] Title must be clear about what is the issue
+
 ## Pull request checklist ##
 
 - [ ] Title must be clear about what will change
