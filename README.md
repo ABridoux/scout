@@ -51,7 +51,7 @@ With the Foundation libraries to encode/decode Json and Plist, one could ask: wh
 I have been working with many Mac admins recently, and many had to deal with Json, Plist and Xml data. While some were using a format-specific library like [jq](https://stedolan.github.io/jq/) to parse Json, others were using **awk**.  Each approach is valid, though it comes with some tradeoffs.
 
 #### Using a format-specific library
-You can use a library for each format. But I am not aware today of a library that unifies all of them. So, what you learnt with [jq](https://stedolan.github.io/jq/) cannot be reused to parse Plist data. You would have to learn to use **PlistBuddy** or the **defaults** command. With Scout, you can parse the same way Json, Plist and Xml data.
+You can use a library for each format. But I am not aware today of a library that unifies all of them. So, what you learned with [jq](https://stedolan.github.io/jq/) cannot be reused to parse Plist data. You would have to learn to use **PlistBuddy** or the **defaults** command. With Scout, you can parse the same way Json, Plist and Xml data.
 
 #### Using a generic text-processing tool
 Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is [really easy to use](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line).
@@ -144,7 +144,7 @@ Another example with one of the playground files and the following command:
 scout -i People.plist "people.Robert.age=2" -v
 ```
 
-When dealing with large files (although it is not recommended to ouput large files in the terminal), colorising the ouput might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color` or `--nc`.
+When dealing with large files (although it is not recommended to output large files in the terminal), colorising the output might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color` or `--nc`.
 
 ##### Customise colors
 You can specify your own color set as explained [here](https://github.com/ABridoux/scout/wiki/%5B30%5D-Syntax-highlighting:-custom-colors). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)

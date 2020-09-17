@@ -66,7 +66,7 @@ Pull requests coming from branches which are not matching any of those pattern w
 
 ## Commits ##
 
-Before commiting anything to you branch, make sure to add relevant message and description to your commit.
+Before committing anything to your branch, make sure to add a relevant message and description to your commit.
 
 If you need to some insights on how to actually do this, here's some very interesting readings:
 
@@ -75,7 +75,7 @@ If you need to some insights on how to actually do this, here's some very intere
 
 ## Unit testing ##
 
-Rather than using TDD, you are encouraged to provide code that testes the API entry points, or critical parts. You can find some inspirations in this [article](https://www.swiftbysundell.com/articles/pragmatic-unit-testing-in-swift/).
+Rather than using TDD, you are encouraged to provide code that tests the API entry points, or critical parts. You can find some inspirations in this [article](https://www.swiftbysundell.com/articles/pragmatic-unit-testing-in-swift/).
 
 Testing errors is heavily recommended to make sure the correct error is thrown when the program is misused.
 
