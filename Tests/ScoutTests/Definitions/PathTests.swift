@@ -178,7 +178,7 @@ final class PathTests: XCTestCase {
     // MARK: Slice
 
     func testFullSlice() throws {
-        let array = Path(secondKey, PathElement.slice(.init(lower: 2, upper: 4)))
+        let array = Path(secondKey, PathElement.slice(2, 4))
         let path = try Path(string: secondKeyWithFullRange)
 
         XCTAssertEqual(path, array)
@@ -192,7 +192,7 @@ final class PathTests: XCTestCase {
     }
 
     func testPartialSliceRight() throws {
-        let array = Path(secondKey, PathElement.slice(.init(lower: 1, upper: .last)))
+        let array = Path(secondKey, PathElement.slice(1, .last))
         let path = try Path(string: secondKeyWithPartialRangeRight)
 
         XCTAssertEqual(path, array)

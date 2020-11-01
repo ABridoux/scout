@@ -12,6 +12,7 @@ public struct Bounds: Equatable {
 
     /// Use the `range(lastValidIndex:path)` function to access to the lower bound
     private let lower: Bound
+
     /// Use the `range(lastValidIndex:path)` function to access to the upper bound
     private let upper: Bound
 
@@ -34,7 +35,7 @@ public struct Bounds: Equatable {
 
     /// - Parameters:
     ///   - lastValidIndex: The last valid index in the array being sliced
-    ///   - path: Path where the bounds a specified. Used to throw a relevant error
+    ///   - path: Path where the bounds is specified. Used to throw a relevant error
     /// - Throws: If the bounds are invalid
     /// - Returns: A range made from the lower and upper bounds
     public func range(lastValidIndex: Int, path: Path) throws -> ClosedRange<Int> {
@@ -64,7 +65,7 @@ public extension Bounds {
         public static let last = Bound(0, identifier: "last")
 
         var value: Int
-        var identifier: String?
+        private(set) var identifier: String?
 
         public init(integerLiteral value: Int) {
             self.value = value

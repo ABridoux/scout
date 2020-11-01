@@ -11,12 +11,12 @@ final class PathExplorerSerializationTests: XCTestCase {
     // MARK: - Constants
 
     struct StubPlistStruct: Codable {
-        let stringValue = "Hello"
-        let intValue = 1
+        var stringValue = "Hello"
+        var intValue = 1
     }
 
     struct Animals: Codable {
-        let ducks = ["Riri", "Fifi", "Loulou"]
+        var ducks = ["Riri", "Fifi", "Loulou"]
     }
 
     struct Character: Encodable, Equatable {
@@ -30,7 +30,7 @@ final class PathExplorerSerializationTests: XCTestCase {
     }
 
     struct StubStruct: Codable {
-        let animals = Animals()
+        var animals = Animals()
     }
 
     let ducks = ["Riri", "Fifi", "Loulou"]
