@@ -123,10 +123,22 @@ struct ReadCommand: ParsableCommand {
             }
             injector = xmlInjector
 
+        } else if let yaml = try? Yaml(data: data) {
+            var yaml = try yaml.get(path)
+
+            value = try getValue(from: &yaml)
+
+            #warning("Change for a YAML color injector")
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try ScoutCommand.getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            injector = jsonInjector
+
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
-    } else {
+            } else {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
             }
         }

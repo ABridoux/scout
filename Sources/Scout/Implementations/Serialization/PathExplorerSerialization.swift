@@ -54,16 +54,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         }
     }
 
-    public var format: DataFormat {
-        if F.self == JsonFormat.self {
-            return .json
-        } else if F.self == PlistFormat.self {
-            return .plist
-        } else {
-            fatalError("Serialiation format not recognized. Allowed: JsonFormat and PlistFormat")
-        }
-
-    }
+    public var format: DataFormat { F.dataFormat }
 
     /// `Path` in the data leading to this sub path explorer
     public var readingPath = Path()

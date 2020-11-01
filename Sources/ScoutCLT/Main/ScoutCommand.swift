@@ -84,6 +84,14 @@ struct ScoutCommand: ParsableCommand {
                 xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
             }
             injector = xmlInjector
+
+        case .yaml:
+            #warning("Change for a YAML color injector")
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try ScoutCommand.getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            injector = jsonInjector
         }
 
         if let csvOutput = csv {

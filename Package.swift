@@ -23,12 +23,15 @@ let package = Package(
             from: "0.0.1"),
         .package(
             url: "https://github.com/ABridoux/lux",
-            from: "0.1.0")
+            from: "0.1.0"),
+        .package(
+            url: "https://github.com/jpsim/Yams.git",
+            from: "4.0.0")
     ],
     targets: [
         .target(
             name: "Scout",
-            dependencies: ["AEXML"]),
+            dependencies: ["AEXML", "Yams"]),
         .target(
             name: "ScoutCLT",
             dependencies: ["Scout", "ArgumentParser", "Lux"]),
