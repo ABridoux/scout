@@ -19,15 +19,18 @@ public protocol SerializationFormat {
     static func serialize(value: Any) throws -> Data
 }
 
+extension SerializationFormat {
+
+    static var foldedMark: String { PathExplorerSerialization<Self>.foldedMark }
+    static var foldedKey: String { PathExplorerSerialization<Self>.foldedKey }
+}
+
 public struct PlistFormat: SerializationFormat {
 
-    public static var dataFormat: DataFormat { .plist }
+    public static let dataFormat = DataFormat.plist
 
     public static var foldedRegexPattern: String {
-        let foldedMark = PathExplorerSerialization<Self>.foldedMark
-        let foldedKey = PathExplorerSerialization<Self>.foldedKey
-
-        return #"(?<=<array>)\s*<string>\#(foldedMark)</string>\s*(?=</array>)"# // array
+        #"(?<=<array>)\s*<string>\#(foldedMark)</string>\s*(?=</array>)"# // array
         + #"|(?<=<dict>)\s*<key>\#(foldedKey)</key>\s*<string>\#(foldedMark)</string>\s*(?=</dict>)"# // dict
     }
 
@@ -42,13 +45,10 @@ public struct PlistFormat: SerializationFormat {
 
 public struct JsonFormat: SerializationFormat {
 
-    public static var dataFormat: DataFormat { .json }
+    public static let dataFormat = DataFormat.json
 
     public static var foldedRegexPattern: String {
-        let foldedMark = PathExplorerSerialization<Self>.foldedMark
-        let foldedKey = PathExplorerSerialization<Self>.foldedKey
-
-        return #"(?<=\[)\s*"\#(foldedMark)"\s*(?=\])"# // array
+        #"(?<=\[)\s*"\#(foldedMark)"\s*(?=\])"# // array
         + #"|(?<=\{)\s*"\#(foldedKey)"\s*:\s*"\#(foldedMark)"\s*(?=\})"# // dict
     }
 
@@ -67,9 +67,12 @@ public struct JsonFormat: SerializationFormat {
 
 public struct YamlFormat: SerializationFormat {
 
-    public static var dataFormat: DataFormat { .yaml }
+    public static let dataFormat = DataFormat.yaml
 
-    public static var foldedRegexPattern: String { "" }
+    public static var foldedRegexPattern: String {
+        #"\#(foldedMark)\s*(?=\n)"# // array
+        + #"|\#(foldedKey)\s*:\s*\#(foldedMark)\s*(?=\n)"# // dict
+    }
 
     public static func serialize(data: Data) throws -> Any {
         guard
