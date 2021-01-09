@@ -48,14 +48,8 @@ struct ReadCommand: ParsableCommand {
     // MARK: - Functions
 
     func run() throws {
-
-        if let filePath = inputFilePath {
-            let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
-            try read(from: data)
-        } else {
-            let streamInput = FileHandle.standardInput.readDataToEndOfFile()
-            try read(from: streamInput)
-        }
+        let data = try readDataOrInputStream(from: inputFilePath)
+        try read(from: data)
     }
 
     func read(from data: Data) throws {
@@ -123,10 +117,22 @@ struct ReadCommand: ParsableCommand {
             }
             injector = xmlInjector
 
+        } else if let yaml = try? Yaml(data: data) {
+            var yaml = try yaml.get(path)
+
+            value = try getValue(from: &yaml)
+
+            #warning("[TODO] Change for a YAML color injector")
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try ScoutCommand.getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            injector = jsonInjector
+
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
-    } else {
+            } else {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
             }
         }

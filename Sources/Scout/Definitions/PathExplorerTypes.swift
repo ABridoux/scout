@@ -5,17 +5,21 @@
 
 import Foundation
 
+@available(*, deprecated, renamed: "PathExplorers.Xml")
 public typealias Xml = PathExplorerXML
+@available(*, deprecated, renamed: "PathExplorers.Json")
 public typealias Json = PathExplorerSerialization<JsonFormat>
+@available(*, deprecated, renamed: "PathExplorers.Plist")
 public typealias Plist = PathExplorerSerialization<PlistFormat>
 
-@available(*, deprecated, message: "'PathExplorerFactory' will be removed in Scout 2.0.0. Use 'PathExplorer(data:)' instead")
-public struct PathExplorerFactory {
-    public static func make<T: PathExplorer>(_ type: T.Type, from data: Data) throws -> T {
-        try T(data: data)
-    }
+public enum PathExplorers {
+    public typealias Xml = PathExplorerXML
+    public typealias Json = PathExplorerSerialization<JsonFormat>
+    public typealias Plist = PathExplorerSerialization<PlistFormat>
+    public typealias Yaml = PathExplorerSerialization<YamlFormat>
 }
 
+/// Unique identifier of a data format
 public enum DataFormat: String {
-    case json, plist, xml
+    case json, plist, xml, yaml
 }
