@@ -38,16 +38,8 @@ struct AddCommand: ParsableCommand {
     var csvSeparator: String?
 
     func run() throws {
-
-        do {
-            if let filePath = modifyFilePath ?? inputFilePath {
-                let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
-                try add(from: data)
-            } else {
-                let streamInput = FileHandle.standardInput.readDataToEndOfFile()
-                try add(from: streamInput)
-            }
-        }
+        let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
+        try add(from: data)
     }
 
     func add(from data: Data) throws {

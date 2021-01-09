@@ -48,14 +48,8 @@ struct ReadCommand: ParsableCommand {
     // MARK: - Functions
 
     func run() throws {
-
-        if let filePath = inputFilePath {
-            let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
-            try read(from: data)
-        } else {
-            let streamInput = FileHandle.standardInput.readDataToEndOfFile()
-            try read(from: streamInput)
-        }
+        let data = try readDataOrInputStream(from: inputFilePath)
+        try read(from: data)
     }
 
     func read(from data: Data) throws {
@@ -128,7 +122,7 @@ struct ReadCommand: ParsableCommand {
 
             value = try getValue(from: &yaml)
 
-            #warning("Change for a YAML color injector")
+            #warning("[TODO] Change for a YAML color injector")
             let jsonInjector = JSONInjector(type: .terminal)
             if let colors = try ScoutCommand.getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)

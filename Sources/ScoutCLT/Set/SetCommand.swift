@@ -47,16 +47,8 @@ struct SetCommand: ParsableCommand {
     // MARK: - Functions
 
     func run() throws {
-
-        do {
-            if let filePath = modifyFilePath ?? inputFilePath {
-                let data = try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
-                try set(from: data)
-            } else {
-                let streamInput = FileHandle.standardInput.readDataToEndOfFile()
-                try set(from: streamInput)
-            }
-        }
+        let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
+        try set(from: data)
     }
 
     func set(from data: Data) throws {

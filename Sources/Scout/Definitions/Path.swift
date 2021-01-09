@@ -46,10 +46,12 @@ public struct Path: Equatable {
      - parameter string: The string representing the path
      - parameter separator: The separator used to split the string. Default is "."
 
-     - note: When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
+     ### Brackets
+     When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
      will make the path ["computer", "general.information", "serial_number"]
 
-     - note: The following separators will not work: "[", "]", "(", ")".
+     ### Excluded separators
+     The following separators will not work: "[", "]", "(", ")".
      When using a special caracter with [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
      it is required to quote it with "\\".
     */
