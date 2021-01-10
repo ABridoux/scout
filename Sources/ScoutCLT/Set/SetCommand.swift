@@ -5,9 +5,8 @@
 
 import ArgumentParser
 import Scout
-import Foundation
 
-struct SetCommand: ParsableCommand {
+struct SetCommand: SADCommand {
 
     // MARK: - Constants
 
@@ -18,10 +17,8 @@ struct SetCommand: ParsableCommand {
 
     // MARK: - Properties
 
-    // MARK: ParsableCommand
-
     @Argument(help: PathAndValue.help)
-    var pathsAndValues = [PathAndValue]()
+    var pathsCollection = [PathAndValue]()
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
@@ -46,58 +43,23 @@ struct SetCommand: ParsableCommand {
 
     // MARK: - Functions
 
-    func run() throws {
-        let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
-        try set(from: data)
-    }
+    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
+        let (path, value) = (pathCollectionElement.readingPath, pathCollectionElement.value)
 
-    func set(from data: Data) throws {
-        let output = modifyFilePath ?? self.output
-        let separator = csvSeparator ?? (csv ? ";" : nil)
-
-        if var json = try? Json(data: data) {
-
-            try set(pathsAndValues, in: &json)
-            try ScoutCommand.output(output, dataWith: json, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else if var plist = try? Plist(data: data) {
-
-            try set(pathsAndValues, in: &plist)
-            try ScoutCommand.output(output, dataWith: plist, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else if var xml = try? Xml(data: data) {
-
-            try set(pathsAndValues, in: &xml)
-            try ScoutCommand.output(output, dataWith: xml, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else {
-            if let filePath = inputFilePath {
-                throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
-            } else {
-                throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
-            }
+        if pathCollectionElement.changeKey {
+            try pathExplorer.set(path, keyNameTo: value)
+            return
         }
-    }
 
-    func set<Explorer: PathExplorer>(_ pathAndValues: [PathAndValue], in explorer: inout Explorer) throws {
-        for pathAndValue in pathAndValues {
-            let (path, value) = (pathAndValue.readingPath, pathAndValue.value)
-
-            if pathAndValue.changeKey {
-                try explorer.set(path, keyNameTo: value)
-                continue
+        if let forceType = pathCollectionElement.forceType {
+            switch forceType {
+            case .string: try pathExplorer.set(path, to: value, as: .string)
+            case .real: try pathExplorer.set(path, to: value, as: .real)
+            case .int: try pathExplorer.set(path, to: value, as: .int)
+            case .bool: try pathExplorer.set(path, to: value, as: .bool)
             }
-
-            if let forceType = pathAndValue.forceType {
-                switch forceType {
-                case .string: try explorer.set(path, to: value, as: .string)
-                case .real: try explorer.set(path, to: value, as: .real)
-                case .int: try explorer.set(path, to: value, as: .int)
-                case .bool: try explorer.set(path, to: value, as: .bool)
-                }
-            } else {
-                try explorer.set(path, to: value)
-            }
+        } else {
+            try pathExplorer.set(path, to: value)
         }
     }
 }
