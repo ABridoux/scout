@@ -7,7 +7,7 @@ import ArgumentParser
 import Scout
 import Foundation
 
-struct DeleteCommand: ParsableCommand {
+struct DeleteCommand: SADCommand {
 
     // MARK: - Constants
 
@@ -19,7 +19,7 @@ struct DeleteCommand: ParsableCommand {
     // MARK: - Properties
 
     @Argument(help: "Paths to indicate the keys to be deleted")
-    var readingPaths = [Path]()
+    var pathsCollection = [Path]()
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
@@ -47,36 +47,7 @@ struct DeleteCommand: ParsableCommand {
 
     // MARK: - Functions
 
-    func run() throws {
-        let data =  try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
-        try delete(from: data)
-    }
-
-    func delete(from data: Data) throws {
-        let output = modifyFilePath ?? self.output
-        let separator = csvSeparator ?? (csv ? ";" : nil)
-
-        if var json = try? Json(data: data) {
-
-            try readingPaths.forEach { try json.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: json, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else if var plist = try? Plist(data: data) {
-
-            try readingPaths.forEach { try plist.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: plist, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else if var xml = try? Xml(data: data) {
-
-            try readingPaths.forEach { try xml.delete($0, deleteIfEmpty: recursive) }
-            try ScoutCommand.output(output, dataWith: xml, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else {
-            if let filePath = inputFilePath {
-                throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
-            } else {
-                throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
-            }
-        }
+    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
+        try pathExplorer.delete(pathCollectionElement, deleteIfEmpty: recursive)
     }
 }

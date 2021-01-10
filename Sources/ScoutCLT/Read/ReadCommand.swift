@@ -22,8 +22,6 @@ struct ReadCommand: ParsableCommand {
     /// Colorize the output
     var colorise: Bool { color.colorise && csvSeparator == nil && csv == false }
 
-    // MARK: ParsableCommand
-
     @Argument(help: .readingPath)
     var readingPath: Path?
 

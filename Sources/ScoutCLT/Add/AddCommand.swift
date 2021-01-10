@@ -7,14 +7,19 @@ import ArgumentParser
 import Scout
 import Foundation
 
-struct AddCommand: ParsableCommand {
+struct AddCommand: SADCommand {
+
+    // MARK: - Constants
+
     static let configuration = CommandConfiguration(
         commandName: "add",
         abstract: "Add value at a given path",
         discussion: "To find examples and advanced explanations, please type `scout doc -c add`")
 
+    // MARK: - Properties
+
     @Argument(help: PathAndValue.help)
-    var pathsAndValues = [PathAndValue]()
+    var pathsCollection = [PathAndValue]()
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
@@ -37,53 +42,20 @@ struct AddCommand: ParsableCommand {
     @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
     var csvSeparator: String?
 
-    func run() throws {
-        let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
-        try add(from: data)
-    }
+    // MARK: - Functions
 
-    func add(from data: Data) throws {
-        let output = modifyFilePath ?? self.output
-        let separator = csvSeparator ?? (csv ? ";" : nil)
+    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
+        let (path, value) = (pathCollectionElement.readingPath, pathCollectionElement.value)
 
-        if var json = try? Json(data: data) {
-
-            try add(pathsAndValues, to: &json)
-            try ScoutCommand.output(output, dataWith: json, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else if var plist = try? Plist(data: data) {
-
-            try add(pathsAndValues, to: &plist)
-            try ScoutCommand.output(output, dataWith: plist, colorise: color.colorise, level: level, csvSeparator: separator)
-
-        } else if var xml = try? Xml(data: data) {
-
-            try add(pathsAndValues, to: &xml)
-            try ScoutCommand.output(output, dataWith: xml, colorise: color.colorise, level: level, csvSeparator: separator)
-
+        if let forceType = pathCollectionElement.forceType {
+            switch forceType {
+            case .string: try pathExplorer.add(value, at: path, as: .string)
+            case .real: try pathExplorer.add(value, at: path, as: .real)
+            case .int: try pathExplorer.add(value, at: path, as: .int)
+            case .bool: try pathExplorer.add(value, at: path, as: .bool)
+            }
         } else {
-            if let filePath = inputFilePath {
-                throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
-            } else {
-                throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
-            }
-        }
-    }
-
-    func add<Explorer: PathExplorer>(_ pathsAndValues: [PathAndValue], to explorer: inout Explorer) throws {
-        try pathsAndValues.forEach { pathAndValue in
-            let (path, value) = (pathAndValue.readingPath, pathAndValue.value)
-
-            if let forceType = pathAndValue.forceType {
-                switch forceType {
-                case .string: try explorer.add(value, at: path, as: .string)
-                case .real: try explorer.add(value, at: path, as: .real)
-                case .int: try explorer.add(value, at: path, as: .int)
-                case .bool: try explorer.add(value, at: path, as: .bool)
-                }
-            } else {
-                try explorer.add(value, at: path)
-            }
+            try pathExplorer.add(value, at: path)
         }
     }
 }
