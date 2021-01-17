@@ -87,53 +87,55 @@ struct ReadCommand: ParsableCommand {
     /// - Throws: If the path is invalid or the values does not exist
     /// - Returns: The value, and the corresponding
     func readValue(at path: Path, in data: Data) throws -> (value: String, injector: TextInjector) {
-        var injector: TextInjector
-        var value: String
 
         if let json = try? Json(data: data) {
             var json = try json.get(path)
 
-            value = try getValue(from: &json)
+            let value = try getValue(from: &json)
 
             let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try ScoutCommand.getColorFile()?.json {
+            if let colors = try getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
             }
-            injector = jsonInjector
+
+            return (value, jsonInjector)
 
         } else if let plist = try? Plist(data: data) {
             var plist = try plist.get(path)
 
-            value = try getValue(from: &plist)
+            let value = try getValue(from: &plist)
 
             let plistInjector = PlistInjector(type: .terminal)
-            if let colors = try ScoutCommand.getColorFile()?.plist {
+            if let colors = try getColorFile()?.plist {
                 plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
             }
-            injector = plistInjector
+
+            return (value, plistInjector)
 
         } else if let xml = try? Xml(data: data) {
             var xml = try xml.get(path)
 
-            value = try getValue(from: &xml)
+            let value = try getValue(from: &xml)
 
             let xmlInjector = XMLEnhancedInjector(type: .terminal)
-            if let colors = try ScoutCommand.getColorFile()?.xml {
+            if let colors = try getColorFile()?.xml {
                 xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
             }
-            injector = xmlInjector
+
+            return (value, xmlInjector)
 
         } else if let yaml = try? Yaml(data: data) {
             var yaml = try yaml.get(path)
 
-            value = try getValue(from: &yaml)
+            let value = try getValue(from: &yaml)
 
             #warning("[TODO] Change for a YAML color injector")
             let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try ScoutCommand.getColorFile()?.json {
+            if let colors = try getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
             }
-            injector = jsonInjector
+
+            return (value, jsonInjector)
 
         } else {
             if let filePath = inputFilePath {
@@ -142,8 +144,6 @@ struct ReadCommand: ParsableCommand {
                 throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
             }
         }
-
-        return (value, injector)
     }
 
     func getValue<Explorer: PathExplorer>(from explorer: inout Explorer) throws -> String {
