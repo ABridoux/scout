@@ -20,7 +20,15 @@ struct ReadCommand: ParsableCommand {
     // MARK: - Properties
 
     /// Colorize the output
-    var colorise: Bool { color.colorise && csvSeparator == nil && csv == false }
+    var colorise: Bool {
+        if color == .forceColor { return true }
+
+        return
+            color.colorise
+            && csvSeparator == nil
+            && csv == false
+            && !FileHandle.standardOutput.isPiped
+    }
 
     @Argument(help: .readingPath)
     var readingPath: Path?

@@ -5,6 +5,7 @@
 
 import Scout
 import ArgumentParser
+import Foundation
 
 /// A Set/Add/Delete command for default implementations
 protocol SADCommand: ParsableCommand {
@@ -29,6 +30,17 @@ protocol SADCommand: ParsableCommand {
 
 extension SADCommand {
 
+    /// Colorize the output
+    var colorise: Bool {
+        if color == .forceColor { return true }
+
+        return
+            color.colorise
+            && csvSeparator == nil
+            && csv == false
+            && !FileHandle.standardOutput.isPiped
+    }
+
     func run() throws {
         let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
         let output = modifyFilePath ?? self.output
@@ -36,19 +48,19 @@ extension SADCommand {
 
         if var json = try? Json(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &json, pathCollectionElement: $0) }
-            try ScoutCommand.output(output, dataWith: json, colorise: color.colorise, level: level, csvSeparator: separator)
+            try ScoutCommand.output(output, dataWith: json, colorise: colorise, level: level, csvSeparator: separator)
 
         } else if var plist = try? Plist(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &plist, pathCollectionElement: $0) }
-            try ScoutCommand.output(output, dataWith: plist, colorise: color.colorise, level: level, csvSeparator: separator)
+            try ScoutCommand.output(output, dataWith: plist, colorise: colorise, level: level, csvSeparator: separator)
 
         } else if var yaml = try? Yaml(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &yaml, pathCollectionElement: $0) }
-            try ScoutCommand.output(output, dataWith: yaml, colorise: color.colorise, level: level, csvSeparator: separator)
+            try ScoutCommand.output(output, dataWith: yaml, colorise: colorise, level: level, csvSeparator: separator)
 
         } else if var xml = try? Xml(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &xml, pathCollectionElement: $0) }
-            try ScoutCommand.output(output, dataWith: xml, colorise: color.colorise, level: level, csvSeparator: separator)
+            try ScoutCommand.output(output, dataWith: xml, colorise: colorise, level: level, csvSeparator: separator)
 
         } else {
 

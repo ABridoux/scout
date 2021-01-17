@@ -43,13 +43,14 @@ struct ScoutCommand: ParsableCommand {
 
     // MARK: - Functions
 
-    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, colorise: Bool, level: Int? = nil, csvSeparator: String? = nil) throws {
+    static func output<P: PathExplorer>(_ output: String?, dataWith pathExplorer: P, colorise: Bool, level: Int? = nil, csvSeparator: String? = nil) throws {
 
         var csv: String?
         if let separator = csvSeparator {
             csv = try pathExplorer.exportCSV(separator: separator)
         }
 
+        // write the output in a file
         if let output = output?.replacingTilde {
             let fm = FileManager.default
             let contents = try csv?.data(using: .utf8) ?? pathExplorer.exportData()
@@ -57,10 +58,40 @@ struct ScoutCommand: ParsableCommand {
             return
         }
 
-        // remaining part to output the data
+        // write the output in the terminal
 
-        // get the injector to inject color if necessary
+        if let csvOutput = csv {
+            print(csvOutput)
+            return
+        }
+
+        // shadow variable to fold if necessary
+        var pathExplorer = pathExplorer
+
+        // fold if specified
+        if let level = level {
+            pathExplorer.fold(upTo: level)
+        }
+
+        let output = try pathExplorer.exportString()
+
+        if colorise {
+            try coloriseAndPrint(output: output, with: pathExplorer)
+        } else {
+            print(output)
+        }
+    }
+
+    static func getColorFile() throws -> ColorFile? {
+        let colorFileURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".scout/Colors.plist")
+        guard let data = try? Data(contentsOf: colorFileURL) else { return nil }
+
+        return try PropertyListDecoder().decode(ColorFile.self, from: data)
+    }
+
+    static func coloriseAndPrint<P: PathExplorer>(output: String, with pathExplorer: P) throws {
         let injector: TextInjector
+
         switch pathExplorer.format {
 
         case .json:
@@ -94,28 +125,6 @@ struct ScoutCommand: ParsableCommand {
             injector = jsonInjector
         }
 
-        if let csvOutput = csv {
-            print(csvOutput)
-            return
-        }
-
-        // shadow variable to fold if necessary
-        var pathExplorer = pathExplorer
-
-        // fold if specified
-        if let level = level {
-            pathExplorer.fold(upTo: level)
-        }
-
-        var output = try pathExplorer.exportString()
-        output = colorise ? injector.inject(in: output) : output
-        print(output)
-    }
-
-    static func getColorFile() throws -> ColorFile? {
-        let colorFileURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".scout/Colors.plist")
-        guard let data = try? Data(contentsOf: colorFileURL) else { return nil }
-
-        return try PropertyListDecoder().decode(ColorFile.self, from: data)
+        print(injector.inject(in: output))
     }
 }
