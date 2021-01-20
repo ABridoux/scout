@@ -17,24 +17,12 @@ public protocol SerializationFormat {
 
     static func serialize(data: Data) throws -> Any
     static func serialize(value: Any) throws -> Data
-    static func serialize(value: Any, to: DataFormat) throws -> Data
 }
 
 extension SerializationFormat {
 
     static var foldedMark: String { PathExplorerSerialization<Self>.foldedMark }
     static var foldedKey: String { PathExplorerSerialization<Self>.foldedKey }
-
-    public static func serialize(value: Any, to: DataFormat) throws -> Data {
-        switch dataFormat {
-        case .json: return try JsonFormat.serialize(value: value)
-        case .plist: return try PlistFormat.serialize(value: value)
-        case .yaml: return try YamlFormat.serialize(value: value)
-        case .xml:
-            #warning("[TODO] To be implemented")
-            return Data()
-        }
-    }
 }
 
 public struct PlistFormat: SerializationFormat {

@@ -10,20 +10,8 @@ extension AEXMLElement {
     /// Copy of the element, without the children
     func copy() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
 
-    /// xml keys have to have a key name. If the key has existing children,
-    /// we will take the name of the first child. Otherwise we will remove the "s" from the parent key name
-    var childrenName: String {
-        var keyName: String
-        if let name = children.first?.name {
-            keyName = name
-        } else {
-            keyName = name
-            if keyName.hasSuffix("s") {
-                keyName.removeLast()
-            }
-        }
-        return keyName
-    }
+    /// Name of the first child if one exists. Otherwise the parent key name will be used.
+    var childrenName: String { children.first?.name ?? name }
 
     /// The common name of all the children is one is found
     /// - note: Handles the case where the name is a pah leading to the key when using dictionary filters

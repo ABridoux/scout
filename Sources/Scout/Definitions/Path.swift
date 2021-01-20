@@ -103,6 +103,8 @@ public struct Path: Equatable {
     public mutating func removeLast() -> PathElement { elements.removeLast() }
 }
 
+// MARK: Collection
+
 extension Path: Collection {
 
     public var startIndex: Int { elements.startIndex }
@@ -141,10 +143,13 @@ extension Path: Collection {
     }
 }
 
+// MARK: String convertible
+
 extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
     public var description: String {
         var description = ""
+
         elements.forEach { element in
             switch element {
             case .index, .count, .slice, .keysList:
@@ -164,6 +169,7 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
         if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
         }
+        
         return description
     }
 
