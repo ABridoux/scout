@@ -45,6 +45,9 @@ struct DeleteCommand: SADCommand {
     @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
     var csvSeparator: String?
 
+    @Option(name: [.short, .customLong("export")], help: "Convert the data to the specified format")
+    var exportFormat: Scout.DataFormat?
+
     // MARK: - Functions
 
     func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {

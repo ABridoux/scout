@@ -9,10 +9,6 @@ import Foundation
 
 extension Path: ExpressibleByArgument {
 
-    // MARK: - Constants
-
-    //    public static var defaultCompletionKind: CompletionKind { .custom(evaluatePath) }
-
     // MARK: - Initialization
 
     public init?(argument: String) {

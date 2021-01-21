@@ -25,6 +25,8 @@ protocol SADCommand: ParsableCommand {
     var csv: Bool { get }
     var csvSeparator: String? { get }
 
+    var exportFormat: Scout.DataFormat? { get }
+
     /// Executed for each `pathsCollection` element
     func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathCollection.Element) throws
 }
@@ -90,10 +92,21 @@ extension SADCommand {
             csv = try pathExplorer.exportCSV(separator: separator)
         }
 
+        var exportedValue: Data?
+        if let format = exportFormat {
+            var rootName: String?
+            if let filePath = inputFilePath {
+                // optionnaly use the file name as root rather than "root"
+                rootName = URL(fileURLWithPath: filePath).lastPathComponentWithoutExtension
+            }
+            exportedValue = try pathExplorer.exportDataTo(format, rootName: rootName)
+        }
+
+        let contents = try csv?.data(using: .utf8) ?? exportedValue ?? pathExplorer.exportData()
+
         // write the output in a file
         if let output = output?.replacingTilde {
             let fm = FileManager.default
-            let contents = try csv?.data(using: .utf8) ?? pathExplorer.exportData()
             fm.createFile(atPath: output, contents: contents, attributes: nil)
             return
         }
@@ -102,6 +115,13 @@ extension SADCommand {
 
         if let csvOutput = csv {
             print(csvOutput)
+            return
+        }
+
+        if let value = exportedValue,
+           let string = String(data: value, encoding: .utf8),
+           let format = exportFormat {
+            try printOutput(output: string, with: format)
             return
         }
 
@@ -115,24 +135,25 @@ extension SADCommand {
 
         let output = try pathExplorer.exportString()
 
-        if colorise {
-            try coloriseAndPrint(output: output, with: pathExplorer)
-        } else {
-            print(output)
-        }
+        try printOutput(output: output, with: pathExplorer.format)
     }
 
-    func coloriseAndPrint<P: PathExplorer>(output: String, with pathExplorer: P) throws {
-        let injector: TextInjector
+    func printOutput(output: String, with format: Scout.DataFormat) throws {
 
-        switch pathExplorer.format {
+        guard colorise else {
+            print(output)
+            return
+        }
+
+        switch format {
 
         case .json:
             let jsonInjector = JSONInjector(type: .terminal)
             if let colors = try getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
             }
-            injector = jsonInjector
+
+            print(jsonInjector.inject(in: output))
 
         case .plist:
 
@@ -140,14 +161,14 @@ extension SADCommand {
             if let colors = try getColorFile()?.plist {
                 plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
             }
-            injector = plistInjector
+            print(plistInjector.inject(in: output))
 
         case .xml:
             let xmlInjector = XMLEnhancedInjector(type: .terminal)
             if let colors = try getColorFile()?.xml {
                 xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
             }
-            injector = xmlInjector
+            print(xmlInjector.inject(in: output))
 
         case .yaml:
             #warning("[TODO] Change for a YAML color injector")
@@ -155,9 +176,7 @@ extension SADCommand {
             if let colors = try getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
             }
-            injector = jsonInjector
+            print(jsonInjector.inject(in: output))
         }
-
-        print(injector.inject(in: output))
     }
 }

@@ -99,7 +99,6 @@ final class PathExplorerSerializationXMLTests: XCTestCase {
         let ducksAndScores = Dictionary(uniqueKeysWithValues: ducksScoresTuples)
         let mousesAndFlags = Dictionary(uniqueKeysWithValues: mousesFlagTuples)
 
-
         XCTAssertEqual(ducksAndScores["Riri"], 10)
         XCTAssertEqual(ducksAndScores["Fifi"], 20)
         XCTAssertEqual(ducksAndScores["Loulou"], 30)
@@ -111,14 +110,8 @@ final class PathExplorerSerializationXMLTests: XCTestCase {
 extension PathExplorerSerializationXMLTests {
 
     func xmlRoot(with value: Any) -> AEXMLElement {
-        let explorer = Json(value: value)
-
-        let data = try explorer.exportToXML() !! "Export to XML failed"
-
-        do {
-            return try AEXMLDocument(xml: data).root
-        } catch {
-            preconditionFailure(error.localizedDescription)
-        }
+        let root = AEXMLElement(name: "root")
+        Json(value: value).xmlElement(on: root)
+        return root
     }
 }

@@ -138,33 +138,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         try add(newValue, at: Path(path), as: type)
     }
 
-    // MARK: Export
-
-    public func exportData() throws -> Data {
-        try F.serialize(value: value)
-    }
-
-    public func exportString() throws -> String {
-        let data = try exportData()
-
-        guard var string = String(data: data, encoding: .utf8) else {
-            throw PathExplorerError.stringToDataConversionError
-        }
-
-        if isFolded {
-            string = string.replacingOccurrences(of: F.foldedRegexPattern, with: "...", options: .regularExpression)
-        }
-
-        guard format == .json else { return string }
-
-        if #available(OSX 10.15, *) {
-            // the without-backslash option is available
-            return string
-        } else {
-            // we have to remvove the back slashes
-            return string.replacingOccurrences(of: "\\", with: "")
-        }
-    }
+    // MARK: Fold
 
     public mutating func fold(upTo level: Int) {
         isFolded = true

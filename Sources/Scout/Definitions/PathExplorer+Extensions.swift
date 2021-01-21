@@ -3,6 +3,8 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
+import Foundation
+
 // MARK: - Literal type extensions
 
 extension PathExplorer {
@@ -130,5 +132,15 @@ extension PathExplorer {
 extension PathExplorer {
     public func exportCSV() throws -> String {
         try exportCSV(separator: ";")
+    }
+
+    /// Export the path explorer value to the specified format data
+    public func exportDataTo(_ format: DataFormat) throws -> Data {
+        try exportDataTo(format, rootName: nil)
+    }
+
+    /// Export the path explorer value to the specified format string data
+    public func exportStringTo(_ format: DataFormat) throws -> String {
+        try exportStringTo(format, rootName: nil)
     }
 }

@@ -169,7 +169,7 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
         if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
         }
-        
+
         return description
     }
 
