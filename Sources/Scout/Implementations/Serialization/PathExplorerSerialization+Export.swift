@@ -68,7 +68,7 @@ extension PathExplorerSerialization {
 
     func exportToXML(rootName: String?) -> AEXMLElement {
         let root = AEXMLElement(name: rootName ?? defaultRootName)
-        xmlElement(on: root)
+        xmlElement(on: root, for: value)
 
         if root.children.count == 1 { // dictionary with a single root element
             return root.children[0]
@@ -76,14 +76,13 @@ extension PathExplorerSerialization {
         return root
     }
 
-    func xmlElement(on element: AEXMLElement) {
+    func xmlElement(on element: AEXMLElement, for value: Any) {
         switch value {
 
         case let dict as DictionaryValue:
             let children = dict.map { (key, value) -> AEXMLElement in
                 let child = AEXMLElement(name: key)
-                let pathExplorer = PathExplorerSerialization(value: value)
-                pathExplorer.xmlElement(on: child)
+                xmlElement(on: child, for: value)
 
                 return child
             }
@@ -92,8 +91,7 @@ extension PathExplorerSerialization {
         case let array as ArrayValue:
             let children = array.enumerated().map { (index, value) -> AEXMLElement in
                 let child = AEXMLElement(name: "\(element.name)-\(index)")
-                let pathExplorer = PathExplorerSerialization(value: value)
-                pathExplorer.xmlElement(on: child)
+                xmlElement(on: child, for: value)
 
                 return child
             }

@@ -7,7 +7,9 @@ import Foundation
 
 extension PathExplorerSerialization {
 
-    public func exportCSV(separator: String = ";") throws -> String {
+    public func exportCSV(separator: String?) throws -> String {
+        let separator = separator ?? defaultCSVSeparator
+
         if value is DictionaryValue {
             let values = try exportCSVDictionary(separator: separator)
             var csv = ""

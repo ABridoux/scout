@@ -84,8 +84,45 @@ public struct YamlFormat: SerializationFormat {
         return serialized
     }
 
+    /// Required cast from `Any` to `NodeRepresentable`
+    ///
+    /// It seems to be a general bug in Swift. When working with an `Any` value from a deserialized data, the
+    /// value cannot conform to a protocol if not casted.
+    ///
+    /// As the YAMS library is casting `Any` as `NodeRepresentable` the problem arises.
+    /// - note:
+    /// Linked references and issues:
+    /// - [Stack Overflow](https://stackoverflow.com/questions/42033735/failing-cast-in-swift-from-any-to-protocol)
+    /// - [bugs.Swift](https://bugs.swift.org/browse/SR-3871)
+    private static func castToNodeRepresentable(_ value: Any) -> NodeRepresentable {
+        if var value = value as? [String: Any] {
+            value.forEach { value[$0.key] = castToNodeRepresentable($0.value) }
+            return value
+
+        } else if let value = value as? [Any] {
+            return value.map(castToNodeRepresentable)
+
+        } else if let value = value as? Int {
+            return value as NodeRepresentable
+
+        } else if let value = value as? Double {
+            return value as NodeRepresentable
+
+        } else if let value = value as? Date {
+            return value as NodeRepresentable
+
+        } else if let value = value as? Bool {
+            return value as NodeRepresentable
+
+        } else {
+            return String(describing: value) as NodeRepresentable
+        }
+    }
+
     public static func serialize(value: Any) throws -> Data {
+        let value = castToNodeRepresentable(value)
         let string = try Yams.dump(object: value)
+
         guard let data = string.data(using: .utf8) else {
             throw PathExplorerError.dataToStringConversionError
         }

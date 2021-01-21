@@ -7,8 +7,9 @@ import ArgumentParser
 import Scout
 import Foundation
 import Lux
+import ScoutCLTCore
 
-struct ReadCommand: ParsableCommand {
+struct ReadCommand: ParsableCommand, ExportCommand {
 
     // MARK: - Constants
 
@@ -36,8 +37,8 @@ struct ReadCommand: ParsableCommand {
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
-    @Option(name: [.short, .long], help: "Write the read data into the file at the given path", completion: .file())
-    var output: String?
+    @Option(name: [.short, .customLong("output")], help: "Write the read data into the file at the given path", completion: .file())
+    var outputFilePath: String?
 
     @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
     var color = ColorFlag.color
@@ -72,7 +73,7 @@ struct ReadCommand: ParsableCommand {
                 throw RuntimeError.noValueAt(path: readingPath.description)
             }
 
-            if let output = output?.replacingTilde, let contents = value.data(using: .utf8) {
+            if let output = outputFilePath?.replacingTilde, let contents = value.data(using: .utf8) {
                 let fm = FileManager.default
                 fm.createFile(atPath: output, contents: contents, attributes: nil)
                 return
@@ -125,33 +126,24 @@ struct ReadCommand: ParsableCommand {
     }
 
     func getValue<Explorer: PathExplorer>(from explorer: inout Explorer) throws -> String {
-        let value: String
 
-        if let separator = csvSeparator {
-            value = try explorer.exportCSV(separator: separator)
-            return value
+        switch try export() {
+
+        case .csv(let separator):
+            return try explorer.exportCSV(separator: separator)
+
+        case .dataFormat(let format):
+            return try explorer.exportStringTo(format, rootName: fileName(of: inputFilePath))
+
+        case nil:
+            break
         }
 
-        if csv {
-            value = try explorer.exportCSV()
-            return value
-        }
-
-        if let format = exportFormat {
-            var rootName: String?
-            if let filePath = inputFilePath {
-                // optionnaly use the file name as root rather than "root"
-                rootName = URL(fileURLWithPath: filePath).lastPathComponentWithoutExtension
-            }
-            value = try explorer.exportStringTo(format, rootName: rootName)
-            return value
-        }
-
-        if let level = level, output == nil { // ignore folding when writing in a file
+        if let level = level, outputFilePath == nil { // ignore folding when writing in a file
             explorer.fold(upTo: level)
         }
 
-        value = explorer.stringValue != "" ? explorer.stringValue : explorer.description
+        let value = explorer.stringValue != "" ? explorer.stringValue : explorer.description
 
         return value
     }

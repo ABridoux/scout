@@ -20,6 +20,6 @@ public enum PathExplorers {
 }
 
 /// Unique identifier of a data format
-public enum DataFormat: String {
+public enum DataFormat: String, CaseIterable {
     case json, plist, xml, yaml
 }

@@ -6,7 +6,9 @@
 import AEXML
 
 extension PathExplorerXML {
-    public func exportCSV(separator: String = ";") throws -> String {
+    public func exportCSV(separator: String?) throws -> String {
+        let separator = separator ?? defaultCSVSeparator
+
         let (headers, values) = try exportCSVHeadersAndValues(separator: separator)
         var csv = ""
 

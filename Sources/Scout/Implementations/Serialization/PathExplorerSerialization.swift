@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// `PathExplorer` struct which uses a serializer to parse data: Json, Plist and Yaml
+/// `PathExplorer` which uses a serializer to parse data: Json, Plist and Yaml
 public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: - Properties

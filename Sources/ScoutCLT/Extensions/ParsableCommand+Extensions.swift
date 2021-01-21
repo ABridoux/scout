@@ -17,16 +17,3 @@ extension ParsableCommand {
         }
     }
 }
-
-extension URL {
-
-    var lastPathComponentWithoutExtension: String {
-        let splitted = lastPathComponent.split(separator: ".")
-
-        guard splitted.count > 1 else {
-            return lastPathComponent
-        }
-
-        return String(splitted[splitted .count - 2])
-    }
-}

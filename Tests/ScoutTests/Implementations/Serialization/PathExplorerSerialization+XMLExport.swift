@@ -7,7 +7,7 @@ import XCTest
 import AEXML
 @testable import Scout
 
-final class PathExplorerSerializationXMLTests: XCTestCase {
+final class PathExplorerSerializationExportXMLTests: XCTestCase {
 
     func testExportString() throws {
         let root = xmlRoot(with: "Ducks")
@@ -107,11 +107,11 @@ final class PathExplorerSerializationXMLTests: XCTestCase {
     }
 }
 
-extension PathExplorerSerializationXMLTests {
+extension PathExplorerSerializationExportXMLTests {
 
     func xmlRoot(with value: Any) -> AEXMLElement {
         let root = AEXMLElement(name: "root")
-        Json(value: value).xmlElement(on: root)
+        Json(value: value).xmlElement(on: root, for: value)
         return root
     }
 }

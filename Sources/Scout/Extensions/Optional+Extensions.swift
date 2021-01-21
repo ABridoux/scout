@@ -12,6 +12,7 @@ infix operator !!
 ///   - optional: The optional to unwrap
 ///   - errorMessage: An error message
 /// - Returns: The unwrapped optional
+/// - note: Idea from [Advanced Swift](https://www.objc.io/books/advanced-swift/)
 func !!<T>(optional: T?, errorMessage: @autoclosure () -> String) -> T {
     if let unwrapped = optional {
         return unwrapped

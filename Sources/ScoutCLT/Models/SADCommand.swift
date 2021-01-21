@@ -7,25 +7,21 @@ import Scout
 import ArgumentParser
 import Foundation
 import Lux
+import ScoutCLTCore
 
 /// A Set/Add/Delete command for default implementations
-protocol SADCommand: ParsableCommand {
+protocol SADCommand: ParsableCommand, ExportCommand {
 
     associatedtype PathCollection: Collection
 
     var pathsCollection: PathCollection { get }
-    var output: String? { get }
 
     var color: ColorFlag { get }
     var level: Int? { get }
 
     var modifyFilePath: String? { get }
     var inputFilePath: String? { get }
-
-    var csv: Bool { get }
-    var csvSeparator: String? { get }
-
-    var exportFormat: Scout.DataFormat? { get }
+    var outputFilePath: String? { get }
 
     /// Executed for each `pathsCollection` element
     func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathCollection.Element) throws
@@ -46,24 +42,23 @@ extension SADCommand {
 
     func run() throws {
         let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
-        let output = modifyFilePath ?? self.output
-        let separator = csvSeparator ?? (csv ? ";" : nil)
+        let outputPath = modifyFilePath ?? outputFilePath
 
         if var json = try? Json(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &json, pathCollectionElement: $0) }
-            try printOutput(output, dataWith: json, colorise: colorise, level: level, csvSeparator: separator)
+            try printOutput(outputPath, dataWith: json, colorise: colorise, level: level)
 
         } else if var plist = try? Plist(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &plist, pathCollectionElement: $0) }
-            try printOutput(output, dataWith: plist, colorise: colorise, level: level, csvSeparator: separator)
+            try printOutput(outputPath, dataWith: plist, colorise: colorise, level: level)
 
         } else if var yaml = try? Yaml(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &yaml, pathCollectionElement: $0) }
-            try printOutput(output, dataWith: yaml, colorise: colorise, level: level, csvSeparator: separator)
+            try printOutput(outputPath, dataWith: yaml, colorise: colorise, level: level)
 
         } else if var xml = try? Xml(data: data) {
             try pathsCollection.forEach { try perform(pathExplorer: &xml, pathCollectionElement: $0) }
-            try printOutput(output, dataWith: xml, colorise: colorise, level: level, csvSeparator: separator)
+            try printOutput(outputPath, dataWith: xml, colorise: colorise, level: level)
 
         } else {
 
@@ -85,44 +80,34 @@ extension SADCommand {
     ///   - colorise: `true` if the data should be colorised
     ///   - level: The level to fold the data
     ///   - csvSeparator: The csv separator to use to export the data
-    func printOutput<P: PathExplorer>(_ output: String?, dataWith pathExplorer: P, colorise: Bool, level: Int? = nil, csvSeparator: String? = nil) throws {
+    func printOutput<P: PathExplorer>(_ output: String?, dataWith pathExplorer: P, colorise: Bool, level: Int? = nil) throws {
 
-        var csv: String?
-        if let separator = csvSeparator {
-            csv = try pathExplorer.exportCSV(separator: separator)
-        }
-
-        var exportedValue: Data?
-        if let format = exportFormat {
-            var rootName: String?
-            if let filePath = inputFilePath {
-                // optionnaly use the file name as root rather than "root"
-                rootName = URL(fileURLWithPath: filePath).lastPathComponentWithoutExtension
-            }
-            exportedValue = try pathExplorer.exportDataTo(format, rootName: rootName)
-        }
-
-        let contents = try csv?.data(using: .utf8) ?? exportedValue ?? pathExplorer.exportData()
-
-        // write the output in a file
         if let output = output?.replacingTilde {
-            let fm = FileManager.default
-            fm.createFile(atPath: output, contents: contents, attributes: nil)
-            return
+            FileManager.default.createFile(atPath: output, contents: nil, attributes: nil)
         }
 
-        // write the output in the terminal
+        switch try export() {
+        case .csv(let separator):
+            let csv = try pathExplorer.exportCSV(separator: separator)
+            if let output = output {
+                try csv.write(toFile: output, atomically: false, encoding: .utf8)
+            } else {
+                print(csv)
+            }
 
-        if let csvOutput = csv {
-            print(csvOutput)
-            return
-        }
+        case .dataFormat(let format):
+            let exported = try pathExplorer.exportDataTo(format, rootName: fileName(of: inputFilePath))
+            if let output = output {
+                try exported.write(to: URL(fileURLWithPath: output))
+            } else {
+                guard let string = String(data: exported, encoding: .utf8) else {
+                    throw PathExplorerError.dataToStringConversionError
+                }
+                try printOutput(output: string, with: format)
+            }
 
-        if let value = exportedValue,
-           let string = String(data: value, encoding: .utf8),
-           let format = exportFormat {
-            try printOutput(output: string, with: format)
-            return
+        case nil:
+            break
         }
 
         // shadow variable to fold if necessary
@@ -152,7 +137,6 @@ extension SADCommand {
             if let colors = try getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
             }
-
             print(jsonInjector.inject(in: output))
 
         case .plist:

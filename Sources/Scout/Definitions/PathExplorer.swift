@@ -367,8 +367,8 @@ where
     /// Export the path explorer value to a String
     func exportString() throws -> String
 
-    /// Export the path explorer value to a CSV if possible
-    func exportCSV(separator: String) throws -> String
+    /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
+    func exportCSV(separator: String?) throws -> String
 
     /// Export the path explorer value to the specified format data with a default root name "root"
     func exportDataTo(_ format: DataFormat, rootName: String?) throws -> Data

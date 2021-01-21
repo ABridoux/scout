@@ -130,8 +130,12 @@ extension PathExplorer {
 // MARK: Export
 
 extension PathExplorer {
+
+    var defaultCSVSeparator: String { ";" }
+
+    /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
     public func exportCSV() throws -> String {
-        try exportCSV(separator: ";")
+        try exportCSV(separator: nil)
     }
 
     /// Export the path explorer value to the specified format data
