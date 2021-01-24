@@ -7,8 +7,9 @@ import ArgumentParser
 import Scout
 import Foundation
 import Lux
+import ScoutCLTCore
 
-struct ReadCommand: ParsableCommand {
+struct ReadCommand: ParsableCommand, ExportCommand {
 
     // MARK: - Constants
 
@@ -36,8 +37,8 @@ struct ReadCommand: ParsableCommand {
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
-    @Option(name: [.short, .long], help: "Write the read data into the file at the given path", completion: .file())
-    var output: String?
+    @Option(name: [.short, .customLong("output")], help: "Write the read data into the file at the given path", completion: .file())
+    var outputFilePath: String?
 
     @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
     var color = ColorFlag.color
@@ -50,6 +51,9 @@ struct ReadCommand: ParsableCommand {
 
     @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
     var csvSeparator: String?
+
+    @Option(name: [.short, .customLong("export")], help: "Convert the data to the specified format")
+    var exportFormat: Scout.DataFormat?
 
     // MARK: - Functions
 
@@ -69,7 +73,7 @@ struct ReadCommand: ParsableCommand {
                 throw RuntimeError.noValueAt(path: readingPath.description)
             }
 
-            if let output = output?.replacingTilde, let contents = value.data(using: .utf8) {
+            if let output = outputFilePath?.replacingTilde, let contents = value.data(using: .utf8) {
                 let fm = FileManager.default
                 fm.createFile(atPath: output, contents: contents, attributes: nil)
                 return
@@ -90,52 +94,27 @@ struct ReadCommand: ParsableCommand {
 
         if let json = try? Json(data: data) {
             var json = try json.get(path)
-
             let value = try getValue(from: &json)
 
-            let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try getColorFile()?.json {
-                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
-            }
-
-            return (value, jsonInjector)
+            return (value, try colorInjector(for: exportFormat ?? .json))
 
         } else if let plist = try? Plist(data: data) {
             var plist = try plist.get(path)
-
             let value = try getValue(from: &plist)
 
-            let plistInjector = PlistInjector(type: .terminal)
-            if let colors = try getColorFile()?.plist {
-                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
-            }
-
-            return (value, plistInjector)
+            return (value, try colorInjector(for: exportFormat ?? .plist))
 
         } else if let xml = try? Xml(data: data) {
             var xml = try xml.get(path)
-
             let value = try getValue(from: &xml)
 
-            let xmlInjector = XMLEnhancedInjector(type: .terminal)
-            if let colors = try getColorFile()?.xml {
-                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
-            }
-
-            return (value, xmlInjector)
+            return (value, try colorInjector(for: exportFormat ?? .xml))
 
         } else if let yaml = try? Yaml(data: data) {
             var yaml = try yaml.get(path)
-
             let value = try getValue(from: &yaml)
 
-            #warning("[TODO] Change for a YAML color injector")
-            let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try getColorFile()?.json {
-                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
-            }
-
-            return (value, jsonInjector)
+            return (value, try colorInjector(for: exportFormat ?? .yaml))
 
         } else {
             if let filePath = inputFilePath {
@@ -147,24 +126,59 @@ struct ReadCommand: ParsableCommand {
     }
 
     func getValue<Explorer: PathExplorer>(from explorer: inout Explorer) throws -> String {
-        let value: String
 
-        if let separator = csvSeparator {
-            value = try explorer.exportCSV(separator: separator)
-            return value
+        switch try export() {
+
+        case .csv(let separator):
+            return try explorer.exportCSV(separator: separator)
+
+        case .dataFormat(let format):
+            return try explorer.exportStringTo(format, rootName: fileName(of: inputFilePath))
+
+        case nil:
+            break
         }
 
-        if csv {
-            value = try explorer.exportCSV()
-            return value
-        }
-
-        if let level = level, output == nil { // ignore folding when writing in a file
+        if let level = level, outputFilePath == nil { // ignore folding when writing in a file
             explorer.fold(upTo: level)
         }
 
-        value = explorer.stringValue != "" ? explorer.stringValue : explorer.description
+        let value = explorer.stringValue != "" ? explorer.stringValue : explorer.description
 
         return value
+    }
+
+    func colorInjector(for format: Scout.DataFormat) throws -> TextInjector {
+        switch format {
+
+        case .json:
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            return jsonInjector
+
+        case .plist:
+            let plistInjector = PlistInjector(type: .terminal)
+            if let colors = try getColorFile()?.plist {
+                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
+            }
+            return plistInjector
+
+        case .yaml:
+            #warning("[TODO] Change for a YAML color injector")
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            return jsonInjector
+
+        case .xml:
+            let xmlInjector = XMLEnhancedInjector(type: .terminal)
+            if let colors = try getColorFile()?.xml {
+                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
+            }
+            return xmlInjector
+        }
     }
 }

@@ -10,6 +10,9 @@ let package = Package(
         .library(
             name: "Scout",
             targets: ["Scout"]),
+        .library(
+            name: "ScoutCLTCore",
+            targets: ["ScoutCLTCore"]),
         .executable(
             name: "ScoutCLT",
             targets: ["ScoutCLT"])
@@ -33,10 +36,16 @@ let package = Package(
             name: "Scout",
             dependencies: ["AEXML", "Yams"]),
         .target(
+            name: "ScoutCLTCore",
+            dependencies: ["Scout"]),
+        .target(
             name: "ScoutCLT",
-            dependencies: ["Scout", "ArgumentParser", "Lux"]),
+            dependencies: ["Scout", "ArgumentParser", "Lux", "ScoutCLTCore"]),
         .testTarget(
             name: "ScoutTests",
             dependencies: ["Scout"]),
+        .testTarget(
+            name: "ScoutCLTCoreTests",
+            dependencies: ["ScoutCLTCore", "Scout"])
     ]
 )
