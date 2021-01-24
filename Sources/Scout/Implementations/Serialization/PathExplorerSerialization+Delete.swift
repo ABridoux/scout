@@ -200,6 +200,55 @@ extension PathExplorerSerialization {
         }
     }
 
+    // MARK: - Regular expression
+
+    public mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
+        if isDictionary {
+            try deleteDict(regularExpression: regularExpression, deleteIfEmpty: deleteIfEmpty)
+        } else if isArray {
+            try deleteArray(regularExpression: regularExpression, deleteIfEmpty: deleteIfEmpty)
+        }
+    }
+
+    mutating func deleteDict(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
+        var dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
+
+        // remove the dict keys matching the regex
+        for key in dict.keys where regularExpression.validate(key) {
+            dict.removeValue(forKey: key)
+        }
+
+        // call the deletion funcion on children
+        try dict.forEach { (key, value) in
+            var explorer = PathExplorerSerialization(value: value)
+            try explorer.delete(regularExpression: regularExpression, deleteIfEmpty: deleteIfEmpty)
+
+            if deleteIfEmpty, explorer.isEmpty {
+                dict.removeValue(forKey: key)
+            } else {
+                dict[key] = explorer.value
+            }
+        }
+
+        value = dict
+    }
+
+    mutating func deleteArray(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
+        let array = try cast(value, as: .array, orThrow: .dictionarySubscript(readingPath))
+
+        // call the deletion funcion on children
+        value = try array.compactMap { (value) -> Any? in
+            var explorer = PathExplorerSerialization(value: value)
+            try explorer.delete(regularExpression: regularExpression, deleteIfEmpty: deleteIfEmpty)
+
+            if deleteIfEmpty, explorer.isEmpty {
+                return nil
+            } else {
+                return explorer.value
+            }
+        }
+    }
+
     // MARK: - General
 
     mutating func delete(element: PathElement) throws {

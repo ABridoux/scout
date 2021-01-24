@@ -207,7 +207,7 @@ final class PathExplorerXMLSerializationExportTests: XCTestCase {
 extension PathExplorerXMLSerializationExportTests {
 
     func serialize(element: AEXMLElement) -> Any {
-        let explorer = PathExplorerXML(element: element, path: Path([]))
+        let explorer = PathExplorerXML(element: element, path: .empty)
         return explorer.serialize(element: element)
     }
 }

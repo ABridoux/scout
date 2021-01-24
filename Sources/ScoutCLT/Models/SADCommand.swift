@@ -41,6 +41,11 @@ extension SADCommand {
     }
 
     func run() throws {
+        try defaultRun()
+    }
+
+    /// The default run function implementation for a SAD command
+    func defaultRun() throws {
         let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
         let outputPath = modifyFilePath ?? outputFilePath
 

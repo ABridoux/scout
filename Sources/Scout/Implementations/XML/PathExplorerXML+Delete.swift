@@ -88,4 +88,22 @@ extension PathExplorerXML {
 
         explorers = newElementsToDelete
     }
+
+    // MARK: - Regular expression
+
+    public mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
+        element.children
+            .filter { regularExpression.validate($0.name) }
+            .forEach { $0.removeFromParent() }
+
+        try element.children.forEach { (child) in
+            var explorer = PathExplorerXML(element: child, path: readingPath)
+            try explorer.delete(regularExpression: regularExpression, deleteIfEmpty: deleteIfEmpty)
+        }
+
+        if deleteIfEmpty, element.children.isEmpty,
+           (element.value == nil || element.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true) {
+            element.removeFromParent()
+        }
+    }
 }
