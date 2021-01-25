@@ -10,19 +10,23 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: - Properties
 
+    // MARK: State
+
     var value: Any
-
-    var isDictionary: Bool { value is DictionaryValue }
-    var isArray: Bool { value is ArrayValue }
-
-    /// `true` if the value is an array or a dictionary and is empty
-    var isEmpty: Bool { isValueEmpty(value) }
 
     /// If `false`, the empty dicitionaries or array will be removed rather than set. Default is `true`
     var allowEmptyGroups = true
 
     /// `true` if the explorer has been folded
     var isFolded = false
+
+    // MARK: Computed
+
+    var isDictionary: Bool { value is DictionaryValue }
+    var isArray: Bool { value is ArrayValue }
+
+    /// `true` if the value is an array or a dictionary and is empty
+    var isEmpty: Bool { isValueEmpty(value) }
 
     // MARK: PathExplorer
 

@@ -6,7 +6,7 @@
 import Foundation
 
 /// Collection of `PathElement`s to subscript a `PathExplorer`
-public struct Path: Equatable {
+public struct Path: Hashable {
 
     // MARK: - Constants
 
@@ -181,5 +181,22 @@ extension Path: ExpressibleByArrayLiteral {
 
     public init(arrayLiteral elements: PathElementRepresentable...) {
         self.elements = elements.map { $0.pathValue }
+    }
+}
+
+// MARK: - Regular expression
+
+extension Path {
+
+    public func lastKeyComponent(matches regularExpression: NSRegularExpression) -> Bool {
+        let lastKey = elements.last { (element) -> Bool in
+            if case .key = element {
+                return true
+            }
+            return false
+        }
+        guard case let .key(name) = lastKey else { return false }
+
+        return regularExpression.validate(name)
     }
 }

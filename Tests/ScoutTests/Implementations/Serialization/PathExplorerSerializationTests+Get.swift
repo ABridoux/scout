@@ -299,8 +299,7 @@ extension PathExplorerSerializationTests {
     // MARK: - Keys list
 
     func testGetKeysListDict() throws {
-        let data = try PropertyListEncoder().encode(charactersByName)
-        let plist = try Plist(data: data)
+        let plist = Plist(value: charactersByName)
         let path: Path = [PathElement.keysList]
 
         XCTAssertEqual(try plist.get(path).value as? [String], ["Buzz", "Woody", "Zurg"])
@@ -312,5 +311,88 @@ extension PathExplorerSerializationTests {
         let path: Path = ["Woody", PathElement.keysList]
 
         XCTAssertEqual(try plist.get(path).value as? [String], ["episodes", "name", "quote"])
+    }
+
+    // MARK: - Key regular expression
+
+    func testGetKeysPaths() throws {
+        var dict = [String: Any]()
+        let firstPlayer: [String: Any] = ["name": "Zerator", "score": 10]
+        let secondPlayer: [String: Any] = ["name": "Mister MV", "score": 20]
+        dict["duration"] = 30
+        dict["players"] = [firstPlayer, secondPlayer]
+        let explorer = Json(value: dict)
+        var paths = [Path]()
+
+        explorer.collectKeysPaths(in: &paths)
+
+        let expectedPaths: Set<Path> = [Path("duration"), Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testGetKeysPathsArrayOrder() throws {
+        var dict = [String: Any]()
+        let firstPlayer: [String: Any] = ["name": "Zerator"]
+        let secondPlayer: [String: Any] = ["name": "Mister MV"]
+        let thirdPlayer: [String: Any] = ["name": "Maghla"]
+        dict["players"] = [firstPlayer, secondPlayer, thirdPlayer]
+        let explorer = Json(value: dict)
+        var paths = [Path]()
+
+        explorer.collectKeysPaths(in: &paths)
+
+        let expectedPaths = [Path("players", 0, "name"), Path("players", 1, "name"), Path("players", 2, "name")]
+        XCTAssertEqual(paths, expectedPaths)
+    }
+
+    func testGetKeysPathsWithKeyPatternSingleAndGroup() throws {
+        var dict = [String: Any]()
+        let firstPlayer: [String: Any] = ["name": "Zerator", "score": 10]
+        let secondPlayer: [String: Any] = ["name": "Mister MV", "score": 20]
+        dict["duration"] = 30
+        dict["name"] = ["Zevent", "EventZ"]
+        dict["players"] = [firstPlayer, secondPlayer]
+        let explorer = Json(value: dict)
+        var paths = [Path]()
+        let regex = try NSRegularExpression(pattern: "name")
+
+        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .singleAndGroup)
+
+        let expectedPaths: Set<Path> = [Path("name"), Path("name", 0), Path("name", 1), Path("players", 0, "name"),Path("players", 1, "name")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testGetKeysPathsWithKeyPatternSingle() throws {
+        var dict = [String: Any]()
+        let firstPlayer: [String: Any] = ["name": "Zerator", "score": 10]
+        let secondPlayer: [String: Any] = ["name": "Mister MV", "score": 20]
+        dict["duration"] = 30
+        dict["name"] = ["Zevent", "EventZ"]
+        dict["players"] = [firstPlayer, secondPlayer]
+        let explorer = Json(value: dict)
+        var paths = [Path]()
+        let regex = try NSRegularExpression(pattern: "name")
+
+        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .single)
+
+        let expectedPaths: Set<Path> = [Path("name", 0), Path("name", 1), Path("players", 0, "name"),Path("players", 1, "name")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testGetKeysPathsWithKeyPatternGroup() throws {
+        var dict = [String: Any]()
+        let firstPlayer: [String: Any] = ["name": "Zerator", "score": 10]
+        let secondPlayer: [String: Any] = ["name": "Mister MV", "score": 20]
+        dict["duration"] = 30
+        dict["name"] = ["Zevent", "EventZ"]
+        dict["players"] = [firstPlayer, secondPlayer]
+        let explorer = Json(value: dict)
+        var paths = [Path]()
+        let regex = try NSRegularExpression(pattern: "name")
+
+        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .group)
+
+        let expectedPaths: Set<Path> = [Path("name")]
+        XCTAssertEqual(Set(paths), expectedPaths)
     }
 }

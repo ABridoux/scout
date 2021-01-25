@@ -200,7 +200,7 @@ extension PathExplorerSerialization {
         }
     }
 
-    // MARK: - Regular expression
+    // MARK: - Key regular expression
 
     public mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
         if isDictionary {

@@ -6,7 +6,7 @@
 import Foundation
 
 /// Lower and upper bounds to be used to slice an array
-public struct Bounds: Equatable {
+public struct Bounds: Hashable {
 
     // MARK: - Properties
 
@@ -59,7 +59,7 @@ public struct Bounds: Equatable {
 
 public extension Bounds {
 
-    struct Bound: ExpressibleByIntegerLiteral, Equatable {
+    struct Bound: ExpressibleByIntegerLiteral, Hashable {
         public typealias IntegerLiteralType = Int
         public static let first = Bound(0, identifier: "first")
         public static let last = Bound(0, identifier: "last")

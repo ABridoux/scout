@@ -10,6 +10,7 @@ enum RuntimeError: LocalizedError {
     case noValueAt(path: String)
     case unknownFormat(String)
     case completionScriptInstallation(description: String)
+    case invalidRegex(String)
 
     var errorDescription: String? {
         switch self {
@@ -17,6 +18,7 @@ enum RuntimeError: LocalizedError {
         case .noValueAt(let path): return "No value at '\(path)'"
         case .unknownFormat(let description): return description
         case .completionScriptInstallation(let description): return "Error while installating the completion script. \(description)"
+        case .invalidRegex(let pattern): return "The regular expression  '\(pattern)' is invalid"
         }
     }
 }
