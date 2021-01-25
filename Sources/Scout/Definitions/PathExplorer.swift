@@ -358,6 +358,10 @@ where
     */
     mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws
 
+    // MARK: - Paths
+
+    func getPaths(for filter: PathFilter?) -> [Path]
+
     // MARK: Conversion
 
     /// Try to convert the value held by the PathExplorer to the given type
