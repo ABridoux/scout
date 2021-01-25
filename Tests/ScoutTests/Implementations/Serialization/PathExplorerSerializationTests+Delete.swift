@@ -238,4 +238,43 @@ extension PathExplorerSerializationTests {
         XCTAssertErrorsEqual(try plist.get("Buzz", "episodes"), .subscriptMissingKey(path: Path("Buzz"), key: "episodes", bestMatch: nil))
         XCTAssertErrorsEqual(try plist.get("Zurg", "episodes"), .subscriptMissingKey(path: Path("Zurg"), key: "episodes", bestMatch: nil))
     }
+
+    // MARK: - Regex pattern
+
+    func testDeleteKeyRegexPattern() throws {
+        let attributesKey = "attributes"
+        let attributes = ["duration": 20, "score": 500]
+        var games = [String: Any]()
+        games[attributesKey] = attributes
+        var firstPlayer: [String: Any] = ["name": "John", "rank": 1]
+        firstPlayer[attributesKey] = attributes
+        var secondPlayer: [String: Any] = ["name": "Maeva", "rank": 1]
+        secondPlayer[attributesKey] = attributes
+        games["players"] = [firstPlayer, secondPlayer]
+        var explorer = Plist(value: games)
+        let regex = try NSRegularExpression(pattern: "attributes")
+
+        try explorer.delete(regularExpression: regex, deleteIfEmpty: false)
+
+        XCTAssertErrorsEqual(try explorer.get("attributes"), .subscriptMissingKey(path: .empty, key: "attributes", bestMatch: nil))
+        XCTAssertErrorsEqual(try explorer.get("players", 0, "attributes"), .subscriptMissingKey(path: Path("players", 0), key: "attributes", bestMatch: nil))
+        XCTAssertErrorsEqual(try explorer.get("players", 1, "attributes"), .subscriptMissingKey(path: Path("players", 1), key: "attributes", bestMatch: nil))
+    }
+
+    func testDeleteKeyRegexPatternDeleteIfEmpty() throws {
+        let attributesKey = "attributes"
+        let attributes = ["duration": 20, "score": 500]
+        var games = [String: Any]()
+        games[attributesKey] = attributes
+        let firstPlayer = [attributesKey: attributes]
+        let secondPlayer = [attributesKey: attributes]
+        games["players"] = [firstPlayer, secondPlayer]
+        var explorer = Plist(value: games)
+        let regex = try NSRegularExpression(pattern: "attributes")
+
+        try explorer.delete(regularExpression: regex, deleteIfEmpty: true)
+
+        XCTAssertErrorsEqual(try explorer.get("attributes"), .subscriptMissingKey(path: .empty, key: "attributes", bestMatch: nil))
+        XCTAssertErrorsEqual(try explorer.get("players"), .subscriptMissingKey(path: .empty, key: "players", bestMatch: nil))
+    }
 }

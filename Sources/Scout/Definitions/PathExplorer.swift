@@ -112,6 +112,10 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool) throws
 
+    /// Delete all the keys matching the regular expression pattern
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
+    mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws
+
     // MARK: Add
 
     /**

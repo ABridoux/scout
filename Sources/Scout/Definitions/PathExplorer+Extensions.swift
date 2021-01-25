@@ -84,6 +84,8 @@ public extension PathExplorer {
 
 extension PathExplorer {
 
+    public var double: Double? { real }
+
     /// Ensure a value as a correct type
     /// - Parameter value: The value to convert
     /// - Parameter type: The type to use to convert the value. Use `automatic` to let the function try the available types

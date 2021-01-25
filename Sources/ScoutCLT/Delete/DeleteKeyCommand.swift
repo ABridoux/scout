@@ -3,23 +3,25 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
-import ArgumentParser
-import Scout
 import Foundation
+import Scout
+import ArgumentParser
 
-struct DeleteCommand: SADCommand {
+struct DeleteKeyCommand: SADCommand {
 
     // MARK: - Constants
 
     static let configuration = CommandConfiguration(
-        commandName: "delete",
-        abstract: "Delete a value at a given path",
-        discussion: "To find examples and advanced explanations, please type `scout doc -c delete-key`")
+        commandName: "delete-key",
+        abstract: "Delete all the (key, value) pairs where the key matches the regular expression pattern",
+        discussion: "To find examples and advanced explanations, please type `scout doc -c delete`")
 
     // MARK: - Properties
 
-    @Argument(help: "Paths to indicate the keys to be deleted")
-    var pathsCollection = [Path]()
+    var pathsCollection: [Path] { [Path("empty")] }
+
+    @Argument(help: "The regular expression pattern the keys to delete have to match")
+    var pattern: String
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
@@ -51,6 +53,8 @@ struct DeleteCommand: SADCommand {
     // MARK: - Functions
 
     func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
-        try pathExplorer.delete(pathCollectionElement, deleteIfEmpty: recursive)
+        // will be called only once
+        let regularExpression = try NSRegularExpression(pattern: pattern)
+        try pathExplorer.delete(regularExpression: regularExpression, deleteIfEmpty: recursive)
     }
 }
