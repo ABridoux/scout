@@ -36,6 +36,10 @@ final class PathExtensionsTests: XCTestCase {
     }
 
     func testSmartDescriptionReplaceFilter() throws {
+        try testPathSmartDescription("people.#Robert|Tom#.#age|hobbies#.Tom.hobbies[1]", expected: "people.Tom.hobbies[1]")
+    }
+
+    func testSmartDescriptionReplaceFilterTwice() throws {
         try testPathSmartDescription("movies[1].#title|name#.hobbies.name[0]", expected: "movies[1].name.hobbies[0]")
     }
 

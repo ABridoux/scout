@@ -208,8 +208,8 @@ extension Path {
     public func flattened() -> Path {
         var indexes = [(index: Int, value: Int)]()
         var slices = [(index: Int, lowerBound: Int, upperBound: Int)]()
-        var lastKey: (index: Int, name: String)?
-        var lastFilter: (index: Int, pattern: String)?
+        var keys = [(index: Int, name: String)]()
+        var filters = [(index: Int, pattern: String)]()
         var newElements = [PathElement]()
 
         elements.enumerated().forEach { (index, element) in
@@ -220,10 +220,10 @@ extension Path {
                 break
 
             case .key(let name):
-                lastKey = (index, name)
+                keys.append((index, name))
 
             case .filter(let pattern):
-                lastFilter = (index, pattern)
+                filters.append((index, pattern))
 
             case .index(let indexValue):
                 indexes.append((index: index, value: indexValue))
@@ -242,19 +242,19 @@ extension Path {
             newElements.append(element)
         }
 
+        var indexesToRemove = [Int]()
+
         if slices.count == 1, let firstSlice = slices.first, let index = indexes.first {
             let newIndex = firstSlice.lowerBound + index.value
             newElements[firstSlice.index] = .index(newIndex)
-            newElements.remove(at: index.index)
+            indexesToRemove.append(index.index)
             slices.removeFirst()
         } else if let firstSlice = slices.first, let lastIndex = indexes.popLast() {
             let newIndex = firstSlice.lowerBound + lastIndex.value
             newElements[firstSlice.index] = .index(newIndex)
-            newElements.remove(at: lastIndex.index)
+            indexesToRemove.append(lastIndex.index)
             slices.removeFirst()
         }
-
-        var indexesToRemove = [Int]()
 
         slices.enumerated().forEach { (index, slice) in
             let arrayIndex = indexes[index]
@@ -263,20 +263,19 @@ extension Path {
             indexesToRemove.append(arrayIndex.index)
         }
 
-        if let filter = lastFilter, let key = lastKey,
-           let regex = try? NSRegularExpression(pattern: filter.pattern), regex.validate(key.name) {
+        var filtersIterator = filters.reversed().makeIterator()
+        var keysIterator = keys.reversed().makeIterator()
+
+        while let filter = filtersIterator.next(), let key = keysIterator.next() {
+            guard
+                let regex = try? NSRegularExpression(pattern: filter.pattern),
+                regex.validate(key.name)
+            else { continue }
             newElements[filter.index] = .key(key.name)
             indexesToRemove.append(key.index)
         }
 
-        indexesToRemove.sorted().reversed().forEach { newElements.remove(at: $0) }
-
-        newElements.removeAll {
-            if case .filter = $0 {
-                return true
-            }
-            return false
-        }
+        indexesToRemove.sorted { $1 < $0 }.forEach { newElements.remove(at: $0) }
 
         return Path(newElements)
     }

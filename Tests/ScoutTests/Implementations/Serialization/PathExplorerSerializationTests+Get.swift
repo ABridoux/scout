@@ -160,7 +160,7 @@ extension PathExplorerSerializationTests {
         let data = try PropertyListEncoder().encode(temperatures)
         let plist = try Plist(data: data)
 
-        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}[a-z]*n").value
+        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}[a-z]*n", detailedName: true).value
 
         let keys = try XCTUnwrap(value as? [String: Int])
         XCTAssertEqual(keys, ["Dublin": 19, "Berlin": 21])
@@ -170,7 +170,7 @@ extension PathExplorerSerializationTests {
         let data = try PropertyListEncoder().encode(ducks)
         let plist = try Plist(data: data)
 
-        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}i[a-z]{1}i").value
+        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}i[a-z]{1}i", detailedName: true).value
 
         let keys = try XCTUnwrap(value as? [String])
         XCTAssertEqual(keys, ["Riri", "Fifi"])

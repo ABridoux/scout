@@ -222,7 +222,7 @@ extension PathExplorerSerialization {
 
         case .dictionaryFilter:
             let dict = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
-            return try get(.arraySlice(bounds), inDictionaryFilter: dict)
+            return try get(.arraySlice(bounds), inDictionaryFilter: dict, detailedName: detailedName)
 
         case nil:
         return try getSingleArraySlice(within: bounds)
@@ -255,7 +255,7 @@ extension PathExplorerSerialization {
 
     // MARK: Dictionary filter
 
-    func getDictionaryFilter(with pattern: String) throws -> Self {
+    func getDictionaryFilter(with pattern: String, detailedName: Bool) throws -> Self {
         switch lastGroupSample {
         case .arraySlice:
             let array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -263,7 +263,7 @@ extension PathExplorerSerialization {
 
         case .dictionaryFilter:
             let dict = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
-            return try get(.dictionaryFilter(pattern), inDictionaryFilter: dict)
+            return try get(.dictionaryFilter(pattern), inDictionaryFilter: dict, detailedName: detailedName)
 
         case nil:
             return try getSingleDictionaryFilter(with: pattern)
@@ -315,7 +315,7 @@ extension PathExplorerSerialization {
         case .count: return try getChildrenCount()
         case .keysList: return try getKeysList()
         case .slice(let bounds): return try getArraySlice(within: bounds, detailedName: detailedName)
-        case .filter(let pattern): return try getDictionaryFilter(with: pattern)
+        case .filter(let pattern): return try getDictionaryFilter(with: pattern, detailedName: detailedName)
         }
     }
 
