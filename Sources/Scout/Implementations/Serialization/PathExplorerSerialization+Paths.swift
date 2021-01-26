@@ -12,7 +12,14 @@ extension PathExplorerSerialization {
 
         if let path = initialPath {
             try path.forEach { (element) in
-                explorer = try explorer.get(element: element, negativeIndexEnabled: true, detailedName: false)
+                switch element {
+                case .count, .keysList:
+                    let context = "It cannot be used with the 'path' command"
+                    throw PathExplorerError.wrongElement(element: element, command: "paths")
+
+                case .filter, .slice, .index, .key:
+                    explorer = try explorer.get(element: element, negativeIndexEnabled: true, detailedName: false)
+                }
             }
         }
         var paths = [Path]()

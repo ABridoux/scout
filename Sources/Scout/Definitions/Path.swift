@@ -208,17 +208,22 @@ extension Path {
     public func flattened() -> Path {
         var indexes = [(index: Int, value: Int)]()
         var slices = [(index: Int, lowerBound: Int, upperBound: Int)]()
+        var lastKey: (index: Int, name: String)?
+        var lastFilter: (index: Int, pattern: String)?
         var newElements = [PathElement]()
 
         elements.enumerated().forEach { (index, element) in
             let element = elements[index]
 
             switch element {
-            case .count, .keysList, .key, .filter:
+            case .count, .keysList:
                 break
 
-            case .filter:
+            case .key(let name):
+                lastKey = (index, name)
 
+            case .filter(let pattern):
+                lastFilter = (index, pattern)
 
             case .index(let indexValue):
                 indexes.append((index: index, value: indexValue))
@@ -228,6 +233,7 @@ extension Path {
                     let lowerBound = bounds.lastComputedLower,
                     let upperBound = bounds.lastComputedUpper
                 else { break }
+                #warning("Handle negative indexes when added")
 
                 slices.append((index, lowerBound, upperBound))
                 indexes.removeAll()
@@ -249,6 +255,7 @@ extension Path {
         }
 
         var indexesToRemove = [Int]()
+
         slices.enumerated().forEach { (index, slice) in
             let arrayIndex = indexes[index]
             let newIndex = slice.lowerBound + arrayIndex.value
@@ -256,7 +263,13 @@ extension Path {
             indexesToRemove.append(arrayIndex.index)
         }
 
-        indexesToRemove.reversed().forEach { newElements.remove(at: $0) }
+        if let filter = lastFilter, let key = lastKey,
+           let regex = try? NSRegularExpression(pattern: filter.pattern), regex.validate(key.name) {
+            newElements[filter.index] = .key(key.name)
+            indexesToRemove.append(key.index)
+        }
+
+        indexesToRemove.sorted().reversed().forEach { newElements.remove(at: $0) }
 
         newElements.removeAll {
             if case .filter = $0 {

@@ -10,7 +10,7 @@
 /// ```
 /// let path: Path = ["people", "Tom", "hobbies", 1]
 /// ```
-/// But the "Expressible" protocols do not allow to do the same with variables.
+/// But the "Expressible" protocols does not allow to do the same with variables.
 /// Thus, using `PathElementRepresentable` allows to instantiate a Path from a mix of Strings and Integers variables:
 /// ```
 /// let firstKey = "people"
