@@ -15,8 +15,8 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertEqual(try plist.get(for: "stringValue").string, StubPlistStruct().stringValue)
-        XCTAssertEqual(try plist.get(for: "intValue").int, StubPlistStruct().intValue)
+        XCTAssertEqual(try plist.get(for: "stringValue", detailedName: true).string, StubPlistStruct().stringValue)
+        XCTAssertEqual(try plist.get(for: "intValue", detailedName: true).int, StubPlistStruct().intValue)
     }
 
     func testSubscriptDict_ThrowsIfNotDict() throws {
@@ -49,7 +49,7 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertEqual(try plist.get(at: 2).string, "cheesecakes")
+        XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, "cheesecakes")
     }
 
     func testSubscriptArray_ThrowsIfNotArray() throws {
@@ -358,7 +358,7 @@ extension PathExplorerSerializationTests {
 
         explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .singleAndGroup)
 
-        let expectedPaths: Set<Path> = [Path("name"), Path("name", 0), Path("name", 1), Path("players", 0, "name"),Path("players", 1, "name")]
+        let expectedPaths: Set<Path> = [Path("name"), Path("name", 0), Path("name", 1), Path("players", 0, "name"), Path("players", 1, "name")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
@@ -375,7 +375,7 @@ extension PathExplorerSerializationTests {
 
         explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .single)
 
-        let expectedPaths: Set<Path> = [Path("name", 0), Path("name", 1), Path("players", 0, "name"),Path("players", 1, "name")]
+        let expectedPaths: Set<Path> = [Path("name", 0), Path("name", 1), Path("players", 0, "name"), Path("players", 1, "name")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 

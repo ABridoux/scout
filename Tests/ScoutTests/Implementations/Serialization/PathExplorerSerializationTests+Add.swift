@@ -15,25 +15,25 @@ extension PathExplorerSerializationTests {
 
         try plist.add("Tom", for: "human")
 
-        XCTAssertEqual(try plist.get(for: "human").string, "Tom")
+        XCTAssertEqual(try plist.get(for: "human", detailedName: true).string, "Tom")
     }
 
     func testAddKeyArrayEnd() throws {
         let data = try PropertyListEncoder().encode(Animals())
-        var plist = try Plist(data: data).get(for: "ducks")
+        var plist = try Plist(data: data).get(for: "ducks", detailedName: true)
 
         try plist.add("Donald", for: -1)
 
-        XCTAssertEqual(try plist.get(at: 3).string, "Donald")
+        XCTAssertEqual(try plist.get(at: 3, detailedName: true).string, "Donald")
     }
 
     func testAddKeyArrayInsert() throws {
         let data = try PropertyListEncoder().encode(Animals())
-        var plist = try Plist(data: data).get(for: "ducks")
+        var plist = try Plist(data: data).get(for: "ducks", detailedName: true)
 
         try plist.add("Donald", for: 2)
 
-        XCTAssertEqual(try plist.get(at: 2).string, "Donald")
+        XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, "Donald")
     }
 
     func testAddKey1() throws {

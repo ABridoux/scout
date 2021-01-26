@@ -225,8 +225,4 @@ extension PathExplorerXMLTests {
             XCTAssertEqual(element.children[i].string, names[i])
         }
     }
-
-    // MARK: - Key regular expression
-
-    
 }

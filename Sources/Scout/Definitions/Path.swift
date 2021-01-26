@@ -244,7 +244,9 @@ extension Path {
 
         var indexesToRemove = [Int]()
 
-        if slices.count == 1, let firstSlice = slices.first, let index = indexes.first {
+        if slices.count == 1, indexes.count > 1,
+           let firstSlice = slices.first, let index = indexes.first {
+            #warning("[TODO] Test this case")
             let newIndex = firstSlice.lowerBound + index.value
             newElements[firstSlice.index] = .index(newIndex)
             indexesToRemove.append(index.index)

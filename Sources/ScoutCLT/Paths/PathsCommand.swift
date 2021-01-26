@@ -36,7 +36,7 @@ struct PathsCommand: ScoutCommand {
 
     // MARK: - Functions
 
-    func inferred<P>(pathExplorer: P) throws where P : PathExplorer {
+    func inferred<P>(pathExplorer: P) throws where P: PathExplorer {
         var pathFilter: PathFilter?
 
         if let keyRegexPattern = keyRegexPattern {

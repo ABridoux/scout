@@ -13,7 +13,7 @@ extension PathExplorerSerialization {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(at index: Int, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws -> Self {
+    func get(at index: Int, negativeIndexEnabled: Bool = true, detailedName: Bool) throws -> Self {
         let newValue: Any
 
         switch lastGroupSample {
@@ -65,7 +65,7 @@ extension PathExplorerSerialization {
 
     /// Get the given index in the dictionary filter by browsing all the arrays in the slice
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(at index: Int, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> DictionaryValue {
+    func get(at index: Int, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool) throws -> DictionaryValue {
         var newDictFilter = DictionaryValue()
 
         try dictionary.forEach { (key, value) in
@@ -80,7 +80,7 @@ extension PathExplorerSerialization {
 
     // MARK: Dictionary
 
-    func get(for key: String, detailedName: Bool = true) throws -> Self {
+    func get(for key: String, detailedName: Bool) throws -> Self {
         let newValue: Any
 
         switch lastGroupSample {
@@ -128,7 +128,7 @@ extension PathExplorerSerialization {
 
     /// Get the given key in the dictionary filter by browsing all the dictionaries in the filter
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(for key: String, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> DictionaryValue {
+    func get(for key: String, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool) throws -> DictionaryValue {
         var newDictFilter = DictionaryValue()
 
         try dictionary.forEach { (keyValue, value) in
@@ -213,7 +213,7 @@ extension PathExplorerSerialization {
 
     /// Returns a slice of value is it is an array
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func getArraySlice(within bounds: Bounds, detailedName: Bool = true) throws -> Self {
+    func getArraySlice(within bounds: Bounds, detailedName: Bool) throws -> Self {
 
         switch lastGroupSample {
         case .arraySlice:
@@ -286,7 +286,7 @@ extension PathExplorerSerialization {
         return PathExplorerSerialization(value: filteredDict, path: path)
     }
 
-    func get(_ groupSample: GroupSample, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> Self {
+    func get(_ groupSample: GroupSample, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool) throws -> Self {
         var newDict = DictionaryValue()
 
         try dictionary.forEach { (key, value) in
@@ -304,7 +304,7 @@ extension PathExplorerSerialization {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(element: PathElement, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws -> Self {
+    func get(element: PathElement, negativeIndexEnabled: Bool = true, detailedName: Bool) throws -> Self {
         guard readingPath.last != .count else {
             throw PathExplorerError.wrongUsage(of: .count, in: readingPath)
         }
@@ -323,7 +323,7 @@ extension PathExplorerSerialization {
         var currentPathExplorer = self
 
         try path.forEach { element in
-            currentPathExplorer = try currentPathExplorer.get(element: element)
+            currentPathExplorer = try currentPathExplorer.get(element: element, detailedName: true)
         }
 
         return currentPathExplorer
