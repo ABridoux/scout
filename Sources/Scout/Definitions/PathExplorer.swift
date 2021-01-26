@@ -360,7 +360,7 @@ where
 
     // MARK: - Paths
 
-    func getPaths(for filter: PathFilter?) -> [Path]
+    func getPaths(startingAt initialPath: Path?, for filter: PathFilter?) throws -> [Path]
 
     // MARK: Conversion
 

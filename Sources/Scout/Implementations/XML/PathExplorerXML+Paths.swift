@@ -5,7 +5,7 @@
 
 extension PathExplorerXML {
 
-    public func getPaths(for filter: PathFilter?) -> [Path] {
+    public func getPaths(startingAt initialPath: Path?, for filter: PathFilter?) throws -> [Path] {
         return []
     }
 }

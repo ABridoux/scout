@@ -16,6 +16,12 @@ public struct Bounds: Hashable {
     /// Use the `range(lastValidIndex:path)` function to access to the upper bound
     private let upper: Bound
 
+    @IntWrapper
+    private(set) var lastComputedLower
+
+    @IntWrapper
+    private(set) var lastComputedUpper
+
     /// Description of the lower bound.
     /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the lower bound
     var lowerString: String { lower == .first ? "" : String(lower.value) }
@@ -53,6 +59,10 @@ public struct Bounds: Hashable {
         guard 0 <= lower, lower <= upper, upper <= lastValidIndex else {
             throw PathExplorerError.wrongBounds(self, in: path, lastValidIndex: lastValidIndex)
         }
+
+        lastComputedLower = lower
+        lastComputedUpper = upper
+
         return lower...upper
     }
 }
@@ -78,6 +88,25 @@ public extension Bounds {
         private init(_ value: Int, identifier: String) {
             self.value = value
             self.identifier = identifier
+        }
+    }
+}
+
+extension Bounds {
+
+    /// Wrapper aound an `Int` value to avoid to make all the `Bounds` mutable
+    /// - note: `Bounds` will only mutate those `IntWrapper` values internally
+    @propertyWrapper
+    final class IntWrapper: Hashable {
+
+        fileprivate(set) var wrappedValue: Int?
+
+        static func == (lhs: IntWrapper, rhs: IntWrapper) -> Bool {
+            lhs.wrappedValue == rhs.wrappedValue
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(wrappedValue)
         }
     }
 }

@@ -7,20 +7,27 @@ import Foundation
 
 extension PathExplorerSerialization {
 
-    public func getPaths(for filter: PathFilter?) -> [Path] {
+    public func getPaths(startingAt initialPath: Path?, for filter: PathFilter?) throws -> [Path] {
+        var explorer = Self(value: value, path: .empty)
+
+        if let path = initialPath {
+            try path.forEach { (element) in
+                explorer = try explorer.get(element: element, negativeIndexEnabled: true, detailedName: false)
+            }
+        }
         var paths = [Path]()
 
         switch filter {
-        case .key(let regex, let valueType): collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: valueType)
-        case nil: collectKeysPaths(in: &paths)
+        case .key(let regex, let valueType): explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: valueType)
+        case nil: explorer.collectKeysPaths(in: &paths)
         }
 
-        return paths
+        return paths.map { $0.flattened() }.sortedByKeysAndIndexes()
     }
 
     func collectKeysPaths(in paths: inout [Path]) {
         if let dict = value as? DictionaryValue {
-            dict.sorted(by: { $0.key < $1.key }).forEach { (key, value) in
+            dict.forEach { (key, value) in
                 let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
                 explorer.collectKeysPaths(in: &paths)
             }
@@ -36,7 +43,7 @@ extension PathExplorerSerialization {
 
     func collectKeysPaths(in paths: inout [Path], whereKeyMatches regularExpression: NSRegularExpression, valueType: PathFilter.ValueType) {
         if let dict = value as? DictionaryValue {
-            dict.sorted(by: { $0.key < $1.key }).forEach { (key, value) in
+            dict.forEach { (key, value) in
                 let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
 
                 if valueType.groupAllowed, regularExpression.validate(key), isGroup(value: value) {

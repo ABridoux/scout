@@ -311,7 +311,7 @@ extension PathExplorerSerialization {
 
         switch element {
         case .key(let key): return try get(for: key, detailedName: detailedName)
-        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
+        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled, detailedName: detailedName)
         case .count: return try getChildrenCount()
         case .keysList: return try getKeysList()
         case .slice(let bounds): return try getArraySlice(within: bounds, detailedName: detailedName)
@@ -349,5 +349,4 @@ extension PathExplorerSerialization {
 
         return (explorers, craftingPath, lastElement)
     }
-
 }

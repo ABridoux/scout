@@ -47,8 +47,8 @@ struct PathsCommand: ScoutCommand {
         }
 
         let readingPath = self.readingPath ?? Path()
-        let explorer = try pathExplorer.get(readingPath)
-        let paths = explorer.getPaths(for: pathFilter)
-        paths.forEach { print($0) }
+        let paths = try pathExplorer.getPaths(startingAt: readingPath, for: pathFilter)
+
+        paths.forEach { print($0.flattened()) }
     }
 }

@@ -147,11 +147,21 @@ extension Path: Collection {
 
 extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
-    public var description: String {
+    /// Prints all the elements in the path, with the default separator
+    /// #### Complexity
+    /// O(n) with `n` number of elements in the path
+    public var description: String { computeDescription() }
+
+    public var debugDescription: String { description }
+
+    func computeDescription(ignore: ((PathElement) -> Bool)? = nil) -> String {
         var description = ""
 
         elements.forEach { element in
+            if let ignore = ignore, ignore(element) { return }
+
             switch element {
+
             case .index, .count, .slice, .keysList:
                 // remove the point added automatically to a path element
                 if description.hasSuffix(Self.defaultSeparator) {
@@ -159,12 +169,16 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
                 }
                 description.append(element.description)
 
-            case .filter(let pattern): description.append("#\(pattern)#")
-            case .key: description.append(element.description)
+            case .filter(let pattern):
+                description.append("#\(pattern)#")
+
+            case .key:
+                description.append(element.description)
             }
 
             description.append(Self.defaultSeparator)
         }
+
         // remove the last point if any
         if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
@@ -172,15 +186,86 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
         return description
     }
-
-    public var debugDescription: String { description }
 }
 
 extension Path: ExpressibleByArrayLiteral {
     public typealias ArrayLiteralElement = PathElementRepresentable
 
     public init(arrayLiteral elements: PathElementRepresentable...) {
-        self.elements = elements.map { $0.pathValue }
+        self.elements = elements.map(\.pathValue)
+    }
+}
+
+// MARK: - Flattening
+
+extension Path {
+
+    /// Compute the path by changing the special path elements like slices or filters
+    ///
+    /// Filters are removed. Slices are changed to indexes to target the path.
+    /// #### Complexity
+    /// O(n) with `n` number of elements in the path
+    public func flattened() -> Path {
+        var indexes = [(index: Int, value: Int)]()
+        var slices = [(index: Int, lowerBound: Int, upperBound: Int)]()
+        var newElements = [PathElement]()
+
+        elements.enumerated().forEach { (index, element) in
+            let element = elements[index]
+
+            switch element {
+            case .count, .keysList, .key, .filter:
+                break
+
+            case .filter:
+
+
+            case .index(let indexValue):
+                indexes.append((index: index, value: indexValue))
+
+            case .slice(let bounds):
+                guard
+                    let lowerBound = bounds.lastComputedLower,
+                    let upperBound = bounds.lastComputedUpper
+                else { break }
+
+                slices.append((index, lowerBound, upperBound))
+                indexes.removeAll()
+            }
+
+            newElements.append(element)
+        }
+
+        if slices.count == 1, let firstSlice = slices.first, let index = indexes.first {
+            let newIndex = firstSlice.lowerBound + index.value
+            newElements[firstSlice.index] = .index(newIndex)
+            newElements.remove(at: index.index)
+            slices.removeFirst()
+        } else if let firstSlice = slices.first, let lastIndex = indexes.popLast() {
+            let newIndex = firstSlice.lowerBound + lastIndex.value
+            newElements[firstSlice.index] = .index(newIndex)
+            newElements.remove(at: lastIndex.index)
+            slices.removeFirst()
+        }
+
+        var indexesToRemove = [Int]()
+        slices.enumerated().forEach { (index, slice) in
+            let arrayIndex = indexes[index]
+            let newIndex = slice.lowerBound + arrayIndex.value
+            newElements[slice.index] = .index(newIndex)
+            indexesToRemove.append(arrayIndex.index)
+        }
+
+        indexesToRemove.reversed().forEach { newElements.remove(at: $0) }
+
+        newElements.removeAll {
+            if case .filter = $0 {
+                return true
+            }
+            return false
+        }
+
+        return Path(newElements)
     }
 }
 
@@ -188,6 +273,7 @@ extension Path: ExpressibleByArrayLiteral {
 
 extension Path {
 
+    /// Last key component matching the regular expression
     public func lastKeyComponent(matches regularExpression: NSRegularExpression) -> Bool {
         let lastKey = elements.last { (element) -> Bool in
             if case .key = element {
@@ -198,5 +284,64 @@ extension Path {
         guard case let .key(name) = lastKey else { return false }
 
         return regularExpression.validate(name)
+    }
+}
+
+// MARK: - Map functions
+
+public extension Path {
+
+    /// Retrieve all the index elements
+    var compactMapIndexes: [Int] {
+        compactMap {
+            if case let .index(index) = $0 {
+                return index
+            }
+            return nil
+        }
+    }
+
+    /// Retrieve all the key elements
+    var compactMapKeys: [String] {
+        compactMap {
+            if case let .key(name) = $0 {
+                return name
+            }
+            return nil
+        }
+    }
+}
+
+// MARK: - Paths collection
+
+public extension Collection where Element == Path {
+
+    /// Sort by key or index when found at the same position
+    func sortedByKeysAndIndexes() -> [Path] {
+        sorted { (lhs, rhs) in
+
+            var lhsIterator = lhs.makeIterator()
+            var rhsIterator = rhs.makeIterator()
+
+            while let lhsElement = lhsIterator.next(), let rhsElement = rhsIterator.next() {
+                switch (lhsElement, rhsElement) {
+
+                case (.key(let lhsLabel), .key(let rhsLabel)):
+                    if lhsLabel != rhsLabel {
+                        return lhsLabel < rhsLabel
+                    }
+
+                case (.index(let lhsIndex), .index(let rhsIndex)):
+                    if lhsIndex != rhsIndex {
+                        return lhsIndex < rhsIndex
+                    }
+
+                default:
+                    return true
+                }
+            }
+
+            return true
+        }
     }
 }
