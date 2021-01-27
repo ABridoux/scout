@@ -29,37 +29,49 @@ final class PathExtensionsTests: XCTestCase {
         XCTAssertFalse(path.lastKeyComponent(matches: wrongRegex))
     }
 
-    // MARK: Smart description
+    // MARK: Flattening
 
-    func testSmartDescriptionReplaceSlice() throws {
-        try testPathSmartDescription("movies[1:5].title[2]", expected: "movies[3].title")
+    func testFlattenReplaceSlice1() throws {
+        try testFlatten("movies[1:5].title[2]", expected: "movies[3].title")
     }
 
-    func testSmartDescriptionReplaceFilter() throws {
-        try testPathSmartDescription("people.#Robert|Tom#.#age|hobbies#.Tom.hobbies[1]", expected: "people.Tom.hobbies[1]")
+    func testFlattenReplaceSlice2() throws {
+        try testFlatten("movies[1:2].chapters[2][1]", expected: "movies[2].chapters[2]")
     }
 
-    func testSmartDescriptionReplaceFilterTwice() throws {
-        try testPathSmartDescription("movies[1].#title|name#.hobbies.name[0]", expected: "movies[1].name.hobbies[0]")
+    func testFlattenReplaceSlice3() throws {
+        try testFlatten("[1:2][1][2][0]", expected: "[1][1][2]")
     }
 
-    func testSmartDescriptionReplaceSliceAndFilter() throws {
-        try testPathSmartDescription("movies[1:5].#title|name#.title[2]", expected: "movies[3].title")
+    func testFlattenReplaceFilter() throws {
+        try testFlatten("people.#Robert|Tom#.#age|hobbies#.Tom.hobbies[1]", expected: "people.Tom.hobbies[1]")
     }
 
-    func testSmartDescriptionReplaceSliceKeySlice() throws {
-        try testPathSmartDescription("movies[1:5].chapters[3:10][2][3]", expected: "movies[4].chapters[5]")
+    func testFlattenReplaceFilter2() throws {
+        try testFlatten("people.#Tom|Robert#.Robert.hobbies[0]", expected: "people.Robert.hobbies[0]")
     }
 
-    func testSmartDescription1() throws {
-        try testPathSmartDescription("[1:3][1][2:3][:1][1][2][1]", expected: "[2][1][3][2]")
+    func testFlattenReplaceFilterTwice() throws {
+        try testFlatten("movies[1].#title|name#.hobbies.name[0]", expected: "movies[1].name.hobbies[0]")
     }
 
-    func testSmartDescription2() throws {
-        try testPathSmartDescription("[1:3][2:3][1][2][3][1]", expected: "[2][3][2][3]")
+    func testFlattenReplaceSliceAndFilter() throws {
+        try testFlatten("movies[1:5].#title|name#.title[2]", expected: "movies[3].title")
     }
 
-    func testPathSmartDescription(_ description: String, expected: String) throws {
+    func testFlattenReplaceSliceKeySlice() throws {
+        try testFlatten("movies[1:5].chapters[3:10][2][3]", expected: "movies[4].chapters[5]")
+    }
+
+    func testFlatten1() throws {
+        try testFlatten("[1:3][1][2:3][:1][1][2][1]", expected: "[2][1][3][2]")
+    }
+
+    func testFlatten2() throws {
+        try testFlatten("[1:3][2:3][1][2][3][1]", expected: "[2][3][2][3]")
+    }
+
+    func testFlatten(_ description: String, expected: String) throws {
         let path = try Path(string: description)
         try path.forEach {
             if case let .slice(bounds) = $0 {

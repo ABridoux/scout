@@ -150,3 +150,12 @@ extension PathExplorer {
         try exportStringTo(format, rootName: nil)
     }
 }
+
+// MARK: Paths
+
+extension PathExplorer {
+
+    public func getPaths(startingAt initialPath: Path?, for filter: PathElementFilter?) throws -> [Path] {
+        try getPaths(startingAt: initialPath, for: filter, valueType: .singleAndGroup)
+    }
+}

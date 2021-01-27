@@ -360,7 +360,12 @@ where
 
     // MARK: - Paths
 
-    func getPaths(startingAt initialPath: Path?, for filter: PathFilter?) throws -> [Path]
+    /// Returns all the path leading to single or group values
+    /// - Parameters:
+    ///   - initialPath: Scope the return paths with this path as a starting point
+    ///   - filter: Optionnaly provide a filter on the key
+    ///   - valueType: Allow group, single values or both. Default to both.
+    func getPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path]
 
     // MARK: Conversion
 

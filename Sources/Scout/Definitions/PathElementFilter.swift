@@ -5,20 +5,11 @@
 
 import Foundation
 
-public enum PathFilter {
-
-    case key(regex: NSRegularExpression, valueType: ValueType)
+public enum PathElementFilter {
+    case key(regex: NSRegularExpression)
 }
 
-extension PathFilter {
-
-    /// Key target with a default `Value.Type.singleAndGroup`
-    static func key(regex: NSRegularExpression) -> PathFilter {
-        .key(regex: regex, valueType: .singleAndGroup)
-    }
-}
-
-extension PathFilter {
+extension PathElementFilter {
 
     /// Specify if group (array, dictionary) values, single values or both paths should be targeted
     public enum ValueType: String, CaseIterable {

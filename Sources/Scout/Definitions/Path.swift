@@ -26,7 +26,7 @@ public struct Path: Hashable {
 
     // MARK: - Properties
 
-    private var elements = [PathElement]()
+    private(set) var elements = [PathElement]()
 
     public static var empty: Path { Path([PathElement]()) }
 
@@ -196,93 +196,6 @@ extension Path: ExpressibleByArrayLiteral {
     }
 }
 
-// MARK: - Flattening
-
-extension Path {
-
-    /// Compute the path by changing the special path elements like slices or filters
-    ///
-    /// Filters are removed. Slices are changed to indexes to target the path.
-    /// #### Complexity
-    /// O(n) with `n` number of elements in the path
-    public func flattened() -> Path {
-        var indexes = [(index: Int, value: Int)]()
-        var slices = [(index: Int, lowerBound: Int, upperBound: Int)]()
-        var keys = [(index: Int, name: String)]()
-        var filters = [(index: Int, pattern: String)]()
-        var newElements = [PathElement]()
-
-        elements.enumerated().forEach { (index, element) in
-            let element = elements[index]
-
-            switch element {
-            case .count, .keysList:
-                break
-
-            case .key(let name):
-                keys.append((index, name))
-
-            case .filter(let pattern):
-                filters.append((index, pattern))
-
-            case .index(let indexValue):
-                indexes.append((index: index, value: indexValue))
-
-            case .slice(let bounds):
-                guard
-                    let lowerBound = bounds.lastComputedLower,
-                    let upperBound = bounds.lastComputedUpper
-                else { break }
-                #warning("Handle negative indexes when added")
-
-                slices.append((index, lowerBound, upperBound))
-                indexes.removeAll()
-            }
-
-            newElements.append(element)
-        }
-
-        var indexesToRemove = [Int]()
-
-        if slices.count == 1, indexes.count > 1,
-           let firstSlice = slices.first, let index = indexes.first {
-            #warning("[TODO] Test this case")
-            let newIndex = firstSlice.lowerBound + index.value
-            newElements[firstSlice.index] = .index(newIndex)
-            indexesToRemove.append(index.index)
-            slices.removeFirst()
-        } else if let firstSlice = slices.first, let lastIndex = indexes.popLast() {
-            let newIndex = firstSlice.lowerBound + lastIndex.value
-            newElements[firstSlice.index] = .index(newIndex)
-            indexesToRemove.append(lastIndex.index)
-            slices.removeFirst()
-        }
-
-        slices.enumerated().forEach { (index, slice) in
-            let arrayIndex = indexes[index]
-            let newIndex = slice.lowerBound + arrayIndex.value
-            newElements[slice.index] = .index(newIndex)
-            indexesToRemove.append(arrayIndex.index)
-        }
-
-        var filtersIterator = filters.reversed().makeIterator()
-        var keysIterator = keys.reversed().makeIterator()
-
-        while let filter = filtersIterator.next(), let key = keysIterator.next() {
-            guard
-                let regex = try? NSRegularExpression(pattern: filter.pattern),
-                regex.validate(key.name)
-            else { continue }
-            newElements[filter.index] = .key(key.name)
-            indexesToRemove.append(key.index)
-        }
-
-        indexesToRemove.sorted { $1 < $0 }.forEach { newElements.remove(at: $0) }
-
-        return Path(newElements)
-    }
-}
-
 // MARK: - Regular expression
 
 extension Path {
@@ -355,7 +268,7 @@ public extension Collection where Element == Path {
                 }
             }
 
-            return true
+            return lhs.count < rhs.count // put the shorter path before
         }
     }
 }

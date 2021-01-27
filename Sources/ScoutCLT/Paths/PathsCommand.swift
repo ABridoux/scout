@@ -7,7 +7,7 @@ import Foundation
 import Scout
 import ArgumentParser
 
-extension PathFilter.ValueType: EnumerableFlag {}
+extension PathElementFilter.ValueType: EnumerableFlag {}
 
 struct PathsCommand: ScoutCommand {
 
@@ -32,22 +32,22 @@ struct PathsCommand: ScoutCommand {
     var keyRegexPattern: String?
 
     @Flag(help: "")
-    var valueType = PathFilter.ValueType.singleAndGroup
+    var valueType = PathElementFilter.ValueType.singleAndGroup
 
     // MARK: - Functions
 
     func inferred<P>(pathExplorer: P) throws where P: PathExplorer {
-        var pathFilter: PathFilter?
+        var pathFilter: PathElementFilter?
 
         if let keyRegexPattern = keyRegexPattern {
             guard let regex = try? NSRegularExpression(pattern: keyRegexPattern) else {
                 throw RuntimeError.invalidRegex(keyRegexPattern)
             }
-            pathFilter = .key(regex: regex, valueType: valueType)
+            pathFilter = .key(regex: regex)
         }
 
         let readingPath = self.readingPath ?? Path()
-        let paths = try pathExplorer.getPaths(startingAt: readingPath, for: pathFilter)
+        let paths = try pathExplorer.getPaths(startingAt: readingPath, for: pathFilter, valueType: valueType)
 
         paths.forEach { print($0.flattened()) }
     }
