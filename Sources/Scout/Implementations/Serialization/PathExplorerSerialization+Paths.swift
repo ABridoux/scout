@@ -32,22 +32,28 @@ extension PathExplorerSerialization {
     }
 
     func collectKeysPaths(in paths: inout [Path], valueType: PathElementFilter.ValueType) {
-        if let dict = value as? DictionaryValue {
-            dict.forEach { (key, value) in
-                let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
+        switch value {
 
+        case let dict as DictionaryValue:
+            dict.forEach { (key, value) in
                 if valueType.groupAllowed, isGroup(value: value) {
                     paths.append(readingPath.appending(key))
                 }
 
+                let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
                 explorer.collectKeysPaths(in: &paths, valueType: valueType)
             }
-        } else if let array = value as? ArrayValue {
+
+        case let array as ArrayValue:
             array.enumerated().forEach { (index, value) in
+                if valueType.groupAllowed, isGroup(value: value) {
+                    paths.append(readingPath.appending(index))
+                }
+
                 let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(index))
                 explorer.collectKeysPaths(in: &paths, valueType: valueType)
             }
-        } else {
+        default:
             if valueType.singleAllowed {
                 paths.append(readingPath)
             }
@@ -55,23 +61,29 @@ extension PathExplorerSerialization {
     }
 
     func collectKeysPaths(in paths: inout [Path], whereKeyMatches regularExpression: NSRegularExpression, valueType: PathElementFilter.ValueType) {
-        if let dict = value as? DictionaryValue {
-            dict.forEach { (key, value) in
-                let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
+        switch value {
 
+        case let dict as DictionaryValue:
+            dict.forEach { (key, value) in
                 if valueType.groupAllowed, regularExpression.validate(key), isGroup(value: value) {
                     paths.append(readingPath.appending(key))
                 }
 
+                let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
                 explorer.collectKeysPaths(in: &paths, whereKeyMatches: regularExpression, valueType: valueType)
             }
-        } else if let array = value as? ArrayValue {
+
+        case let array as ArrayValue:
             array.enumerated().forEach { (index, value) in
+
                 let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(index))
                 explorer.collectKeysPaths(in: &paths, whereKeyMatches: regularExpression, valueType: valueType)
             }
-        } else if valueType.singleAllowed, readingPath.lastKeyComponent(matches: regularExpression) {
-            paths.append(readingPath)
+
+        default:
+            if valueType.singleAllowed, readingPath.lastKeyComponent(matches: regularExpression) {
+                paths.append(readingPath)
+            }
         }
     }
 }

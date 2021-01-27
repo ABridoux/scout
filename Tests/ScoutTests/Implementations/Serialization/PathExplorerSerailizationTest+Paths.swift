@@ -20,6 +20,13 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
         return dict
     }
 
+    var events: [String: Any] {
+        var dict = players
+        dict["name"] = ["Zevent", "EventZ"]
+
+        return dict
+    }
+
     // MARK: - Functions
 
     func testGetKeysPathsSingleValues() throws {
@@ -38,7 +45,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
 
         explorer.collectKeysPaths(in: &paths, valueType: .group)
 
-        let expectedPaths: Set<Path> = [Path("players")]
+        let expectedPaths: Set<Path> = [Path("players"), Path("players", 0), Path("players", 1)]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
@@ -49,8 +56,12 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
         explorer.collectKeysPaths(in: &paths, valueType: .singleAndGroup)
 
         let expectedPaths: Set<Path> = [Path("players"),
-                                        Path("duration"), Path("players", 0, "name"),
-                                        Path("players", 0, "score"), Path("players", 1, "name"),
+                                        Path("duration"),
+                                        Path("players", 0),
+                                        Path("players", 0, "name"),
+                                        Path("players", 0, "score"),
+                                        Path("players", 1),
+                                        Path("players", 1, "name"),
                                         Path("players", 1, "score")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
@@ -71,13 +82,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
     }
 
     func testGetKeysPathsWithKeyPatternSingleAndGroup() throws {
-        var dict = [String: Any]()
-        let firstPlayer: [String: Any] = ["name": "Zerator", "score": 10]
-        let secondPlayer: [String: Any] = ["name": "Mister MV", "score": 20]
-        dict["duration"] = 30
-        dict["name"] = ["Zevent", "EventZ"]
-        dict["players"] = [firstPlayer, secondPlayer]
-        let explorer = Json(value: dict)
+        let explorer = Json(value: events)
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 
@@ -88,13 +93,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
     }
 
     func testGetKeysPathsWithKeyPatternGroup() throws {
-        var dict = [String: Any]()
-        let firstPlayer: [String: Any] = ["name": "Zerator", "score": 10]
-        let secondPlayer: [String: Any] = ["name": "Mister MV", "score": 20]
-        dict["duration"] = 30
-        dict["name"] = ["Zevent", "EventZ"]
-        dict["players"] = [firstPlayer, secondPlayer]
-        let explorer = Json(value: dict)
+        let explorer = Json(value: events)
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 

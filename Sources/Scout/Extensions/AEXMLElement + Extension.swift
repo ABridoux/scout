@@ -31,6 +31,20 @@ extension AEXMLElement {
 
         return name
     }
+
+    /// `true` if all the children have a different name
+    var differentiableChildren: Bool {
+        var names = Set<String>()
+
+        for child in children {
+            if names.contains(child.name) {
+                return false
+            }
+            names.insert(child.name)
+        }
+
+        return true
+    }
 }
 
 extension AEXMLElement {

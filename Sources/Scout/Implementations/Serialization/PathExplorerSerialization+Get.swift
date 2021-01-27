@@ -143,7 +143,7 @@ extension PathExplorerSerialization {
 
     // MARK: - Count
 
-    /// - Returns: The count of the array or dictionary if  `value` is an array or a dictionary
+    /// - Returns: The count of the array or dictionary if `value` is an array or a dictionary
     func getChildrenCount() throws -> Self {
         switch lastGroupSample {
         case .arraySlice: return  try getChildrenCountInArraySlice()
@@ -304,7 +304,7 @@ extension PathExplorerSerialization {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(element: PathElement, negativeIndexEnabled: Bool = true, detailedName: Bool) throws -> Self {
+    func get(element: PathElement, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws -> Self {
         guard readingPath.last != .count else {
             throw PathExplorerError.wrongUsage(of: .count, in: readingPath)
         }

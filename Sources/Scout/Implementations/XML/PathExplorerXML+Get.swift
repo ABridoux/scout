@@ -11,13 +11,13 @@ extension PathExplorerXML {
     // MARK: - Array
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
-    /// - parameter ignoreArraySlicing: If `true`, the fact that self is part of a slicing will be ignore to simple get the index
-    func get(at index: Int, negativeIndexEnabled: Bool = false) throws -> Self {
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func get(at index: Int, negativeIndexEnabled: Bool = false, detailedName: Bool = true) throws -> Self {
         let copy: AEXMLElement
 
         switch lastGroupSample {
         case .arraySlice: copy = try getInArraySlice(at: index)
-        case .dictionaryFilter: copy = try getInDictionaryFilter(at: index)
+        case .dictionaryFilter: copy = try getInDictionaryFilter(at: index, detailedName: detailedName)
         case nil: copy = try getSingle(at: index, negativeIndexEnabled: negativeIndexEnabled)
         }
 
@@ -51,13 +51,13 @@ extension PathExplorerXML {
         return copy
     }
 
-    func getInDictionaryFilter(at index: Int) throws -> AEXMLElement {
+    func getInDictionaryFilter(at index: Int, detailedName: Bool = true) throws -> AEXMLElement {
         let copy = AEXMLElement(name: element.name + PathElement.index(index).description)
 
         try element.children.forEach { child in
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(child.name))
             let newChild = try pathExplorer.getSingle(at: index)
-            newChild.name = child.name + GroupSample.keySeparator + GroupSample.indexDescription(index)
+            newChild.name = detailedName ? child.name + GroupSample.keySeparator + GroupSample.indexDescription(index) : child.name
             copy.addChild(newChild)
         }
 
@@ -66,15 +66,15 @@ extension PathExplorerXML {
 
     // MARK: - Dictionary
 
-    /// - parameter ignoreArraySlicing: If `true`, the fact that self is part of a slicing will be ignore to simple get the index
-    func get(for key: String) throws  -> PathExplorerXML {
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func get(for key: String, detailedName: Bool = true) throws  -> PathExplorerXML {
         let copy: AEXMLElement
 
         guard element.name != key else { return self } // trying to get a root element
 
         switch lastGroupSample {
         case .arraySlice: copy = try getInArraySlice(for: key)
-        case .dictionaryFilter: copy = try getInDictionaryFilter(for: key)
+        case .dictionaryFilter: copy = try getInDictionaryFilter(for: key, detailedName: detailedName)
         case nil: copy = try getSingle(for: key)
         }
 
@@ -106,13 +106,13 @@ extension PathExplorerXML {
         return copy
     }
 
-    func getInDictionaryFilter(for key: String) throws -> AEXMLElement {
+    func getInDictionaryFilter(for key: String, detailedName: Bool = true) throws -> AEXMLElement {
         let copy = AEXMLElement(name: element.name + GroupSample.keySeparator + key)
 
         try element.children.forEach { child in
             let pathExplorer = PathExplorerXML(element: child, path: readingPath.appending(child.name))
             let newChild = try pathExplorer.getSingle(for: key)
-            newChild.name = child.name + GroupSample.keySeparator + newChild.name
+            newChild.name = detailedName ? child.name + GroupSample.keySeparator + newChild.name : child.name
             copy.addChild(newChild)
         }
         return copy
@@ -228,14 +228,15 @@ extension PathExplorerXML {
     // MARK: - General
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
-    func get(element: PathElement, negativeIndexEnabled: Bool = true) throws  -> Self {
+    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    func get(element: PathElement, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws  -> Self {
         guard readingPath.last != .count else {
             throw PathExplorerError.wrongUsage(of: .count, in: readingPath)
         }
 
         switch element {
-        case .key(let key): return try get(for: key)
-        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
+        case .key(let key): return try get(for: key, detailedName: detailedName)
+        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled, detailedName: detailedName)
         case .count: return try getChildrenCount()
         case .keysList: return try getKeysList()
         case .slice(let bounds): return try getArraySlice(within: bounds)

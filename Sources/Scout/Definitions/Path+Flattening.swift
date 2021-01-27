@@ -65,7 +65,7 @@ extension Path {
 
     /// Compute the path by changing the special path elements like slices or filters
     ///
-    /// Filters are removed. Slices are changed to indexes to target the path.
+    /// Filters are changed to the key they correspond to. Slices are changed to indexes to target the path.
     /// #### Complexity
     /// O(n) with `n` number of elements in the path
     public func flattened() -> Path {
@@ -79,17 +79,18 @@ extension Path {
         // remove the indexes used to replaced the slices and the keys used to replace the filters
         indexesToRemove.sorted { $1 < $0 }.forEach { newElements.remove(at: $0) }
 
-        // remove the left filters
+        // remove the left filters and slices (can remain when targeting a group for example)
         newElements.removeAll { element in
-            if case .filter = element {
-                return true
+            switch element {
+            case .filter, .slice: return true
+            default: return false
             }
-            return false
         }
 
         return Path(newElements)
     }
 
+    /// Parse the path and store the relevant elements with their indexes
     private func getIndexesElements() -> IndexedElements {
         var indexElements = IndexedElements()
 
@@ -123,13 +124,14 @@ extension Path {
         return indexElements
     }
 
+    /// Update the slices when flattening
     private func update(
         slices: inout [IndexedSlice],
         with indexes: inout IndexedCollection<Int>,
         in newElements: inout [PathElement],
         indexesToRemove: inout [Int]) {
 
-        // change the slices with the gathered idnexes
+        // change the slices with the gathered indexes
         if slices.count == 1, indexes.count == 1, let firstSlice = slices.first, let index = indexes.first {
             // specific use case with one slice
             let newIndex = firstSlice.lowerBound + index.value
@@ -146,16 +148,18 @@ extension Path {
             slices.removeFirst()
         }
 
-        slices.enumerated().forEach { (index, slice) in
+        var slicesIterator = slices.makeIterator()
+        var indexesIterator = indexes.makeIterator()
+        while let slice = slicesIterator.next(), let index = indexesIterator.next() {
             // for each slice, take the last remaining index, compute the final index value
             // and replace the slice with the index computed value
-            let arrayIndex = indexes[index]
-            let newIndex = slice.lowerBound + arrayIndex.value
+            let newIndex = slice.lowerBound + index.value
             newElements[slice.index] = .index(newIndex)
-            indexesToRemove.append(arrayIndex.index)
+            indexesToRemove.append(index.index)
         }
     }
 
+    /// Update the filters when flattening
     private func update(
         filters: IndexedCollection<String>,
         with keys: IndexedCollection<String>,

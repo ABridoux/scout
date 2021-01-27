@@ -11,7 +11,7 @@ public enum PathElementFilter {
 
 extension PathElementFilter {
 
-    /// Specify if group (array, dictionary) values, single values or both paths should be targeted
+    /// Specifies if group (array, dictionary) values, single (string, bool...) values or both should be targeted
     public enum ValueType: String, CaseIterable {
         /// Allows the key with a single or a group value
         case singleAndGroup
@@ -20,7 +20,10 @@ extension PathElementFilter {
         /// Allows the key with a group (array, dictionary) value
         case single
 
+        /// Allows group values (array, dictionaries)
         var groupAllowed: Bool { [.singleAndGroup, .group].contains(self) }
+
+        /// Allow single values (string, bool...)
         var singleAllowed: Bool { [.singleAndGroup, .single].contains(self) }
     }
 }
