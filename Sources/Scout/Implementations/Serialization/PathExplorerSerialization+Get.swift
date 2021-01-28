@@ -13,7 +13,7 @@ extension PathExplorerSerialization {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(at index: Int, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws -> Self {
+    func get(at index: Int, negativeIndexEnabled: Bool = true, detailedName: Bool) throws -> Self {
         let newValue: Any
 
         switch lastGroupSample {
@@ -65,7 +65,7 @@ extension PathExplorerSerialization {
 
     /// Get the given index in the dictionary filter by browsing all the arrays in the slice
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(at index: Int, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> DictionaryValue {
+    func get(at index: Int, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool) throws -> DictionaryValue {
         var newDictFilter = DictionaryValue()
 
         try dictionary.forEach { (key, value) in
@@ -80,7 +80,7 @@ extension PathExplorerSerialization {
 
     // MARK: Dictionary
 
-    func get(for key: String, detailedName: Bool = true) throws -> Self {
+    func get(for key: String, detailedName: Bool) throws -> Self {
         let newValue: Any
 
         switch lastGroupSample {
@@ -128,7 +128,7 @@ extension PathExplorerSerialization {
 
     /// Get the given key in the dictionary filter by browsing all the dictionaries in the filter
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func get(for key: String, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> DictionaryValue {
+    func get(for key: String, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool) throws -> DictionaryValue {
         var newDictFilter = DictionaryValue()
 
         try dictionary.forEach { (keyValue, value) in
@@ -143,7 +143,7 @@ extension PathExplorerSerialization {
 
     // MARK: - Count
 
-    /// - Returns: The count of the array or dictionary if  `value` is an array or a dictionary
+    /// - Returns: The count of the array or dictionary if `value` is an array or a dictionary
     func getChildrenCount() throws -> Self {
         switch lastGroupSample {
         case .arraySlice: return  try getChildrenCountInArraySlice()
@@ -213,7 +213,7 @@ extension PathExplorerSerialization {
 
     /// Returns a slice of value is it is an array
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
-    func getArraySlice(within bounds: Bounds, detailedName: Bool = true) throws -> Self {
+    func getArraySlice(within bounds: Bounds, detailedName: Bool) throws -> Self {
 
         switch lastGroupSample {
         case .arraySlice:
@@ -222,7 +222,7 @@ extension PathExplorerSerialization {
 
         case .dictionaryFilter:
             let dict = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
-            return try get(.arraySlice(bounds), inDictionaryFilter: dict)
+            return try get(.arraySlice(bounds), inDictionaryFilter: dict, detailedName: detailedName)
 
         case nil:
         return try getSingleArraySlice(within: bounds)
@@ -255,7 +255,7 @@ extension PathExplorerSerialization {
 
     // MARK: Dictionary filter
 
-    func getDictionaryFilter(with pattern: String) throws -> Self {
+    func getDictionaryFilter(with pattern: String, detailedName: Bool) throws -> Self {
         switch lastGroupSample {
         case .arraySlice:
             let array = try cast(value, as: .array, orThrow: .groupSampleConversionError(readingPath))
@@ -263,7 +263,7 @@ extension PathExplorerSerialization {
 
         case .dictionaryFilter:
             let dict = try cast(value, as: .dictionary, orThrow: .groupSampleConversionError(readingPath))
-            return try get(.dictionaryFilter(pattern), inDictionaryFilter: dict)
+            return try get(.dictionaryFilter(pattern), inDictionaryFilter: dict, detailedName: detailedName)
 
         case nil:
             return try getSingleDictionaryFilter(with: pattern)
@@ -286,7 +286,7 @@ extension PathExplorerSerialization {
         return PathExplorerSerialization(value: filteredDict, path: path)
     }
 
-    func get(_ groupSample: GroupSample, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool = true) throws -> Self {
+    func get(_ groupSample: GroupSample, inDictionaryFilter dictionary: DictionaryValue, detailedName: Bool) throws -> Self {
         var newDict = DictionaryValue()
 
         try dictionary.forEach { (key, value) in
@@ -311,11 +311,11 @@ extension PathExplorerSerialization {
 
         switch element {
         case .key(let key): return try get(for: key, detailedName: detailedName)
-        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled)
+        case .index(let index): return try get(at: index, negativeIndexEnabled: negativeIndexEnabled, detailedName: detailedName)
         case .count: return try getChildrenCount()
         case .keysList: return try getKeysList()
         case .slice(let bounds): return try getArraySlice(within: bounds, detailedName: detailedName)
-        case .filter(let pattern): return try getDictionaryFilter(with: pattern)
+        case .filter(let pattern): return try getDictionaryFilter(with: pattern, detailedName: detailedName)
         }
     }
 
@@ -323,7 +323,7 @@ extension PathExplorerSerialization {
         var currentPathExplorer = self
 
         try path.forEach { element in
-            currentPathExplorer = try currentPathExplorer.get(element: element)
+            currentPathExplorer = try currentPathExplorer.get(element: element, detailedName: true)
         }
 
         return currentPathExplorer

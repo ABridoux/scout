@@ -64,7 +64,7 @@ extension PathExplorerSerialization {
 
         for (index, element) in craftingPath.enumerated() {
             // if the key already exists, retrieve it
-            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
+            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false, detailedName: true) {
                 // when using the -1 index and adding a value,
                 // we will consider it has to be added, not that it is used to target the last value
                 pathExplorers.append(pathExplorer)
@@ -74,7 +74,7 @@ extension PathExplorerSerialization {
                 let childValue = try makeDictionaryOrArray(childKey: path[index + 1])
                 try currentPathExplorer.add(childValue, for: element)
 
-                let pathExplorer = try currentPathExplorer.get(element: element)
+                let pathExplorer = try currentPathExplorer.get(element: element, detailedName: true)
                 // remove the previously added path explorer as we added a new key to it
                 pathExplorers.removeLast()
                 pathExplorers.append(currentPathExplorer)

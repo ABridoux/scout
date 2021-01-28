@@ -6,7 +6,7 @@
 import Foundation
 
 /// Store the possible elements that can be used to subscript a `PathExplorer`
-public enum PathElement: Equatable {
+public enum PathElement: Hashable {
 
     // MARK: - Constants
 

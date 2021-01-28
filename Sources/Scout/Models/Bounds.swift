@@ -6,7 +6,7 @@
 import Foundation
 
 /// Lower and upper bounds to be used to slice an array
-public struct Bounds: Equatable {
+public struct Bounds: Hashable {
 
     // MARK: - Properties
 
@@ -15,6 +15,12 @@ public struct Bounds: Equatable {
 
     /// Use the `range(lastValidIndex:path)` function to access to the upper bound
     private let upper: Bound
+
+    @IntWrapper
+    private(set) var lastComputedLower
+
+    @IntWrapper
+    private(set) var lastComputedUpper
 
     /// Description of the lower bound.
     /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the lower bound
@@ -53,13 +59,17 @@ public struct Bounds: Equatable {
         guard 0 <= lower, lower <= upper, upper <= lastValidIndex else {
             throw PathExplorerError.wrongBounds(self, in: path, lastValidIndex: lastValidIndex)
         }
+
+        lastComputedLower = lower
+        lastComputedUpper = upper
+
         return lower...upper
     }
 }
 
 public extension Bounds {
 
-    struct Bound: ExpressibleByIntegerLiteral, Equatable {
+    struct Bound: ExpressibleByIntegerLiteral, Hashable {
         public typealias IntegerLiteralType = Int
         public static let first = Bound(0, identifier: "first")
         public static let last = Bound(0, identifier: "last")
@@ -78,6 +88,25 @@ public extension Bounds {
         private init(_ value: Int, identifier: String) {
             self.value = value
             self.identifier = identifier
+        }
+    }
+}
+
+extension Bounds {
+
+    /// Wrapper aound an `Int` value to avoid to make all the `Bounds` mutable
+    /// - note: `Bounds` will only mutate those `IntWrapper` values internally
+    @propertyWrapper
+    final class IntWrapper: Hashable {
+
+        fileprivate(set) var wrappedValue: Int?
+
+        static func == (lhs: IntWrapper, rhs: IntWrapper) -> Bool {
+            lhs.wrappedValue == rhs.wrappedValue
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(wrappedValue)
         }
     }
 }

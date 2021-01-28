@@ -358,6 +358,15 @@ where
     */
     mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws
 
+    // MARK: - Paths
+
+    /// Returns all the paths leading to single or group values
+    /// - Parameters:
+    ///   - initialPath: Scope the return paths with this path as a starting point
+    ///   - filter: Optionnally provide a filter on the key
+    ///   - valueType: Allow group, single values or both. Default to both.
+    func getPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path]
+
     // MARK: Conversion
 
     /// Try to convert the value held by the PathExplorer to the given type

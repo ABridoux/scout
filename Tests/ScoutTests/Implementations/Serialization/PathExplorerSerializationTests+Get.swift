@@ -15,8 +15,8 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertEqual(try plist.get(for: "stringValue").string, StubPlistStruct().stringValue)
-        XCTAssertEqual(try plist.get(for: "intValue").int, StubPlistStruct().intValue)
+        XCTAssertEqual(try plist.get(for: "stringValue", detailedName: true).string, StubPlistStruct().stringValue)
+        XCTAssertEqual(try plist.get(for: "intValue", detailedName: true).int, StubPlistStruct().intValue)
     }
 
     func testSubscriptDict_ThrowsIfNotDict() throws {
@@ -49,7 +49,7 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertEqual(try plist.get(at: 2).string, "cheesecakes")
+        XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, "cheesecakes")
     }
 
     func testSubscriptArray_ThrowsIfNotArray() throws {
@@ -160,7 +160,7 @@ extension PathExplorerSerializationTests {
         let data = try PropertyListEncoder().encode(temperatures)
         let plist = try Plist(data: data)
 
-        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}[a-z]*n").value
+        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}[a-z]*n", detailedName: true).value
 
         let keys = try XCTUnwrap(value as? [String: Int])
         XCTAssertEqual(keys, ["Dublin": 19, "Berlin": 21])
@@ -170,7 +170,7 @@ extension PathExplorerSerializationTests {
         let data = try PropertyListEncoder().encode(ducks)
         let plist = try Plist(data: data)
 
-        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}i[a-z]{1}i").value
+        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}i[a-z]{1}i", detailedName: true).value
 
         let keys = try XCTUnwrap(value as? [String])
         XCTAssertEqual(keys, ["Riri", "Fifi"])
@@ -299,8 +299,7 @@ extension PathExplorerSerializationTests {
     // MARK: - Keys list
 
     func testGetKeysListDict() throws {
-        let data = try PropertyListEncoder().encode(charactersByName)
-        let plist = try Plist(data: data)
+        let plist = Plist(value: charactersByName)
         let path: Path = [PathElement.keysList]
 
         XCTAssertEqual(try plist.get(path).value as? [String], ["Buzz", "Woody", "Zurg"])

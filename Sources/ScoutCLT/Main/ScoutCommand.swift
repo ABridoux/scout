@@ -4,42 +4,92 @@
 // MIT license, see LICENSE file for details
 
 import Foundation
-import ArgumentParser
 import Scout
+import ArgumentParser
 import Lux
 
-private let abstract =
-"""
-Read and modify values in specific format file or data. Currently supported: Json, Plist and Xml.
-"""
+protocol ScoutCommand: ParsableCommand {
 
-private let discussion =
-"""
-To find advanced help and rich examples, please type `scout doc`.
+    var inputFilePath: String? { get }
 
+    /// Called with the correct `PathExplorer` when `inferPathExplorer(from:in:)` completes
+    func inferred<P: PathExplorer>(pathExplorer: P) throws
+}
 
-Written by Alexis Bridoux.
-\u{001B}[38;5;88mhttps://github.com/ABridoux/scout\u{001B}[0;0m
-MIT license, see LICENSE file for details
-"""
+extension ScoutCommand {
 
-struct ScoutCommand: ParsableCommand {
+    func run() throws {
+        let data = try readDataOrInputStream(from: inputFilePath)
+        try inferPathExplorer(from: data, in: inputFilePath)
+    }
 
-    // MARK: - Constants
+    /// Try to read data from the optional `filePath`. Otherwise, return the data from the standard input stream
+    func readDataOrInputStream(from filePath: String?) throws -> Data {
+        if let filePath = filePath {
+            return try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
+        } else {
+            return FileHandle.standardInput.readDataToEndOfFile()
+        }
+    }
 
-    static let configuration = CommandConfiguration(
-            commandName: "scout",
-            abstract: abstract,
-            discussion: discussion,
-            version: Scout.Version.current,
-            subcommands: [
-                ReadCommand.self,
-                SetCommand.self,
-                DeleteCommand.self,
-                AddCommand.self,
-                DocCommand.self,
-                DeleteKeyCommand.self,
-                InstallCompletionScriptCommand.self],
-            defaultSubcommand: ReadCommand.self)
+    func inferPathExplorer(from data: Data, in inputFilePath: String?) throws {
 
+        if let json = try? Json(data: data) {
+            try inferred(pathExplorer: json)
+        } else if let plist = try? Plist(data: data) {
+            try inferred(pathExplorer: plist)
+        } else if let xml = try? Xml(data: data) {
+            try inferred(pathExplorer: xml)
+        } else if let yaml = try? Yaml(data: data) {
+            try inferred(pathExplorer: yaml)
+        } else {
+            if let filePath = inputFilePath {
+                throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
+            } else {
+                throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
+            }
+        }
+    }
+
+    /// Retrieve the color file to colorise the output if one is found
+    func getColorFile() throws -> ColorFile? {
+        let colorFileURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".scout/Colors.plist")
+        guard let data = try? Data(contentsOf: colorFileURL) else { return nil }
+
+        return try PropertyListDecoder().decode(ColorFile.self, from: data)
+    }
+
+    func colorInjector(for format: Scout.DataFormat) throws -> TextInjector {
+        switch format {
+
+        case .json:
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            return jsonInjector
+
+        case .plist:
+            let plistInjector = PlistInjector(type: .terminal)
+            if let colors = try getColorFile()?.plist {
+                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
+            }
+            return plistInjector
+
+        case .yaml:
+            #warning("[TODO] Change for a YAML color injector")
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            return jsonInjector
+
+        case .xml:
+            let xmlInjector = XMLEnhancedInjector(type: .terminal)
+            if let colors = try getColorFile()?.xml {
+                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
+            }
+            return xmlInjector
+        }
+    }
 }

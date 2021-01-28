@@ -10,7 +10,7 @@ import Lux
 import ScoutCLTCore
 
 /// A Set/Add/Delete command for default implementations
-protocol SADCommand: ParsableCommand, ExportCommand {
+protocol SADCommand: ScoutCommand, ExportCommand {
 
     associatedtype PathCollection: Collection
 
@@ -20,7 +20,6 @@ protocol SADCommand: ParsableCommand, ExportCommand {
     var level: Int? { get }
 
     var modifyFilePath: String? { get }
-    var inputFilePath: String? { get }
     var outputFilePath: String? { get }
 
     /// Executed for each `pathsCollection` element
@@ -40,39 +39,12 @@ extension SADCommand {
             && !FileHandle.standardOutput.isPiped
     }
 
-    func run() throws {
-        try defaultRun()
-    }
-
-    /// The default run function implementation for a SAD command
-    func defaultRun() throws {
-        let data = try readDataOrInputStream(from: modifyFilePath ?? inputFilePath)
+    func inferred<P: PathExplorer>(pathExplorer: P) throws {
         let outputPath = modifyFilePath ?? outputFilePath
 
-        if var json = try? Json(data: data) {
-            try pathsCollection.forEach { try perform(pathExplorer: &json, pathCollectionElement: $0) }
-            try printOutput(outputPath, dataWith: json, colorise: colorise, level: level)
-
-        } else if var plist = try? Plist(data: data) {
-            try pathsCollection.forEach { try perform(pathExplorer: &plist, pathCollectionElement: $0) }
-            try printOutput(outputPath, dataWith: plist, colorise: colorise, level: level)
-
-        } else if var yaml = try? Yaml(data: data) {
-            try pathsCollection.forEach { try perform(pathExplorer: &yaml, pathCollectionElement: $0) }
-            try printOutput(outputPath, dataWith: yaml, colorise: colorise, level: level)
-
-        } else if var xml = try? Xml(data: data) {
-            try pathsCollection.forEach { try perform(pathExplorer: &xml, pathCollectionElement: $0) }
-            try printOutput(outputPath, dataWith: xml, colorise: colorise, level: level)
-
-        } else {
-
-            if let filePath = inputFilePath {
-                throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
-            } else {
-                throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
-            }
-        }
+        var explorer = pathExplorer
+        try pathsCollection.forEach { try perform(pathExplorer: &explorer, pathCollectionElement: $0) }
+        try printOutput(outputPath, dataWith: explorer, colorise: colorise, level: level)
     }
 }
 
@@ -129,43 +101,11 @@ extension SADCommand {
     }
 
     func printOutput(output: String, with format: Scout.DataFormat) throws {
-
-        guard colorise else {
+        if colorise {
+            let injector = try colorInjector(for: format)
+            print(injector.inject(in: output))
+        } else {
             print(output)
-            return
-        }
-
-        switch format {
-
-        case .json:
-            let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try getColorFile()?.json {
-                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
-            }
-            print(jsonInjector.inject(in: output))
-
-        case .plist:
-
-            let plistInjector = PlistInjector(type: .terminal)
-            if let colors = try getColorFile()?.plist {
-                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
-            }
-            print(plistInjector.inject(in: output))
-
-        case .xml:
-            let xmlInjector = XMLEnhancedInjector(type: .terminal)
-            if let colors = try getColorFile()?.xml {
-                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
-            }
-            print(xmlInjector.inject(in: output))
-
-        case .yaml:
-            #warning("[TODO] Change for a YAML color injector")
-            let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try getColorFile()?.json {
-                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
-            }
-            print(jsonInjector.inject(in: output))
         }
     }
 }

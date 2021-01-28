@@ -6,7 +6,7 @@
 import Foundation
 
 /// Collection of `PathElement`s to subscript a `PathExplorer`
-public struct Path: Equatable {
+public struct Path: Hashable {
 
     // MARK: - Constants
 
@@ -26,7 +26,7 @@ public struct Path: Equatable {
 
     // MARK: - Properties
 
-    private var elements = [PathElement]()
+    private(set) var elements = [PathElement]()
 
     public static var empty: Path { Path([PathElement]()) }
 
@@ -147,11 +147,21 @@ extension Path: Collection {
 
 extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
-    public var description: String {
+    /// Prints all the elements in the path, with the default separator
+    /// #### Complexity
+    /// O(n) with `n` number of elements in the path
+    public var description: String { computeDescription() }
+
+    public var debugDescription: String { description }
+
+    func computeDescription(ignore: ((PathElement) -> Bool)? = nil) -> String {
         var description = ""
 
         elements.forEach { element in
+            if let ignore = ignore, ignore(element) { return }
+
             switch element {
+
             case .index, .count, .slice, .keysList:
                 // remove the point added automatically to a path element
                 if description.hasSuffix(Self.defaultSeparator) {
@@ -159,12 +169,16 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
                 }
                 description.append(element.description)
 
-            case .filter(let pattern): description.append("#\(pattern)#")
-            case .key: description.append(element.description)
+            case .filter(let pattern):
+                description.append("#\(pattern)#")
+
+            case .key:
+                description.append(element.description)
             }
 
             description.append(Self.defaultSeparator)
         }
+
         // remove the last point if any
         if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
@@ -172,14 +186,89 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
         return description
     }
-
-    public var debugDescription: String { description }
 }
 
 extension Path: ExpressibleByArrayLiteral {
     public typealias ArrayLiteralElement = PathElementRepresentable
 
     public init(arrayLiteral elements: PathElementRepresentable...) {
-        self.elements = elements.map { $0.pathValue }
+        self.elements = elements.map(\.pathValue)
+    }
+}
+
+// MARK: - Regular expression
+
+extension Path {
+
+    /// Last key component matching the regular expression
+    public func lastKeyComponent(matches regularExpression: NSRegularExpression) -> Bool {
+        let lastKey = elements.last { (element) -> Bool in
+            if case .key = element {
+                return true
+            }
+            return false
+        }
+        guard case let .key(name) = lastKey else { return false }
+
+        return regularExpression.validate(name)
+    }
+}
+
+// MARK: - Map functions
+
+public extension Path {
+
+    /// Retrieve all the index elements
+    var compactMapIndexes: [Int] {
+        compactMap {
+            if case let .index(index) = $0 {
+                return index
+            }
+            return nil
+        }
+    }
+
+    /// Retrieve all the key elements
+    var compactMapKeys: [String] {
+        compactMap {
+            if case let .key(name) = $0 {
+                return name
+            }
+            return nil
+        }
+    }
+}
+
+// MARK: - Paths collection
+
+public extension Collection where Element == Path {
+
+    /// Sort by key or index when found at the same position
+    func sortedByKeysAndIndexes() -> [Path] {
+        sorted { (lhs, rhs) in
+
+            var lhsIterator = lhs.makeIterator()
+            var rhsIterator = rhs.makeIterator()
+
+            while let lhsElement = lhsIterator.next(), let rhsElement = rhsIterator.next() {
+                switch (lhsElement, rhsElement) {
+
+                case (.key(let lhsLabel), .key(let rhsLabel)):
+                    if lhsLabel != rhsLabel {
+                        return lhsLabel < rhsLabel
+                    }
+
+                case (.index(let lhsIndex), .index(let rhsIndex)):
+                    if lhsIndex != rhsIndex {
+                        return lhsIndex < rhsIndex
+                    }
+
+                default:
+                    return true
+                }
+            }
+
+            return lhs.count < rhs.count // put the shorter path before
+        }
     }
 }
