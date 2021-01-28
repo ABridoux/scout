@@ -11,7 +11,7 @@ extension PathExplorerXML {
     // MARK: - Array
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
-    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    /// - parameter detailedName: If `true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
     func get(at index: Int, negativeIndexEnabled: Bool = false, detailedName: Bool = true) throws -> Self {
         let copy: AEXMLElement
 
@@ -66,7 +66,7 @@ extension PathExplorerXML {
 
     // MARK: - Dictionary
 
-    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    /// - parameter detailedName: If `true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
     func get(for key: String, detailedName: Bool = true) throws  -> PathExplorerXML {
         let copy: AEXMLElement
 
@@ -228,7 +228,7 @@ extension PathExplorerXML {
     // MARK: - General
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
-    /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
+    /// - parameter detailedName: If `true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
     func get(element: PathElement, negativeIndexEnabled: Bool = true, detailedName: Bool = true) throws  -> Self {
         guard readingPath.last != .count else {
             throw PathExplorerError.wrongUsage(of: .count, in: readingPath)

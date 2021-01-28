@@ -13,8 +13,6 @@ struct PathsCommand: ScoutCommand {
 
     // MARK: - Constants
 
-    // MARK: - Constants
-
     static let configuration = CommandConfiguration(
         commandName: "paths",
         abstract: "List the paths in the data",

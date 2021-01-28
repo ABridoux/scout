@@ -95,7 +95,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
             explorer.fold(upTo: level)
         }
 
-        let value = explorer.stringValue != "" ? explorer.stringValue : explorer.description
+        let value = !explorer.stringValue.isEmpty ? explorer.stringValue : explorer.description
 
         return value
     }

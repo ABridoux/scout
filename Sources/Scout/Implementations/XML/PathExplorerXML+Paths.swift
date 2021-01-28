@@ -36,7 +36,7 @@ extension PathExplorerXML {
 
         if valueType.singleAllowed,
            let value = element.value?.trimmingCharacters(in: .whitespacesAndNewlines),
-           value != "" {
+           !value.isEmpty {
             paths.append(readingPath)
         }
 
@@ -61,7 +61,7 @@ extension PathExplorerXML {
 
         if valueType.singleAllowed,
            let value = element.value?.trimmingCharacters(in: .whitespacesAndNewlines),
-           value != "", regularExpression.validate(element.name) {
+           !value.isEmpty, regularExpression.validate(element.name) {
             paths.append(readingPath)
         }
 
