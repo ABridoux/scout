@@ -117,7 +117,7 @@ extension PathExplorer {
         return try Type(value: value)
     }
 
-    /// When dealing with setting, deleting or adding operations, this method ensures the given last element is correct
+    /// When dealing with setting or deleting operations, this method ensures the given last element is correct
     /// - Parameters:
     ///   - element: Last element of the path
     ///   - path: Path where the element is

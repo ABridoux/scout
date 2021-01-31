@@ -13,7 +13,7 @@ extension PathExplorerTestsIntegration {
     func testGet<Explorer: PathExplorer, Value: KeyAllowedType>(path: Path, explorer: Explorer, value: Value, file: StaticString = #file, line: UInt = #line) {
         do {
             let foundValue = try explorer.get(path, as: .init(Value.self))
-            XCTAssertEqual(value, foundValue)
+            XCTAssertEqual(value, foundValue, file: file, line: line)
         } catch {
             XCTFail("\(explorer.format): \(error.localizedDescription)", file: file, line: line)
         }
@@ -109,7 +109,15 @@ extension PathExplorerTestsIntegration {
             return
         }
 
-        testGet(path: path, explorer: explorer, value: value, file: file, line: line)
+        let path = path.map { element -> PathElement in
+            if case .count = element {
+                return .index(-1)
+            } else {
+                return element
+            }
+        }
+
+        testGet(path: Path(path), explorer: explorer, value: value, file: file, line: line)
     }
 
     func testPathExplorersAdd<Value: KeyAllowedType>(path: Path, value: Value, file: StaticString = #file, line: UInt = #line) {

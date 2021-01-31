@@ -78,19 +78,27 @@ public struct Path: Hashable {
     }
 
     public init(_ pathElements: [PathElementRepresentable]) {
-        elements = pathElements.map { $0.pathValue }
+        elements = pathElements.map(\.pathValue)
     }
 
     public init(_ pathElements: PathElementRepresentable...) {
-        elements = pathElements.map { $0.pathValue }
+        self.init(pathElements)
+    }
+
+    public init(_ pathElements: ArraySlice<PathElement>) {
+        self.init(Array(pathElements))
     }
 
     public init(pathElements: PathElement...) {
-        elements = pathElements
+        self.init(pathElements)
     }
 
-    public init( pathElements: [PathElement]) {
-        elements = pathElements
+    public init(pathElements: [PathElement]) {
+        self.init(pathElements)
+    }
+
+    public init(pathElements: ArraySlice<PathElement>) {
+        self.init(Array(pathElements))
     }
 
     // MARK: - Functions

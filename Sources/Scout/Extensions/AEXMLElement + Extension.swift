@@ -49,15 +49,11 @@ extension AEXMLElement {
 
 extension AEXMLElement {
 
-    enum Group {
-        case array, dictionary
-    }
-
     private struct GroupCount {
         var arrays = 0
         var dicitionaries = 0
 
-        var max: Group {
+        var max: GroupValue {
             if arrays > dicitionaries {
                 return .array
             }
@@ -71,7 +67,7 @@ extension AEXMLElement {
     /// O(nm) where
     /// - n: Children count
     /// - m: Maximum children's children count
-    var bestChildrenGroupFit: Group {
+    var bestChildrenGroupFit: GroupValue {
         var groupCounts = GroupCount()
 
         children.forEach { child in

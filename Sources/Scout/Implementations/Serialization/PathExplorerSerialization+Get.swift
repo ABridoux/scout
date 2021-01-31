@@ -35,18 +35,12 @@ extension PathExplorerSerialization {
 
     func getSingle(at index: Int, negativeIndexEnabled: Bool = true) throws -> Any {
         let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        let computedIndex = index < 0 ? array.count + index : index
 
-        if index == .lastIndex, negativeIndexEnabled {
-            if array.isEmpty {
-                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
-            }
-            return array[array.count - 1]
-        } else {
-            guard array.count > index, index >= 0 else {
-                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
-            }
-            return array[index]
+        guard array.count > computedIndex, computedIndex >= 0 else {
+            throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
         }
+        return array[computedIndex]
     }
 
     /// Get the given index in the array slice by browsing all the arrays in the slice

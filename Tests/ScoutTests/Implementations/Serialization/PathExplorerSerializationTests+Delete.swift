@@ -30,6 +30,28 @@ extension PathExplorerSerializationTests {
         XCTAssertErrorsEqual(try plist.delete(deletePath), .subscriptWrongIndex(path: path, index: 4, arrayCount: 3))
     }
 
+    func testDeleteLastElement() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try Plist(data: data)
+        let path = Path("animals", "ducks", -1)
+
+        try plist.delete(path)
+
+        XCTAssertEqual(try plist.get("animals", "ducks", 1).string, "Fifi")
+        XCTAssertThrowsError(try plist.get("animals", "ducks", 2))
+    }
+
+    func testDeleteNegativeIndex() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try Plist(data: data)
+        let path = Path("animals", "ducks", -2)
+
+        try plist.delete(path)
+
+        XCTAssertEqual(try plist.get("animals", "ducks", 1).string, "Loulou")
+        XCTAssertThrowsError(try plist.get("animals", "ducks", 2))
+    }
+
     func testDeleteLastElement_ThrowsIfEmpty() throws {
         let data = try PropertyListEncoder().encode([String]())
         var plist = try Plist(data: data)

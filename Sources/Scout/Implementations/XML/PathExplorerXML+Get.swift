@@ -88,7 +88,7 @@ extension PathExplorerXML {
         let child = element[key]
 
         guard child.error == nil else {
-            let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(element.children.map { $0.name }))
+            let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(element.children.map(\.name)))
             throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: bestMatch)
         }
 

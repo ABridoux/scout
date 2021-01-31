@@ -22,9 +22,19 @@ extension PathExplorerSerializationTests {
         let data = try PropertyListEncoder().encode(Animals())
         var plist = try Plist(data: data).get(for: "ducks", detailedName: true)
 
-        try plist.add("Donald", for: -1)
+        try plist.add("Donald", for: .count)
 
         XCTAssertEqual(try plist.get(at: 3, detailedName: true).string, "Donald")
+    }
+
+    func testAddKeyArrayNegativeIndex() throws {
+        let data = try PropertyListEncoder().encode(Animals())
+        var plist = try Plist(data: data).get(for: "ducks", detailedName: true)
+
+        try plist.add("Donald", for: -2)
+
+        XCTAssertEqual(try plist.get(at: 1, detailedName: true).string, "Donald")
+        XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, "Fifi")
     }
 
     func testAddKeyArrayInsert() throws {
@@ -36,24 +46,35 @@ extension PathExplorerSerializationTests {
         XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, "Donald")
     }
 
-    func testAddKey1() throws {
+    func testAddCreateKeyInPath() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try Plist(data: data)
-        let path = Path("animals", "ducks", -1)
+        let path = Path(pathElements: "animals", "ducks", .count)
 
         try plist.add("Donald", at: path)
 
         XCTAssertEqual(try plist.get(["animals", "ducks", 3]).string, "Donald")
     }
 
-    func testAddKey2() throws {
+    func testAddCreateIndexInPath() throws {
+        let array: Any = [["title": "firstTitle"], ["title": "secondTitle"], ["title": "thirdTitle"]]
+        let data = try JSONSerialization.data(withJSONObject: array)
+        var json = try Json(data: data)
+        let path = Path(pathElements: .count, "title")
+
+        try json.add("fourthTitle", at: path)
+
+        XCTAssertEqual(try json.get([-1, "title"]).string, "fourthTitle")
+    }
+
+    func testAddCreateIndexInEmptyArrayInPath() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try Plist(data: data)
-        let path = Path("animals", "mouses", -1)
+        let path = Path(pathElements: "animals", "mouses", .count, "name")
 
         try plist.add("Mickey", at: path)
 
-        XCTAssertEqual(try plist.get(["animals", "mouses", 0]).string, "Mickey")
+        XCTAssertEqual(try plist.get(["animals", "mouses", -1, "name"]).string, "Mickey")
     }
 
     func testAddKey3() throws {
@@ -72,7 +93,7 @@ extension PathExplorerSerializationTests {
         let path = Path("animals")
         let addingPath = path.appending(2)
 
-        XCTAssertErrorsEqual(try plist.add("Daisy", at: addingPath), .dictionarySubscript(path))
+        XCTAssertErrorsEqual(try plist.add("Daisy", at: addingPath), .wrongElementToSubscript(group: .dictionary, element: 2, path: path))
     }
 
     func testAddToArray_ThrowsIfNonIndex() throws {
@@ -81,7 +102,7 @@ extension PathExplorerSerializationTests {
         let path = Path("animals", "ducks")
         let addingPath = path.appending("Uncle")
 
-        XCTAssertErrorsEqual(try plist.add("Scrooge", at: addingPath), .arraySubscript(path))
+        XCTAssertErrorsEqual(try plist.add("Scrooge", at: addingPath), .wrongElementToSubscript(group: .array, element: "Uncle", path: path))
     }
 
     func testAddToArray_ThrowsIfWrongIndex() throws {
@@ -90,6 +111,6 @@ extension PathExplorerSerializationTests {
         let path = Path("animals", "ducks")
         let addingPath = path.appending(4)
 
-        XCTAssertErrorsEqual(try plist.add("Scrooge", at: addingPath), .wrongValueForKey(value: "Scrooge", element: .index(4)))
+        XCTAssertErrorsEqual(try plist.add("Scrooge", at: addingPath), .subscriptWrongIndex(path: path, index: 4, arrayCount: 3))
     }
 }

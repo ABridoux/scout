@@ -34,20 +34,21 @@ extension PathExplorerSerialization {
     /// Set the index in the given array to the new value
     func setSingle(at index: Int, to newValue: Any) throws -> ArrayValue {
         var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        let computedIndex = index < 0 ? array.count + index : index
 
-        if index == .lastIndex {
+        if array.isEmpty, index == -1 { // add the value if targeting the last possible index
             array.append(newValue)
             return array
         }
 
-        guard array.count > index, index >= 0 else {
+        guard array.count > computedIndex, computedIndex >= 0 else {
             throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
         }
 
         if !allowEmptyGroups, isValueEmpty(newValue) {
-            array.remove(at: index)
+            array.remove(at: computedIndex)
         } else {
-            array[index] = newValue
+            array[computedIndex] = newValue
         }
 
         return array
