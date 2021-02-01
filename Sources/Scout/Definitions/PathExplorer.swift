@@ -173,7 +173,7 @@ where
      }
      ```
      - Throws:When trying to add a named key to an array, or a indexed key to a dictionary
-     - note: To add a key at the end of an array, specify the index `-1`
+     - note: To add a key at the end of an array, specify the element `.count`
     */
     mutating func add(_ newValue: Any, at path: Path) throws
 
@@ -365,7 +365,7 @@ where
     ///   - initialPath: Scope the return paths with this path as a starting point
     ///   - filter: Optionnally provide a filter on the key
     ///   - valueType: Allow group, single values or both. Default to both.
-    func getPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path]
+    func listPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path]
 
     // MARK: Conversion
 

@@ -8,7 +8,7 @@ import AEXML
 
 extension PathExplorerXML {
 
-    public func getPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path] {
+    public func listPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path] {
         var explorer = PathExplorerXML(element: element, path: .empty)
 
         if let path = initialPath {

@@ -16,10 +16,10 @@ extension PathExplorerXMLTests {
         XCTAssertEqual(try xml.get(for: "intValue").int, 2)
     }
 
-    func testAddKeyArray() throws {
+    func testAppendArrayCount() throws {
         var xml = try Xml(data: stubData2).get(for: "dogs")
 
-        try xml.add("Endo", for: -1)
+        try xml.add("Endo", for: .count)
 
         XCTAssertEqual(try xml.get(at: 3).string, "Endo")
     }
@@ -35,25 +35,54 @@ extension PathExplorerXMLTests {
         XCTAssertEqual(try xml.get(at: 3).string, "Betty")
     }
 
-    func testAddKey1() throws {
+    func testAddKeyLastNegativeIndex() throws {
         var xml = try Xml(data: stubData2)
         let path = Path("dogs", -1)
 
         try xml.add("Endo", at: path)
 
-        XCTAssertEqual(try xml.get(["dogs", 3]).string, "Endo")
+        XCTAssertEqual(try xml.get(["dogs", 2]).string, "Endo")
+        XCTAssertEqual(try xml.get(["dogs", 3]).string, "Betty")
     }
 
-    func testAddKey2() throws {
+    func testAddKeyNegativeIndex() throws {
         var xml = try Xml(data: stubData2)
-        let path = Path("cats", -1)
+        let path = Path("dogs", -2)
+
+        try xml.add("Endo", at: path)
+
+        XCTAssertEqual(try xml.get(["dogs", 1]).string, "Endo")
+        XCTAssertEqual(try xml.get(["dogs", 2]).string, "Spot")
+    }
+
+    func testAppendIndex0EmptyArray() throws {
+        var xml = try Xml(data: stubData2)
+        let path = Path("cats", 0)
 
         try xml.add("Mocka", at: path)
 
         XCTAssertEqual(try xml.get(["cats", 0]).string, "Mocka")
     }
 
-    func testAddKey3() throws {
+    func testAppendArrayCountEmptyArray() throws {
+        var xml = try Xml(data: stubData2)
+        let path = Path("cats", PathElement.count)
+
+        try xml.add("Mocka", at: path)
+
+        XCTAssertEqual(try xml.get(["cats", 0]).string, "Mocka")
+    }
+
+    func testAppendArrayCountInPath() throws {
+        var xml = try Xml(data: stubData2)
+        let path = Path("cats", PathElement.count)
+
+        try xml.add("Mocka", at: path)
+
+        XCTAssertEqual(try xml.get(["cats", 0]).string, "Mocka")
+    }
+
+    func testAddKeyInPath() throws {
         var xml = try Xml(data: stubData2)
         let path = Path("cats", "my_cat")
 

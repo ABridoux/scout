@@ -69,9 +69,11 @@ extension PathExplorerXML {
 
             let newChildren: [AEXMLElement]
             switch groupSample {
+
             case .dictionaryFilter(let pattern):
                 let regex = try NSRegularExpression(pattern: pattern, path: readingPath)
                 newChildren = element.children.filter { regex.validate($0.name) }
+
             case .arraySlice(let bounds):
                 let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: path)
                 newChildren = Array(element.children[sliceRange])

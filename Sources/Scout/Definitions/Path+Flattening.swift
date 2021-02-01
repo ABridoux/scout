@@ -65,7 +65,7 @@ extension Path {
 
     /// Compute the path by changing the special path elements like slices or filters
     ///
-    /// Filters are changed to the key they correspond to. Slices are changed to indexes to target the path.
+    /// Filters are changed to the key they correspond to. Slices are changed to indexes.
     /// #### Complexity
     /// O(n) with `n` number of elements in the path
     public func flattened() -> Path {

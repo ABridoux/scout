@@ -13,41 +13,40 @@ extension PathExplorerXML {
             existingChild.value = newValue
         } else {
             // otherwise add the child
-            element.addChild(name: key, value: newValue, attributes: [:])
+            element.addChild(name: key, value: newValue)
         }
     }
 
     mutating func add(newValue: String, at index: Int) throws {
         let keyName = element.childrenName
 
-        if index == .lastIndex || element.children.isEmpty {
-            // no children so add the child as the first one
-            element.addChild(name: keyName, value: newValue, attributes: [:])
-
-        } else if index >= 0, element.children.count > index {
-            insertChild(named: keyName, withValue: newValue, at: index)
-
-        } else {
-            throw PathExplorerError.wrongValueForKey(value: newValue, element: .index(index))
+        if index == 0, element.children.isEmpty {
+            // allow to add an element if the array is empty and the index is 0
+            element.addChild(name: keyName, value: newValue)
+            return
         }
+
+        let index = try computeIndex(from: index, arrayCount: element.children.count, allowNegative: true, in: readingPath)
+
+        insertChild(named: keyName, withValue: newValue, at: index)
+    }
+
+    mutating func append(newValue: String) {
+        element.addChild(name: element.childrenName, value: newValue)
     }
 
     public mutating func add(_ newValue: Any, at path: PathElementRepresentable...) throws {
         try add(newValue, at: Path(path))
     }
 
-    /// Add the new value to the array or dictionary value
-    /// - Parameters:
-    ///   - newValue: The new value to add
-    ///   - element: If string, try to add the new value to the dictionary. If int, try to add the new value to the array. `-1` will add the value at the end of the array.
-    /// - Throws: if self cannot be subscript with the given element
     mutating func add(_ newValue: String, for pathElement: PathElement) throws {
 
         switch pathElement {
 
         case .key(let key): try add(newValue: newValue, for: key)
         case .index(let index): try add(newValue: newValue, at: index)
-        case .count, .keysList, .slice, .filter: throw PathExplorerError.wrongUsage(of: pathElement, in: readingPath)
+        case .count: append(newValue: newValue)
+        case .keysList, .slice, .filter: throw PathExplorerError.wrongUsage(of: pathElement, in: readingPath)
         }
     }
 
@@ -90,26 +89,19 @@ extension PathExplorerXML {
         var path = path
         let lastElement = path.removeLast()
 
-        try validateLast(element: lastElement, in: path.appending(lastElement))
-
         var currentPathExplorer = self
 
         try path.forEach { element in
+
             if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
                 // the key does not exist. Add a new key to it
                 let keyName = element.key ?? currentPathExplorer.element.childrenName
-                currentPathExplorer.element.addChild(name: keyName, value: nil, attributes: [:])
+                currentPathExplorer.element.addChild(name: keyName, value: nil)
 
-                if case let .index(index) = element, index == .lastIndex {
-                    // get the last element
-                    let childrenCount = currentPathExplorer.element.children.count - 1
-                    currentPathExplorer = try currentPathExplorer.get(element: .index(childrenCount))
-                } else {
-                    currentPathExplorer = try currentPathExplorer.get(element: element)
-                }
+                currentPathExplorer = try currentPathExplorer.get(element: element)
             }
         }
 

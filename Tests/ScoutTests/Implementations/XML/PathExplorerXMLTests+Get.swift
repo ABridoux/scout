@@ -31,6 +31,22 @@ extension PathExplorerXMLTests {
         XCTAssertEqual(try xml.get(path).string, "Spot")
     }
 
+    func testSubscriptArrayLastNegativeIndex() throws {
+        let xml = try Xml(data: stubData2)
+
+        let path = Path("dogs", -1)
+
+        XCTAssertEqual(try xml.get(path).string, "Betty")
+    }
+
+    func testSubscriptArrayNegativeIndex() throws {
+        let xml = try Xml(data: stubData2)
+
+        let path = Path("dogs", -2)
+
+        XCTAssertEqual(try xml.get(path).string, "Spot")
+    }
+
     // MARK: - Group values
 
     // MARK: Array slice
@@ -186,13 +202,6 @@ extension PathExplorerXMLTests {
         let path = Path("root", "dogs", PathElement.count)
 
         XCTAssertErrorsEqual(try xml.delete(path), .wrongUsage(of: .count, in: path))
-    }
-
-    func testAddCount_ThrowsError() throws {
-        var xml = try Xml(data: stubData2)
-        let path = Path("root", "dogs", PathElement.count)
-
-        XCTAssertErrorsEqual(try xml.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
 
     // MARK: - Keys list
