@@ -125,7 +125,7 @@ extension PathExplorerXML {
             let countChild = AEXMLElement(name: name, value: child.children.count.description)
             copy.addChild(countChild)
         }
-        
+
         return PathExplorerXML(element: copy, path: readingPath.appending(.count))
     }
 

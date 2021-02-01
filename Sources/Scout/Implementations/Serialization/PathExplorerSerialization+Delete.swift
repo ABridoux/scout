@@ -30,14 +30,8 @@ extension PathExplorerSerialization {
 
     func deleteSingle(at index: Int) throws -> ArrayValue {
         var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
-        let computedIndex = index < 0 ? array.count + index : index
-
-        guard 0 <= computedIndex, computedIndex < array.count else {
-            throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
-        }
-
+        let computedIndex = try computeIndex(from: index, arrayCount: array.count, allowNegative: true, in: readingPath)
         array.remove(at: computedIndex)
-
         return array
     }
 

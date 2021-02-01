@@ -71,7 +71,7 @@ public extension PathExplorer {
         let computedIndex = (index < 0 && allowNegative) ? arrayCount + index : index
 
         guard 0 <= computedIndex, computedIndex < arrayCount else {
-            throw PathExplorerError.subscriptWrongIndex(path: path, index: index, arrayCount: arrayCount)
+            throw PathExplorerError.subscriptWrongIndex(path: path.flattened(), index: index, arrayCount: arrayCount)
         }
         return computedIndex
     }

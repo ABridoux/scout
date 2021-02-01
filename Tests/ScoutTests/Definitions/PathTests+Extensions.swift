@@ -43,6 +43,10 @@ final class PathExtensionsTests: XCTestCase {
         try testFlatten("[1:2][1][2][0]", expected: "[1][1][2]")
     }
 
+    func testFlattenReplaceSliceNegativeIndex() throws {
+        try testFlatten("[1:4][1][2][-1]", expected: "[3][1][2]")
+    }
+
     func testFlattenReplaceFilter() throws {
         try testFlatten("people.#Robert|Tom#.#age|hobbies#.Tom.hobbies[1]", expected: "people.Tom.hobbies[1]")
     }
@@ -67,12 +71,17 @@ final class PathExtensionsTests: XCTestCase {
         try testFlatten("[1:3][1][2:3][:1][1][2][1]", expected: "[2][1][3][2]")
     }
 
+    func testFlatten1NegativeIndex() throws {
+        try testFlatten("[1:3][1][2:3][:1][-1][2][1]", expected: "[2][1][2][2]")
+    }
+
     func testFlatten2() throws {
         try testFlatten("[1:3][2:3][1][2][3][1]", expected: "[2][3][2][3]")
     }
 
     func testFlatten(_ description: String, expected: String) throws {
         let path = try Path(string: description)
+
         try path.forEach {
             if case let .slice(bounds) = $0 {
                 _ = try bounds.range(lastValidIndex: .max, path: .empty)

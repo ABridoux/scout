@@ -120,7 +120,6 @@ static let configuration = CommandConfiguration(
             case .read: print(ReadDocumentation.text)
             case .set: print(SetDocumentation.text)
             case .delete: print(DeleteDocumentation.text)
-                #warning("Update doc for DeleteKey command")
             case .deleteKey: print(DeleteDocumentation.text)
             case .add: print(AddDocumentation.text)
             }

@@ -36,12 +36,12 @@ extension PathExplorerSerialization {
         var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
         let computedIndex = index < 0 ? array.count + index : index
 
-        if array.isEmpty, index == -1 { // add the value if targeting the last possible index
+        if array.isEmpty, index == -1 { // add the value if targeting the last possible index when empty
             array.append(newValue)
             return array
         }
 
-        guard array.count > computedIndex, computedIndex >= 0 else {
+        guard 0 <= computedIndex, computedIndex < array.count else {
             throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
         }
 

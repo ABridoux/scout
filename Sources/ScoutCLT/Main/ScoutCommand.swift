@@ -77,7 +77,6 @@ extension ScoutCommand {
             return plistInjector
 
         case .yaml:
-            #warning("[TODO] Change for a YAML color injector")
             let jsonInjector = JSONInjector(type: .terminal)
             if let colors = try getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)

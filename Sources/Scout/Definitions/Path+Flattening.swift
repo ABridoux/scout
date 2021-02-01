@@ -67,7 +67,7 @@ extension Path {
     ///
     /// Filters are changed to the key they correspond to. Slices are changed to indexes.
     /// #### Complexity
-    /// O(n) with `n` number of elements in the path
+    /// O(n) with `n` the count of elements in the path
     public func flattened() -> Path {
         var indexedElements = getIndexesElements()
         var newElements = elements
@@ -114,7 +114,6 @@ extension Path {
                     let lowerBound = bounds.lastComputedLower,
                     let upperBound = bounds.lastComputedUpper
                 else { break }
-                #warning("Handle negative indexes when added")
 
                 indexElements.slices.append(index: index, lower: lowerBound, upper: upperBound)
                 indexElements.indexes.removeAll()
@@ -142,7 +141,9 @@ extension Path {
         } else if let firstSlice = slices.first, let lastIndex = indexes.popLast() {
             // with several slices, the first slice replacement index is determined
             // by the last index
-            let newIndex = firstSlice.lowerBound + lastIndex.value
+            let newIndex = lastIndex.value < 0 ?
+                firstSlice.upperBound + lastIndex.value :
+                firstSlice.lowerBound + lastIndex.value
             newElements[firstSlice.index] = .index(newIndex)
             indexesToRemove.append(lastIndex.index)
             slices.removeFirst()
@@ -153,7 +154,9 @@ extension Path {
         while let slice = slicesIterator.next(), let index = indexesIterator.next() {
             // for each slice, take the last remaining index, compute the final index value
             // and replace the slice with the index computed value
-            let newIndex = slice.lowerBound + index.value
+            let newIndex = index.value < 0 ?
+                slice.upperBound + index.value :
+                slice.lowerBound + index.value
             newElements[slice.index] = .index(newIndex)
             indexesToRemove.append(index.index)
         }

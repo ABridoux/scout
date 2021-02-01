@@ -28,14 +28,15 @@ extension PathExplorerSerialization {
 
             case .index(let index):
                 let computedIndex = index < 0 ? array.count + index : index
-                if (array.isEmpty && computedIndex == 0)  || computedIndex == array.count {
+                
+                if (array.isEmpty && computedIndex == 0) || computedIndex == array.count {
                     // empty array so the value should be added anyway
                     array.append(newValue)
                 } else if 0 <= computedIndex, computedIndex < array.count {
                     // insert the new value at the index
                     array.insert(newValue, at: computedIndex)
                 } else {
-                    throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: array.count)
+                    throw PathExplorerError.subscriptWrongIndex(path: readingPath.flattened(), index: index, arrayCount: array.count)
                 }
 
             default:
@@ -79,6 +80,7 @@ extension PathExplorerSerialization {
         readingPath = currentPathExplorer.readingPath
     }
 
+    /// Parse the path, adding a key if it does not exist in the dictionay or array
     private func addOrGetKeys(in path: Path) throws -> PathParsingStorage {
         var currentPathExplorer = self
         var craftingPath = path.elements[0..<path.elements.count - 1]
