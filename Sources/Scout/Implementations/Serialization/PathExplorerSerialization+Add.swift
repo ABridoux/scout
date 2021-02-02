@@ -14,24 +14,34 @@ extension PathExplorerSerialization {
 
         if var dict = value as? DictionaryValue {
             guard let key = element.key else {
-                throw PathExplorerError.dictionarySubscript(readingPath)
+                throw PathExplorerError.wrongElementToSubscript(group: .dictionary, element: element, path: readingPath)
             }
             dict[key] = newValue
             value = dict
 
         } else if var array = value as? ArrayValue {
-            guard let index = element.index else {
-                throw PathExplorerError.arraySubscript(readingPath)
-            }
+            switch element {
 
-            if index == .lastIndex || array.isEmpty {
+            case .count:
                 // add the new value at the end of the array
                 array.append(newValue)
-            } else if index >= 0, array.count >= index {
-                // insert the new value at the index
-                array.insert(newValue, at: index)
-            } else {
-                throw PathExplorerError.wrongValueForKey(value: String(describing: newValue), element: .index(index))
+
+            case .index(let index):
+                let computedIndex = index < 0 ? array.count + index : index
+                
+                if (array.isEmpty && computedIndex == 0) || computedIndex == array.count {
+                    // empty array so the value should be added anyway
+                    array.append(newValue)
+                } else if 0 <= computedIndex, computedIndex < array.count {
+                    // insert the new value at the index
+                    array.insert(newValue, at: computedIndex)
+                } else {
+                    throw PathExplorerError.subscriptWrongIndex(path: readingPath.flattened(), index: index, arrayCount: array.count)
+                }
+
+            default:
+                throw PathExplorerError.wrongElementToSubscript(group: .array, element: element, path: readingPath)
+
             }
             value = array
         }
@@ -44,29 +54,50 @@ extension PathExplorerSerialization {
     func makeDictionaryOrArray(childKey: PathElement) throws -> Any {
         switch childKey {
         case .key: return DictionaryValue()
-        case .index: return ArrayValue()
-        case .count, .keysList, .slice, .filter: throw PathExplorerError.wrongUsage(of: childKey, in: readingPath)
+        case .index, .count: return ArrayValue()
+        case .keysList, .slice, .filter: throw PathExplorerError.wrongUsage(of: childKey, in: readingPath)
         }
     }
 
     public mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws {
-        guard !path.isEmpty else { return }
+        guard let lastElement = path.last else { return }
 
         let newValue = try convert(newValue, to: type)
 
-        var craftingPath = path
-        let lastElement = craftingPath.removeLast()
+        let parsingStorage = try addOrGetKeys(in: path)
+        var currentPathExplorer = parsingStorage.currentExplorer
+        try currentPathExplorer.add(newValue, for: lastElement)
 
-        try validateLast(element: lastElement, in: path)
+        try zip(parsingStorage.foundPathExplorers, parsingStorage.craftingPath)
+            .reversed()
+            .forEach { pathExplorer, element in
+                var pathExplorer = pathExplorer
+                try pathExplorer.set(element: element, to: currentPathExplorer.value)
+                currentPathExplorer = pathExplorer
+        }
 
+        value = currentPathExplorer.value
+        readingPath = currentPathExplorer.readingPath
+    }
+
+    /// Parse the path, adding a key if it does not exist in the dictionay or array
+    private func addOrGetKeys(in path: Path) throws -> PathParsingStorage {
         var currentPathExplorer = self
+        var craftingPath = path.elements[0..<path.elements.count - 1]
         var pathExplorers = [currentPathExplorer]
 
         for (index, element) in craftingPath.enumerated() {
+            var element = element
+
+            if case .count = element {
+                // count element: Append the value and replace the element with the new last index
+                let array = try cast(currentPathExplorer.value, as: .array, orThrow: .wrongUsage(of: element, in: currentPathExplorer.readingPath))
+                element = .index(array.count)
+                craftingPath[index] = element
+            }
+
             // if the key already exists, retrieve it
             if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false, detailedName: true) {
-                // when using the -1 index and adding a value,
-                // we will consider it has to be added, not that it is used to target the last value
                 pathExplorers.append(pathExplorer)
                 currentPathExplorer = pathExplorer
             } else {
@@ -78,20 +109,20 @@ extension PathExplorerSerialization {
                 // remove the previously added path explorer as we added a new key to it
                 pathExplorers.removeLast()
                 pathExplorers.append(currentPathExplorer)
-
                 pathExplorers.append(pathExplorer)
                 currentPathExplorer = pathExplorer
             }
         }
 
-        try currentPathExplorer.add(newValue, for: lastElement)
+        return PathParsingStorage(currentExplorer: currentPathExplorer, craftingPath: Path(craftingPath), foundPathExplorers: pathExplorers)
+    }
+}
 
-        for (pathExplorer, element) in zip(pathExplorers, craftingPath).reversed() {
-            var pathExplorer = pathExplorer
-            try pathExplorer.set(element: element, to: currentPathExplorer.value)
-            currentPathExplorer = pathExplorer
-        }
+private extension PathExplorerSerialization {
 
-        value = currentPathExplorer.value
+    struct PathParsingStorage {
+        var currentExplorer: PathExplorerSerialization
+        var craftingPath: Path
+        var foundPathExplorers: [PathExplorerSerialization]
     }
 }

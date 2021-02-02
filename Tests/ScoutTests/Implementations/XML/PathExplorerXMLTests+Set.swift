@@ -11,7 +11,7 @@ extension PathExplorerXMLTests {
     func testSubscriptStringSet() throws {
         var xml = try Xml(data: stubData1)
 
-        try xml.set(for: "stringValue", to: "world")
+        try xml.set("stringValue", to: "world")
 
         XCTAssertEqual(try xml.get(for: "stringValue").string, "world")
         XCTAssertEqual(try xml.get(for: "boolValue").bool, false)
@@ -22,6 +22,20 @@ extension PathExplorerXMLTests {
 
         try xml.set("dogs", 1, to: "Endo")
         XCTAssertEqual(try xml.get(for: "dogs").get(at: 1).string, "Endo")
+    }
+
+    func testSubscriptIntSetLastNegativeIndex() throws {
+        var xml = try Xml(data: stubData2)
+
+        try xml.set("dogs", -1, to: "Endo")
+        XCTAssertEqual(try xml.get(for: "dogs").get(at: 2).string, "Endo")
+    }
+
+    func testSubscriptIntSetNegativeIndex() throws {
+        var xml = try Xml(data: stubData2)
+
+        try xml.set("dogs", -3, to: "Endo")
+        XCTAssertEqual(try xml.get(for: "dogs").get(at: 0).string, "Endo")
     }
 
     func testSubscriptArraySet() throws {

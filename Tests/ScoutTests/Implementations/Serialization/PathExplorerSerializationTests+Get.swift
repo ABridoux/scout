@@ -52,6 +52,42 @@ extension PathExplorerSerializationTests {
         XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, "cheesecakes")
     }
 
+    func testSubscriptArrayLastIndex() throws {
+        let array = ["I", "love", "cheesecakes"]
+        let data = try PropertyListEncoder().encode(array)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(at: -1, detailedName: true).string, "cheesecakes")
+    }
+
+    func testSubscriptArrayNegativeIndex() throws {
+        let array = ["I", "love", "cheesecakes"]
+        let data = try PropertyListEncoder().encode(array)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(at: -2, detailedName: true).string, "love")
+    }
+
+    func testSubscriptArrayOneElementNegativeIndex() throws {
+        let array: [Any] = ["I"]
+        let data = try PropertyListSerialization.data(fromPropertyList: array, format: .xml, options: .zero)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(-1).string, "I")
+    }
+
+    func testSubscriptArrayOneElementNegativeIndexNotLast() throws {
+        let array: [Any] = [["cheesecakes", "pancakes"]]
+        let data = try PropertyListSerialization.data(fromPropertyList: array, format: .xml, options: .zero)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(-1, 1).string, "pancakes")
+    }
+
     func testSubscriptArray_ThrowsIfNotArray() throws {
         let data = try PropertyListEncoder().encode(Animals())
 
@@ -286,14 +322,6 @@ extension PathExplorerSerializationTests {
         let path: Path = ["animals", "ducks", PathElement.count]
 
         XCTAssertErrorsEqual(try plist.delete(path), .wrongUsage(of: .count, in: path))
-    }
-
-    func testAddCount_ThrowsError() throws {
-        let data = try PropertyListEncoder().encode(StubStruct())
-        var plist = try Plist(data: data)
-        let path: Path = ["animals", "ducks", PathElement.count]
-
-        XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
     }
 
     // MARK: - Keys list

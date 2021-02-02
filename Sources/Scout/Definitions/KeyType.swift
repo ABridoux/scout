@@ -28,3 +28,7 @@ public final class IntType: KeyType<Int> {}
 public final class RealType: KeyType<Double> {}
 public final class BoolType: KeyType<Bool> {}
 public final class AutomaticType: KeyType<AnyHashable> {}
+
+public enum GroupValue: String, Equatable {
+    case array, dictionary
+}

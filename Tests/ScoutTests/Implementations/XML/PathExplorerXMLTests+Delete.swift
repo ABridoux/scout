@@ -9,13 +9,40 @@ import AEXML
 
 extension PathExplorerXMLTests {
 
-    func testDelete() throws {
+    func testDeleteIndex() throws {
         var xml = try Xml(data: stubData2)
 
         try xml.delete(["dogs", 1])
 
         XCTAssertEqual(try xml.get("dogs", 1).string, "Betty")
         XCTAssertThrowsError(try xml.get("dogs", 2))
+    }
+
+    func testDeleteLastNegativeIndex() throws {
+        var xml = try Xml(data: stubData2)
+
+        try xml.delete(["dogs", -1])
+
+        XCTAssertEqual(try xml.get("dogs", 1).string, "Spot")
+        XCTAssertEqual(xml.element.children[0].children.count, 2)
+    }
+
+    func testDeleteNegativeIndex() throws {
+        var xml = try Xml(data: stubData2)
+
+        try xml.delete(["dogs", -2])
+
+        XCTAssertEqual(try xml.get("dogs", 1).string, "Betty")
+        XCTAssertEqual(xml.element.children[0].children.count, 2)
+    }
+
+    func testDeleteKey() throws {
+        var xml = try Xml(data: toyBoxByName)
+
+        try xml.delete(["characters", "Woody"])
+
+        XCTAssertThrowsError(try xml.get("characters", "Woody"))
+        XCTAssertEqual(xml.element.children[0].children.count, 2)
     }
 
     // MARK: - Group samples

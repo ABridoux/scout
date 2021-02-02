@@ -61,6 +61,21 @@ extension PathExplorer {
 
 public extension PathExplorer {
 
+    /// Compute the index, positive or negative. Negative index uses the array count
+    /// - Parameters:
+    ///   - index: Index to compute
+    ///   - arrayCount: Array count
+    ///   - allowNegative: If false, the function will throw if a negative index is passed
+    ///   - path: Path to use when throwing an error
+    func computeIndex(from index: Int, arrayCount: Int, allowNegative: Bool, in path: Path) throws -> Int {
+        let computedIndex = (index < 0 && allowNegative) ? arrayCount + index : index
+
+        guard 0 <= computedIndex, computedIndex < arrayCount else {
+            throw PathExplorerError.subscriptWrongIndex(path: path.flattened(), index: index, arrayCount: arrayCount)
+        }
+        return computedIndex
+    }
+
     /// Delete the key at the given path, specified as array.
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func delete(_ path: Path) throws {
@@ -117,7 +132,7 @@ extension PathExplorer {
         return try Type(value: value)
     }
 
-    /// When dealing with setting, deleting or adding operations, this method ensures the given last element is correct
+    /// When dealing with setting or deleting operations, this method ensures the given last element is correct
     /// - Parameters:
     ///   - element: Last element of the path
     ///   - path: Path where the element is
@@ -156,6 +171,6 @@ extension PathExplorer {
 extension PathExplorer {
 
     public func getPaths(startingAt initialPath: Path?, for filter: PathElementFilter?) throws -> [Path] {
-        try getPaths(startingAt: initialPath, for: filter, valueType: .singleAndGroup)
+        try listPaths(startingAt: initialPath, for: filter, valueType: .singleAndGroup)
     }
 }

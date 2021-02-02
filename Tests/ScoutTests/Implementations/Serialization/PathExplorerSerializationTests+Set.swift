@@ -29,6 +29,39 @@ extension PathExplorerSerializationTests {
         XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, newValue)
     }
 
+    func testSubscriptArraySetLastIndex() throws {
+        let array = ["I", "love", "cheesecakes"]
+        let data = try PropertyListEncoder().encode(array)
+        let newValue = "pies"
+
+        var plist = try Plist(data: data)
+
+        try plist.set(at: -1, to: newValue)
+        XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, newValue)
+    }
+
+    func testSubscriptArraySetNegativeIndex() throws {
+        let array = ["I", "love", "cheesecakes"]
+        let data = try PropertyListEncoder().encode(array)
+        let newValue = "pies"
+
+        var plist = try Plist(data: data)
+
+        try plist.set(at: -3, to: newValue)
+        XCTAssertEqual(try plist.get(at: 0, detailedName: true).string, newValue)
+    }
+
+    func testSubscriptArraySetLastIndexEmptyCreateAppend() throws {
+        let array = [String]()
+        let data = try PropertyListEncoder().encode(array)
+        let newValue = "pies"
+
+        var plist = try Plist(data: data)
+
+        try plist.set(at: -1, to: newValue)
+        XCTAssertEqual(try plist.get(at: 0, detailedName: true).string, newValue)
+    }
+
     func testSubscriptWithArraySet() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try Plist(data: data)

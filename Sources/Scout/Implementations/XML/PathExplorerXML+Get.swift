@@ -25,18 +25,8 @@ extension PathExplorerXML {
     }
 
     func getSingle(at index: Int, negativeIndexEnabled: Bool = true) throws -> AEXMLElement {
-        if negativeIndexEnabled, index == .lastIndex {
-            guard let last = element.children.last else {
-                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: element.children.count)
-            }
-            return last
-
-        } else {
-            guard element.children.count > index, index >= 0 else {
-                throw PathExplorerError.subscriptWrongIndex(path: readingPath, index: index, arrayCount: element.children.count)
-            }
-            return element.children[index]
-        }
+        let index = try computeIndex(from: index, arrayCount: element.children.count, allowNegative: negativeIndexEnabled, in: readingPath)
+        return element.children[index]
     }
 
     func getInArraySlice(at index: Int) throws -> AEXMLElement {
@@ -68,10 +58,9 @@ extension PathExplorerXML {
 
     /// - parameter detailedName: If `true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
     func get(for key: String, detailedName: Bool = true) throws  -> PathExplorerXML {
-        let copy: AEXMLElement
-
         guard element.name != key else { return self } // trying to get a root element
 
+        let copy: AEXMLElement
         switch lastGroupSample {
         case .arraySlice: copy = try getInArraySlice(for: key)
         case .dictionaryFilter: copy = try getInDictionaryFilter(for: key, detailedName: detailedName)
@@ -82,13 +71,12 @@ extension PathExplorerXML {
     }
 
     func getSingle(for key: String) throws -> AEXMLElement {
-
         guard element.name != key else { return element } // trying to get a root element
 
         let child = element[key]
 
         guard child.error == nil else {
-            let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(element.children.map { $0.name }))
+            let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(element.children.map(\.name)))
             throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: bestMatch)
         }
 
@@ -121,25 +109,24 @@ extension PathExplorerXML {
     // MARK: - Count
 
     func getChildrenCount() throws -> Self {
-        if let sample = lastGroupSample {
-            let copy = AEXMLElement(name: element.name + PathElement.count.description)
-
-            element.children.forEach { child in
-                let name: String
-
-                switch sample {
-                case .dictionaryFilter: name = child.name + GroupSample.keySeparator + PathElement.count.keyName
-                case .arraySlice: name = child.name
-                }
-
-                let countChild = AEXMLElement(name: name, value: child.children.count.description)
-                copy.addChild(countChild)
-            }
-            return PathExplorerXML(element: copy, path: readingPath.appending(.count))
+        guard let sample = lastGroupSample else {
+            let countElement = AEXMLElement(name: "", value: "\(element.children.count)")
+            return PathExplorerXML(element: countElement, path: readingPath.appending(.count))
         }
 
-        return PathExplorerXML(element: .init(name: "", value: "\(self.element.children.count)", attributes: [:]),
-                               path: readingPath.appending(.count))
+        let copy = AEXMLElement(name: element.name + PathElement.count.description)
+        element.children.forEach { child in
+            let name: String
+            switch sample {
+            case .dictionaryFilter: name = child.name + GroupSample.keySeparator + PathElement.count.keyName
+            case .arraySlice: name = child.name
+            }
+
+            let countChild = AEXMLElement(name: name, value: child.children.count.description)
+            copy.addChild(countChild)
+        }
+
+        return PathExplorerXML(element: copy, path: readingPath.appending(.count))
     }
 
     // MARK: - Keys list

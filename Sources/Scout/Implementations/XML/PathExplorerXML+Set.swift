@@ -5,24 +5,6 @@
 
 extension PathExplorerXML {
 
-    mutating func set(at index: Int, to newValue: String) throws {
-
-        guard element.children.count > index, index >= 0 else {
-            throw PathExplorerError.arraySubscript(readingPath)
-        }
-
-        element.children[index].value = newValue
-    }
-
-    mutating func set(for key: String, to newValue: String) throws {
-
-        guard element[key].children.isEmpty else {
-            throw PathExplorerError.invalidValue(newValue)
-        }
-
-        element[key].value = newValue
-    }
-
     public mutating func set(_ path: Path, to newValue: Any) throws {
         let newValueString = try convert(newValue, to: .string)
 
