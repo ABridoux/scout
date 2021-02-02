@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "BooleanExpressionEvaluation",
+        "repositoryURL": "https://github.com/ABridoux/BooleanExpressionEvaluation",
+        "state": {
+          "branch": "develop",
+          "revision": "04713e1d1f4d237c00a16334158553281f590a7d",
+          "version": null
+        }
+      },
+      {
         "package": "Lux",
         "repositoryURL": "https://github.com/ABridoux/lux",
         "state": {

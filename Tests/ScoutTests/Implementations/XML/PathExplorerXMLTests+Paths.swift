@@ -59,7 +59,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         let explorer = Xml(element: players, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .single)
+        explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.single))
 
         let expectedPaths: Set<Path> = [Path("duration"), Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
         XCTAssertEqual(Set(paths), expectedPaths)
@@ -69,7 +69,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         let explorer = Xml(element: players, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .group)
+        explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.group))
 
         let expectedPaths: Set<Path> = [Path("players"), Path("players", 0), Path("players", 1)]
         XCTAssertEqual(Set(paths), expectedPaths)
@@ -79,7 +79,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         let explorer = Xml(element: players, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .singleAndGroup)
+        explorer.collectKeysPaths(in: &paths, filter: .noFilter)
 
         let expectedPaths: Set<Path> = [Path("players"),
                                         Path("duration"),
@@ -107,7 +107,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         let explorer = Xml(element: root, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .single)
+        explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.single))
 
         let expectedPaths = [Path("duration"), Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
         XCTAssertEqual(paths, expectedPaths)
@@ -118,7 +118,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 
-        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .singleAndGroup)
+        explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex))
 
         let expectedPaths: Set<Path> = [Path("name"), Path("name", 0), Path("name", 1), Path("players", 0, "name"), Path("players", 1, "name")]
         XCTAssertEqual(Set(paths), expectedPaths)
@@ -129,7 +129,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 
-        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .group)
+        explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex, target: .group))
 
         let expectedPaths: Set<Path> = [Path("name")]
         XCTAssertEqual(Set(paths), expectedPaths)
