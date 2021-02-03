@@ -33,6 +33,8 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case csvExportWrongGroupValue
     case csvExportAmbiguous(expected: String, path: Path)
 
+    case predicateError(description: String)
+
     public var errorDescription: String? {
         switch self {
         case .invalidData(let type): return "Cannot intialize a \(String(describing: type)) object with the given data"
@@ -77,6 +79,8 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .groupSampleConversionError(let path): return "Internal error. Group sample conversion error in '\(path.description)'"
         case .csvExportWrongGroupValue: return "CSV export requires either first object to be an array or a dictionary of arrays"
         case .csvExportAmbiguous(let expectedType, let path): return "Ambiguous type for value at '\(path.description). Expected \(expectedType) as the first value is of type \(expectedType)"
+
+        case .predicateError(let description): return description
         }
     }
 }

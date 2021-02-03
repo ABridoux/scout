@@ -23,35 +23,36 @@ extension PathExplorerSerialization {
         }
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, filter: filter)
+        try explorer.collectKeysPaths(in: &paths, filter: filter)
         return paths.map { $0.flattened() }.sortedByKeysAndIndexes()
     }
 
-    func collectKeysPaths(in paths: inout [Path], filter: PathsFilter) {
+    func collectKeysPaths(in paths: inout [Path], filter: PathsFilter) throws {
         switch value {
 
         case let dict as DictionaryValue:
-            dict.forEach { (key, value) in
+            try dict.forEach { (key, value) in
                 if filter.groupAllowed, filter.validate(key: key), isGroup(value: value) {
                     paths.append(readingPath.appending(key))
                 }
 
                 let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(key))
-                explorer.collectKeysPaths(in: &paths, filter: filter)
+                try explorer.collectKeysPaths(in: &paths, filter: filter)
             }
 
         case let array as ArrayValue:
-            array.enumerated().forEach { (index, value) in
+            try array.enumerated().forEach { (index, value) in
                 if filter.groupAllowed, isGroup(value: value), filter.validate(index: index) {
                     paths.append(readingPath.appending(index))
                 }
 
                 let explorer = PathExplorerSerialization(value: value, path: readingPath.appending(index))
-                explorer.collectKeysPaths(in: &paths, filter: filter)
+                try explorer.collectKeysPaths(in: &paths, filter: filter)
             }
 
         default:
             guard filter.singleAllowed else { break }
+            guard try filter.validate(value: value) else { return }
             guard let name = readingPath.lastKeyElementName else {
                 paths.append(readingPath)
                 return

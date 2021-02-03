@@ -23,24 +23,24 @@ extension PathExplorerXML {
             }
         }
         var paths = [Path]()
-        explorer.collectKeysPaths(in: &paths, filter: filter)
+        try explorer.collectKeysPaths(in: &paths, filter: filter)
 
         return paths.map { $0.flattened() }.sortedByKeysAndIndexes()
     }
 
-    func collectKeysPaths(in paths: inout [Path], filter: PathsFilter) {
+    func collectKeysPaths(in paths: inout [Path], filter: PathsFilter) throws {
 
         if filter.singleAllowed,
            let value = element.value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty,
-           filter.validate(key: element.name) {
+           filter.validate(key: element.name), try filter.validate(value: value) {
             paths.append(readingPath)
         }
 
-        element.children.enumerated().forEach { (index, child) in
+        try element.children.enumerated().forEach { (index, child) in
             let newElement: PathElement = element.differentiableChildren ? .key(child.name) : .index(index)
 
             if child.children.isEmpty {
-                if filter.singleAllowed, filter.validate(key: child.name) {
+                if filter.singleAllowed, filter.validate(key: child.name), try filter.validate(value: child.string) {
                     paths.append(readingPath.appending(newElement))
                 }
             } else {
@@ -48,7 +48,7 @@ extension PathExplorerXML {
                     paths.append(readingPath.appending(newElement))
                 }
                 let explorer = PathExplorerXML(element: child, path: readingPath.appending(newElement))
-                explorer.collectKeysPaths(in: &paths, filter: filter)
+                try explorer.collectKeysPaths(in: &paths, filter: filter)
             }
         }
     }
