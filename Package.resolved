@@ -23,9 +23,9 @@
         "package": "Lux",
         "repositoryURL": "https://github.com/ABridoux/lux",
         "state": {
-          "branch": null,
-          "revision": "cace00831871a0c890cccb9d0de965686d253177",
-          "version": "0.4.3"
+          "branch": "develop",
+          "revision": "d0308a5d0bec04885df7a8e4a896f10a892e1f7f",
+          "version": null
         }
       },
       {
