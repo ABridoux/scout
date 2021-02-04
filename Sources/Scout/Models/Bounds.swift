@@ -40,24 +40,24 @@ public struct Bounds: Hashable {
     // MARK: - Functions
 
     /// - Parameters:
-    ///   - lastValidIndex: The last valid index in the array being sliced
+    ///   - arrayCount:The count of the array
     ///   - path: Path where the bounds is specified. Used to throw a relevant error
     /// - Throws: If the bounds are invalid
     /// - Returns: A range made from the lower and upper bounds
-    public func range(lastValidIndex: Int, path: Path) throws -> ClosedRange<Int> {
-        let lower = self.lower.value < 0 ? lastValidIndex + self.lower.value : self.lower.value
+    public func range(arrayCount: Int, path: Path) throws -> ClosedRange<Int> {
+        let lower = self.lower.value < 0 ? arrayCount + self.lower.value : self.lower.value
 
         let upper: Int
         if self.upper == .last {
-            upper = lastValidIndex
+            upper = arrayCount - 1
         } else if self.upper.value < 0 { // deal with negative indexes
-            upper = lastValidIndex + self.upper.value
+            upper = arrayCount + self.upper.value
         } else {
             upper = self.upper.value
         }
 
-        guard 0 <= lower, lower <= upper, upper <= lastValidIndex else {
-            throw PathExplorerError.wrongBounds(self, in: path, lastValidIndex: lastValidIndex)
+        guard 0 <= lower, lower <= upper, upper <= arrayCount else {
+            throw PathExplorerError.wrongBounds(self, in: path, arrayCount: arrayCount)
         }
 
         lastComputedLower = lower
@@ -72,7 +72,7 @@ public extension Bounds {
     struct Bound: ExpressibleByIntegerLiteral, Hashable {
         public typealias IntegerLiteralType = Int
         public static let first = Bound(0, identifier: "first")
-        public static let last = Bound(0, identifier: "last")
+        public static let last = Bound(-1, identifier: "last")
 
         var value: Int
         private(set) var identifier: String?

@@ -84,7 +84,7 @@ final class PathExtensionsTests: XCTestCase {
 
         try path.forEach {
             if case let .slice(bounds) = $0 {
-                _ = try bounds.range(lastValidIndex: .max, path: .empty)
+                _ = try bounds.range(arrayCount: .max, path: .empty)
             }
         }
 

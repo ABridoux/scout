@@ -156,7 +156,7 @@ extension PathExplorerXML {
         let newKeyName = element.name + GroupSample.keySeparator + slice.keyName
         let copy = AEXMLElement(name: newKeyName, value: element.value, attributes: element.attributes)
         let path = readingPath.appending(slice)
-        let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: path)
+        let sliceRange = try bounds.range(arrayCount: element.children.count, path: path)
 
         var slicedChildren = [AEXMLElement]()
 

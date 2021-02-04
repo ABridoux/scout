@@ -155,7 +155,7 @@ extension PathExplorerSerialization {
         let newSlice = try cast(newValue, as: .array,
                                 orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.name, value: String(describing: newValue), element: slice))
 
-        let range = try bounds.range(lastValidIndex: array.count - 1, path: readingPath)
+        let range = try bounds.range(arrayCount: array.count, path: readingPath)
         let leftRange = range.lowerBound > 0 ? 0...range.lowerBound - 1 : nil
         let rightRange = range.upperBound < array.count - 1 ? range.upperBound + 1...array.count - 1 : nil
 

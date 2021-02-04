@@ -75,7 +75,7 @@ extension PathExplorerXML {
                 newChildren = element.children.filter { regex.validate($0.name) }
 
             case .arraySlice(let bounds):
-                let sliceRange = try bounds.range(lastValidIndex: element.children.count - 1, path: path)
+                let sliceRange = try bounds.range(arrayCount: element.children.count, path: path)
                 newChildren = Array(element.children[sliceRange])
             }
 
