@@ -170,7 +170,7 @@ extension PathExplorer {
 
 extension PathExplorer {
 
-    public func getPaths(startingAt initialPath: Path?, for filter: PathElementFilter?) throws -> [Path] {
-        try listPaths(startingAt: initialPath, for: filter, valueType: .singleAndGroup)
+    public func getPaths(startingAt initialPath: Path) throws -> [Path] {
+        try listPaths(startingAt: initialPath, filter: .noFilter)
     }
 }

@@ -33,7 +33,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
         let explorer = Json(value: players)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .single)
+        try explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.single))
 
         let expectedPaths: Set<Path> = [Path("duration"), Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
         XCTAssertEqual(Set(paths), expectedPaths)
@@ -43,7 +43,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
         let explorer = Json(value: players)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .group)
+        try explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.group))
 
         let expectedPaths: Set<Path> = [Path("players"), Path("players", 0), Path("players", 1)]
         XCTAssertEqual(Set(paths), expectedPaths)
@@ -53,7 +53,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
         let explorer = Json(value: players)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .singleAndGroup)
+        try explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.singleAndGroup))
 
         let expectedPaths: Set<Path> = [Path("players"),
                                         Path("duration"),
@@ -75,31 +75,66 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
         let explorer = Json(value: dict)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .single)
+        try explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.single))
 
         let expectedPaths = [Path("players", 0, "name"), Path("players", 1, "name"), Path("players", 2, "name")]
         XCTAssertEqual(paths, expectedPaths)
     }
 
-    func testGetKeysPathsWithKeyPatternSingleAndGroup() throws {
+    func testGetKeysPathsWithKeyRegexSingleAndGroup() throws {
         let explorer = Json(value: events)
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 
-        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .singleAndGroup)
+        try explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex))
 
         let expectedPaths: Set<Path> = [Path("name"), Path("name", 0), Path("name", 1), Path("players", 0, "name"), Path("players", 1, "name")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
-    func testGetKeysPathsWithKeyPatternGroup() throws {
+    func testGetKeysPathsWithKeyRegexGroup() throws {
         let explorer = Json(value: events)
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 
-        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .group)
+        try explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex, target: .group))
 
         let expectedPaths: Set<Path> = [Path("name")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testGetKeysPathsWithValuePredicate() throws {
+        let explorer = Json(value: events)
+        var paths = [Path]()
+        let predicate = try PathsFilter.Predicate(format: "value < 30")
+
+        try explorer.collectKeysPaths(in: &paths, filter: .value(predicate))
+
+        let expectedPaths: Set<Path> = [Path("players", 0, "score"), Path("players", 1, "score")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testGetKeysPathsWithValue2Predicates() throws {
+        let explorer = Json(value: events)
+        var paths = [Path]()
+        let namePredicate = try PathsFilter.Predicate(format: "value isIn 'Zerator, Mister MV'")
+        let scorePredicate = try PathsFilter.Predicate(format: "value < 30")
+
+        try explorer.collectKeysPaths(in: &paths, filter: .value(namePredicate, scorePredicate))
+
+        let expectedPaths: Set<Path> = [Path("players", 0, "name"), Path("players", 1, "name"), Path("players", 0, "score"), Path("players", 1, "score")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testGetKeysPathsWithKeyRegexValuePredicate() throws {
+        let explorer = Json(value: events)
+        var paths = [Path]()
+        let nameRegex = try NSRegularExpression(pattern: "score")
+        let scorePredicate = try PathsFilter.Predicate(format: "value > 0")
+
+        try explorer.collectKeysPaths(in: &paths, filter: .keyAndValue(keyRegex: nameRegex, valuePredicates: scorePredicate))
+
+        let expectedPaths: Set<Path> = [Path("players", 0, "score"), Path("players", 1, "score")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 }

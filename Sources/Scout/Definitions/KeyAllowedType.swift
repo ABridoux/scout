@@ -6,14 +6,12 @@
 import Foundation
 
 /// A value can take a type conforming to this protocol
-public protocol KeyAllowedType: LosslessStringConvertible, Equatable {
+public protocol KeyAllowedType: LosslessStringConvertible, Hashable {
 
     static var typeDescription: String { get }
-
-    init(value: Any) throws
 }
 
-public extension KeyAllowedType {
+extension KeyAllowedType {
 
     /// Try to instantiate a type with the given value
     init(value: Any) throws {
@@ -22,21 +20,22 @@ public extension KeyAllowedType {
             return
         }
 
-        if let stringValue = (value as? CustomStringConvertible)?.description {
+        guard let stringValue = (value as? CustomStringConvertible)?.description else {
+            throw PathExplorerError.valueConversionError(value: String(describing: value), type: String(describing: Self.typeDescription))
+        }
 
-            if Self.self == Bool.self {
-                // specific case for Bool values as we allow other string than "true" or "false"
-                if Bool.trueSet.contains(stringValue) {
-                    self = try Self(value: true)
-                    return
-                } else if Bool.falseSet.contains(stringValue) {
-                    self = try Self(value: false)
-                    return
-                }
-            } else if let convertedValue = Self(stringValue) {
-                self = convertedValue
+        if Self.self == Bool.self {
+            // specific case for Bool values as we allow other string than "true" or "false"
+            if Bool.trueSet.contains(stringValue) {
+                self = try Self(value: true)
+                return
+            } else if Bool.falseSet.contains(stringValue) {
+                self = try Self(value: false)
                 return
             }
+        } else if let convertedValue = Self(stringValue) {
+            self = convertedValue
+            return
         }
 
         throw PathExplorerError.valueConversionError(value: String(describing: value), type: String(describing: Self.typeDescription))

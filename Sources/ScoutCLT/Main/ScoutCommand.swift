@@ -91,4 +91,12 @@ extension ScoutCommand {
             return xmlInjector
         }
     }
+
+    /// Try to get the regex from the pattern, throwing a `RuntimeError` when failing
+    func regexFrom(pattern: String) throws -> NSRegularExpression {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            throw RuntimeError.invalidRegex(pattern)
+        }
+        return regex
+    }
 }

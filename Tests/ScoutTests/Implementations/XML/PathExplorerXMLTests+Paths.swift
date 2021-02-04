@@ -48,38 +48,38 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         root.addChild(events)
         root.addChild(players)
 
-        root.addChild(name: "duration", value: "20")
+        root.addChild(name: "duration", value: "40")
 
         return root
     }
 
     // MARK: - Functions
 
-    func testGetKeysPathsSingleValues() throws {
+    func testListPathsSingleValues() throws {
         let explorer = Xml(element: players, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .single)
+        try explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.single))
 
         let expectedPaths: Set<Path> = [Path("duration"), Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
-    func testGetKeysPathsGroupValues() throws {
+    func testListPathsGroupValues() throws {
         let explorer = Xml(element: players, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .group)
+        try explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.group))
 
         let expectedPaths: Set<Path> = [Path("players"), Path("players", 0), Path("players", 1)]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
-    func testGetKeysPathsGroupAndSingleValues() throws {
+    func testListKeysPathsGroupAndSingleValues() throws {
         let explorer = Xml(element: players, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .singleAndGroup)
+        try explorer.collectKeysPaths(in: &paths, filter: .noFilter)
 
         let expectedPaths: Set<Path> = [Path("players"),
                                         Path("duration"),
@@ -92,7 +92,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
-    func testGetKeysPathsArrayOrder() throws {
+    func testListPathsArrayOrder() throws {
         let root = AEXMLElement(name: "root")
         root.addChild(name: "duration", value: "20")
         let players = AEXMLElement(name: "players")
@@ -107,31 +107,66 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         let explorer = Xml(element: root, path: .empty)
         var paths = [Path]()
 
-        explorer.collectKeysPaths(in: &paths, valueType: .single)
+        try explorer.collectKeysPaths(in: &paths, filter: .targetOnly(.single))
 
         let expectedPaths = [Path("duration"), Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
         XCTAssertEqual(paths, expectedPaths)
     }
 
-    func testGetKeysPathsWithKeyPatternSingleAndGroup() throws {
+    func testListPathsKeyRegexSingleAndGroup() throws {
         let explorer = Xml(element: events, path: .empty)
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 
-        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .singleAndGroup)
+        try explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex))
 
         let expectedPaths: Set<Path> = [Path("name"), Path("name", 0), Path("name", 1), Path("players", 0, "name"), Path("players", 1, "name")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
-    func testGetKeysPathsWithKeyPatternGroup() throws {
+    func testListPathsKeyRegexGroup() throws {
         let explorer = Xml(element: events, path: .empty)
         var paths = [Path]()
         let regex = try NSRegularExpression(pattern: "name")
 
-        explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: .group)
+        try explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex, target: .group))
 
         let expectedPaths: Set<Path> = [Path("name")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testListPathsValuePRedicate() throws {
+        let explorer = Xml(element: events, path: .empty)
+        var paths = [Path]()
+        let predicate = try PathsFilter.Predicate(format: "value < 30")
+
+        try explorer.collectKeysPaths(in: &paths, filter: .value(predicate))
+
+        let expectedPaths: Set<Path> = [Path("players", 0, "score"), Path("players", 1, "score")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testListPaths2Filters() throws {
+        let explorer = Xml(element: events, path: .empty)
+        var paths = [Path]()
+        let scorePredicate = try PathsFilter.Predicate(format: "value < 30")
+        let namePredicate = try PathsFilter.Predicate(format: "value isIn 'Zerator, Mister MV'")
+
+        try explorer.collectKeysPaths(in: &paths, filter: .value(scorePredicate, namePredicate))
+
+        let expectedPaths: Set<Path> = [Path("players", 0, "score"), Path("players", 1, "score"), Path("players", 0, "name"), Path("players", 1, "name")]
+        XCTAssertEqual(Set(paths), expectedPaths)
+    }
+
+    func testListPathKeyRegexValuePredicate() throws {
+        let explorer = Xml(element: events, path: .empty)
+        var paths = [Path]()
+        let nameRegex = try NSRegularExpression(pattern: "score")
+        let scorePredicate = try PathsFilter.Predicate(format: "value > 0")
+
+        try explorer.collectKeysPaths(in: &paths, filter: .keyAndValue(keyRegex: nameRegex, valuePredicates: scorePredicate))
+
+        let expectedPaths: Set<Path> = [Path("players", 0, "score"), Path("players", 1, "score")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 }

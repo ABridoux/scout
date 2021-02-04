@@ -8,7 +8,7 @@ import AEXML
 
 extension PathExplorerXML {
 
-    public func listPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path] {
+    public func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path] {
         var explorer = PathExplorerXML(element: element, path: .empty)
 
         if let path = initialPath {
@@ -23,63 +23,32 @@ extension PathExplorerXML {
             }
         }
         var paths = [Path]()
-
-        switch filter {
-        case .key(let regex): explorer.collectKeysPaths(in: &paths, whereKeyMatches: regex, valueType: valueType)
-        case nil: explorer.collectKeysPaths(in: &paths, valueType: valueType)
-        }
+        try explorer.collectKeysPaths(in: &paths, filter: filter)
 
         return paths.map { $0.flattened() }.sortedByKeysAndIndexes()
     }
 
-    func collectKeysPaths(in paths: inout [Path], valueType: PathElementFilter.ValueType) {
+    func collectKeysPaths(in paths: inout [Path], filter: PathsFilter) throws {
 
-        if valueType.singleAllowed,
-           let value = element.value?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !value.isEmpty {
+        if filter.singleAllowed,
+           let value = element.value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty,
+           filter.validate(key: element.name), try filter.validate(value: value) {
             paths.append(readingPath)
         }
 
-        element.children.enumerated().forEach { (index, child) in
+        try element.children.enumerated().forEach { (index, child) in
             let newElement: PathElement = element.differentiableChildren ? .key(child.name) : .index(index)
 
             if child.children.isEmpty {
-                if valueType.singleAllowed {
+                if filter.singleAllowed, filter.validate(key: child.name), try filter.validate(value: child.string) {
                     paths.append(readingPath.appending(newElement))
                 }
             } else {
-                if valueType.groupAllowed {
+                if filter.groupAllowed, filter.validate(key: child.name) {
                     paths.append(readingPath.appending(newElement))
                 }
                 let explorer = PathExplorerXML(element: child, path: readingPath.appending(newElement))
-                explorer.collectKeysPaths(in: &paths, valueType: valueType)
-            }
-        }
-    }
-
-    func collectKeysPaths(in paths: inout [Path], whereKeyMatches regularExpression: NSRegularExpression, valueType: PathElementFilter.ValueType) {
-
-        if valueType.singleAllowed,
-           let value = element.value?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !value.isEmpty, regularExpression.validate(element.name) {
-            paths.append(readingPath)
-        }
-
-        let differentiableChildren = element.differentiableChildren
-
-        element.children.enumerated().forEach { (index, child) in
-            let newElement: PathElement = differentiableChildren ? .key(child.name) : .index(index)
-
-            if child.children.isEmpty {
-                if valueType.singleAllowed, regularExpression.validate(child.name) {
-                    paths.append(readingPath.appending(newElement))
-                }
-            } else {
-                if valueType.groupAllowed, differentiableChildren, regularExpression.validate(child.name) {
-                    paths.append(readingPath.appending(newElement))
-                }
-                let explorer = PathExplorerXML(element: child, path: readingPath.appending(newElement))
-                explorer.collectKeysPaths(in: &paths, whereKeyMatches: regularExpression, valueType: valueType)
+                try explorer.collectKeysPaths(in: &paths, filter: filter)
             }
         }
     }

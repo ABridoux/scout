@@ -28,7 +28,7 @@ extension PathExplorerSerialization {
 
             case .index(let index):
                 let computedIndex = index < 0 ? array.count + index : index
-                
+
                 if (array.isEmpty && computedIndex == 0) || computedIndex == array.count {
                     // empty array so the value should be added anyway
                     array.append(newValue)

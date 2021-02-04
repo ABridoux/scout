@@ -208,6 +208,15 @@ extension Path: ExpressibleByArrayLiteral {
 
 extension Path {
 
+    public var lastKeyElementName: String? {
+        let lastKey = elements.last { (element) -> Bool in
+            if case .key = element { return true }
+            return false
+        }
+        guard case let .key(name) = lastKey else { return nil }
+        return name
+    }
+
     /// Last key component matching the regular expression
     public func lastKeyComponent(matches regularExpression: NSRegularExpression) -> Bool {
         let lastKey = elements.last { (element) -> Bool in

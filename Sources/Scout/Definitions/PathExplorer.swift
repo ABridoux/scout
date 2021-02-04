@@ -242,9 +242,8 @@ where
     /// Returns all the paths leading to single or group values
     /// - Parameters:
     ///   - initialPath: Scope the return paths with this path as a starting point
-    ///   - filter: Optionnally provide a filter on the key
-    ///   - valueType: Allow group, single values or both. Default to both.
-    func listPaths(startingAt initialPath: Path?, for filter: PathElementFilter?, valueType: PathElementFilter.ValueType) throws -> [Path]
+    ///   - filter: Optionnally provide a filter on the key and/or value. Default is `noFilter`
+    func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path]
 
     // MARK: Conversion
 

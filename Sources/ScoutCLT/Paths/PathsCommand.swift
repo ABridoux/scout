@@ -7,7 +7,7 @@ import Foundation
 import Scout
 import ArgumentParser
 
-extension PathElementFilter.ValueType: EnumerableFlag {}
+extension PathsFilter.ValueTarget: EnumerableFlag {}
 
 struct PathsCommand: ScoutCommand {
 
@@ -20,32 +20,60 @@ struct PathsCommand: ScoutCommand {
 
     // MARK: - Properties
 
-    @Argument(help: .readingPath)
-    var readingPath: Path?
+    @Argument(help: "Initial path from which the paths should be listed")
+    var initialPath: Path?
 
     @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
     var inputFilePath: String?
 
     @Option(name: [.short, .customLong("key")], help: "Specify a regular expression to filter the keys")
-    var keyRegexPattern: String?
+    var keyRegexPattren: String?
 
-    @Flag(help: "")
-    var valueType = PathElementFilter.ValueType.singleAndGroup
+    @Option(name: [.short, .customLong("value")], help: "Specify a predicate to filter the values of the paths. Several predicates can be specified. A value validated by any of the predicates will be valid.")
+    var valuePredicates = [String]()
+
+    @Flag(help: "Target single values (stirng, number, bool), group values (array, dictionary), or both.")
+    var valueTarget = PathsFilter.ValueTarget.singleAndGroup
 
     // MARK: - Functions
 
     func inferred<P>(pathExplorer: P) throws where P: PathExplorer {
-        var pathFilter: PathElementFilter?
+        var pathsFilter = PathsFilter.targetOnly(valueTarget)
+        let valuePredicates = self.valuePredicates.isEmpty ? nil : try self.valuePredicates.map { try PathsFilter.Predicate(format: $0) }
+        var keyRegex: NSRegularExpression?
 
-        if let keyRegexPattern = keyRegexPattern {
-            guard let regex = try? NSRegularExpression(pattern: keyRegexPattern) else {
-                throw RuntimeError.invalidRegex(keyRegexPattern)
-            }
-            pathFilter = .key(regex: regex)
+        if let pattern = keyRegexPattren {
+            keyRegex = try regexFrom(pattern: pattern)
         }
 
-        let readingPath = self.readingPath ?? Path()
-        let paths = try pathExplorer.listPaths(startingAt: readingPath, for: pathFilter, valueType: valueType)
+        switch (keyRegex, valuePredicates, valueTarget) {
+
+        case (nil, nil, let target):
+            pathsFilter = .targetOnly(target)
+
+        case (.some(let regex), nil, let target):
+            pathsFilter = .key(regex: regex, target: target)
+
+        case (.some(let regex), .some(let predicates), nil):
+            pathsFilter = .keyAndValue(keyRegex: regex, valuePredicates: predicates)
+
+        case (nil, .some(let predicates), nil):
+            pathsFilter = .value(predicates)
+
+        case (nil, .some(let predicates), let target):
+            if target != .singleAndGroup {
+                throw RuntimeError.invalidArgumentsCombination(description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'")
+            }
+            pathsFilter = .value(predicates)
+
+        case (.some(let regex), .some(let predicates), let target):
+            if target != .singleAndGroup {
+                throw RuntimeError.invalidArgumentsCombination(description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'")
+            }
+            pathsFilter = .keyAndValue(keyRegex: regex, valuePredicates: predicates)
+        }
+
+        let paths = try pathExplorer.listPaths(startingAt: initialPath, filter: pathsFilter)
 
         paths.forEach { print($0.flattened()) }
     }

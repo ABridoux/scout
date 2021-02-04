@@ -29,12 +29,15 @@ let package = Package(
             from: "0.1.0"),
         .package(
             url: "https://github.com/jpsim/Yams.git",
-            from: "4.0.0")
+            from: "4.0.0"),
+        .package(
+            url: "https://github.com/ABridoux/BooleanExpressionEvaluation",
+            .branch("develop"))
     ],
     targets: [
         .target(
             name: "Scout",
-            dependencies: ["AEXML", "Yams"]),
+            dependencies: ["AEXML", "Yams", "BooleanExpressionEvaluation"]),
         .target(
             name: "ScoutCLTCore",
             dependencies: ["Scout"]),
