@@ -77,11 +77,11 @@ extension ScoutCommand {
             return plistInjector
 
         case .yaml:
-            let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try getColorFile()?.json {
-                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            let yamlInjector = YAMLInjector(type: .terminal)
+            if let colors = try getColorFile()?.yaml {
+                yamlInjector.delegate = YAMLInjectorColorDelegate(colors: colors)
             }
-            return jsonInjector
+            return yamlInjector
 
         case .xml:
             let xmlInjector = XMLEnhancedInjector(type: .terminal)
