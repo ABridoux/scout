@@ -224,7 +224,7 @@ extension PathExplorerSerialization {
         let path = readingPath.appending(slice)
         let array = try cast(value, as: .array, orThrow: .wrongUsage(of: slice, in: path))
 
-        let sliceRange = try bounds.range(lastValidIndex: array.count - 1, path: path)
+        let sliceRange = try bounds.range(arrayCount: array.count, path: path)
 
         let newValue = Array(array[sliceRange])
         return PathExplorerSerialization(value: newValue, path: path)

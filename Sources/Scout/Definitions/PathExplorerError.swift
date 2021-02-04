@@ -21,7 +21,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case arraySubscript(Path)
     case subscriptWrongIndex(path: Path, index: Int, arrayCount: Int)
     case keyNameSetOnNonDictionary(path: Path)
-    case wrongBounds(Bounds, in: Path, lastValidIndex: Int)
+    case wrongBounds(Bounds, in: Path, arrayCount: Int)
     case wrongRegularExpression(pattern: String, in: Path)
 
     case stringToDataConversionError
@@ -62,11 +62,11 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .subscriptWrongIndex(let path, let index, let count): return "The index [\(index)] is not within the bounds (0...\(count - 1)) of the Array  at '\(path.description)'"
         case .keyNameSetOnNonDictionary(path: let path): return "'\(path.description)' is not a dictionary and cannot set the key name of its children if any"
 
-        case .wrongBounds(let bounds, let path, let lastValidIndex): return
+        case .wrongBounds(let bounds, let path, let arrayCount): return
             """
-            Wrong slice '[\(bounds.lowerString):\(bounds.upperString)]' in '\(path.description)' Last index : \(lastValidIndex).
-            Valid slice: 0 <= lowerBound <= upperBound <= lastIndex. Negative bounds are substracted to the last index (-bound -> lastIndex - bound).
-            Omit lower to target first index. Omit upper to target last index
+            Wrong slice '[\(bounds.lowerString):\(bounds.upperString)]' in '\(path.description)'. Array count: \(arrayCount).
+            Valid slice: 0 <= lowerBound <= upperBound < arrayCount. Negative bounds are substracted from the array count (-bound -> arrayCount - bound).
+            Omit lower to target first index. Omit upper to target last index.
             """
 
         case .wrongRegularExpression(let pattern, let path): return "Wrong regular expression pattern '\(pattern.description)' in '\(path.description)'."
