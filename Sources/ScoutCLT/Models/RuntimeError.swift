@@ -11,6 +11,7 @@ enum RuntimeError: LocalizedError {
     case unknownFormat(String)
     case completionScriptInstallation(description: String)
     case invalidRegex(String)
+    case invalidArgumentsCombination(description: String)
 
     var errorDescription: String? {
         switch self {
@@ -19,6 +20,7 @@ enum RuntimeError: LocalizedError {
         case .unknownFormat(let description): return description
         case .completionScriptInstallation(let description): return "Error while installating the completion script. \(description)"
         case .invalidRegex(let pattern): return "The regular expression  '\(pattern)' is invalid"
+        case .invalidArgumentsCombination(let description): return description
         }
     }
 }

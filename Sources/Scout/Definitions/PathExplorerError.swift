@@ -33,7 +33,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case csvExportWrongGroupValue
     case csvExportAmbiguous(expected: String, path: Path)
 
-    case predicateError(description: String)
+    case predicateError(predicate: String, description: String)
 
     public var errorDescription: String? {
         switch self {
@@ -80,7 +80,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .csvExportWrongGroupValue: return "CSV export requires either first object to be an array or a dictionary of arrays"
         case .csvExportAmbiguous(let expectedType, let path): return "Ambiguous type for value at '\(path.description). Expected \(expectedType) as the first value is of type \(expectedType)"
 
-        case .predicateError(let description): return description
+        case .predicateError(let predicate, let description): return #"Unable to evaluate the predicate "\#(predicate)". \#(description)"#
         }
     }
 }

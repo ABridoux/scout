@@ -44,22 +44,18 @@ extension KeyAllowedType {
 
 extension String: KeyAllowedType {
     public static let typeDescription = "String"
-    static var valueType: PathsFilter.Predicate.ValueType { .string }
 }
 
 extension Int: KeyAllowedType {
     public static let typeDescription = "Integer"
-    static var valueType: PathsFilter.Predicate.ValueType { .int }
 }
 
 extension Double: KeyAllowedType {
     public static let typeDescription = "Real"
-    static var valueType: PathsFilter.Predicate.ValueType { .double }
 }
 
 extension Bool: KeyAllowedType {
     public static let typeDescription = "Boolean"
-    static var valueType: PathsFilter.Predicate.ValueType { .bool }
 
     static let trueSet: Set<String> = ["y", "yes", "Y", "Yes", "YES", "t", "true", "T", "True", "TRUE"]
     static let falseSet: Set<String> = ["n", "no", "N", "No", "NO", "f", "false", "F", "False", "FALSE"]
@@ -67,5 +63,4 @@ extension Bool: KeyAllowedType {
 
 extension AnyHashable: KeyAllowedType {
     public static let typeDescription = "Automatic"
-    static var valueType: PathsFilter.Predicate.ValueType { .string }
 }

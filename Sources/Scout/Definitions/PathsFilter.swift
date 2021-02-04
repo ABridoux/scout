@@ -116,35 +116,39 @@ extension PathsFilter {
     /// - note: Public wrapper around BoleeanExpressionEvaluation.Expression
     public final class Predicate {
         private(set) var expression: Expression
-        private(set) var mismatchedTypes: Set<ValueType> = []
+
+        /// The value types that the operators in the expression support
+        private(set) var operatorsValueTypes: Set<ValueType>
 
         /// Specify a predicate with a 'value' variable that will be replaced with a concrete value during evaluation
         public init(format: String) throws {
             expression = try Expression(format)
+            operatorsValueTypes = expression.operators.reduce(Self.allValueTypesSet) { $0.intersection(Self.valueTypes(of: $1)) }
         }
 
         /// Evaluate the predicate with the value.
         ///
-        /// Ignore the error of mismatching type between the value and an operand and retruen `false
+        /// - note: Ignore the error of mismatching types between the value and an operand and return `false`
         public func evaluate(with value: Any) throws -> Bool {
-            // if the type has already be invalidated, return false immediately
-            if mismatchedTypes.contains(type(of: value)) { return false }
+            let valueType = type(of: value)
+
+            // exit immediately if the operators do not support the value type
+            guard operatorsValueTypes.contains(valueType) else { return false }
 
             do {
                 return try expression.evaluate(with: ["value": String(describing: value)])
             } catch ExpressionError.mismatchingType {
-                mismatchedTypes.insert(type(of: value))
+                // error of mistmatching type for `valueType`. Remove it from the supported types
+                operatorsValueTypes.remove(valueType)
                 return false //ignore the error of wrong value type
             } catch {
-                throw PathExplorerError.predicateError(description: error.localizedDescription)
+                throw PathExplorerError.predicateError(predicate: expression.description, description: error.localizedDescription)
             }
         }
 
         func type(of value: Any) -> ValueType {
             // use the initialisation from any allowing a string value
-            if let _ = try? Int(value: value) {
-                return .int
-            } else if let _ = try? Double(value: value) {
+            if let _ = try? Double(value: value) {
                 return .double
             } else if let _ = try? Bool(value: value) {
                 return .bool
@@ -157,7 +161,31 @@ extension PathsFilter {
 
 extension PathsFilter.Predicate {
 
-    enum ValueType: Hashable {
-        case string, int, double, bool
+    enum ValueType: Hashable, CaseIterable {
+        case string, double, bool
+    }
+
+    static var allValueTypesSet: Set<ValueType> {
+        Set(ValueType.allCases)
+    }
+}
+
+extension PathsFilter.Predicate {
+
+    static func valueTypes(of comparisonOperator: Operator) -> Set<ValueType> {
+        switch comparisonOperator {
+        case .equal, .nonEqual:
+            return allValueTypesSet
+
+        case .greaterThan, .greaterThanOrEqual, .lesserThan, .lesserThanOrEqual:
+            return [.double, .string]
+
+        case .contains, .isIn, .hasPrefix, .hasSuffix:
+            return [.string]
+
+        default:
+            assertionFailure("Operator not handled: \(comparisonOperator)")
+            return allValueTypesSet
+        }
     }
 }

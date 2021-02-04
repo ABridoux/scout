@@ -13,12 +13,18 @@ final class PathsFilterTests: XCTestCase {
 
         _ = try predicate.evaluate(with: "yo")
 
-        XCTAssertEqual(predicate.mismatchedTypes, Set(arrayLiteral: .string))
+        XCTAssertEqual(predicate.operatorsValueTypes, Set(arrayLiteral: .double))
     }
 
     func testPredicateMismatchedTypesReturnsFalse() throws {
         let predicate = try PathsFilter.Predicate(format: "value > 10")
 
         XCTAssertFalse(try predicate.evaluate(with: "yo"))
+    }
+
+    func testPredicateValueTypes() throws {
+        let predicate = try PathsFilter.Predicate(format: "!(value hasPrefix 'yo')")
+
+        XCTAssertFalse(try predicate.evaluate(with: 10))
     }
 }
