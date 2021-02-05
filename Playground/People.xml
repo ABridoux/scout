@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <people>
-
 	<Tom>
 		<height>175</height>
 		<age>68</age>
@@ -49,5 +48,4 @@
 			</movie>
 		</movies>
 	</Suzanne>
-
 </people>

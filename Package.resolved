@@ -23,8 +23,8 @@
         "package": "Lux",
         "repositoryURL": "https://github.com/ABridoux/lux",
         "state": {
-          "branch": "feature/update-colors",
-          "revision": "03168888abeeb59c4209ccf2635b50a0c2df43eb",
+          "branch": "develop",
+          "revision": "3ba93705ef6d1e4d54c70ef7ffe8d05a0241cd79",
           "version": null
         }
       },
