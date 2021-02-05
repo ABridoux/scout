@@ -4,10 +4,8 @@
 // MIT license, see LICENSE file for details
 
 import ArgumentParser
-import Lux
 
 enum ReadDocumentation: Documentation {
-    private static let jsonInjector = JSONInjector(type: .terminal)
 
     private static let examples =
         [(#"`scout read "Tom.hobbies[0]"`"#, #"will output Tom first hobby "cooking""#),
@@ -38,8 +36,7 @@ enum ReadDocumentation: Documentation {
 
     \(commonDoc)
 
-    Count/Keys symbols
-    ------------------
+    \(header: "Count/Keys symbols")
     - Get an dictionary or an array count with the '[#]' symbol.
     - List the keys of a dictionary witht the '{#}' symbol.
 
@@ -47,12 +44,11 @@ enum ReadDocumentation: Documentation {
 
     \(miscDoc)
 
-    Examples
-    ========
+    \(examplesHeader)
 
     JSON file
 
-    \(jsonInjector.inject(in: jsonExample))
+    \(injectedJSONExample)
 
     \(examplesText(from: examples))
     """

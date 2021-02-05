@@ -31,12 +31,12 @@ enum SetDocumentation: Documentation {
     private static let examples =
         [(#"`scout set "[1].changefreq=yearly"`"#, #"will change the second url #changefreq# key value to "yearly""#),
         (#"`scout set "[0].priority"=2.0`"#, #"will change the first url #priority# key value to 2.0"#),
-        (#"`scout set "[1].changefreq=yearly"` "urlset[0].priority=2.0"`"#, #"will change both the second url #changefreq# key value to "yearly" and the first url #priority# key value to 2.0"#),
+        (#"`scout set "[1].changefreq=yearly"` "urlset[0].priority=2.0"`"#, #"will change both the second url #changefreq# key value to "yearly"\#n and the first url #priority# key value to 2.0"#),
         (#"`scout set "[-1].priority=2.0"`"#, #"will change the last url #priority# key value to 2.0"#),
-        (#"`scout set "[0].changefreq=#frequence#""#, #"will change the first url #changefreq# key name to #frequence#"#),
+        (#"`scout set "[0].changefreq=#frequence#"`"#, #"will change the first url #changefreq# key name to #frequence#"#),
         (#"`scout set "[0].priority=/2.0/"`"#, #"will change the first url #priority# key value to the String value "2.0""#),
         (#"`scout set "[0].priority=~2~"`"#, #"will change the first url #priority# key value to the Real value 2 (Plist only)"#),
-        (#"`scout set "[0].priority=1" -e json"#, #"will set the value and convert the modified data to a JSON format"#)]
+        (#"`scout set "[0].priority=1" -e json`"#, #"will set the value and convert the modified data to a JSON format"#)]
 
     static let text =
     """
@@ -47,25 +47,21 @@ enum SetDocumentation: Documentation {
 
     \(SetCommand.configuration.abstract)
 
-    Notes
-    =====
+    \(notesHeader)
 
     \(commonDoc)
 
-    Several paths
-    -------------
+    \(header: "Several paths")
     It's possible to set multiple values in one command by specifying several path/value pairs.
 
-    Set key name
-    ------------
+    \(bold: "Set key name")
     Enclose the value with sharp signs to change the key name: #keyName#.
 
     \(forceTypeDoc)
 
     \(miscDoc)
 
-    Examples
-    ========
+    \(examplesHeader)
 
     Xml file
 

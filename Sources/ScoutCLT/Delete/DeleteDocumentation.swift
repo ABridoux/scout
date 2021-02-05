@@ -7,7 +7,6 @@ import ArgumentParser
 import Lux
 
 enum DeleteDocumentation: Documentation {
-    private static let jsonInjector = JSONInjector(type: .terminal)
 
     static let recursive = zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-r")
 
@@ -30,29 +29,25 @@ enum DeleteDocumentation: Documentation {
 
     \(DeleteCommand.configuration.abstract)
 
-    Notes
-    =====
+    \(notesHeader)
 
     \(commonDoc)
 
-    Several paths
-    -------------
+    \(header: "Several paths")
     It's possible to set multiple values in one command by specifying several path/value pairs.
 
-    Delete if empty
-    -------------
+    \(header: "Delete if empty")
     Use the flag \(recursive) to delete an array or a dictionary key when left empty
 
     \(slicingAndFilteringDoc)
 
     \(miscDoc)
 
-    Examples
-    ========
+    \(examplesHeader)
 
     JSON file
 
-    \(jsonInjector.inject(in: jsonExample))
+        \(injectedJSONExample)
 
     \(examplesText(from: examples))
     """

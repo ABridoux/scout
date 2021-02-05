@@ -26,7 +26,7 @@ let package = Package(
             from: "0.0.1"),
         .package(
             url: "https://github.com/ABridoux/lux",
-            .branch("develop")),
+            .branch("feature/update-colors")),
         .package(
             url: "https://github.com/jpsim/Yams.git",
             from: "4.0.0"),

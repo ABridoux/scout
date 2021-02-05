@@ -34,43 +34,61 @@ extension Documentation {
 
 extension Documentation {
 
+    static var notesHeader: String {
+        """
+        Notes
+        ====
+        """
+    }
+
+    static var examplesHeader: String {
+        """
+        Examples
+        ========
+        """
+    }
+
     static var commonDoc: String {
         """
-        Invalid path
-        -------------
+        \(header: "Invalid path")
         If the path is invalid, the program will return an error.
 
-        Negative index subscripting
-        ---------------------------
-        It's possible to access an element in an array by sepcifying its index starting from the end of the array.
+        \(header: "Negative index subscripting")
+        It's possible to access an element in an array by specifying its index starting from the end of the array.
         For instance, -2 targets the second element starting from the end.
 
-        This figure gives an example.
+        This figure gives an example with the 'ducks' array.
 
         ["Riri", "Fifi", "Loulou", "Donald", "Daisy"]
         [  0   ,   1   ,    2    ,    3    ,    4   ] (Positive)
         [ -5   ,  -4   ,   -3    ,   -2    ,   -1   ] (Negative)
+
+        -> ducks[1] targets "Fifi"
+        -> ducks[-2] targets "Donald"
         """
     }
 
     static var slicingAndFilteringDoc: String {
         """
-        Array slicing
-        -------------
+        \(header: "Array slicing")
         Slice an array with square brackets and a double point ':' between the bounds: '[lower:upper]'.
         The upper bound is included.
         No lower means 0 like [:10] and no upper means the last index like [10:].
 
         Use a negative index to target the last nth elements like [-4:] to target the last 4 elements
         or [-4: -2] to target from the last fourth to the last second element.
-        This figure gives an example.
+
+        This figure gives an example with the 'ducks' array.
 
         ["Riri", "Fifi", "Loulou", "Donald", "Daisy"]
         [  0   ,   1   ,    2    ,    3    ,    4   ] (Positive)
         [ -5   ,  -4   ,   -3    ,   -2    ,   -1   ] (Negative)
 
-        Keys filtering
-        --------------
+        -> ducks[:1] targets ["Rifi", "Fifi"]
+        -> ducks[-2:] targets ["Donald", "Daisy"]
+        -> ducks [-3:-2] targets ["Loulou", "Donald"]
+
+        \(header: "Keys filtering")
         Target specific keys in a dictionary with a regular expression by enclosing it with sharp signs.
         For instance #.*device.*# to target all the keys in a dictionary containing the word device.
         """
@@ -78,27 +96,23 @@ extension Documentation {
 
     static var miscDoc: String {
         """
-        Color
-        -----
+        \(header: "Color")
         Deactivate the output colorization with \(noColor) or \(nc).
         Automatically invoked when the output is piped or written in a file.
         Useful to avoid slowdowns when dealing with large files.
 
-        Export
-        ------
+        \(header: "Export")
         Export the data to another available format with the \(export) command.
         Output an array or a dictionary of arrays as CSV with the \(csv) flag or \(csvSep) option.
 
-        Folding
-        -------
+        \(header: "Folding")
         Fold the arrays and dictionaries at a certain depth level with the \(level) option.
         """
     }
 
     static var forceTypeDoc: String {
         """
-        Forcing a type
-        --------------
+        \(header: "Forcing a type")
         String: enclose the value with slash signs to force the value as a string: /valueAsString/.
         Boolean: enclose the value with interrogative signs to force the value as a boolean: ?valueToBoolean?.
         Real: enclose the value with tilde signs to force the value as a real: ~valueToReal~.
@@ -132,5 +146,9 @@ extension Documentation {
           }
         }
         """
+    }
+
+    static var injectedJSONExample: String {
+        JSONInjector(type: .terminal).inject(in: jsonExample)
     }
 }

@@ -7,7 +7,6 @@ import ArgumentParser
 import Lux
 
 enum AddDocumentation: Documentation {
-    private static let jsonInjector = JSONInjector(type: .terminal)
 
     private static let examples =
         [(#"`scout add "Franklin.height=165"`"#, #"will create a new dictionary Franklin and add a height key into it with the value 165"#),
@@ -28,31 +27,26 @@ enum AddDocumentation: Documentation {
 
     \(AddCommand.configuration.abstract)
 
-    Notes
-    =====
+    \(notesHeader)
 
     \(commonDoc)
 
-    Several paths
-    -------------
+    \(header: "Several paths")
     It's possible to add multiple values in one command by specifying several path/value pairs.
 
-    Keys creation
-    -------------
+    \(header: "Keys creation")
     All the keys which do not exist in the path will be created.
 
-    Append a value
-    --------------
+    \(header: "Append a value")
     To add a value at the end of an array, specify the '[#]' symbol rather than an index
 
     \(forceTypeDoc)
 
-    Examples
-    ========
+    \(examplesHeader)
 
     JSON file
 
-    \(jsonInjector.inject(in: jsonExample))
+    \(injectedJSONExample)
 
     \(examplesText(from: examples))
     """
