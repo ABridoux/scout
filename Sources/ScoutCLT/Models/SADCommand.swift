@@ -71,6 +71,7 @@ extension SADCommand {
             } else {
                 print(csv)
             }
+            return
 
         case .dataFormat(let format):
             let exported = try pathExplorer.exportDataTo(format, rootName: fileName(of: inputFilePath))
@@ -82,6 +83,7 @@ extension SADCommand {
                 }
                 try printOutput(output: string, with: format)
             }
+            return
 
         case nil:
             break
