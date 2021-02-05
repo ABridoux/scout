@@ -107,24 +107,32 @@ struct HomeDocumentation: Documentation {
 }
 
 struct DocCommand: ParsableCommand {
-static let configuration = CommandConfiguration(
-    commandName: "doc",
-    abstract: "Rich examples and advanced explanations")
+    static let configuration = CommandConfiguration(
+        commandName: "doc",
+        abstract: "Rich examples and advanced explanations")
 
-    @Option(name: [.short, .long], help: "Command specific documentation: \(Command.documentationDescription)")
+    @Option(name: [.short, .long], help: "Commands specific documentation: \(Command.documentationDescription)")
     var command: Command?
 
+    @Option(name: [.short, .customLong("advanced")], help: "Advanced documentation on topics related to Scout")
+    var advancedTopic: AdvancedDocumentation.Topic?
+
     func run() throws {
-        if let command = command {
-            switch command {
-            case .read: print(ReadDocumentation.text)
-            case .set: print(SetDocumentation.text)
-            case .delete: print(DeleteDocumentation.text)
-            case .deleteKey: print(DeleteDocumentation.text)
-            case .add: print(AddDocumentation.text)
-            }
-        } else {
-            print(HomeDocumentation.text)
+        switch (command, advancedTopic) {
+        case (nil, nil): print(HomeDocumentation.text)
+        case (.some(let command), nil): printCommand(command)
+        case (nil, .some(let topic)): print(topic.doc)
+        case (.some, .some): throw RuntimeError.invalidArgumentsCombination(description: "(-c|--command) and (-a|--advanced) cannot be used simultaneously")
+        }
+    }
+
+    func printCommand(_ command: Command) {
+        switch command {
+        case .read: print(ReadDocumentation.text)
+        case .set: print(SetDocumentation.text)
+        case .delete: print(DeleteDocumentation.text)
+        case .add: print(AddDocumentation.text)
+        case .paths: print(PathsDocumentation.text)
         }
     }
 }
