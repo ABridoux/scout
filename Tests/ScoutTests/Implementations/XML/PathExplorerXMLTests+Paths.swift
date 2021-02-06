@@ -39,7 +39,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         secondPlayer.addChild(name: "name", value: "Mister MV")
         secondPlayer.addChild(name: "score", value: "20")
 
-        let events = AEXMLElement(name: "name")
+        let events = AEXMLElement(name: "events_name")
         events.addChild(name: "name", value: "Zevent")
         events.addChild(name: "name", value: "EventZ")
 
@@ -116,22 +116,22 @@ final class PathExplorerXMLPathsTests: XCTestCase {
     func testListPathsKeyRegexSingleAndGroup() throws {
         let explorer = Xml(element: events, path: .empty)
         var paths = [Path]()
-        let regex = try NSRegularExpression(pattern: "name")
+        let regex = try NSRegularExpression(pattern: ".*name.*")
 
         try explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex))
 
-        let expectedPaths: Set<Path> = [Path("name"), Path("name", 0), Path("name", 1), Path("players", 0, "name"), Path("players", 1, "name")]
+        let expectedPaths: Set<Path> = [Path("events_name"), Path("events_name", 0), Path("events_name", 1), Path("players", 0, "name"), Path("players", 1, "name")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 
     func testListPathsKeyRegexGroup() throws {
         let explorer = Xml(element: events, path: .empty)
         var paths = [Path]()
-        let regex = try NSRegularExpression(pattern: "name")
+        let regex = try NSRegularExpression(pattern: ".*name.*")
 
         try explorer.collectKeysPaths(in: &paths, filter: .key(regex: regex, target: .group))
 
-        let expectedPaths: Set<Path> = [Path("name")]
+        let expectedPaths: Set<Path> = [Path("events_name")]
         XCTAssertEqual(Set(paths), expectedPaths)
     }
 

@@ -10,7 +10,11 @@ import Lux
 
 protocol ScoutCommand: ParsableCommand {
 
+    /// A file path from which to read the data
     var inputFilePath: String? { get }
+
+    /// A file path from which to read and write the data
+    var modifyFilePath: String? { get }
 
     /// Called with the correct `PathExplorer` when `inferPathExplorer(from:in:)` completes
     func inferred<P: PathExplorer>(pathExplorer: P) throws
@@ -18,18 +22,41 @@ protocol ScoutCommand: ParsableCommand {
 
 extension ScoutCommand {
 
+    // MARK: - Properties
+
+    var modifyFilePath: String? { nil }
+
+    // MARK: - Functions
+
     func run() throws {
-        let data = try readDataOrInputStream(from: inputFilePath)
+        var filePath: String?
+        switch (inputFilePath, modifyFilePath) {
+        case (.some(let path), nil): filePath = path
+        case (nil, .some(let path)): filePath = path
+        case (nil, nil): break
+        case (.some, .some): throw RuntimeError.invalidArgumentsCombination(description: "Combining (-i|--input) with (-m|--modify) is not allowed")
+        }
+
+        let data = try readDataOrInputStream(from: filePath)
         try inferPathExplorer(from: data, in: inputFilePath)
+    }
+
+    private func standardInputLimitTimer() -> Timer {
+        let timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { (_) in
+            Self.exit(withError: RuntimeError.invalidData("Readind the input stream takes too much time"))
+        }
+        timer.tolerance = 0.2
+        return timer
     }
 
     /// Try to read data from the optional `filePath`. Otherwise, return the data from the standard input stream
     func readDataOrInputStream(from filePath: String?) throws -> Data {
         if let filePath = filePath {
             return try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
-        } else {
-            return FileHandle.standardInput.readDataToEndOfFile()
         }
+
+        let input = FileHandle.standardInput
+        return input.availableData
     }
 
     func inferPathExplorer(from data: Data, in inputFilePath: String?) throws {

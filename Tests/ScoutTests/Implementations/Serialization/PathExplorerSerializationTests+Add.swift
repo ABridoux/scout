@@ -77,7 +77,17 @@ extension PathExplorerSerializationTests {
         XCTAssertEqual(try plist.get(["animals", "mouses", -1, "name"]).string, "Mickey")
     }
 
-    func testAddKey3() throws {
+    func testAddCreateNegativeIndexInPath() throws {
+        let data = try PropertyListEncoder().encode(characters)
+        var plist = try Plist(data: data)
+        let path = Path(-2, "friend")
+
+        try plist.add("Woody", at: path)
+
+        XCTAssertEqual(try plist.get(1, "friend").string, "Woody")
+    }
+
+    func testAddKey() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try Plist(data: data)
         let path = Path("animals", "mouses", "character")

@@ -1,0 +1,30 @@
+Robert:
+  age: 23
+  height: 181
+  hobbies:
+  - video games
+  - party
+  - tennis
+  running_records:
+  - - 10
+    - 12
+    - 9
+    - 10
+  - - 9
+    - 12
+    - 11
+Suzanne:
+  job: actress
+  movies:
+  - awards: Best speech for a silent movie
+    title: Tomorrow is so far
+  - awards: Best title
+    title: Yesterday will never go
+  - title: What about today?
+Tom:
+  age: 68
+  height: 175
+  hobbies:
+  - cooking
+  - guitar
+

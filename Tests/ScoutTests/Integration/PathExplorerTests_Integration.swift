@@ -10,15 +10,15 @@ final class PathExplorerTestsIntegration: XCTestCase {
 
     // MARK: - Constants
 
-    let tom: Path = ["people", "Tom"]
-    let tomHeight: Path = ["people", "Tom", "height"]
-    let tomHobbies: Path = ["people", "Tom", "hobbies"]
-    let tomSecondHobby: Path = ["people", "Tom", "hobbies", 1]
-    let tomLastHobby: Path = ["people", "Tom", "hobbies", -1]
-    let tomAddLastHobby: Path = ["people", "Tom", "hobbies", PathElement.count]
-    let suzanneFirstMovieTitle: Path = ["people", "Suzanne", "movies", 0, "title"]
-    let suzanneLastMovieTitle: Path = ["people", "Suzanne", "movies", -1, "title"]
-    let robertRunningRecordsSecondFirst: Path = ["people", "Robert", "running_records", 1, 0]
+    let tom: Path = ["Tom"]
+    let tomHeight: Path = ["Tom", "height"]
+    let tomHobbies: Path = ["Tom", "hobbies"]
+    let tomSecondHobby: Path = ["Tom", "hobbies", 1]
+    let tomLastHobby: Path = ["Tom", "hobbies", -1]
+    let tomAddLastHobby: Path = ["Tom", "hobbies", PathElement.count]
+    let suzanneFirstMovieTitle: Path = ["Suzanne", "movies", 0, "title"]
+    let suzanneLastMovieTitle: Path = ["Suzanne", "movies", -1, "title"]
+    let robertRunningRecordsSecondFirst: Path = ["Robert", "running_records", 1, 0]
 
     // MARK: - Properties
 

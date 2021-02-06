@@ -36,7 +36,6 @@ struct ScoutMainCommand: ParsableCommand {
                 DeleteCommand.self,
                 AddCommand.self,
                 DocCommand.self,
-                DeleteKeyCommand.self,
                 PathsCommand.self,
                 InstallCompletionScriptCommand.self],
             defaultSubcommand: ReadCommand.self)

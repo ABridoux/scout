@@ -6,7 +6,7 @@
 import ArgumentParser
 import Lux
 
-struct SetDocumentation: Documentation {
+enum SetDocumentation: Documentation {
     private static let xmlInjector = XMLEnhancedInjector(type: .terminal)
 
     private static let xmlExample =
@@ -28,41 +28,40 @@ struct SetDocumentation: Documentation {
     </urlset>
     """
 
-    private static let examples = [(#"`scout set "urlset[1].changefreq=yearly"`"#, #"will change the second url #changefreq# key value to "yearly""#),
-                                   (#"`scout set "urlset[0].priority"=2.0`"#, #"will change the first url #priority# key value to 2.0"#),
-                                   (#"`scout set "urlset[1].changefreq=yearly"` "urlset[0].priority=2.0"`"#, """
-                                                                                                            will change both the second url #changefreq# key value to "yearly"
-                                                                                                                and the first url #priority# key value to 2.0
-                                                                                                            """),
-                                   (#"`scout set "urlset[-1].priority=2.0"`"#, #"will change the last url #priority# key value to 2.0"#),
-                                   (#"`scout set "urlset[0].changefreq=#frequence#""#, #"will change the first url #changefreq# key name to #frequence#"#),
-                                   (#"`scout set "urlset[0].priority=/2.0/"`"#, #"will change the first url #priority# key value to the String value "2.0""#),
-                                   (#"`scout set "urlset[0].priority=~2~"`"#, #"will change the first url #priority# key value to the Real value 2 (Plist only)"#)]
+    private static let examples =
+        [(#"`scout set "[1].changefreq=yearly"`"#, #"will change the second url #changefreq# key value to "yearly""#),
+        (#"`scout set "[0].priority"=2.0`"#, #"will change the first url #priority# key value to 2.0"#),
+        (#"`scout set "[1].changefreq=yearly"` "urlset[0].priority=2.0"`"#, #"will change both the second url #changefreq# key value to "yearly"\#n and the first url #priority# key value to 2.0"#),
+        (#"`scout set "[-1].priority=2.0"`"#, #"will change the last url #priority# key value to 2.0"#),
+        (#"`scout set "[0].changefreq=#frequence#"`"#, #"will change the first url #changefreq# key name to #frequence#"#),
+        (#"`scout set "[0].priority=/2.0/"`"#, #"will change the first url #priority# key value to the String value "2.0""#),
+        (#"`scout set "[0].priority=~2~"`"#, #"will change the first url #priority# key value to the Real value 2 (Plist only)"#),
+        (#"`scout set "[0].priority=1" -e json`"#, #"will set the value and convert the modified data to a JSON format"#)]
 
     static let text =
     """
 
+    -----------
     Set command
-    ============
+    -----------
 
-    Notes
-    -----
-    - If the path is invalid, the program will return an error
-    - Enclose the value with sharp signs to change the key name: #keyName#
-    - Enclose the value with slash signs to force the value as a string: /valueAsString/ (Plist, Json)
-    - Enclose the value with interrogative signs to force the value as a boolean: ?valueToBoolean? (Plist, Json)
-    - Enclose the value with tilde signs to force the value as a real: ~valueToReal~ (Plist)
-    - Enclose the value with chevron signs to force the value as a integer: <valueToInteger> (Plist)
-    - When accessing an array value by its index, use the index -1 to access to the last element
+    \(SetCommand.configuration.abstract)
 
-    - You can set multiple values in one command.
-    - Deactivate the output colorization with \(noColor) or \(nc).
-        Useful to export the data or if you encounter slowdowns when dealing with large files ((although it is not recommended to ouput large files in the terminal).
-    - Output an array or a dictionary of arrays with the \(csv) flag or \(csvSep) option
-    - Fold the arrays and dictionaries at a certain depth level with the \(level) option
+    \(notesHeader)
 
-    Examples
-    --------
+    \(commonDoc)
+
+    \(header: "Several paths")
+    It's possible to set multiple values in one command by specifying several path/value pairs.
+
+    \(bold: "Set key name")
+    Enclose the value with sharp signs to change the key name: #keyName#.
+
+    \(forceTypeDoc)
+
+    \(miscDoc)
+
+    \(examplesHeader)
 
     Xml file
 

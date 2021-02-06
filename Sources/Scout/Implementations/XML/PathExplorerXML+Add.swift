@@ -20,8 +20,8 @@ extension PathExplorerXML {
     mutating func add(newValue: String, at index: Int) throws {
         let keyName = element.childrenName
 
-        if index == 0, element.children.isEmpty {
-            // allow to add an element if the array is empty and the index is 0
+        if index == 0 || index == .lastIndex, element.children.isEmpty {
+            // allow to add an element if the array is empty and the index is 0 or -1
             element.addChild(name: keyName, value: newValue)
             return
         }
@@ -92,15 +92,15 @@ extension PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach { element in
+            let element = element == .count ? PathElement.index(currentPathExplorer.element.children.count) : element
 
-            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
+            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: true) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
                 // the key does not exist. Add a new key to it
                 let keyName = element.key ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil)
-
                 currentPathExplorer = try currentPathExplorer.get(element: element)
             }
         }

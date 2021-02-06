@@ -55,7 +55,7 @@ extension PathExplorerXMLTests {
         XCTAssertEqual(try xml.get(["dogs", 2]).string, "Spot")
     }
 
-    func testAppendIndex0EmptyArray() throws {
+    func testAddIndex0EmptyArray() throws {
         var xml = try Xml(data: stubData2)
         let path = Path("cats", 0)
 
@@ -80,6 +80,15 @@ extension PathExplorerXMLTests {
         try xml.add("Mocka", at: path)
 
         XCTAssertEqual(try xml.get(["cats", 0]).string, "Mocka")
+    }
+
+    func testAddArrayCountInPath_ExistingArray() throws {
+        var xml = try Xml(data: toyBox)
+        let path = Path("characters", PathElement.count, "name")
+
+        try xml.add("Jenny", at: path)
+
+        XCTAssertEqual(try xml.get("characters", 3, "name").string, "Jenny")
     }
 
     func testAddKeyInPath() throws {

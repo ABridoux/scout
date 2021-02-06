@@ -4,6 +4,7 @@
 // MIT license, see LICENSE file for details
 
 import Foundation
+import Lux
 
 extension String {
 
@@ -37,4 +38,39 @@ extension String {
 
     /// true if the string has the symbol as prefix and suffix
     func isEnclosed(by symbol: String) -> Bool { hasPrefix(symbol) && hasSuffix(symbol) }
+}
+
+extension String.StringInterpolation {
+
+    private static let zshInjector = ZshInjector(type: .terminal)
+
+    mutating func appendInterpolation(zsh: String) {
+        appendLiteral(Self.zshInjector.inject(in: zsh))
+    }
+
+    mutating func appendInterpolation(zshString: String) {
+        appendLiteral(Self.zshInjector.inject(in: #""\#(zshString)""#))
+    }
+
+    mutating func appendInterpolation(error string: String) {
+        appendLiteral(string.error)
+    }
+
+    mutating func appendInterpolation(main string: String) {
+        appendLiteral(string.mainColor)
+    }
+
+    mutating func appendInterpolation(bold string: String) {
+        appendLiteral(string.bold)
+    }
+
+    mutating func appendInterpolation(header string: String) {
+        let line = Array(repeating: "-", count: string.count).joined(separator: "")
+        appendLiteral(string.bold + "\n" + line)
+    }
+
+    mutating func appendInterpolation(subheader string: String) {
+        let line = Array(repeating: "-", count: string.count).joined(separator: "")
+        appendLiteral(string + "\n" + line)
+    }
 }
