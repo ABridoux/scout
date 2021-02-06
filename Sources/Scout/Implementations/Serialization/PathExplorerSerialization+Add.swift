@@ -30,7 +30,7 @@ extension PathExplorerSerialization {
                 let computedIndex = index < 0 ? array.count + index : index
 
                 if (array.isEmpty && computedIndex == 0) || computedIndex == array.count {
-                    // empty array so the value should be added anyway
+                    // empty array so the value should be added anyway or adding a new value
                     array.append(newValue)
                 } else if 0 <= computedIndex, computedIndex < array.count {
                     // insert the new value at the index
@@ -97,7 +97,7 @@ extension PathExplorerSerialization {
             }
 
             // if the key already exists, retrieve it
-            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false, detailedName: true) {
+            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: true, detailedName: true) {
                 pathExplorers.append(pathExplorer)
                 currentPathExplorer = pathExplorer
             } else {

@@ -41,7 +41,7 @@ struct HomeDocumentation: Documentation {
     \(injectedJSONExample)
 
     - \(zshString: "Tom.height") targets Tom's height: 175
-    - \(zshString: "Tom.hobbies[1]") targets Tom second hobby: "party"
+    - \(zshString: "Arnaud.hobbies[1]") targets Arnaud second hobby: "party"
 
     Overview
     ========

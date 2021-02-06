@@ -47,7 +47,7 @@ enum DeleteDocumentation: Documentation {
 
     JSON file
 
-        \(injectedJSONExample)
+    \(injectedJSONExample)
 
     \(examplesText(from: examples))
     """

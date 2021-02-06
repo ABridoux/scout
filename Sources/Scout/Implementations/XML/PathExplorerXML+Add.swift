@@ -92,9 +92,9 @@ extension PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach { element in
-            let element = element == .count ? PathElement.index(.lastIndex) : element
+            let element = element == .count ? PathElement.index(currentPathExplorer.element.children.count) : element
 
-            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
+            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: true) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {

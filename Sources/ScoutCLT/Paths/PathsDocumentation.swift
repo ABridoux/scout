@@ -56,8 +56,7 @@ enum PathsDocumentation: Documentation {
     If a value has not the right type, the predicate will be false.
     For instance, the value "light" will not be validated by the predicate "value > 10".
 
-    Additional informations about predicates can be found on this page or by running
-    `\(zsh: "scout doc -a predicates")`.
+    Additional informations about predicates can be found by running `\(zsh: "scout doc -a predicates")`.
 
     \(slicingAndFilteringDoc)
 
