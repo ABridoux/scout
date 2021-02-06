@@ -78,5 +78,12 @@ extension AdvancedDocumentation.Predicates {
     The whole left operand has to match the regular expression to be validated.
     Ex: \(zshString: "value matches '[0-9]{3}'"). true when value: "123". false when value: "1010"
 
+    \(header: "Boolean")
+    When the value is a boolean, it's possible to only specify it.
+    Ex: \(zshString: "value"). true if value is: true. It's the same as \(zshString: "value == true")
+    It's possible to use the 'not' operator to invert a boolean or an expression
+    Ex: \(zshString: "!value"). true when value is: false. It's the same as \(zshString: "value == false")
+    Ex: \(zshString: "!(value hasPrefix 'To')"). true when value does not start with "To"
+
     """
 }

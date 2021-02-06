@@ -92,28 +92,16 @@ extension PathExplorerXML {
         var currentPathExplorer = self
 
         try path.forEach { element in
+            let element = element == .count ? PathElement.index(.lastIndex) : element
 
-            var isCountElement = false
-            if case .count = element {
-                // the value has to be added at the end of the array
-                isCountElement = true
-            }
-
-            if !isCountElement, let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
+            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
                 // the key does not exist. Add a new key to it
                 let keyName = element.key ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil)
-
-                if isCountElement {
-                    // get the last children and not the array/dict count
-                    currentPathExplorer = try currentPathExplorer.get(element: .index(.lastIndex))
-                } else {
-                    // standard get
-                    currentPathExplorer = try currentPathExplorer.get(element: element)
-                }
+                currentPathExplorer = try currentPathExplorer.get(element: element)
             }
         }
 
