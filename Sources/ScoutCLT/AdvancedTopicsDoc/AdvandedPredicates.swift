@@ -17,7 +17,7 @@ extension AdvancedDocumentation.Predicates {
             .map(\.bold)
             .joined(separator: ", ")
     }
-    
+
     static var text =
     """
     ----------

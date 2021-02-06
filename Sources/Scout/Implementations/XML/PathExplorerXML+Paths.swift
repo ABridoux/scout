@@ -42,7 +42,6 @@ extension PathExplorerXML {
             }
         }
 
-
         try element.children.enumerated().forEach { (index, child) in
             let newElement: PathElement = element.differentiableChildren ? .key(child.name) : .index(index)
 

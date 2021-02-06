@@ -121,7 +121,6 @@ extension Documentation {
     }
 }
 
-
 extension Documentation {
 
     static var jsonExample: String {

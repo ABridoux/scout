@@ -20,8 +20,8 @@ extension PathExplorerXML {
     mutating func add(newValue: String, at index: Int) throws {
         let keyName = element.childrenName
 
-        if index == 0, element.children.isEmpty {
-            // allow to add an element if the array is empty and the index is 0
+        if index == 0 || index == .lastIndex, element.children.isEmpty {
+            // allow to add an element if the array is empty and the index is 0 or -1
             element.addChild(name: keyName, value: newValue)
             return
         }
@@ -93,7 +93,13 @@ extension PathExplorerXML {
 
         try path.forEach { element in
 
-            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
+            var isCountElement = false
+            if case .count = element {
+                // the value has to be added at the end of the array
+                isCountElement = true
+            }
+
+            if !isCountElement, let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: false) {
                 // the key exist. Just keep parsing
                 currentPathExplorer = pathExplorer
             } else {
@@ -101,7 +107,13 @@ extension PathExplorerXML {
                 let keyName = element.key ?? currentPathExplorer.element.childrenName
                 currentPathExplorer.element.addChild(name: keyName, value: nil)
 
-                currentPathExplorer = try currentPathExplorer.get(element: element)
+                if isCountElement {
+                    // get the last children and not the array/dict count
+                    currentPathExplorer = try currentPathExplorer.get(element: .index(.lastIndex))
+                } else {
+                    // standard get
+                    currentPathExplorer = try currentPathExplorer.get(element: element)
+                }
             }
         }
 
