@@ -16,7 +16,7 @@ public enum PathsFilter {
     /// Filter the value based on predicates. The value is valid when one of the predicates validates it.
     case value([Predicate])
 
-    ///  Filter the keys based on a regular expression and the value based on predicates. The value is valid when one of the predicates validates it.
+    /// Filter the keys based on a regular expression and the value based on predicates. The value is valid when one of the predicates validates it.
     case keyAndValue(keyRegex: NSRegularExpression, valuePredicates: [Predicate])
 
     /// Allows group values (array, dictionaries)
@@ -72,15 +72,40 @@ extension PathsFilter {
     /// No filter with target `singleAndGroup`
     public static var noFilter: PathsFilter { .targetOnly(.singleAndGroup) }
 
-    /// Key filter with `singleAndGroup` target
+    ///  Filter the keys based on a regular expression. Default `singleAndGroup` target.
     public static func key(regex: NSRegularExpression) -> PathsFilter { .key(regex: regex, target: .singleAndGroup) }
 
+    /// Filter the value based on predicates. The value is valid when one of the predicates validates it.
     public static func value(_ predicate: Predicate, _ additionalPredicates: Predicate...) -> Self {
         .value([predicate] + additionalPredicates)
     }
 
+    /// Filter the keys based on a regular expression and the value based on predicates. The value is valid when one of the predicates validates it.
     public static func keyAndValue(keyRegex: NSRegularExpression, valuePredicates: Predicate, _ additionalPredicates: Predicate...) -> Self {
         .keyAndValue(keyRegex: keyRegex, valuePredicates: [valuePredicates] + additionalPredicates)
+    }
+
+    /// Key filter with a pattern for the regular expression.
+    /// - Throws: If the pattern is invalid
+    public static func key(pattern: String, target valueTarget: ValueTarget = .singleAndGroup) throws -> PathsFilter {
+        try .key(regex: NSRegularExpression(pattern: pattern), target: valueTarget)
+    }
+
+    /// Value filter with formats for the predicates.
+    /// - Throws: If one format is invalid
+    public static func value(_ format: String, _ additionalPredicatesFormats: String...) throws -> Self {
+        let predicate = try Predicate(format: format)
+        let additionalPredicates = try additionalPredicatesFormats.map { try Predicate(format: $0) }
+        return .value([predicate] + additionalPredicates)
+    }
+
+    /// Filter the keys based on a regular expression and the value based on predicates. The value is valid when one of the predicates validates it.
+    /// - Throws: If the regular expression pattern is invalid or one predicate format is invalid
+    public static func keyAndValue(pattern: String, valuePredicatesFormat firstFormat: String, _ additionalPredicatesFormats: String...) throws -> Self {
+        let regex = try NSRegularExpression(pattern: pattern)
+        let firstPredicate = try Predicate(format: firstFormat)
+        let additionalPredicates = try additionalPredicatesFormats.map { try Predicate(format: $0) }
+        return .keyAndValue(keyRegex: regex, valuePredicates: [firstPredicate] + additionalPredicates)
     }
 }
 

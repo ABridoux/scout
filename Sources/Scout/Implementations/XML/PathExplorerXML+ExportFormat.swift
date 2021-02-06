@@ -15,7 +15,7 @@ extension PathExplorerXML {
 
     // MARK: - Functions
 
-    public func exportDataTo(_ format: DataFormat, rootName: String?) throws -> Data {
+    public func exportData(to format: DataFormat, rootName: String?) throws -> Data {
         let serializeValue = { serialize(element: element) }
 
         switch format {
@@ -34,14 +34,14 @@ extension PathExplorerXML {
         }
     }
 
-    public func exportStringTo(_ format: DataFormat, rootName: String?) throws -> String {
+    public func exportString(to format: DataFormat, rootName: String?) throws -> String {
 
         switch format {
         case .xml:
             return element.xml
 
         case .json, .plist, .yaml:
-            let data = try exportDataTo(format)
+            let data = try exportData(to: format)
             guard let string = String(data: data, encoding: .utf8) else {
                 throw PathExplorerError.dataToStringConversionError
             }

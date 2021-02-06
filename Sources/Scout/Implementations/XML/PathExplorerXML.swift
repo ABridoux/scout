@@ -65,10 +65,6 @@ public struct PathExplorerXML: PathExplorer {
 
     // MARK: Get
 
-    public func get(_ path: PathElementRepresentable...) throws -> Self {
-        try get(Path(path))
-    }
-
     public func get(_ path: Path) throws  -> Self {
         var currentPathExplorer = self
 
