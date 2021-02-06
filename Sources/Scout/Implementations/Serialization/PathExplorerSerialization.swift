@@ -106,14 +106,6 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         try add(newValue, at: path, as: .automatic)
     }
 
-    public mutating func add(_ newValue: Any, at path: PathElementRepresentable...) throws {
-        try add(newValue, at: Path(path), as: .automatic)
-    }
-
-    public mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws {
-        try add(newValue, at: Path(path), as: type)
-    }
-
     // MARK: Fold
 
     public mutating func fold(upTo level: Int) {

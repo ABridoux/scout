@@ -100,10 +100,6 @@ public struct PathExplorerXML: PathExplorer {
         try add(newValue, at: path)
     }
 
-    public mutating func add<Type>(_ newValue: Any, at path: PathElementRepresentable..., as type: KeyType<Type>) throws where Type: KeyAllowedType {
-        try add(newValue, at: Path(path))
-    }
-
     // MARK: Export
 
     public func exportData() throws -> Data {

@@ -71,7 +71,7 @@ public extension PathExplorer {
 
     // MARK: - Delete
 
-    /// Delete the key at the given path,specified as variadic `PathElement`s
+    /// Delete the key at the given path, specified as variadic `PathElement`s
     ///
     /// #### Negative index
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
@@ -80,5 +80,38 @@ public extension PathExplorer {
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func delete(_ elements: PathElement..., deleteIfEmpty: Bool = false) throws {
         try delete(Path(elements), deleteIfEmpty: deleteIfEmpty)
+    }
+
+    // MARK: - Add
+
+    /// Add a value at the given path, specified as variadic `PathElement`s
+
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
+
+    /// #### Appending
+    /// To add a key at the end of an array, specify the `PathElement.count`
+
+    /// ### Non-existing key
+    /// Any non existing key encoutered in the path will be created.
+    mutating func add(_ newValue: Any, at elements: PathElement...) throws {
+        try add(newValue, at: Path(elements))
+    }
+
+    /// Add a value at the given path, specified as variadic `PathElement`s
+
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
+
+    /// #### Appending
+    /// To add a key at the end of an array, specify the `PathElement.count`
+
+    /// ### Non-existing key
+    /// Any non existing key encoutered in the path will be created.
+
+    /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
+    /// throwing an error if the conversion is not possible
+    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at elements: PathElement..., as type: KeyType<Type>) throws {
+        try add(newValue, at: Path(elements), as: type)
     }
 }
