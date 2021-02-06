@@ -34,7 +34,7 @@ extension PathExplorerSerialization {
     }
 
     func getSingle(at index: Int, negativeIndexEnabled: Bool = true) throws -> Any {
-        let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.flattened()))
         let computedIndex = try computeIndex(from: index, arrayCount: array.count, allowNegative: negativeIndexEnabled, in: readingPath)
         return array[computedIndex]
     }
@@ -92,7 +92,7 @@ extension PathExplorerSerialization {
 
     /// If `value` can be casted as a dictionary, and has the given key, return the dictionary and the key value in a tuple. Throws otherwise.
     func getDictAndValueFor(for key: String) throws -> (dictionary: DictionaryValue, value: Any) {
-        let dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
+        let dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath.flattened()))
 
         guard let value = dict[key] else {
             let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(dict.keys))
@@ -153,7 +153,7 @@ extension PathExplorerSerialization {
     }
 
     func getChildrenCountInArraySlice() throws -> Self {
-        let dict  = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        let dict  = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.flattened()))
         var countsArray = [Int]()
 
         for (index, value) in dict.enumerated() {

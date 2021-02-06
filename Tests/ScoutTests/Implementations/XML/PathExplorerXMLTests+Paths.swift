@@ -138,7 +138,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
     func testListPathsValuePRedicate() throws {
         let explorer = Xml(element: events, path: .empty)
         var paths = [Path]()
-        let predicate = try PathsFilter.Predicate(format: "value < 30")
+        let predicate = try PathsFilter.ExpressionPredicate(format: "value < 30")
 
         try explorer.collectKeysPaths(in: &paths, filter: .value(predicate))
 
@@ -149,8 +149,8 @@ final class PathExplorerXMLPathsTests: XCTestCase {
     func testListPaths2Filters() throws {
         let explorer = Xml(element: events, path: .empty)
         var paths = [Path]()
-        let scorePredicate = try PathsFilter.Predicate(format: "value < 30")
-        let namePredicate = try PathsFilter.Predicate(format: "value isIn 'Zerator, Mister MV'")
+        let scorePredicate = try PathsFilter.ExpressionPredicate(format: "value < 30")
+        let namePredicate = try PathsFilter.ExpressionPredicate(format: "value isIn 'Zerator, Mister MV'")
 
         try explorer.collectKeysPaths(in: &paths, filter: .value(scorePredicate, namePredicate))
 
@@ -162,7 +162,7 @@ final class PathExplorerXMLPathsTests: XCTestCase {
         let explorer = Xml(element: events, path: .empty)
         var paths = [Path]()
         let nameRegex = try NSRegularExpression(pattern: "score")
-        let scorePredicate = try PathsFilter.Predicate(format: "value > 0")
+        let scorePredicate = try PathsFilter.ExpressionPredicate(format: "value > 0")
 
         try explorer.collectKeysPaths(in: &paths, filter: .keyAndValue(keyRegex: nameRegex, valuePredicates: scorePredicate))
 

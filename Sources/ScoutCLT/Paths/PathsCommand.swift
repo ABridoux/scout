@@ -39,7 +39,7 @@ struct PathsCommand: ScoutCommand {
 
     func inferred<P>(pathExplorer: P) throws where P: PathExplorer {
         var pathsFilter = PathsFilter.targetOnly(valueTarget)
-        let valuePredicates = self.valuePredicates.isEmpty ? nil : try self.valuePredicates.map { try PathsFilter.Predicate(format: $0) }
+        let valuePredicates = self.valuePredicates.isEmpty ? nil : try self.valuePredicates.map { try PathsFilter.ExpressionPredicate(format: $0) }
         var keyRegex: NSRegularExpression?
 
         if let pattern = keyRegexPattren {

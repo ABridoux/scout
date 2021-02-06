@@ -58,7 +58,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
             return "The key #\(key)# cannot be found in the Dictionary '\(path.description)'.\n\(bestMatchString)"
 
-        case .arraySubscript(let path): return "Cannot subscript the key at '\(path.description)' with an Integer as is not an Array"
+        case .arraySubscript(let path): return "Cannot subscript the key at '\(path.description)' with an integer as it is not an Array"
         case .subscriptWrongIndex(let path, let index, let count): return "The index [\(index)] is not within the bounds (0...\(count - 1)) of the Array  at '\(path.description)'"
         case .keyNameSetOnNonDictionary(path: let path): return "'\(path.description)' is not a dictionary and cannot set the key name of its children if any"
 

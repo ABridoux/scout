@@ -9,7 +9,7 @@ import XCTest
 final class PathsFilterTests: XCTestCase {
 
     func testPredicateMismatchedTypes() throws {
-        let predicate = try PathsFilter.Predicate(format: "value > 10")
+        let predicate = try PathsFilter.ExpressionPredicate(format: "value > 10")
 
         _ = try predicate.evaluate(with: "yo")
 
@@ -17,13 +17,13 @@ final class PathsFilterTests: XCTestCase {
     }
 
     func testPredicateMismatchedTypesReturnsFalse() throws {
-        let predicate = try PathsFilter.Predicate(format: "value > 10")
+        let predicate = try PathsFilter.ExpressionPredicate(format: "value > 10")
 
         XCTAssertFalse(try predicate.evaluate(with: "yo"))
     }
 
     func testPredicateValueTypes() throws {
-        let predicate = try PathsFilter.Predicate(format: "!(value hasPrefix 'yo')")
+        let predicate = try PathsFilter.ExpressionPredicate(format: "!(value hasPrefix 'yo')")
 
         XCTAssertFalse(try predicate.evaluate(with: 10))
     }

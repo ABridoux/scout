@@ -106,7 +106,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
     func testGetKeysPathsWithValuePredicate() throws {
         let explorer = Json(value: events)
         var paths = [Path]()
-        let predicate = try PathsFilter.Predicate(format: "value < 30")
+        let predicate = try PathsFilter.ExpressionPredicate(format: "value < 30")
 
         try explorer.collectKeysPaths(in: &paths, filter: .value(predicate))
 
@@ -117,8 +117,8 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
     func testGetKeysPathsWithValue2Predicates() throws {
         let explorer = Json(value: events)
         var paths = [Path]()
-        let namePredicate = try PathsFilter.Predicate(format: "value isIn 'Zerator, Mister MV'")
-        let scorePredicate = try PathsFilter.Predicate(format: "value < 30")
+        let namePredicate = try PathsFilter.ExpressionPredicate(format: "value isIn 'Zerator, Mister MV'")
+        let scorePredicate = try PathsFilter.ExpressionPredicate(format: "value < 30")
 
         try explorer.collectKeysPaths(in: &paths, filter: .value(namePredicate, scorePredicate))
 
@@ -130,7 +130,7 @@ final class PathExplorerSerializationPathsTest: XCTestCase {
         let explorer = Json(value: events)
         var paths = [Path]()
         let nameRegex = try NSRegularExpression(pattern: "score")
-        let scorePredicate = try PathsFilter.Predicate(format: "value > 0")
+        let scorePredicate = try PathsFilter.ExpressionPredicate(format: "value > 0")
 
         try explorer.collectKeysPaths(in: &paths, filter: .keyAndValue(keyRegex: nameRegex, valuePredicates: scorePredicate))
 
