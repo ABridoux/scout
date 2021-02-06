@@ -88,28 +88,10 @@ public struct PathExplorerXML: PathExplorer {
         return try T(value: value)
     }
 
-    public func get<T>(_ path: PathElementRepresentable..., as type: KeyType<T>) throws -> T where T: KeyAllowedType {
-        try get(Path(path), as: type)
-    }
-
     // MARK: Set
 
     public mutating func set<Type>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
         try set(path, to: newValue)
-    }
-
-    public mutating  func set(_ path: PathElementRepresentable..., to newValue: Any) throws {
-        try set(Path(path), to: newValue)
-    }
-
-    public mutating func set<Type>(_ path: PathElementRepresentable..., to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
-        try set(Path(path), to: newValue)
-    }
-
-    // -- Set key name
-
-    public mutating func set(_ path: PathElementRepresentable..., keyNameTo newKeyName: String) throws {
-        try set(Path(path), keyNameTo: newKeyName)
     }
 
     // MARK: Delete

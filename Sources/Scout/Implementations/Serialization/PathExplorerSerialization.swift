@@ -90,36 +90,14 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: Get
 
-    public func get(_ path: PathElementRepresentable...) throws -> Self {
-        try get(Path(path))
-    }
-
     public func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T {
         try T(value: get(path).value)
-    }
-
-    public func get<T: KeyAllowedType>(_ path: PathElementRepresentable..., as type: KeyType<T>) throws -> T {
-        try T(value: get(Path(path)).value)
     }
 
     // MARK: Set
 
     public mutating func set(_ path: Path, to newValue: Any) throws {
         try set(path, to: newValue, as: .automatic)
-    }
-
-    public mutating func set<Type: KeyAllowedType>(_ path: PathElementRepresentable..., to newValue: Any, as type: KeyType<Type>) throws {
-        try set(Path(path), to: newValue, as: type)
-    }
-
-    public mutating func set(_ path: PathElementRepresentable..., to newValue: Any) throws {
-        try set(Path(path), to: newValue, as: .automatic)
-    }
-
-    // -- Set key name
-
-    public mutating func set(_ path: PathElementRepresentable..., keyNameTo newKeyName: String) throws {
-        try set(Path(path), keyNameTo: newKeyName)
     }
 
     // MARK: Delete
