@@ -68,4 +68,17 @@ public extension PathExplorer {
     mutating func set(_ elements: PathElement..., keyNameTo newKeyName: String) throws {
         try set(Path(elements), keyNameTo: newKeyName)
     }
+
+    // MARK: - Delete
+
+    /// Delete the key at the given path,specified as variadic `PathElement`s
+    ///
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
+    ///
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    mutating func delete(_ elements: PathElement..., deleteIfEmpty: Bool = false) throws {
+        try delete(Path(elements), deleteIfEmpty: deleteIfEmpty)
+    }
 }

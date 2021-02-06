@@ -94,12 +94,6 @@ public struct PathExplorerXML: PathExplorer {
         try set(path, to: newValue)
     }
 
-    // MARK: Delete
-
-    public mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool = false) throws {
-        try delete(Path(path), deleteIfEmpty: deleteIfEmpty)
-    }
-
     // MARK: Add
 
     public mutating func add<Type>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws where Type: KeyAllowedType {

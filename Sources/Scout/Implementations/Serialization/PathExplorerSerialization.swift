@@ -100,12 +100,6 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         try set(path, to: newValue, as: .automatic)
     }
 
-    // MARK: Delete
-
-    public mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool = false) throws {
-        try delete(Path(path), deleteIfEmpty: deleteIfEmpty)
-    }
-
     // MARK: Add
 
     public mutating func add(_ newValue: Any, at path: Path) throws {

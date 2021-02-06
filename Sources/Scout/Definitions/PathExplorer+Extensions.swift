@@ -84,8 +84,8 @@ public extension PathExplorer {
 
     /// Delete the key at the given path, specified as array.
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ path: PathElementRepresentable) throws {
-        try delete(path, deleteIfEmpty: false)
+    mutating func delete(_ elemnents: PathElementRepresentable) throws {
+        try delete(Path(elemnents), deleteIfEmpty: false)
     }
 }
 

@@ -106,23 +106,6 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws
 
-    /// Delete the key at the given path,specified as variadic `PathElementRepresentable`s
-    ///
-    /// #### Negative index
-    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
-    ///
-    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
-    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ path: PathElementRepresentable..., deleteIfEmpty: Bool) throws
-
-    /// Delete all the keys matching the regular expression pattern
-    ///
-    /// #### Negative index
-    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
-    ///
-    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion
-    mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws
-
     // MARK: Add
 
     /**
