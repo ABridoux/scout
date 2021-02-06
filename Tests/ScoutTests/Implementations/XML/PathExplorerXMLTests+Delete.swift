@@ -61,7 +61,7 @@ extension PathExplorerXMLTests {
     func testDeleteSliceKey() throws {
         var xml = try Xml(data: toyBox)
 
-        try xml.delete(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes"])
+        try xml.delete("toybox", "characters", .slice(0, 1), "episodes")
 
         for index in 0...1 {
             let path = Path("toybox", "characters", index)
@@ -72,7 +72,7 @@ extension PathExplorerXMLTests {
     func testDeleteSliceIndex() throws {
         var xml = try Xml(data: toyBox)
 
-        try xml.delete(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes", 1])
+        try xml.delete("toybox", "characters", .slice(0, 1), "episodes", 1)
 
         let path = Path("toybox", "characters", 0, "episodes")
         XCTAssertErrorsEqual(try xml.get(path.appending("episodes", 2)), .subscriptWrongIndex(path: path, index: 2, arrayCount: 2))
@@ -83,7 +83,7 @@ extension PathExplorerXMLTests {
     func testDeleteDictionaryFilter() throws {
         var xml = try Xml(data: toyBoxByName)
 
-        try xml.delete("characters", PathElement.filter(".*(z|Z).*"))
+        try xml.delete("characters", .filter(".*(z|Z).*"))
 
         XCTAssertEqual(xml.element.children.count, 1)
         XCTAssertEqual(xml.element["characters"].children.first?.name, "Woody")
@@ -92,7 +92,7 @@ extension PathExplorerXMLTests {
     func testDeleteDictionaryFilterKey() throws {
         var xml = try Xml(data: toyBoxByName)
 
-        try xml.delete("characters", PathElement.filter(".*(z|Z).*"), "episodes")
+        try xml.delete("characters", .filter(".*(z|Z).*"), "episodes")
 
         XCTAssertEqual(xml.element["characters"]["Woody"].children.count, 3)
         XCTAssertEqual(xml.element["characters"]["Zurg"].children.count, 2)
@@ -102,7 +102,7 @@ extension PathExplorerXMLTests {
     func testDeleteDictionaryFilterIndex() throws {
         var xml = try Xml(data: toyBoxByName)
 
-        try xml.delete("characters", PathElement.filter(".*(z|Z).*"), "episodes", 0)
+        try xml.delete("characters", .filter(".*(z|Z).*"), "episodes", 0)
 
         XCTAssertEqual(xml.element["characters"]["Woody"]["episodes"].children.count, 3)
         XCTAssertEqual(xml.element["characters"]["Zurg"]["episodes"].children.count, 2)

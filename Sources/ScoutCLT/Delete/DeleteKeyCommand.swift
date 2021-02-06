@@ -53,10 +53,12 @@ struct DeleteKeyCommand: SADCommand {
     // MARK: - Functions
 
     func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
-        // will be called only once
-        guard let regex = try? NSRegularExpression(pattern: pattern) else {
-            throw RuntimeError.invalidRegex(pattern)
-        }
-        try pathExplorer.delete(regularExpression: regex, deleteIfEmpty: recursive)
+        // postponed to 3.1.0
+
+//         will be called only once
+//        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+//            throw RuntimeError.invalidRegex(pattern)
+//        }
+//        try pathExplorer.delete(regularExpression: regex, deleteIfEmpty: recursive)
     }
 }
