@@ -1,21 +1,20 @@
 {
-  "Tom": {
-    "height": 175,
-    "age": 68,
-    "hobbies": [
+  "Tom" : {
+    "age" : 68,
+    "hobbies" : [
       "cooking",
       "guitar"
-    ]
+    ],
+    "height" : 175
   },
-  "Robert": {
-    "height": 181,
-    "age": 23,
-    "hobbies": [
+  "Robert" : {
+    "age" : 23,
+    "hobbies" : [
       "video games",
       "party",
       "tennis"
     ],
-    "running_records": [
+    "running_records" : [
       [
         10,
         12,
@@ -27,21 +26,22 @@
         12,
         11
       ]
-    ]
+    ],
+    "height" : 181
   },
-  "Suzanne": {
-    "job": "actress",
-    "movies": [
+  "Suzanne" : {
+    "job" : "actress",
+    "movies" : [
       {
-        "title": "Tomorrow is so far",
-        "awards": "Best speech for a silent movie"
+        "title" : "Tomorrow is so far",
+        "awards" : "Best speech for a silent movie"
       },
       {
-        "title": "Yesterday will never go",
-        "awards": "Best title"
+        "title" : "Yesterday will never go",
+        "awards" : "Best title"
       },
       {
-        "title": "What about today?"
+        "title" : "What about today?"
       }
     ]
   }

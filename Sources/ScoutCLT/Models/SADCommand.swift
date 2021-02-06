@@ -52,21 +52,21 @@ extension SADCommand {
 
     /// Print the data from the path explorer and colorize it if specified
     /// - Parameters:
-    ///   - output: A file path to a file where to write the data
+    ///   - outputFilePath: A file path to a file where to write the data
     ///   - pathExplorer: The path explorer to use to get the data
     ///   - colorise: `true` if the data should be colorised
     ///   - level: The level to fold the data
     ///   - csvSeparator: The csv separator to use to export the data
-    func printOutput<P: PathExplorer>(_ output: String?, dataWith pathExplorer: P, colorise: Bool, level: Int? = nil) throws {
+    func printOutput<P: PathExplorer>(_ outputFilePath: String?, dataWith pathExplorer: P, colorise: Bool, level: Int? = nil) throws {
 
-        if let output = output?.replacingTilde {
+        if let output = outputFilePath?.replacingTilde {
             FileManager.default.createFile(atPath: output, contents: nil, attributes: nil)
         }
 
         switch try export() {
         case .csv(let separator):
             let csv = try pathExplorer.exportCSV(separator: separator)
-            if let output = output {
+            if let output = outputFilePath {
                 try csv.write(toFile: output, atomically: false, encoding: .utf8)
             } else {
                 print(csv)
@@ -75,7 +75,7 @@ extension SADCommand {
 
         case .dataFormat(let format):
             let exported = try pathExplorer.exportDataTo(format, rootName: fileName(of: inputFilePath))
-            if let output = output {
+            if let output = outputFilePath {
                 try exported.write(to: URL(fileURLWithPath: output))
             } else {
                 guard let string = String(data: exported, encoding: .utf8) else {
@@ -99,7 +99,11 @@ extension SADCommand {
 
         let output = try pathExplorer.exportString()
 
-        try printOutput(output: output, with: pathExplorer.format)
+        if let filePath = outputFilePath {
+            try output.write(toFile: filePath, atomically: false, encoding: .utf8)
+        } else {
+            try printOutput(output: output, with: pathExplorer.format)
+        }
     }
 
     func printOutput(output: String, with format: Scout.DataFormat) throws {
