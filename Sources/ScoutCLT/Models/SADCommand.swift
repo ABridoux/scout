@@ -40,7 +40,7 @@ extension SADCommand {
     }
 
     func inferred<P: PathExplorer>(pathExplorer: P) throws {
-        let outputPath = modifyFilePath ?? outputFilePath
+        let outputPath = modifyFilePath?.replacingTilde ?? outputFilePath?.replacingTilde
 
         var explorer = pathExplorer
         try pathsCollection.forEach { try perform(pathExplorer: &explorer, pathCollectionElement: $0) }
