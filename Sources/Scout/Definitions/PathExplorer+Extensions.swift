@@ -156,21 +156,12 @@ extension PathExplorer {
     }
 
     /// Export the path explorer value to the specified format data
-    public func exportDataTo(_ format: DataFormat) throws -> Data {
-        try exportDataTo(format, rootName: nil)
+    public func exportData(to format: DataFormat) throws -> Data {
+        try exportData(to: format, rootName: nil)
     }
 
     /// Export the path explorer value to the specified format string data
-    public func exportStringTo(_ format: DataFormat) throws -> String {
-        try exportStringTo(format, rootName: nil)
-    }
-}
-
-// MARK: Paths
-
-extension PathExplorer {
-
-    public func getPaths(startingAt initialPath: Path) throws -> [Path] {
-        try listPaths(startingAt: initialPath, filter: .noFilter)
+    public func exportString(to format: DataFormat) throws -> String {
+        try exportString(to: format, rootName: nil)
     }
 }

@@ -114,4 +114,22 @@ public extension PathExplorer {
     mutating func add<Type: KeyAllowedType>(_ newValue: Any, at elements: PathElement..., as type: KeyType<Type>) throws {
         try add(newValue, at: Path(elements), as: type)
     }
+
+    // MARK: - Paths
+
+    /// Returns all the paths leading to single or group values
+    /// - Parameters:
+    ///   - initialPath: Scope the return paths with this path as a starting point
+    ///   - filter: Optionnally provide a filter on the key and/or value. Default is `noFilter`
+    func listPaths(startingAt initialPath: Path? = nil) throws -> [Path] {
+        try listPaths(startingAt: initialPath, filter: .noFilter)
+    }
+
+    /// Returns all the paths leading to single or group values
+    /// - Parameters:
+    ///   - initialPath: Scope the return paths with this path as a starting point
+    ///   - filter: Optionnally provide a filter on the key and/or value. Default is `noFilter`
+    func listPaths(startingAt elements: PathElement..., filter: PathsFilter = .noFilter) throws -> [Path] {
+        try listPaths(startingAt: Path(elements), filter: .noFilter)
+    }
 }

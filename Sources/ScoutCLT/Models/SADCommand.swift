@@ -74,7 +74,7 @@ extension SADCommand {
             return
 
         case .dataFormat(let format):
-            let exported = try pathExplorer.exportDataTo(format, rootName: fileName(of: inputFilePath))
+            let exported = try pathExplorer.exportData(to: format, rootName: fileName(of: inputFilePath))
             if let output = outputFilePath {
                 try exported.write(to: URL(fileURLWithPath: output))
             } else {

@@ -85,7 +85,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
             return try explorer.exportCSV(separator: separator)
 
         case .dataFormat(let format):
-            return try explorer.exportStringTo(format, rootName: fileName(of: inputFilePath))
+            return try explorer.exportString(to: format, rootName: fileName(of: inputFilePath))
 
         case nil:
             break

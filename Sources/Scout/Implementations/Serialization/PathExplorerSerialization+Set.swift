@@ -33,7 +33,7 @@ extension PathExplorerSerialization {
 
     /// Set the index in the given array to the new value
     func setSingle(at index: Int, to newValue: Any) throws -> ArrayValue {
-        var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        var array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.flattened()))
         let computedIndex = index < 0 ? array.count + index : index
 
         if array.isEmpty, index == -1 { // add the value if targeting the last possible index when empty
@@ -151,7 +151,7 @@ extension PathExplorerSerialization {
 
     mutating func setArraySlice(within bounds: Bounds, to newValue: Any) throws {
         let slice = PathElement.slice(bounds)
-        let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath))
+        let array = try cast(value, as: .array, orThrow: .arraySubscript(readingPath.flattened()))
         let newSlice = try cast(newValue, as: .array,
                                 orThrow: .wrongGroupValueForKey(group: GroupSample.arraySliceEmpty.name, value: String(describing: newValue), element: slice))
 

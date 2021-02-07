@@ -160,10 +160,10 @@ where
     func exportCSV(separator: String?) throws -> String
 
     /// Export the path explorer value to the specified format data with a default root name "root"
-    func exportDataTo(_ format: DataFormat, rootName: String?) throws -> Data
+    func exportData(to format: DataFormat, rootName: String?) throws -> Data
 
     /// Export the path explorer value to the specified format string data with a default root name "root"
-    func exportStringTo(_ format: DataFormat, rootName: String?) throws -> String
+    func exportString(to format: DataFormat, rootName: String?) throws -> String
 
     /// Replace the group values (array or dictionaries) sub values by a unique one
     /// holding a fold mark to be replaced when exporting the string
