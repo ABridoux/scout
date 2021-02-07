@@ -8,7 +8,7 @@ import Scout
 
 private let abstract =
 """
-Read and modify values in specific format file or data. Currently supported: Json, Plist and Xml.
+Read and modify values in specific format file or data. Currently supported: Json, Plist, YAML and Xml.
 """
 
 private let discussion =

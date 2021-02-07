@@ -4,5 +4,5 @@
 // MIT license, see LICENSE file for details
 
 public struct Version {
-    public static let current = "2.0.0"
+    public static let current = "3.0.0-beta01"
 }

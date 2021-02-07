@@ -35,6 +35,12 @@ Install<br>
 This library aims to make specific formats data values reading and writing simple when the data format is not known at build time.
 It was inspired by [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON) and all the projects that followed, while trying to cover more ground, like Xml or Plist. It unifies writing and reading for those different formats. Getting a value in a Json format would be the same as getting a value in a Xml format.
 
+Supported formats:
+- JSON
+- Plist
+- YAML
+- XML
+
 ## Summary
 - [Why](#why)
 - [Features](#features)
@@ -42,6 +48,10 @@ It was inspired by [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON) and al
 - [Usage](#usage)
 - [Special thanks](#special-thanks)
 - [Contributing](#contributing)
+
+### News
+- Checkout what's new in **Scout** 3.0.0 [here](https://www.woodys-findings.com/scout/news-3.0.0).
+- Checkout what's new in **Scout** 2.0.0 [here](https://www.woodys-findings.com/scout/news-2.0.0).
 
 ## Why?
 
@@ -60,30 +70,41 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 ## Features
 - CRUD functions for JSON, Plist and XML data format
-  - Set a key name
-  - Force a type
-  - Dictionary and array count
-  - Dictionary keys
-  - Delete array or dictionary when deleting all its values 
-  - Array slicing for *read* and *delete* commands 
-  - Dictionary filtering for *read* and *delete* commands 
-- Use paths to specify the target value
+    - Read, Set, Delete or Add a value at a specific path in the data
+    - Subscript dictionary with a dot "."
+    - Subscript arrays with an index between brackets [index]. Negative indexes allowed.
+    - Set a key name
+    - Force a type
+    - Dictionary and array count
+    - Dictionary keys
+    - Delete array or dictionary when deleting all its values 
+    - Array slicing for *read* and *delete* commands 
+    - Dictionary filtering for *read* and *delete* commands 
+- List paths in the data to iterate over the values
 - Stream or file input
 - Find best match in case of a typo
-- Syntax highlighting
+- Data formats conversion (e.g. JSON -> Plist, YAML -> XML)
 - CSV export for arrays and dictionaries of arrays 
-- Folding at a depth level 
+- Syntax highlighting
+- Folding at a depth level
 - Auto-completion for commands 
 
 ### Insights
 
-See the wiki ([Swift package](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package), [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)) to see in details how to use those features.
+See the wiki to see in detail how to use those features:
+- [Swift package](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package)
+- [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)
 
 #### CRUD functions for JSON, Plist and XML data format
 - add a value (Create)
 - read a value (Read)
 - set a value (Update)
 - delete a value (Delete)
+
+Subscript dictionary with a dot "." like "dictionary.key"
+
+Subscript arrays with an index between brackets [index] like "array[index]".
+Negative indexes allowed.
 
 ##### Set key name
 Set a key name rather than its value.
@@ -96,15 +117,6 @@ Get a dictionary or an array count with the `[#]` symbol
 
 ##### Dictionary keys list
 Get a dictionary keys list with the `{#}` symbol.
-Bash/Zsh: useful when combined with `csv-sep " "` to iterate over the keys:
-
-```zsh
-keys=(`scout read -i People.json "people{#}" —csv-sep " "`)
-
-for key in $keys;  do
-	scout read -i People.json ”people.$key”;
-done
-```
 
 ##### Delete arrays or dictionaries when left empty
 With the *delete* command, it is possible to specify that a dictionary or an array should be deleted when all its keys are also being deleted.
@@ -115,8 +127,11 @@ Specify a slice of an array to read it or to delete it with `[lower:upper]` synt
 ##### Dictionary filtering
 Specify a regular expression between sharp signs '#' to filter the keys of a dictionary, like `people.#h.*#` to target all the keys starting with "h" in the dictionary 'people'. A key is a valid match when it is entirely validated by the regular expression.
 
-#### Use paths to specify the value to target
-A path is a sequence of keys or symbols to navigate through the data.
+#### List paths
+It's possible to list the paths in the data to iterate over the values. The paths can be retrieved as an array in a shell script to be used in a loop.
+This list can be filtered to target only single or group values, specific keys or values, or paths starting from a base.
+
+[Learn more]()
 
 #### Stream or file input
 Set the input as a file with the input option `-i | --input` or as the last process/command output with a pipe:
@@ -141,16 +156,20 @@ curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | sc
 Another example with one of the playground files and the following command:
 
 ```bash
-scout -i People.plist "people.Robert.age=2" -v
+scout -i People.plist "people.Robert.age=2"
 ```
 
 When dealing with large files (although it is not recommended to output large files in the terminal), colorising the output might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color` or `--nc`.
 
-##### Customise colors
-You can specify your own color set as explained [here](https://github.com/ABridoux/scout/wiki/%5B30%5D-Syntax-highlighting:-custom-colors). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
+#### Data formats conversion
+The library offer a conversion feature from a supported format to another one like Plist -> JSON or YAML -> XML. Read or modify the data and export it to another format.
+[Learn more]()
 
 #### CSV export
 Export data when dealing with arrays or a dictionary of arrays. Default separator ';' or customisable.
+
+##### Customise colors
+You can specify your own colors set as explained [here](https://github.com/ABridoux/scout/wiki/%5B30%5D-Syntax-highlighting:-custom-colors). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
 
 #### Folding
 Fold arrays or dictionaries at a certain depth level to make the data more readable
@@ -170,12 +189,12 @@ Use the following command.
 ```bash
 brew install ABridoux/formulae/scout
 ```
-It will **download the notarized executable** from the [latest release](https://github.com/ABridoux/scout/releases/latest/download/scout.zip)
+It will **download the notarized executable** from the [latest release](https://github.com/ABridoux/scout/releases/latest/download/scout.zip).
 
 
 #### Download
 
-You can download the [latest version of the executable](https://github.com/ABridoux/scout/releases/latest/download/scout.zip) from the [releases](https://github.com/ABridoux/scout/releases). Note that the **executable is notarized**. Also, a notarized [scout package](https://github.com/ABridoux/scout/releases/latest/download/scout.pkg) is provided.
+You can download the [latest version of the executable](https://github.com/ABridoux/scout/releases/latest/download/scout.zip) from the [releases](https://github.com/ABridoux/scout/releases). Note that the **executable is notarized**. Also, a [scout package](https://github.com/ABridoux/scout/releases/latest/download/scout.pkg) is provided.
 
 After having unzipped the file, you can install it if you want to.
 
@@ -228,7 +247,7 @@ Start by importing the package in your file *Packages.swift*.
 let package = Package (
     ...
     dependencies: [
-        .package(url: "https://github.com/ABridoux/scout", from: "1.0.0")
+        .package(url: "https://github.com/ABridoux/scout", from: "3.0.0")
     ],
     ...
 )
@@ -240,7 +259,7 @@ You can then `import Scout` in a file.
 ## Usage
 
 ### Playground
-You can find and try examples with one file *People* using the different available formats in the [Playground folder](Playground). The folder contains a *Commands.md* file so that you can see how to use the same commands to parse the different formats.
+You can find and try examples with one file *People* using the different available formats in the [Playground folder](Playground). The folder contains a *Commands.md* file so that you can see how to use the same commands with the different formats.
 
 ### Examples and explanations (wiki)
 [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)
@@ -262,6 +281,6 @@ Font used for the logo: Ver Army by [Damien Gosset](http://sweeep.fr/cv/index.ph
 <br>
 
 ## Contributing
-Scout is open-source and under a [MIT license](License). If you want to make a change or to add a new feature, please [open a Pull Request](https://github.com/ABridoux/scout/pull/new). You can learn more about contributing on this [wiki page](https://github.com/ABridoux/scout/wiki/%5B81%5D-Contributing).
+Scout is open-source and under a [MIT license](License). If you want to make a change or to add a new feature, please [open an issue](https://github.com/ABridoux/scout/issues) or [a pull request](https://github.com/ABridoux/scout/pull/new). You can learn more about contributing on this [wiki page](https://github.com/ABridoux/scout/wiki/%5B81%5D-Contributing).
 Also, feel free to [report a bug, an error or even a typo](https://github.com/ABridoux/scout/issues).
 
