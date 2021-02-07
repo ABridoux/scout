@@ -30,7 +30,7 @@ extension ScoutCommand {
 
     func run() throws {
         var filePath: String?
-        switch (inputFilePath, modifyFilePath) {
+        switch (inputFilePath?.replacingTilde, modifyFilePath?.replacingTilde) {
         case (.some(let path), nil): filePath = path
         case (nil, .some(let path)): filePath = path
         case (nil, nil): break
