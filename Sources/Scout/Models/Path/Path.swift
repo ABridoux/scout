@@ -28,7 +28,7 @@ public struct Path: Hashable {
 
     private(set) var elements = [PathElement]()
 
-    public static var empty: Path { Path([PathElement]()) }
+    public static var empty: Path { [] }
 
     // MARK: - Initialization
 
@@ -134,20 +134,8 @@ extension Path: Collection {
         elements.append(element.pathValue)
     }
 
-    public mutating func popFirst() -> PathElement? {
-        if let firstElement = elements.first {
-            elements.removeFirst()
-            return firstElement
-        }
-        return nil
-    }
-
     public mutating func popLast() -> PathElement? {
-        if let lastElement = elements.last {
-            elements.removeLast()
-            return lastElement
-        }
-        return nil
+        elements.popLast()
     }
 }
 
