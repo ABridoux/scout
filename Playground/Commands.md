@@ -3,12 +3,12 @@ Use these commands with the People files in the playground.
 The commands work regardless of the file format you choose with the `-i | --input` option: People.json, People.plist, People.yml or People.xml.
 
 **Summary**
-[Read a value](#read)
-[Set values](#set)
-[Delete values](#delete)
-[Add values](#add)
-[Listing paths](#listing-paths)
-[Export to another format](#export-to-another-format)
+- [Read a value](#read)
+- [Set values](#set)
+- [Delete values](#delete)
+- [Add values](#add)
+- [Listing paths](#listing-paths)
+- [Export to another format](#export-to-another-format)
 
 ## Read
 - Will output an error if a key in the given path does not exist. 
