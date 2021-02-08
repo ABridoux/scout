@@ -2,23 +2,6 @@
 
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
----
-## [3.0.0-beta01](https://github.com/ABridoux/scout/tree/3.0.0-beta01) (07/02/2021)
-
-### Added
-- YAML support [#132] [#142]
-- Conversion from one format to another [#133]
-- Disabled colorisation when the output is piped [#140]
-- List paths in the data [#151] [#154]
-- Array subscript with a negative index [#152]
-
-### Changed
-- set functions adding a value to an array with the index `-1` removed. [#152]
-- Array slicing index targets a different range (shifted to the right) [#158]
-- `PathExplorer` default implementations changed [#163]
-
-More informations: [What's new in Scout 3.0.0](https://www.woodys-findings.com/scout/news-3.0.0)
-
 ## [2.0.0](https://github.com/ABridoux/scout/tree/2.0.0) (05/09/2020)
 
 ### Added

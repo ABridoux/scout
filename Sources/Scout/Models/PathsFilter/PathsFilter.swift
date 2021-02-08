@@ -13,10 +13,10 @@ public enum PathsFilter {
     case key(regex: NSRegularExpression, target: ValueTarget)
 
     /// Filter the value based on predicates. The value is valid when one of the predicates validates it.
-    case value([Predicate])
+    case value([ValuePredicate])
 
     /// Filter the keys based on a regular expression and the value based on predicates. The value is valid when one of the predicates validates it.
-    case keyAndValue(keyRegex: NSRegularExpression, valuePredicates: [Predicate])
+    case keyAndValue(keyRegex: NSRegularExpression, valuePredicates: [ValuePredicate])
 
     /// Allows group values (array, dictionaries)
     var groupAllowed: Bool {

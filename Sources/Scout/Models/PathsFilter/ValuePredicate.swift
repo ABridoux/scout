@@ -7,7 +7,7 @@ import Foundation
 import BooleanExpressionEvaluation
 
 /// Expression or function to evaluate a value
-public protocol Predicate {
+public protocol ValuePredicate {
 
     /// Evaluate the predicate with the value.
     ///
@@ -24,7 +24,7 @@ extension PathsFilter {
     /// - `value hasPrefix 'Lou' && value hasSuffix 'lou'`
     ///
     /// - note: Public wrapper around BoleeanExpressionEvaluation.Expression
-    public final class ExpressionPredicate: Predicate {
+    public final class ExpressionPredicate: ValuePredicate {
         private(set) var expression: Expression
 
         /// The value types that the operators in the expression support
@@ -72,7 +72,7 @@ extension PathsFilter {
 extension PathsFilter {
 
     /// Specify a function to filter the value
-    public final class FunctionPredicate: Predicate {
+    public final class FunctionPredicate: ValuePredicate {
 
         public typealias Evaluation = (Any) throws -> Bool
         public var evaluation: Evaluation

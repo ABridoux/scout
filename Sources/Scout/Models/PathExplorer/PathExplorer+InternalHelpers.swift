@@ -31,7 +31,13 @@ extension PathExplorer {
     }
 }
 
-// MARK: Properties
+// MARK: - Properties
+
+public extension PathExplorer {
+
+    /// `real` property for convenience naming
+    public var double: Double? { real }
+}
 
 extension PathExplorer {
 
@@ -86,8 +92,6 @@ public extension PathExplorer {
 // MARK: Data validation
 
 extension PathExplorer {
-
-    public var double: Double? { real }
 
     /// Ensure a value as a correct type
     /// - Parameter value: The value to convert

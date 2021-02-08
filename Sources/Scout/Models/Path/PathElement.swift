@@ -128,7 +128,8 @@ extension PathElement: CustomStringConvertible {
         }
     }
 
-    /// Name of the path element when used a key
+    /// Name of the path element when used as a key in  a dictionary
+    /// - note: Mainly used for the sliced and filtetered key names
     var keyName: String {
         switch self {
         case .key(let key): return key
