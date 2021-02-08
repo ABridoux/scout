@@ -2,7 +2,6 @@
 
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
----
 ## [2.0.0](https://github.com/ABridoux/scout/tree/2.0.0) (05/09/2020)
 
 ### Added
@@ -12,7 +11,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 - Delete empty dictionaries and arrays when left empty [#109]
 - Dictionary filtering [#112]
 - CSV export [#103]
-- Commands.md new examples [#117]
+- *Commands.md* new examples [#117]
 - CLT scout command help license [#117]
 - Get a dictionary keys [#121]
 - CLT *read* command new `--output` option to export the read data or the CSV export into a file.

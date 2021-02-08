@@ -20,7 +20,7 @@ struct HomeDocumentation: Documentation {
 
     \u{001B}[0;0m
 
-    Current: \(main: Version.current)
+    Current: \(main: ScoutVersion.current)
 
     Scout offers features to manage data and support 4 data formats:
     - JSON
