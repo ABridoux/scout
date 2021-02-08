@@ -59,7 +59,7 @@ extension PathExplorer {
 
 // MARK: Helpers
 
-public extension PathExplorer {
+extension PathExplorer {
 
     /// Compute the index, positive or negative. Negative index uses the array count
     /// - Parameters:
@@ -74,18 +74,6 @@ public extension PathExplorer {
             throw PathExplorerError.subscriptWrongIndex(path: path.flattened(), index: index, arrayCount: arrayCount)
         }
         return computedIndex
-    }
-
-    /// Delete the key at the given path, specified as array.
-    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ path: Path) throws {
-        try delete(path, deleteIfEmpty: false)
-    }
-
-    /// Delete the key at the given path, specified as array.
-    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    mutating func delete(_ elemnents: PathElementRepresentable) throws {
-        try delete(Path(elemnents), deleteIfEmpty: false)
     }
 }
 

@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -25,6 +25,7 @@ let package = Package(
             url: "https://github.com/apple/swift-argument-parser",
             from: "0.0.1"),
         .package(
+            name: "Lux",
             url: "https://github.com/ABridoux/lux",
             .branch("develop")),
         .package(
@@ -37,18 +38,28 @@ let package = Package(
     targets: [
         .target(
             name: "Scout",
-            dependencies: ["AEXML", "Yams", "BooleanExpressionEvaluation"]),
+            dependencies: [
+                "AEXML",
+                "Yams",
+                "BooleanExpressionEvaluation"]),
         .target(
             name: "ScoutCLTCore",
-            dependencies: ["Scout"]),
+            dependencies: [
+                "Scout"]),
         .target(
             name: "ScoutCLT",
-            dependencies: ["Scout", "ArgumentParser", "Lux", "ScoutCLTCore"]),
+            dependencies: [
+                "Scout",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                "Lux",
+                "ScoutCLTCore"]),
         .testTarget(
             name: "ScoutTests",
             dependencies: ["Scout"]),
         .testTarget(
             name: "ScoutCLTCoreTests",
-            dependencies: ["ScoutCLTCore", "Scout"])
+            dependencies: [
+                "ScoutCLTCore",
+                "Scout"])
     ]
 )
