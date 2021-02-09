@@ -54,10 +54,10 @@ extension PathExplorerXMLTests {
     func testGetArraySlice() throws {
         var xml = try Xml(data: stubData2)
 
-        let path = Path(pathElements: .key("dogs"), .slice(.init(lower: 0, upper: 1)))
+        let path = Path(elements: "dogs", .slice(0, 1))
         xml = try xml.get(path)
 
-        let resultValue = xml.element.children.map { $0.string }
+        let resultValue = xml.element.children.map(\.string)
 
         XCTAssertEqual(["Villy", "Spot"], resultValue)
     }
@@ -65,21 +65,21 @@ extension PathExplorerXMLTests {
     func testGetArraySliceKey() throws {
         var xml = try Xml(data: toyBox)
 
-        let path = Path(pathElements: .key("toybox"), .key("characters"), .slice(.init(lower: 0, upper: 1)), .key("name"))
+        let path = Path(elements: "toybox", "characters", .slice(0, 1), "name")
         xml = try xml.get(path)
 
-        let resultValue = xml.element.children.map { $0.value }
+        let resultValue = xml.element.children.map(\.value)
 
-        XCTAssertEqual(resultValue, Character.toybox[0...1].map { $0.name })
+        XCTAssertEqual(resultValue, Character.toybox[0...1].map(\.name))
     }
 
     func testGetArraySliceIndex() throws {
         var xml = try Xml(data: toyBox)
 
-        let path = Path(pathElements: .key("toybox"), .key("characters"), .slice(.init(lower: 0, upper: 1)), .key("episodes"), .index(0))
+        let path = Path(elements: "toybox", "characters", .slice(0, 1), "episodes", 0)
         xml = try xml.get(path)
 
-        let resultValue = xml.element.children.map { $0.int }
+        let resultValue = xml.element.children.map(\.int)
 
         XCTAssertEqual(resultValue, [1, 1])
     }
@@ -87,9 +87,9 @@ extension PathExplorerXMLTests {
     func testGetSliceCount() throws {
         var xml = try Xml(data: toyBox)
 
-        xml = try xml.get(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes", PathElement.count])
+        xml = try xml.get("toybox", "characters", .slice(0, 1), "episodes", .count)
 
-        let resultValue = xml.element.children.map { $0.int }
+        let resultValue = xml.element.children.map(\.int)
 
         XCTAssertEqual(resultValue, [3, 3])
     }
@@ -97,9 +97,9 @@ extension PathExplorerXMLTests {
     func testGetSliceGroupSample() throws {
         var xml = try Xml(data: toyBox)
 
-        xml = try xml.get(["toybox", "characters", PathElement.slice(.init(lower: 0, upper: 1)), "episodes", PathElement.slice(Bounds(lower: 0, upper: 1))])
+        xml = try xml.get("toybox", "characters", .slice(0, 1), "episodes", .slice( 0, 1))
 
-        let resultValue = xml.element.children.flatMap { $0.children }.map { $0.int }
+        let resultValue = xml.element.children.flatMap(\.children).map(\.int)
 
         XCTAssertEqual(resultValue, [1, 2, 1, 2])
     }

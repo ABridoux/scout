@@ -49,7 +49,7 @@ extension PathExplorerSerializationTests {
     func testAddCreateKeyInPath() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try Plist(data: data)
-        let path = Path(pathElements: "animals", "ducks", .count)
+        let path = Path(elements: "animals", "ducks", .count)
 
         try plist.add("Donald", at: path)
 
@@ -60,7 +60,7 @@ extension PathExplorerSerializationTests {
         let array: Any = [["title": "firstTitle"], ["title": "secondTitle"], ["title": "thirdTitle"]]
         let data = try JSONSerialization.data(withJSONObject: array)
         var json = try Json(data: data)
-        let path = Path(pathElements: .count, "title")
+        let path = Path(elements: .count, "title")
 
         try json.add("fourthTitle", at: path)
 
@@ -70,7 +70,7 @@ extension PathExplorerSerializationTests {
     func testAddCreateIndexInEmptyArrayInPath() throws {
         let data = try PropertyListEncoder().encode(StubStruct())
         var plist = try Plist(data: data)
-        let path = Path(pathElements: "animals", "mouses", .count, "name")
+        let path = Path(elements: "animals", "mouses", .count, "name")
 
         try plist.add("Mickey", at: path)
 

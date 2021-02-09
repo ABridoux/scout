@@ -140,7 +140,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceKey() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("name"))
+        let path = Path(elements: .slice(0, 1), "name")
 
         plist = try plist.get(path)
 
@@ -151,7 +151,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceIndex() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .index(1))
+        let path = Path(elements: .slice(0, 1), "episodes", 1)
 
         plist = try plist.get(path)
 
@@ -162,7 +162,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceCount() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .count)
+        let path = Path(elements: .slice(0, 1), "episodes", .count)
 
         plist = try plist.get(path)
 
@@ -173,7 +173,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceArraySlice() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .slice(.init(lower: 1, upper: 2)))
+        let path = Path(elements: .slice(0, 1), "episodes", .slice(1, 2))
 
         plist = try plist.get(path)
 
@@ -184,7 +184,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceDictionaryFilter() throws {
         let data = try PropertyListEncoder().encode(charactersByName)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter(".*(z|Z).*"), .key("episodes"), .slice(.init(lower: 1, upper: 2)))
+        let path = Path(elements: .filter(".*(z|Z).*"), "episodes", .slice(1, 2))
 
         plist = try plist.get(path)
 
@@ -245,7 +245,7 @@ extension PathExplorerSerializationTests {
     func testGetDictionaryCount() throws {
         let data = try PropertyListEncoder().encode(charactersByName)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter(".*(z|Z).*"), .count)
+        let path = Path(elements: .filter(".*(z|Z).*"), .count)
 
         plist = try plist.get(path)
 
@@ -256,7 +256,7 @@ extension PathExplorerSerializationTests {
     func testGetDictionaryFilterArraySlice() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .filter("episodes"))
+        let path = Path(elements: .slice(0, 1), .filter("episodes"))
 
         plist = try plist.get(path)
 
@@ -267,7 +267,7 @@ extension PathExplorerSerializationTests {
     func testGetDictionaryFilterDictionaryFilter() throws {
         let data = try PropertyListEncoder().encode(charactersByName)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter(".*(z|Z).*"), .filter("episodes"))
+        let path = Path(elements: .filter(".*(z|Z).*"), .filter("episodes"))
 
         plist = try plist.get(path)
 

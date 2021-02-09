@@ -36,7 +36,7 @@ extension PathExplorer {
 public extension PathExplorer {
 
     /// `real` property for convenience naming
-    public var double: Double? { real }
+    var double: Double? { real }
 }
 
 extension PathExplorer {
