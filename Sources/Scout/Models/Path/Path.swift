@@ -24,11 +24,11 @@ public struct Path: Hashable {
         return regex
     }
 
+    public static var empty: Path { .init() }
+
     // MARK: - Properties
 
     private var elements = [PathElement]()
-
-    public static var empty: Path { [] }
 
     // MARK: - Initialization
 
@@ -81,53 +81,40 @@ public struct Path: Hashable {
         elements = []
     }
 
+    /// Instantiate a path from `PathElementRepresentable`s
     public init(_ pathElements: [PathElementRepresentable]) {
         elements = pathElements.map(\.pathValue)
     }
 
+    /// Instantiate a path from `PathElementRepresentable`s
     public init(_ pathElements: PathElementRepresentable...) {
         self.init(pathElements)
     }
 
-    public init(_ pathElements: ArraySlice<PathElement>) {
-        self.init(Array(pathElements))
-    }
-
+    /// Instantiate a path from `PathElement`s
     public init(elements: PathElement...) {
         self.init(elements)
     }
 
+    /// Instantiate a path from `PathElement`s
     public init(elements: [PathElement]) {
         self.init(elements)
     }
 
-    public init(elements: ArraySlice<PathElement>) {
-        self.init(Array(elements))
-    }
-
     // MARK: - Functions
-
-    // MARK: Path manipulations
 
     public func appending(_ elements: PathElementRepresentable...) -> Path { Path(self.elements + elements) }
     public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
-
-    public mutating func removeLast() -> PathElement { elements.removeLast() }
 }
 
-// MARK: Collection
+// MARK: - Collection
 
 extension Path: Collection, MutableCollection {
 
     public var startIndex: Int { elements.startIndex }
     public var endIndex: Int { elements.endIndex }
 
-    /// Last element in the Path
-    public var last: PathElement? { elements.last }
-
-    public func index(after i: Int) -> Int {
-        return elements.index(after: i)
-    }
+    public func index(after i: Int) -> Int { elements.index(after: i) }
 
     public subscript(elementIndex: Int) -> PathElement {
         get {
@@ -144,154 +131,27 @@ extension Path: Collection, MutableCollection {
     public mutating func append(_ element: PathElementRepresentable) {
         elements.append(element.pathValue)
     }
-
-    public mutating func popLast() -> PathElement? {
-        elements.popLast()
-    }
 }
 
 extension Path: RangeReplaceableCollection {
 
-    public mutating func replaceSubrange<C>(_ subrange: Range<Int>, with newElements: C) where C : Collection, Self.Element == C.Element {
+    public mutating func replaceSubrange<C: Collection>(_ subrange: Range<Int>, with newElements: C)
+    where Self.Element == C.Element {
         elements.replaceSubrange(subrange, with: newElements)
     }
 }
 
-// MARK: String convertible
+extension Path: BidirectionalCollection {
 
-extension Path: CustomStringConvertible, CustomDebugStringConvertible {
-
-    /// Prints all the elements in the path, with the default separator
-    /// #### Complexity
-    /// O(n) with `n` number of elements in the path
-    public var description: String { computeDescription() }
-
-    public var debugDescription: String { description }
-
-    func computeDescription(ignore: ((PathElement) -> Bool)? = nil) -> String {
-        var description = ""
-
-        elements.forEach { element in
-            if let ignore = ignore, ignore(element) { return }
-
-            switch element {
-
-            case .index, .count, .slice, .keysList:
-                // remove the point added automatically to a path element
-                if description.hasSuffix(Self.defaultSeparator) {
-                    description.removeLast()
-                }
-                description.append(element.description)
-
-            case .filter(let pattern):
-                description.append("#\(pattern)#")
-
-            case .key:
-                description.append(element.description)
-            }
-
-            description.append(Self.defaultSeparator)
-        }
-
-        // remove the last point if any
-        if description.hasSuffix(Self.defaultSeparator) {
-            description.removeLast()
-        }
-
-        return description
-    }
+    public func index(before i: Int) -> Int { elements.index(before: i) }
 }
+
+// MARK: - ExpressibleByArrayLiteral
 
 extension Path: ExpressibleByArrayLiteral {
     public typealias ArrayLiteralElement = PathElementRepresentable
 
     public init(arrayLiteral elements: PathElementRepresentable...) {
         self.elements = elements.map(\.pathValue)
-    }
-}
-
-// MARK: - Regular expression
-
-extension Path {
-
-    public var lastKeyElementName: String? {
-        let lastKey = elements.last { (element) -> Bool in
-            if case .key = element { return true }
-            return false
-        }
-        guard case let .key(name) = lastKey else { return nil }
-        return name
-    }
-
-    /// Last key component matching the regular expression
-    public func lastKeyComponent(matches regularExpression: NSRegularExpression) -> Bool {
-        let lastKey = elements.last { (element) -> Bool in
-            if case .key = element {
-                return true
-            }
-            return false
-        }
-        guard case let .key(name) = lastKey else { return false }
-
-        return regularExpression.validate(name)
-    }
-}
-
-// MARK: - Map functions
-
-public extension Path {
-
-    /// Retrieve all the index elements
-    var compactMapIndexes: [Int] {
-        compactMap {
-            if case let .index(index) = $0 {
-                return index
-            }
-            return nil
-        }
-    }
-
-    /// Retrieve all the key elements
-    var compactMapKeys: [String] {
-        compactMap {
-            if case let .key(name) = $0 {
-                return name
-            }
-            return nil
-        }
-    }
-}
-
-// MARK: - Paths collection
-
-public extension Collection where Element == Path {
-
-    /// Sort by key or index when found at the same position
-    func sortedByKeysAndIndexes() -> [Path] {
-        sorted { (lhs, rhs) in
-
-            var lhsIterator = lhs.makeIterator()
-            var rhsIterator = rhs.makeIterator()
-
-            while let lhsElement = lhsIterator.next(), let rhsElement = rhsIterator.next() {
-                switch (lhsElement, rhsElement) {
-
-                case (.key(let lhsLabel), .key(let rhsLabel)):
-                    if lhsLabel != rhsLabel {
-                        return lhsLabel < rhsLabel
-                    }
-
-                case (.index(let lhsIndex), .index(let rhsIndex)):
-                    if lhsIndex != rhsIndex {
-                        return lhsIndex < rhsIndex
-                    }
-
-                default:
-                    return true
-                }
-            }
-
-            return lhs.count < rhs.count // put the shorter path before
-        }
     }
 }
