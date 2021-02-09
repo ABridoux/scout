@@ -54,7 +54,7 @@ extension PathExplorerXMLTests {
     func testGetArraySlice() throws {
         var xml = try Xml(data: stubData2)
 
-        let path = Path(pathElements: .key("dogs"), .slice(.init(lower: 0, upper: 1)))
+        let path = Path(elements: "dogs", .slice(0, 1))
         xml = try xml.get(path)
 
         let resultValue = xml.element.children.map { $0.string }
@@ -65,7 +65,7 @@ extension PathExplorerXMLTests {
     func testGetArraySliceKey() throws {
         var xml = try Xml(data: toyBox)
 
-        let path = Path(pathElements: .key("toybox"), .key("characters"), .slice(.init(lower: 0, upper: 1)), .key("name"))
+        let path = Path(elements: "toybox", "characters", .slice(0, 1), "name")
         xml = try xml.get(path)
 
         let resultValue = xml.element.children.map { $0.value }

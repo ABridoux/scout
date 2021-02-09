@@ -26,7 +26,7 @@ public struct Path: Hashable {
 
     // MARK: - Properties
 
-    private(set) var elements = [PathElement]()
+    private var elements = [PathElement]()
 
     public static var empty: Path { [] }
 
@@ -77,6 +77,10 @@ public struct Path: Hashable {
         self.elements = elements
     }
 
+    public init() {
+        elements = []
+    }
+
     public init(_ pathElements: [PathElementRepresentable]) {
         elements = pathElements.map(\.pathValue)
     }
@@ -89,16 +93,16 @@ public struct Path: Hashable {
         self.init(Array(pathElements))
     }
 
-    public init(pathElements: PathElement...) {
-        self.init(pathElements)
+    public init(elements: PathElement...) {
+        self.init(elements)
     }
 
-    public init(pathElements: [PathElement]) {
-        self.init(pathElements)
+    public init(elements: [PathElement]) {
+        self.init(elements)
     }
 
-    public init(pathElements: ArraySlice<PathElement>) {
-        self.init(Array(pathElements))
+    public init(elements: ArraySlice<PathElement>) {
+        self.init(Array(elements))
     }
 
     // MARK: - Functions
@@ -113,7 +117,7 @@ public struct Path: Hashable {
 
 // MARK: Collection
 
-extension Path: Collection {
+extension Path: Collection, MutableCollection {
 
     public var startIndex: Int { elements.startIndex }
     public var endIndex: Int { elements.endIndex }
@@ -126,8 +130,15 @@ extension Path: Collection {
     }
 
     public subscript(elementIndex: Int) -> PathElement {
-        assert(elementIndex >= startIndex && elementIndex <= endIndex)
-        return elements[elementIndex]
+        get {
+            assert(elementIndex >= startIndex && elementIndex <= endIndex)
+            return elements[elementIndex]
+        }
+
+        set {
+            assert(elementIndex >= startIndex && elementIndex <= endIndex)
+            elements[elementIndex] = newValue
+        }
     }
 
     public mutating func append(_ element: PathElementRepresentable) {
@@ -136,6 +147,13 @@ extension Path: Collection {
 
     public mutating func popLast() -> PathElement? {
         elements.popLast()
+    }
+}
+
+extension Path: RangeReplaceableCollection {
+
+    public mutating func replaceSubrange<C>(_ subrange: Range<Int>, with newElements: C) where C : Collection, Self.Element == C.Element {
+        elements.replaceSubrange(subrange, with: newElements)
     }
 }
 

@@ -70,24 +70,24 @@ extension Path {
     /// O(n) with `n` the count of elements in the path
     public func flattened() -> Path {
         var indexedElements = getIndexesElements()
-        var newElements = elements
+        var newPath = self
         var indexesToRemove = [Int]()
 
-        update(slices: &indexedElements.slices, with: &indexedElements.indexes, in: &newElements, indexesToRemove: &indexesToRemove)
-        update(filters: indexedElements.filters, with: indexedElements.keys, in: &newElements, indexesToRemove: &indexesToRemove)
+        update(slices: &indexedElements.slices, with: &indexedElements.indexes, in: &newPath, indexesToRemove: &indexesToRemove)
+        update(filters: indexedElements.filters, with: indexedElements.keys, in: &newPath, indexesToRemove: &indexesToRemove)
 
         // remove the indexes used to replaced the slices and the keys used to replace the filters
-        indexesToRemove.sorted { $1 < $0 }.forEach { newElements.remove(at: $0) }
+        indexesToRemove.sorted { $1 < $0 }.forEach { newPath.remove(at: $0) }
 
         // remove the left filters and slices (can remain when targeting a group for example)
-        newElements.removeAll { element in
+        newPath.removeAll { element in
             switch element {
             case .filter, .slice: return true
             default: return false
             }
         }
 
-        return Path(newElements)
+        return Path(newPath)
     }
 
     /// Parse the path and store the relevant elements with their indexes
@@ -127,14 +127,14 @@ extension Path {
     private func update(
         slices: inout [IndexedSlice],
         with indexes: inout IndexedCollection<Int>,
-        in newElements: inout [PathElement],
+        in newPath: inout Path,
         indexesToRemove: inout [Int]) {
 
         // change the slices with the gathered indexes
         if slices.count == 1, indexes.count == 1, let firstSlice = slices.first, let index = indexes.first {
             // specific use case with one slice
             let newIndex = firstSlice.lowerBound + index.value
-            newElements[firstSlice.index] = .index(newIndex)
+            newPath[firstSlice.index] = .index(newIndex)
             indexesToRemove.append(index.index)
             slices.removeFirst()
 
@@ -144,7 +144,7 @@ extension Path {
             let newIndex = lastIndex.value < 0 ?
                 firstSlice.upperBound + lastIndex.value :
                 firstSlice.lowerBound + lastIndex.value
-            newElements[firstSlice.index] = .index(newIndex)
+            newPath[firstSlice.index] = .index(newIndex)
             indexesToRemove.append(lastIndex.index)
             slices.removeFirst()
         }
@@ -157,7 +157,7 @@ extension Path {
             let newIndex = index.value < 0 ?
                 slice.upperBound + index.value :
                 slice.lowerBound + index.value
-            newElements[slice.index] = .index(newIndex)
+            newPath[slice.index] = .index(newIndex)
             indexesToRemove.append(index.index)
         }
     }
@@ -166,7 +166,7 @@ extension Path {
     private func update(
         filters: IndexedCollection<String>,
         with keys: IndexedCollection<String>,
-        in newElements: inout [PathElement],
+        in newPath: inout Path,
         indexesToRemove: inout [Int]) {
 
         // replace the filters with the corresponding key
@@ -179,7 +179,7 @@ extension Path {
                 regex.validate(key.value)
             else { continue }
 
-            newElements[filter.index] = .key(key.value)
+            newPath[filter.index] = .key(key.value)
             indexesToRemove.append(key.index)
         }
     }

@@ -83,7 +83,7 @@ extension PathExplorerSerialization {
     /// Parse the path, adding a key if it does not exist in the dictionay or array
     private func addOrGetKeys(in path: Path) throws -> PathParsingStorage {
         var currentPathExplorer = self
-        var craftingPath = path.elements[0..<path.elements.count - 1]
+        var craftingPath = path[0..<path.count - 1]
         var pathExplorers = [currentPathExplorer]
 
         for (index, element) in craftingPath.enumerated() {
