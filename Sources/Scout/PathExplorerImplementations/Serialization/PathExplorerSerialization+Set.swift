@@ -217,7 +217,7 @@ extension PathExplorerSerialization {
        }
 
         guard var currentExplorer = pathExplorers.last else {
-            throw PathExplorerError.underlyingError("Internal error while exploring the path '\(path.appending(lastElement).description)' to set it")
+            throw PathExplorerError.underlyingError("Internal error while exploring the path '\(path.appending(lastElement))' to set it")
         }
 
         try currentExplorer.change(key: lastKey, nameTo: newKeyName)

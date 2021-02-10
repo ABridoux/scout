@@ -10,6 +10,7 @@ struct HomeDocumentation: Documentation {
 
     static let text =
     """
+
     \u{001B}[38;5;88m
         ______     ______    ___   _____  _____  _________
       .' ____ \\  .' ___  | .'   `.|_   _||_   _||  _   _  |

@@ -11,7 +11,7 @@ public enum CLTCoreError: LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .exportConflict: return "Ambiguous export specification. '--csv' and --export-fromat' cannot be use simultaneously"
+        case .exportConflict: return "Ambiguous export specification. '--csv' and --export-format' cannot be used simultaneously"
         }
     }
 }
