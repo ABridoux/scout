@@ -69,7 +69,7 @@ extension Path {
     /// #### Complexity
     /// O(n) with `n` the count of elements in the path
     public func flattened() -> Path {
-        var indexedElements = getIndexesElements()
+        var indexedElements = getIndexedElements()
         var newPath = self
         var indexesToRemove = [Int]()
 
@@ -91,7 +91,7 @@ extension Path {
     }
 
     /// Parse the path and store the relevant elements with their indexes
-    private func getIndexesElements() -> IndexedElements {
+    private func getIndexedElements() -> IndexedElements {
         var indexElements = IndexedElements()
 
         enumerated().forEach { (index, element) in

@@ -66,6 +66,8 @@ public enum PathsFilter {
     }
 }
 
+// MARK: - Convenience
+
 extension PathsFilter {
 
     /// No filter with target `singleAndGroup`

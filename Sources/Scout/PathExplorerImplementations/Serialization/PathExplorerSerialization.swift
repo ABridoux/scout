@@ -165,6 +165,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         }
     }
 
+    /// `true` if the provided value is a group one (array or dictionary)
     func isGroup(value: Any) -> Bool {
         value is ArrayValue || value is DictionaryValue || false
     }
