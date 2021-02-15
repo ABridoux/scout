@@ -14,7 +14,7 @@ extension PathExplorerSerialization {
 
         if var dict = value as? DictionaryValue {
             guard let key = element.key else {
-                throw PathExplorerError.wrongElementToSubscript(group: .dictionary, element: element, path: readingPath)
+                throw PathExplorerError.wrongElementToSubscript(group: Self.dictionaryTypeDescription, element: element, path: readingPath)
             }
             dict[key] = newValue
             value = dict
@@ -40,7 +40,7 @@ extension PathExplorerSerialization {
                 }
 
             default:
-                throw PathExplorerError.wrongElementToSubscript(group: .array, element: element, path: readingPath)
+                throw PathExplorerError.wrongElementToSubscript(group: Self.arrayTypeDescription, element: element, path: readingPath)
 
             }
             value = array

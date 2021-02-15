@@ -11,7 +11,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
     case invalidValue(String)
     case valueConversionError(value: String, type: String)
     case wrongValueForKey(value: String, element: PathElement)
-    case wrongElementToSubscript(group: GroupValue, element: PathElement, path: Path)
+    case wrongElementToSubscript(group: String, element: PathElement, path: Path)
     case wrongGroupValueForKey(group: String, value: String, element: PathElement)
     case wrongUsage(of: PathElement, in: Path)
     case wrongElement(element: PathElement, command: String)
@@ -40,7 +40,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
         case .invalidData(let type): return "Cannot intialize a \(String(describing: type)) object with the given data"
         case .invalidValue(let value): return "The key value \(value) is invalid"
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
-        case .wrongElementToSubscript(let group, let element, let path): return "Wrong element \(element.description) to subscript the \(group.rawValue) at '\(path)'"
+        case .wrongElementToSubscript(let group, let element, let path): return "Wrong element \(element.description) to subscript the \(group) at '\(path)'"
         case .wrongValueForKey(let value, let element): return "Cannot set `\(value)` to key/index #\(element)# which is a Dictionary or an Array"
         case .wrongGroupValueForKey(let group, let value, let element): return "Cannot set `\(value)` to array #\(element)# which is \(group)"
         case .wrongUsage(let element, let path): return "Wrong usage of \(element.description) in '\(path.description)'. \(element.usage)"
