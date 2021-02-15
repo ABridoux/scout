@@ -10,20 +10,6 @@ public struct Path: Hashable {
 
     // MARK: - Constants
 
-    static let defaultSeparator = "."
-    private static let countSymbol = PathElement.defaultCountSymbol
-    private static let keysListSymbol = PathElement.defaultKeysListSymbol
-
-    static func splitRegexPattern(separator: String) -> String {
-        var regex = #"\(.+\)"# // anything between brackets is allowed
-        regex += #"|\[[0-9\#(countSymbol):-]+\]"# // indexes and count
-        regex += #"|\{\#(keysListSymbol)\}"# // keys list
-        regex += #"|#(\x5C#|[^#])+#"# // dictionary filter
-        regex += #"|[^\#(separator)^\[^\]^\{^\}]+"# // standard key
-
-        return regex
-    }
-
     public static var empty: Path { .init() }
 
     // MARK: - Properties
@@ -32,9 +18,43 @@ public struct Path: Hashable {
 
     // MARK: - Initialization
 
+    private init(string: String, splitRegex: NSRegularExpression) {
+        elements = splitRegex
+            .matches(in: string)
+            .map { PathElement(from: String($0).removingEnclosingBrackets()) }
+    }
+
+    /// Instantiate a `Path` for a string representing path components separated with the default separator '.'.
+    ///
+    /// ### Example with default separator '.'
+    ///
+    /// `computers[2].name` will make the path `["computers", 2, "name"]`
+    ///
+    /// `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
+    ///
+    /// `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
+    ///
+    /// - parameter string: The string representing the path
+    /// - parameter separator: The separator used to split the string. Default is "."
+    ///
+    /// ### Brackets
+    /// When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
+    /// will make the path ["computer", "general.information", "serial_number"]
+    public init(string: String) {
+        let pattern = Self.splitRegexPattern()
+        let splitRegex: NSRegularExpression
+        do {
+            splitRegex = try NSRegularExpression(pattern: pattern)
+        } catch {
+            preconditionFailure(PathError.invalidRegex(pattern: pattern).localizedDescription)
+        }
+
+        self.init(string: string, splitRegex: splitRegex)
+    }
+
     /// Instantiate a `Path` for a string representing path components separated with the separator.
     ///
-    /// ### Example with default separator "."
+    /// ### Example with default separator '.'
     ///
     /// `computers[2].name` will make the path `["computers", 2, "name"]`
     ///
@@ -55,17 +75,18 @@ public struct Path: Hashable {
     ///
     /// When using a special character for a [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
     /// it is required to quote it with "\\".
-    public init(string: String, separator: String = "\\.") {
+    public init(string: String, separator: String) throws {
+        try Self.validate(separator: separator)
+        let pattern = Self.splitRegexPattern(separator: separator)
+
         let splitRegex: NSRegularExpression
         do {
-            splitRegex = try NSRegularExpression(pattern: Self.splitRegexPattern(separator: separator))
+            splitRegex = try NSRegularExpression(pattern: pattern)
         } catch {
-            preconditionFailure("The regular expression to split the path string is not valid. Forbidden separators: '[', ']', '(', ')'. \(error)")
+            throw PathError.invalidRegex(pattern: pattern)
         }
 
-        elements = splitRegex
-            .matches(in: string)
-            .map { PathElement(from: $0.removingEnclosingBrackets()) }
+        self.init(string: string, splitRegex: splitRegex)
     }
 
     public init() {

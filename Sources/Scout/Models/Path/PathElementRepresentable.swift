@@ -86,7 +86,7 @@ extension String: PathElementRepresentable {
             return nil
         }
 
-        return .slice(Bounds(lower: lower, upper: upper))
+        return .slice(lower, upper)
     }
 
     var filter: PathElement? {
