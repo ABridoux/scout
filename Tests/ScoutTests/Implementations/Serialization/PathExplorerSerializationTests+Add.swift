@@ -103,7 +103,7 @@ extension PathExplorerSerializationTests {
         let path = Path("animals")
         let addingPath = path.appending(2)
 
-        XCTAssertErrorsEqual(try plist.add("Daisy", at: addingPath), .wrongElementToSubscript(group: .dictionary, element: 2, path: path))
+        XCTAssertErrorsEqual(try plist.add("Daisy", at: addingPath), .wrongElementToSubscript(group: Plist.dictionaryTypeDescription, element: 2, path: path))
     }
 
     func testAddToArray_ThrowsIfNonIndex() throws {
@@ -112,7 +112,7 @@ extension PathExplorerSerializationTests {
         let path = Path("animals", "ducks")
         let addingPath = path.appending("Uncle")
 
-        XCTAssertErrorsEqual(try plist.add("Scrooge", at: addingPath), .wrongElementToSubscript(group: .array, element: "Uncle", path: path))
+        XCTAssertErrorsEqual(try plist.add("Scrooge", at: addingPath), .wrongElementToSubscript(group: Plist.arrayTypeDescription, element: "Uncle", path: path))
     }
 
     func testAddToArray_ThrowsIfWrongIndex() throws {

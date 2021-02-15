@@ -3,7 +3,7 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
-/// Holds the types a value can have
+/// Holds the types a key can have
 public class KeyType<T: KeyAllowedType> {
 
     // MARK: - Constants
@@ -28,8 +28,3 @@ public final class IntType: KeyType<Int> {}
 public final class RealType: KeyType<Double> {}
 public final class BoolType: KeyType<Bool> {}
 public final class AutomaticType: KeyType<AnyHashable> {}
-
-/// Array or dictionary value type
-public enum GroupValue: String, Equatable {
-    case array, dictionary
-}
