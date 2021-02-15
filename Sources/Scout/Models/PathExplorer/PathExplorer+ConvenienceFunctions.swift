@@ -96,13 +96,13 @@ public extension PathExplorer {
     // MARK: - Add
 
     /// Add a value at the given path, specified as variadic `PathElement`s
-
+    ///
     /// #### Negative index
     /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
-
+    ///
     /// #### Appending
     /// To add a key at the end of an array, specify the `PathElement.count`
-
+    ///
     /// ### Non-existing key
     /// Any non existing key encoutered in the path will be created.
     mutating func add(_ newValue: Any, at elements: PathElement...) throws {
@@ -110,16 +110,16 @@ public extension PathExplorer {
     }
 
     /// Add a value at the given path, specified as variadic `PathElement`s
-
+    ///
     /// #### Negative index
     /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
-
+    ///
     /// #### Appending
     /// To add a key at the end of an array, specify the `PathElement.count`
-
+    ///
     /// ### Non-existing key
     /// Any non existing key encoutered in the path will be created.
-
+    ///
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
     mutating func add<Type: KeyAllowedType>(_ newValue: Any, at elements: PathElement..., as type: KeyType<Type>) throws {

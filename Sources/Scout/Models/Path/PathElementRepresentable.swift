@@ -39,50 +39,39 @@ extension String: PathElementRepresentable {
         return PathElement.index(index)
     }
 
-    var count: PathElement? {
-        if self == PathElement.count.description {
-            return .count
-        }
-        return nil
-    }
+    var count: PathElement? { self == PathElement.count.description ? .count : nil }
 
-    var keysList: PathElement? {
-        if self == PathElement.keysList.description {
-            return .keysList
-        }
-        return nil
-    }
+    var keysList: PathElement? { self == PathElement.keysList.description ? .keysList : nil }
 
     var slice: PathElement? {
-        guard self.hasPrefix("["), self.hasSuffix("]") else {
-            return nil
-        }
+        guard
+            hasPrefix("["),
+            hasSuffix("]")
+        else { return nil }
 
         var copy = self
         copy.removeFirst()
         copy.removeLast()
 
-        let splitted = copy.components(separatedBy: ":")
+        let splitted = copy.split(separator: ":", omittingEmptySubsequences: false)
 
-        guard splitted.count == 2 else {
+        guard splitted.count == 2 else { return nil }
+
+        var lower: Bounds.Bound
+        if splitted[0] == "" {
+            lower = .first
+        } else if let lowerValue = Int(splitted[0]) {
+            lower = .init(lowerValue)
+        } else {
             return nil
         }
 
-        var lowerBound: Bounds.Bound?
-        if splitted[0] == "" {
-            lowerBound = .first
-        } else if let lowerValue = Int(splitted[0]) {
-            lowerBound = .init(lowerValue)
-        }
-
-        var upperBound: Bounds.Bound?
+        var upper: Bounds.Bound
         if splitted[1] == "" {
-            upperBound = .last
+            upper = .last
         } else if let upperValue = Int(splitted[1]) {
-            upperBound = .init(upperValue)
-        }
-
-        guard let lower = lowerBound, let upper = upperBound else {
+            upper = .init(upperValue)
+        } else {
             return nil
         }
 

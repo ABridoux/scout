@@ -5,32 +5,6 @@
 
 import Foundation
 
-// MARK: - Literal type extensions
-
-extension PathExplorer {
-    public init(stringLiteral value: Self.StringLiteralType) {
-        self.init(value: value)
-    }
-}
-
-extension PathExplorer {
-    public init(booleanLiteral value: Self.BooleanLiteralType) {
-        self.init(value: value)
-    }
-}
-
-extension PathExplorer {
-    public init(integerLiteral value: Self.IntegerLiteralType) {
-        self.init(value: value)
-    }
-}
-
-extension PathExplorer {
-    public init(floatLiteral value: Self.FloatLiteralType) {
-        self.init(value: value)
-    }
-}
-
 // MARK: - Properties
 
 public extension PathExplorer {
