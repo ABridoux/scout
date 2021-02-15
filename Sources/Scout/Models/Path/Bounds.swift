@@ -23,11 +23,11 @@ public struct Bounds: Hashable {
     private(set) var lastComputedUpper
 
     /// Description of the lower bound.
-    /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the lower bound
+    /// - note: Do not use this value to convert it to an Int. Rather use the `range(arrayCount:path)` function to access to the lower bound
     var lowerString: String { lower == .first ? "" : String(lower.value) }
 
     /// Description of the upper bound.
-    /// - note: Do not use this value to convert it to an Int. Rather use the `range(lastValidIndex:path)` function to access to the upper bound
+    /// - note: Do not use this value to convert it to an Int. Rather use the `range(arrayCount:path)` function to access to the upper bound
     var upperString: String { upper == .last ? "" : String(upper.value) }
 
     // MARK: - Initialization
@@ -40,7 +40,7 @@ public struct Bounds: Hashable {
     // MARK: - Functions
 
     /// - Parameters:
-    ///   - arrayCount:The count of the array
+    ///   - arrayCount: The count of the array to slice
     ///   - path: Path where the bounds is specified. Used to throw a relevant error
     /// - Throws: If the bounds are invalid
     /// - Returns: A range made from the lower and upper bounds

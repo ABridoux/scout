@@ -32,49 +32,40 @@ public struct Path: Hashable {
 
     // MARK: - Initialization
 
-    /**
-     Instantiate a `Path` for a string representing path components separated with the separator.
-
-     ### Example with default separator "."
-
-     `computers[2].name` will make the path `["computers", 2, "name"]`
-
-     `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
-
-     `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
-
-     - parameter string: The string representing the path
-     - parameter separator: The separator used to split the string. Default is "."
-
-     ### Brackets
-     When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
-     will make the path ["computer", "general.information", "serial_number"]
-
-     ### Excluded separators
-     The following separators will not work: "[", "]", "(", ")".
-     When using a special caracter with [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
-     it is required to quote it with "\\".
-    */
-    public init(string: String, separator: String = "\\.") throws {
-        var elements = [PathElement]()
-        // setup the regular expressions
-        let splitRegex = try NSRegularExpression(pattern: Self.splitRegexPattern(separator: separator))
-
-        let matches = splitRegex.matches(in: string)
-        for match in matches {
-
-            // remove the brackets if any
-            var match = match
-            if match.hasPrefix("("), match.hasSuffix(")") {
-                match.removeFirst()
-                match.removeLast()
-            }
-
-            let element = PathElement(from: match)
-            elements.append(element)
+    /// Instantiate a `Path` for a string representing path components separated with the separator.
+    ///
+    /// ### Example with default separator "."
+    ///
+    /// `computers[2].name` will make the path `["computers", 2, "name"]`
+    ///
+    /// `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
+    ///
+    /// `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
+    ///
+    /// - parameter string: The string representing the path
+    /// - parameter separator: The separator used to split the string. Default is "."
+    ///
+    /// ### Brackets
+    /// When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
+    /// will make the path ["computer", "general.information", "serial_number"]
+    ///
+    /// ### Excluded separators
+    /// The following separators will not work: '[', ']', '(', ')'.
+    ///
+    ///
+    /// When using a special character for a [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
+    /// it is required to quote it with "\\".
+    public init(string: String, separator: String = "\\.") {
+        let splitRegex: NSRegularExpression
+        do {
+            splitRegex = try NSRegularExpression(pattern: Self.splitRegexPattern(separator: separator))
+        } catch {
+            preconditionFailure("The regular expression to split the path string is not valid. Forbidden separators: '[', ']', '(', ')'. \(error)")
         }
 
-        self.elements = elements
+        elements = splitRegex
+            .matches(in: string)
+            .map { PathElement(from: $0.removingEnclosingBrackets()) }
     }
 
     public init() {
@@ -105,11 +96,12 @@ public struct Path: Hashable {
 
     public func appending(_ elements: PathElementRepresentable...) -> Path { Path(self.elements + elements) }
     public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
+    public mutating func append(_ element: PathElementRepresentable) { elements.append(element.pathValue) }
 }
 
 // MARK: - Collection
 
-extension Path: Collection, MutableCollection {
+extension Path: Collection {
 
     public var startIndex: Int { elements.startIndex }
     public var endIndex: Int { elements.endIndex }
@@ -117,19 +109,8 @@ extension Path: Collection, MutableCollection {
     public func index(after i: Int) -> Int { elements.index(after: i) }
 
     public subscript(elementIndex: Int) -> PathElement {
-        get {
-            assert(elementIndex >= startIndex && elementIndex <= endIndex)
-            return elements[elementIndex]
-        }
-
-        set {
-            assert(elementIndex >= startIndex && elementIndex <= endIndex)
-            elements[elementIndex] = newValue
-        }
-    }
-
-    public mutating func append(_ element: PathElementRepresentable) {
-        elements.append(element.pathValue)
+        get { return elements[elementIndex] }
+        set { elements[elementIndex] = newValue }
     }
 }
 
@@ -145,6 +126,9 @@ extension Path: BidirectionalCollection {
 
     public func index(before i: Int) -> Int { elements.index(before: i) }
 }
+
+extension Path: MutableCollection {}
+extension Path: RandomAccessCollection {}
 
 // MARK: - ExpressibleByArrayLiteral
 

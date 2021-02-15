@@ -80,7 +80,7 @@ final class PathExtensionsTests: XCTestCase {
     }
 
     func testFlatten(_ description: String, expected: String) throws {
-        let path = try Path(string: description)
+        let path = Path(string: description)
 
         try path.forEach {
             if case let .slice(bounds) = $0 {
@@ -94,17 +94,17 @@ final class PathExtensionsTests: XCTestCase {
     // MARK: Sorted key and indexes
 
     func testSortedKeysAndIndexes1() throws {
-        let path1 = try Path(string: "movies[2].chapters[4]")
-        let path2 = try Path(string: "movies[3].chapters[3]")
-        let path3 = try Path(string: "movies[3].chapters[4]")
+        let path1 = Path(string: "movies[2].chapters[4]")
+        let path2 = Path(string: "movies[3].chapters[3]")
+        let path3 = Path(string: "movies[3].chapters[4]")
 
         XCTAssertEqual([path2, path3, path1].sortedByKeysAndIndexes(), [path1, path2, path3])
     }
 
     func testSortedKeysAndIndexes2() throws {
-        let path1 = try Path(string: "actors.prices")
-        let path2 = try Path(string: "movies[3].chapters[3]")
-        let path3 = try Path(string: "movies[4].chapters[2]")
+        let path1 = Path(string: "actors.prices")
+        let path2 = Path(string: "movies[3].chapters[3]")
+        let path3 = Path(string: "movies[4].chapters[2]")
 
         XCTAssertEqual([path2, path3, path1].sortedByKeysAndIndexes(), [path1, path2, path3])
     }
