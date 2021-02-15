@@ -28,6 +28,14 @@ extension String {
         return hasPrefix(string) && hasSuffix(string)
     }
 
+    /// Remove the enclosing brackets '(' ')' if found
+    func removingEnclosingBrackets() -> String {
+        if hasPrefix("("), hasSuffix(")") {
+            return String(self[index(after: startIndex)..<index(before: endIndex)])
+        }
+        return self
+    }
+
     /// Escape the given string for a CSV export
     func escapingCSV(_ string: String) -> String {
         if contains(string) {

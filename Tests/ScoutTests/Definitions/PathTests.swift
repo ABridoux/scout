@@ -47,91 +47,91 @@ final class PathTests: XCTestCase {
 
     func testSimpleKeys() throws {
         let array: Path = [firstKey, secondKey, thirdKey]
-        let path = try Path(string: "\(firstKey).\(secondKey).\(thirdKey)")
+        let path = Path(string: "\(firstKey).\(secondKey).\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
 
     func testKeysWithIndex() throws {
         let array: Path = [firstKey, secondKey, index, thirdKey]
-        let path = try Path(string: "\(firstKey).\(secondKeyWithIndex).\(thirdKey)")
+        let path = Path(string: "\(firstKey).\(secondKeyWithIndex).\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
 
     func testKeysWithNegativeIndex() throws {
         let array: Path = [firstKey, secondKey, -index, thirdKey]
-        let path = try Path(string: "\(firstKey).\(secondKeyWithNegativeIndex).\(thirdKey)")
+        let path = Path(string: "\(firstKey).\(secondKeyWithNegativeIndex).\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
 
     func testKeysWithBrackets() throws {
         let array: Path = [firstKey, secondKey, index, thirdKeyWithDot]
-        let path = try Path(string: "\(firstKey).\(secondKeyWithIndex).(\(thirdKeyWithDot))")
+        let path = Path(string: "\(firstKey).\(secondKeyWithIndex).(\(thirdKeyWithDot))")
 
         XCTAssertEqual(path, array)
     }
 
     func testKeysWithBracketsAndIndex() throws {
         let array: Path = [firstKey, secondKeyWithDot, 1, thirdKey]
-        let path = try Path(string: "\(firstKey).(\(secondKeyWithDot))[1]\(thirdKey)")
+        let path = Path(string: "\(firstKey).(\(secondKeyWithDot))[1]\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
 
     func testNestedArray() throws {
         let array: Path = [firstKey, secondKey, index, 0, thirdKey]
-        let path = try Path(string: "\(firstKey).\(secondKeyWithNestedArray).\(thirdKey)")
+        let path = Path(string: "\(firstKey).\(secondKeyWithNestedArray).\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
 
     func testNestedArrayTwoLevels() throws {
         let array: Path = [firstKey, secondKey, index, 0, 2, thirdKey]
-        let path = try Path(string: "\(firstKey).\(secondKeyWithTwoNestedArrays).\(thirdKey)")
+        let path = Path(string: "\(firstKey).\(secondKeyWithTwoNestedArrays).\(thirdKey)")
 
         XCTAssertEqual(path, array)
     }
 
     func testSeparator1() throws {
         let array: Path = [firstKey, secondKey, thirdKey]
-        let path = try Path(string: "\(firstKey)\(secondSeparator)\(secondKey)\(secondSeparator)\(thirdKey)", separator: secondSeparator)
+        let path = Path(string: "\(firstKey)\(secondSeparator)\(secondKey)\(secondSeparator)\(thirdKey)", separator: secondSeparator)
 
         XCTAssertEqual(path, array)
     }
 
     func testSeparator2() throws {
         let array: Path = [firstKey, secondKey, thirdKey]
-        let path = try Path(string: "\(firstKey)\(thirdSeparator)\(secondKey)\(thirdSeparator)\(thirdKey)", separator: thirdSeparator)
+        let path = Path(string: "\(firstKey)\(thirdSeparator)\(secondKey)\(thirdSeparator)\(thirdKey)", separator: thirdSeparator)
 
         XCTAssertEqual(path, array)
     }
 
     func testSeparator3() throws {
         let array: Path = [firstKey, secondKey, thirdKey]
-        let path = try Path(string: "\(firstKey)$\(secondKey)$\(thirdKey)", separator: fourthSeparator)
+        let path = Path(string: "\(firstKey)$\(secondKey)$\(thirdKey)", separator: fourthSeparator)
 
         XCTAssertEqual(path, array)
     }
 
     func testSeparator3WithBracketAndIndex() throws {
         let array: Path = [firstKey, secondKeyWithFourthSeparator, index, thirdKey]
-        let path = try Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparator))[\(index)]$\(thirdKey)", separator: fourthSeparator)
+        let path = Path(string: "\(firstKey)$(\(secondKeyWithFourthSeparator))[\(index)]$\(thirdKey)", separator: fourthSeparator)
 
         XCTAssertEqual(path, array)
     }
 
     func testRootElementArray() throws {
         let array: Path = [1, firstKey, secondKey]
-        let path = try Path(string: "[1].\(firstKey).\(secondKey)")
+        let path = Path(string: "[1].\(firstKey).\(secondKey)")
 
         XCTAssertEqual(path, array)
     }
 
     func testRootElementNestedArrays() throws {
         let array: Path = [1, 0, firstKey, secondKey]
-        let path = try Path(string: "[1][0].\(firstKey).\(secondKey)")
+        let path = Path(string: "[1][0].\(firstKey).\(secondKey)")
 
         XCTAssertEqual(path, array)
     }
@@ -140,14 +140,14 @@ final class PathTests: XCTestCase {
 
     func testCount() throws {
         let array: Path = [secondKey, PathElement.count]
-        let path = try Path(string: secondKeyWithCount)
+        let path = Path(string: secondKeyWithCount)
 
         XCTAssertEqual(path, array)
     }
 
     func testCountNotFinal() throws {
         let array: Path = [thirdKey, PathElement.count, secondKey]
-        let path = try Path(string: thirdKeyWithCount)
+        let path = Path(string: thirdKeyWithCount)
 
         XCTAssertEqual(path, array)
     }
@@ -156,21 +156,21 @@ final class PathTests: XCTestCase {
 
     func testKeysList() throws {
         let array: Path = [secondKey, PathElement.keysList]
-        let path = try Path(string: secondKeyWithKeysList)
+        let path = Path(string: secondKeyWithKeysList)
 
         XCTAssertEqual(path, array)
     }
 
     func testKeysListFirstElement() throws {
         let array: Path = [PathElement.keysList, 1]
-        let path = try Path(string: "{#}[1]")
+        let path = Path(string: "{#}[1]")
 
         XCTAssertEqual(path, array)
     }
 
     func testKeysListAfterIndex() throws {
         let array: Path = ["hello", 1, PathElement.keysList]
-        let path = try Path(string: "hello[1]{#}")
+        let path = Path(string: "hello[1]{#}")
 
         XCTAssertEqual(path, array)
     }
@@ -179,21 +179,21 @@ final class PathTests: XCTestCase {
 
     func testFullSlice() throws {
         let array = Path(secondKey, PathElement.slice(2, 4))
-        let path = try Path(string: secondKeyWithFullRange)
+        let path = Path(string: secondKeyWithFullRange)
 
         XCTAssertEqual(path, array)
     }
 
     func testPartialSliceLeft() throws {
         let array = Path(secondKey, PathElement.slice(.init(lower: .first, upper: 4)))
-        let path = try Path(string: secondKeyWithPartialRangeLeft)
+        let path = Path(string: secondKeyWithPartialRangeLeft)
 
         XCTAssertEqual(path, array)
     }
 
     func testPartialSliceRight() throws {
         let array = Path(secondKey, PathElement.slice(1, .last))
-        let path = try Path(string: secondKeyWithPartialRangeRight)
+        let path = Path(string: secondKeyWithPartialRangeRight)
 
         XCTAssertEqual(path, array)
     }
@@ -202,14 +202,14 @@ final class PathTests: XCTestCase {
 
     func testFilter() throws {
         let array = Path(secondKey, PathElement.filter("Halo.*"))
-        let path = try Path(string: secondKeyWithFilter)
+        let path = Path(string: secondKeyWithFilter)
 
         XCTAssertEqual(path, array)
     }
 
     func testFilterAndCount() throws {
         let array = Path(secondKey, PathElement.filter("Halo.*"), PathElement.count)
-        let path = try Path(string: secondKeyWithFilterAndCount)
+        let path = Path(string: secondKeyWithFilterAndCount)
 
         XCTAssertEqual(path, array)
     }
