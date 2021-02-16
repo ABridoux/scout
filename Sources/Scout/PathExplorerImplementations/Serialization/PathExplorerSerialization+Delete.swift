@@ -5,9 +5,9 @@
 
 import Foundation
 
-extension PathExplorerSerialization {
+// MARK: - Array
 
-    // MARK: - Array
+extension PathExplorerSerialization {
 
     mutating func delete(at index: Int) throws {
 
@@ -50,8 +50,11 @@ extension PathExplorerSerialization {
             dictionary[keyValue] = try pathExplorer.deleteSingle(at: index)
         }
     }
+}
 
-    // MARK: - Dictionary
+// MARK: - Dictionary
+
+extension PathExplorerSerialization {
 
       mutating func delete(for key: String) throws {
 
@@ -94,7 +97,11 @@ extension PathExplorerSerialization {
           }
       }
 
-    // MARK: - Group
+}
+
+// MARK: - Group
+
+extension PathExplorerSerialization {
 
     mutating func deleteSingle(_ groupSample: GroupSample) throws {
         switch groupSample {
@@ -186,10 +193,13 @@ extension PathExplorerSerialization {
 
         }
     }
+}
 
-    // MARK: - Key regular expression
+// MARK: - Key regular expression (3.1.0)
 
-    public mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
+extension PathExplorerSerialization {
+
+    mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
         if isDictionary {
             try deleteDict(regularExpression: regularExpression, deleteIfEmpty: deleteIfEmpty)
         } else if isArray {
@@ -235,8 +245,11 @@ extension PathExplorerSerialization {
             }
         }
     }
+}
 
-    // MARK: - General
+// MARK: - General
+
+extension PathExplorerSerialization {
 
     mutating func delete(element: PathElement) throws {
         switch element {

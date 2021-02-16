@@ -6,9 +6,9 @@
 import Foundation
 import AEXML
 
-extension PathExplorerXML {
+// MARK: - Array
 
-    // MARK: - Array
+extension PathExplorerXML {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If `true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
@@ -53,8 +53,11 @@ extension PathExplorerXML {
 
         return copy
     }
+}
 
-    // MARK: - Dictionary
+// MARK: - Dictionary
+
+extension PathExplorerXML {
 
     /// - parameter detailedName: If `true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
     func get(for key: String, detailedName: Bool = true) throws  -> PathExplorerXML {
@@ -105,8 +108,11 @@ extension PathExplorerXML {
         }
         return copy
     }
+}
 
-    // MARK: - Count
+// MARK: - Count
+
+extension PathExplorerXML {
 
     func getChildrenCount() throws -> Self {
         guard let sample = lastGroupSample else {
@@ -128,8 +134,11 @@ extension PathExplorerXML {
 
         return PathExplorerXML(element: copy, path: readingPath.appending(.count))
     }
+}
 
-    // MARK: - Keys list
+// MARK: - Keys list
+
+extension PathExplorerXML {
 
     func getKeysList() throws -> Self {
         var keyChildren = [AEXMLElement]()
@@ -146,8 +155,11 @@ extension PathExplorerXML {
         copy.addChildren(keyChildren.sorted { $0.string < $1.string })
         return PathExplorerXML(element: copy, path: readingPath.appending(.keysList))
     }
+}
 
-    // MARK: - Group
+// MARK: - Group
+
+extension PathExplorerXML {
 
     /// Returns a slice of value is it is an array
     func getArraySlice(within bounds: Bounds) throws -> PathExplorerXML {
@@ -211,8 +223,11 @@ extension PathExplorerXML {
 
         return PathExplorerXML(element: copy, path: path)
     }
+}
 
-    // MARK: - General
+// MARK: - General
+
+extension PathExplorerXML {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If `true`, when using a dictionary filter, the keys names will be changed to reflect the filtering

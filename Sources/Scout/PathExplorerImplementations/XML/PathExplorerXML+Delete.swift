@@ -6,6 +6,8 @@
 import AEXML
 import Foundation
 
+// MARK: - Public
+
 extension PathExplorerXML {
 
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool = false) throws {
@@ -44,6 +46,11 @@ extension PathExplorerXML {
             }
         }
     }
+}
+
+// MARK: - Internal
+
+extension PathExplorerXML {
 
     func delete(for key: String, in explorers: inout [Self], in path: Path) throws {
         for (index, pathExplorer) in explorers.enumerated() {
@@ -90,10 +97,13 @@ extension PathExplorerXML {
 
         explorers = newElementsToDelete
     }
+}
 
-    // MARK: - Regular expression
+// MARK: Regular expression
 
-    public mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
+extension PathExplorerXML {
+
+    mutating func delete(regularExpression: NSRegularExpression, deleteIfEmpty: Bool) throws {
         element.children
             .filter { regularExpression.validate($0.name) }
             .forEach { $0.removeFromParent() }

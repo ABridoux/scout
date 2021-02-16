@@ -5,14 +5,6 @@
 
 import Foundation
 
-// MARK: - Properties
-
-public extension PathExplorer {
-
-    /// `real` property for convenience naming
-    var double: Double? { real }
-}
-
 extension PathExplorer {
 
     /// The last array slice or dictionary filter found in the path if any
@@ -37,7 +29,7 @@ extension PathExplorer {
     static var foldedMark: String { "~~SCOUT_FOLDED~~" }
 }
 
-// MARK: Helpers
+// MARK: - Array
 
 extension PathExplorer {
 
@@ -57,13 +49,13 @@ extension PathExplorer {
     }
 }
 
-// MARK: Debug
+// MARK: - Debug
 
 public extension PathExplorer {
     var debugDescription: String { description }
 }
 
-// MARK: Data validation
+// MARK: - Data validation
 
 extension PathExplorer {
 
@@ -107,27 +99,5 @@ extension PathExplorer {
         if element == .count {
             throw PathExplorerError.wrongUsage(of: .count, in: path)
         }
-    }
-}
-
-// MARK: Export
-
-extension PathExplorer {
-
-    var defaultCSVSeparator: String { ";" }
-
-    /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
-    public func exportCSV() throws -> String {
-        try exportCSV(separator: nil)
-    }
-
-    /// Export the path explorer value to the specified format data
-    public func exportData(to format: DataFormat) throws -> Data {
-        try exportData(to: format, rootName: nil)
-    }
-
-    /// Export the path explorer value to the specified format string data
-    public func exportString(to format: DataFormat) throws -> String {
-        try exportString(to: format, rootName: nil)
     }
 }

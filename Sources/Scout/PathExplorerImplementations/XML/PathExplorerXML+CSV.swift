@@ -5,7 +5,10 @@
 
 import AEXML
 
+// MARK: - Public
+
 extension PathExplorerXML {
+
     public func exportCSV(separator: String?) throws -> String {
         let separator = separator ?? defaultCSVSeparator
 
@@ -26,6 +29,11 @@ extension PathExplorerXML {
 
         return csv
     }
+}
+
+// MARK: - Internal
+
+extension PathExplorerXML {
 
     func exportCSVHeadersAndValues(separator: String) throws -> (headers: [String], values: [[String]]) {
         var headers = Set<String>()

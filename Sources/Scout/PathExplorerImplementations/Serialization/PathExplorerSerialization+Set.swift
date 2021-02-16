@@ -5,9 +5,9 @@
 
 import Foundation
 
-extension PathExplorerSerialization {
+// MARK: - Array
 
-    // MARK: - Array
+extension PathExplorerSerialization {
 
     mutating func set(at index: Int, to newValue: Any) throws {
 
@@ -82,8 +82,11 @@ extension PathExplorerSerialization {
             dictionary[subKey] = try pathExplorer.setSingle(at: index, to: newValue)
         }
     }
+}
 
-    // MARK: - Dictionary
+// MARK: - Dictionary
+
+extension PathExplorerSerialization {
 
     /// Set the key in the given dictionary to the new value
     mutating func set(for key: String, to newValue: Any) throws {
@@ -146,8 +149,11 @@ extension PathExplorerSerialization {
             dictionary[subKey] = try pathExplorer.setSingle(for: key, to: newValue)
         }
     }
+}
 
-    // MARK: - Group
+// MARK: - Group
+
+extension PathExplorerSerialization {
 
     mutating func setArraySlice(within bounds: Bounds, to newValue: Any) throws {
         let slice = PathElement.slice(bounds)
@@ -196,8 +202,11 @@ extension PathExplorerSerialization {
         }
         value = newDictFilter
     }
+}
 
-    // MARK: - Key name
+// MARK: - Key name
+
+extension PathExplorerSerialization {
 
     mutating func change(key: String, nameTo newKeyName: String) throws {
         var (dict, value) = try getDictAndValueFor(for: key)
@@ -230,8 +239,11 @@ extension PathExplorerSerialization {
 
         self = currentExplorer
     }
+}
 
-    // MARK: - General
+// MARK: - General
+
+extension PathExplorerSerialization {
 
     mutating func set(element: PathElement, to newValue: Any) throws {
         switch element {

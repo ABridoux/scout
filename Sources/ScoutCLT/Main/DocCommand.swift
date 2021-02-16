@@ -73,6 +73,9 @@ struct HomeDocumentation: Documentation {
 }
 
 struct DocCommand: ParsableCommand {
+
+    // MARK: - Properties
+
     static let configuration = CommandConfiguration(
         commandName: "doc",
         abstract: "Rich examples and advanced explanations")
@@ -82,6 +85,8 @@ struct DocCommand: ParsableCommand {
 
     @Option(name: [.short, .customLong("advanced")], help: "Advanced documentation on topics related to Scout")
     var advancedTopic: AdvancedDocumentation.Topic?
+
+    // MARK: - Functions
 
     func run() throws {
         switch (command, advancedTopic) {

@@ -156,12 +156,10 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     /// If the given value is an array or a dictionary, check it's emptyness. Returns `false` otherwise.
     func isValueEmpty(_ value: Any) -> Bool {
-        if let array = value as? ArrayValue {
-            return array.isEmpty
-        } else if let dict = value as? DictionaryValue {
-            return dict.isEmpty
-        } else {
-            return false
+        switch value {
+        case let array as ArrayValue: return array.isEmpty
+        case let dict as DictionaryValue: return dict.isEmpty
+        default: return false
         }
     }
 

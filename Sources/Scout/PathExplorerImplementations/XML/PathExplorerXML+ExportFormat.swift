@@ -6,14 +6,9 @@
 import Foundation
 import AEXML
 
+// MARK: - Public
+
 extension PathExplorerXML {
-
-    // MARK: - Constants
-
-    var attributesKey: String { "attributes" }
-    var valueKey: String { "value" }
-
-    // MARK: - Functions
 
     public func exportData(to format: DataFormat, rootName: String?) throws -> Data {
         let serializeValue = { serialize(element: element) }
@@ -49,6 +44,14 @@ extension PathExplorerXML {
             return string
         }
     }
+}
+
+// MARK: - Internal
+
+extension PathExplorerXML {
+
+    var attributesKey: String { "attributes" }
+    var valueKey: String { "value" }
 
     func serialize(element: AEXMLElement) -> Any {
         if element.children.isEmpty {
