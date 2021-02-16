@@ -5,11 +5,9 @@
 
 import Foundation
 
+// MARK: - Array
+
 extension PathExplorerSerialization {
-
-    // MARK: - Single value
-
-    // MARK: Array
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
@@ -67,8 +65,11 @@ extension PathExplorerSerialization {
 
         return newDictFilter
     }
+}
 
-    // MARK: Dictionary
+// MARK: - Dictionary
+
+extension PathExplorerSerialization {
 
     func get(for key: String, detailedName: Bool) throws -> Self {
         let newValue: Any
@@ -130,8 +131,11 @@ extension PathExplorerSerialization {
 
         return newDictFilter
     }
+}
 
-    // MARK: - Count
+// MARK: - Count
+
+extension PathExplorerSerialization {
 
     /// - Returns: The count of the array or dictionary if `value` is an array or a dictionary
     func getChildrenCount() throws -> Self {
@@ -180,8 +184,11 @@ extension PathExplorerSerialization {
         }
         return PathExplorerSerialization(value: countsDict, path: readingPath.appending(.count))
     }
+}
 
-    // MARK: - Keys list
+// MARK: - Keys list
+
+extension PathExplorerSerialization {
 
     func getKeysList() throws -> Self {
         let dict = try cast(value, as: .dictionary, orThrow: .dictionarySubscript(readingPath))
@@ -189,8 +196,11 @@ extension PathExplorerSerialization {
 
         return PathExplorerSerialization(value: keys, path: readingPath.appending(.keysList))
     }
+}
 
-    // MARK: - Group
+// MARK: - Group
+
+extension PathExplorerSerialization {
 
     func getSingle(_ groupSample: GroupSample) throws -> Self {
         switch groupSample {
@@ -198,8 +208,11 @@ extension PathExplorerSerialization {
         case .dictionaryFilter(let pattern): return try getSingleDictionaryFilter(with: pattern)
         }
     }
+}
 
-    // MARK: Array slice
+// MARK: Array slice
+
+extension PathExplorerSerialization {
 
     /// Returns a slice of value is it is an array
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering
@@ -242,8 +255,11 @@ extension PathExplorerSerialization {
 
         return PathExplorerSerialization(value: newArray, path: readingPath.appending(groupSample.pathElement))
     }
+}
 
-    // MARK: Dictionary filter
+// MARK: Dictionary filter
+
+extension PathExplorerSerialization {
 
     func getDictionaryFilter(with pattern: String, detailedName: Bool) throws -> Self {
         switch lastGroupSample {
@@ -289,8 +305,11 @@ extension PathExplorerSerialization {
 
         return PathExplorerSerialization(value: newDict, path: readingPath.appending(groupSample.pathElement))
     }
+}
 
-    // MARK: - General
+// MARK: - General
+
+extension PathExplorerSerialization {
 
     /// - parameter negativeIndexEnabled: If set to `true`, it is possible to get the last element of an array with the index `-1`
     /// - parameter detailedName: If`true`, when using a dictionary filter, the keys names will be changed to reflect the filtering

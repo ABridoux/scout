@@ -27,7 +27,7 @@ extension PathExplorerSerialization {
         }
     }
 
-    public func exportCSVArray(separator: String = ";") throws -> String {
+    func exportCSVArray(separator: String = ";") throws -> String {
         let array = try cast(value, as: .array, orThrow: .csvExportWrongGroupValue)
         var csv = ""
 

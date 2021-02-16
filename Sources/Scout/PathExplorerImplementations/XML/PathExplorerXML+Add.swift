@@ -5,6 +5,40 @@
 
 import AEXML
 
+// MARK: - Public
+
+extension PathExplorerXML {
+
+    public mutating func add(_ newValue: Any, at path: Path) throws {
+        guard !path.isEmpty else { return }
+
+        let newValue = try convert(newValue, to: .string)
+
+        var path = path
+        let lastElement = path.removeLast()
+
+        var currentPathExplorer = self
+
+        try path.forEach { element in
+            let element = element == .count ? PathElement.index(currentPathExplorer.element.children.count) : element
+
+            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: true) {
+                // the key exist. Just keep parsing
+                currentPathExplorer = pathExplorer
+            } else {
+                // the key does not exist. Add a new key to it
+                let keyName = element.key ?? currentPathExplorer.element.childrenName
+                currentPathExplorer.element.addChild(name: keyName, value: nil)
+                currentPathExplorer = try currentPathExplorer.get(element: element)
+            }
+        }
+
+        try currentPathExplorer.add(newValue, for: lastElement)
+    }
+}
+
+// MARK: - Internal
+
 extension PathExplorerXML {
 
     mutating func add(newValue: String, for key: String) throws {
@@ -35,7 +69,7 @@ extension PathExplorerXML {
         element.addChild(name: element.childrenName, value: newValue)
     }
 
-    public mutating func add(_ newValue: Any, at path: PathElementRepresentable...) throws {
+    mutating func add(_ newValue: Any, at path: PathElementRepresentable...) throws {
         try add(newValue, at: Path(path))
     }
 
@@ -79,32 +113,5 @@ extension PathExplorerXML {
             // the element is the root element, so simply change it
             element = copy
         }
-    }
-
-    public mutating func add(_ newValue: Any, at path: Path) throws {
-        guard !path.isEmpty else { return }
-
-        let newValue = try convert(newValue, to: .string)
-
-        var path = path
-        let lastElement = path.removeLast()
-
-        var currentPathExplorer = self
-
-        try path.forEach { element in
-            let element = element == .count ? PathElement.index(currentPathExplorer.element.children.count) : element
-
-            if let pathExplorer = try? currentPathExplorer.get(element: element, negativeIndexEnabled: true) {
-                // the key exist. Just keep parsing
-                currentPathExplorer = pathExplorer
-            } else {
-                // the key does not exist. Add a new key to it
-                let keyName = element.key ?? currentPathExplorer.element.childrenName
-                currentPathExplorer.element.addChild(name: keyName, value: nil)
-                currentPathExplorer = try currentPathExplorer.get(element: element)
-            }
-        }
-
-        try currentPathExplorer.add(newValue, for: lastElement)
     }
 }
