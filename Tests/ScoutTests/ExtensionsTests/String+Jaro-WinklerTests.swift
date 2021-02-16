@@ -12,19 +12,19 @@ final class String_JaroWinklerTests: XCTestCase {
     let propositions: Set<String> = ["tag", "date", "name", "owner", "release", "version", "forest", "mouse", "versionning"]
 
     func testMartha() {
-        let distance = "MARTHA".jaroWinklerDistanceFrom("MARHTA")
+        let distance = "MARTHA".jaroWinklerDistance(from: "MARHTA")
 
         XCTAssertEqual(distance, 0.961, accuracy: 0.3)
     }
 
     func testDWAYNE() {
-        let distance = "DWAYNE".jaroWinklerDistanceFrom("DUANE")
+        let distance = "DWAYNE".jaroWinklerDistance(from: "DUANE")
 
         XCTAssertEqual(distance, 0.84, accuracy: 0.3)
     }
 
     func testDIXON() {
-        let distance = "DIXON".jaroWinklerDistanceFrom("DICKSONX")
+        let distance = "DIXON".jaroWinklerDistance(from: "DICKSONX")
 
         XCTAssertEqual(distance, 0.813, accuracy: 0.3)
     }
