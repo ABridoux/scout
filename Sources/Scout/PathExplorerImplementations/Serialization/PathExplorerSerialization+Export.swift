@@ -38,9 +38,9 @@ extension PathExplorerSerialization {
 
     public func exportData(to format: DataFormat, rootName: String?) throws -> Data {
         switch format {
-        case .json: return try JsonFormat.serialize(value: value)
-        case .plist: return try PlistFormat.serialize(value: value)
-        case .yaml: return try YamlFormat.serialize(value: value)
+        case .json: return try SerializationFormats.Json.serialize(value: value)
+        case .plist: return try SerializationFormats.Plist.serialize(value: value)
+        case .yaml: return try SerializationFormats.Yaml.serialize(value: value)
         case .xml:
             let element = exportToXML(rootName: rootName)
             guard let data = AEXMLDocument(root: element).xml.data(using: .utf8) else {

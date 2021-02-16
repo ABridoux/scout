@@ -14,12 +14,7 @@ public typealias Plist = PathExplorerSerialization<PlistFormat>
 
 public enum PathExplorers {
     public typealias Xml = PathExplorerXML
-    public typealias Json = PathExplorerSerialization<JsonFormat>
-    public typealias Plist = PathExplorerSerialization<PlistFormat>
-    public typealias Yaml = PathExplorerSerialization<YamlFormat>
-}
-
-/// Unique identifier of a data format
-public enum DataFormat: String, CaseIterable {
-    case json, plist, xml, yaml
+    public typealias Json = PathExplorerSerialization<SerializationFormats.Json>
+    public typealias Plist = PathExplorerSerialization<SerializationFormats.Plist>
+    public typealias Yaml = PathExplorerSerialization<SerializationFormats.Yaml>
 }
