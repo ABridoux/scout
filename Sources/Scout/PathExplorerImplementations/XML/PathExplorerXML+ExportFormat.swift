@@ -26,11 +26,11 @@ extension PathExplorerXML {
             return data
 
         case .json:
-            return try JsonFormat.serialize(value: serializeValue())
+            return try SerializationFormats.Json.serialize(value: serializeValue())
         case .plist:
-            return try PlistFormat.serialize(value: serializeValue())
+            return try SerializationFormats.Plist.serialize(value: serializeValue())
         case .yaml:
-            return try YamlFormat.serialize(value: serializeValue())
+            return try SerializationFormats.Yaml.serialize(value: serializeValue())
         }
     }
 
