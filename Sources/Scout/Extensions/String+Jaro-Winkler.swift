@@ -14,10 +14,11 @@ extension String {
     func jaroWinklerDistance(from string: String) -> Double { JaroWinklerDistance(self, string).computeDistance() }
 
     func bestJaroWinklerMatchIn(propositions: Set<String>) -> String? {
-        let sortedPropositions = propositions.sorted { jaroWinklerDistance(from: $0) > jaroWinklerDistance(from: $1) }
+        guard let bestMath = propositions.max(by: { jaroWinklerDistance(from: $0) < jaroWinklerDistance(from: $1) }) else {
+            return nil
+        }
 
-        guard let firstMatch = sortedPropositions.first else { return nil }
-        return firstMatch.jaroWinklerDistance(from: self) >= 0.5 ? firstMatch : nil
+        return jaroWinklerDistance(from: bestMath) >= 0.5 ? bestMath : nil
     }
 }
 
