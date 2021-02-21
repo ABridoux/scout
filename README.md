@@ -247,7 +247,10 @@ You can then `import Scout` in a file.
 You can find and try examples with one file *People* using the different available formats in the [Playground folder](Playground). The folder contains a *Commands.md* file so that you can see how to use the same commands with the different formats.
 
 ## Special thanks
+First of all, many thanks to all contributors of this library. Their help is truly appreciated.
+
 To parse and edit XML data, as the standard library does not offer a simple way to do it, **Scout** uses the wonderful library of Marko Tadić: [AEXML](https://github.com/tadija/AEXML). He has done an amazing work. And if several XML parsing and writing libraries exist today, I would definitely recommend his. Marko, you might never read those lines, but thank you!
+The same goes for the [Yams](https://www.woodys-findings.com/scout/wiki/home) and its contributors. Thank you for this project.
 
 Thanks also to the team at Apple behind the [ArgumentParser](https://github.com/apple/swift-argument-parser) library. They have done an incredible work to make command line tools in Swift easy to implement.
 
