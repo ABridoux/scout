@@ -14,18 +14,18 @@
         "package": "BooleanExpressionEvaluation",
         "repositoryURL": "https://github.com/ABridoux/BooleanExpressionEvaluation",
         "state": {
-          "branch": "develop",
-          "revision": "0cc620e646f7622dd8c7b578dc7ada85f45ff495",
-          "version": null
+          "branch": null,
+          "revision": "ab25774a0368e12def337fa941a41a6be2757fd1",
+          "version": "2.0.0"
         }
       },
       {
         "package": "Lux",
         "repositoryURL": "https://github.com/ABridoux/lux",
         "state": {
-          "branch": "develop",
-          "revision": "3ba93705ef6d1e4d54c70ef7ffe8d05a0241cd79",
-          "version": null
+          "branch": null,
+          "revision": "ec1cb60275bce9fc1398cd70e0eb8dc98842dd56",
+          "version": "0.5.0"
         }
       },
       {
@@ -44,6 +44,15 @@
           "branch": null,
           "revision": "9564d61b08a5335ae0a36f789a7d71493eacadfc",
           "version": "0.3.2"
+        }
+      },
+      {
+        "package": "SwiftSoup",
+        "repositoryURL": "https://github.com/scinfu/SwiftSoup.git",
+        "state": {
+          "branch": null,
+          "revision": "11da8c685ddde2d519fad04a7daf8485bbbc773e",
+          "version": "1.7.5"
         }
       },
       {

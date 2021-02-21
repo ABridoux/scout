@@ -28,7 +28,7 @@ extension AdvancedDocumentation.Predicates {
     The variable 'value' in the predicate will be replaced when evaluating a value against the predicate.
     For instance, the predicate \(zshString: "value > 10") will validate only the numeric values that are greater than 10.
 
-    Strings have to be specified with single quotes to distinguish them from a variable: \(zshString: "'value == 'String'").
+    Strings have to be specified with single quotes to distinguish them from a variable: \(zshString: "value == 'String'").
 
     It's possible to use logic operators in a predicate to specify advanced conditions.
     For instance, \(zshString: "value > 10 && value <= 20")
@@ -47,6 +47,10 @@ extension AdvancedDocumentation.Predicates {
     The 'and' \("&&".bold) and 'or' \("||".bold) are available.
     - \(zshString: "value == 'Riri' || value == 'Fifi' || value == 'Loulou'")
     - \(zshString: "value > 10 && value <= 20")
+
+    Also, the 'not' ! operator is available and can invert an epxression.
+    - \(zshString: "!value") when value is a boolean. It's the same as \(zshString: "value == false")
+    - \(zshString: "!(value > 10)")
 
     \(header: "Advanced operators")
     Predicates can use advanced operators.

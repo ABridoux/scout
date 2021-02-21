@@ -33,7 +33,7 @@ struct HomeDocumentation: Documentation {
     \(ArgumentHelp.readingPath.discussion)
 
     You can find more examples here:
-    \(main: "https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line")
+    \(main: "https://www.woodys-findings.com/scout/wiki")
 
     \(examplesHeader)
 
