@@ -27,13 +27,13 @@ let package = Package(
         .package(
             name: "Lux",
             url: "https://github.com/ABridoux/lux",
-            .branch("develop")),
+            from: "0.1.0"),
         .package(
             url: "https://github.com/jpsim/Yams.git",
             from: "4.0.0"),
         .package(
             url: "https://github.com/ABridoux/BooleanExpressionEvaluation",
-            .branch("develop"))
+            from: "2.0.0")
     ],
     targets: [
         .target(

@@ -3,7 +3,7 @@
 <br>
 Swift package<br>
     <a href="#">
-        <img src="https://img.shields.io/badge/Swift-5.1-orange.svg" />
+        <img src="https://img.shields.io/badge/Swift-5.3-orange" />
     </a>
     <a href="https://swift.org/package-manager">
         <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
@@ -216,23 +216,6 @@ rm scout
 ##### Note
 - To find all scout versions, please browse the [releases](https://github.com/ABridoux/scout/releases) page.
 - When deploying a package (with a MDM for example), it might be useful to add the version to the name. To get scout latest version: simply run `scout --version` (`scout version` version < 2.0.0)  to get your **installed scout version**, or ` curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | scout tag_name` to get the latest version **available on the Github repository**.
-
-#### Git
-
-Use the following lines to clone the repository and to install **scout** (requires Swift 5.2 toolchain to be installed). You can check the *Makefile* to see the commands used to build and install the executable. The last line is optional and lets you install the script to auto-complete the commands.
-
-```bash
-$ git clone https://github.com/ABridoux/scout
-$ cd scout
-$ make
-```
-
-The program should be install in */usr/local/bin*. You can then remove the repository if you do not want to keep it:
-
-```bash
-$ cd ..
-$ rm -r Scout
-```
 
 #### Auto-completion
 You can run `scout install-completion-script` to install the script to auto-complete commands depending on your shell. After this command, you might want to run the `source` command for the changes to be effective.

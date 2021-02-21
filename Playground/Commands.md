@@ -47,7 +47,7 @@ scout read "Robert.running_records[1][0]" -i People.json
 The following:
 
 ```bash
-scout read "people.Tom" -i People.json
+scout read "Tom" -i People.json
 ```
 outputs Tom dictionary:
 
