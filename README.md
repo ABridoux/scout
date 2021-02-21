@@ -49,6 +49,10 @@ Supported formats:
 - [Special thanks](#special-thanks)
 - [Contributing](#contributing)
 
+### Wiki
+
+The wiki can be found [here](https://www.woodys-findings.com/scout/wiki/home).
+
 ### News
 - Checkout what's new in **Scout** 3.0.0 [here](https://www.woodys-findings.com/scout/news-3.0.0).
 - Checkout what's new in **Scout** 2.0.0 [here](https://www.woodys-findings.com/scout/news-2.0.0).
@@ -91,9 +95,7 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 ### Insights
 
-See the wiki to see in detail how to use those features:
-- [Swift package](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package)
-- [Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)
+The [wiki](https://www.woodys-findings.com/scout/wiki/home) gives more details to use those features. Also, the [Playground](Playground) folder 
 
 #### CRUD functions for JSON, Plist and XML data format
 - add a value (Create)
@@ -131,7 +133,7 @@ Specify a regular expression between sharp signs '#' to filter the keys of a dic
 It's possible to list the paths in the data to iterate over the values. The paths can be retrieved as an array in a shell script to be used in a loop.
 This list can be filtered to target only single or group values, specific keys or values, or paths starting from a base.
 
-[Learn more]()
+You can [learn more](https://www.woodys-findings.com/scout/wiki/list-paths) about this feature. Also, [scripting recipes](https://www.woodys-findings.com/scout/wiki/scripting-recipes) are provided with use cases using this feature.
 
 #### Stream or file input
 Set the input as a file with the input option `-i | --input` or as the last process/command output with a pipe:
@@ -159,17 +161,17 @@ Another example with one of the playground files and the following command:
 scout -i People.plist "people.Robert.age=2"
 ```
 
-When dealing with large files (although it is not recommended to output large files in the terminal), colorising the output might bring to slowdowns. You can deactivate the colorisation with the flag `--no-color` or `--nc`.
+When dealing with large files (although it is not recommended to output large files in the terminal), highlighting the output might bring to slowdowns. It's possible to deactivate the colorisation with the flag `--no-color` or `--nc`. This is automatic when writing the output in a file or when the program output is piped.
 
 #### Data formats conversion
 The library offer a conversion feature from a supported format to another one like Plist -> JSON or YAML -> XML. Read or modify the data and export it to another format.
-[Learn more]()
+[Learn more](https://www.woodys-findings.com/scout/wiki/conversion)
 
 #### CSV export
 Export data when dealing with arrays or a dictionary of arrays. Default separator ';' or customisable.
 
 ##### Customise colors
-You can specify your own colors set as explained [here](https://github.com/ABridoux/scout/wiki/%5B30%5D-Syntax-highlighting:-custom-colors). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
+You can specify your own colors set as explained [here](https://www.woodys-findings.com/scout/wiki/highlighting). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
 
 #### Folding
 Fold arrays or dictionaries at a certain depth level to make the data more readable
@@ -243,13 +245,6 @@ You can then `import Scout` in a file.
 
 ### Playground
 You can find and try examples with one file *People* using the different available formats in the [Playground folder](Playground). The folder contains a *Commands.md* file so that you can see how to use the same commands with the different formats.
-
-### Examples and explanations (wiki)
-[Command-line](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line)
-
-[Swift](https://github.com/ABridoux/scout/wiki/%5B21%5D-Usage-examples:-Swift-package)
-
-<br>
 
 ## Special thanks
 To parse and edit XML data, as the standard library does not offer a simple way to do it, **Scout** uses the wonderful library of Marko Tadić: [AEXML](https://github.com/tadija/AEXML). He has done an amazing work. And if several XML parsing and writing libraries exist today, I would definitely recommend his. Marko, you might never read those lines, but thank you!
