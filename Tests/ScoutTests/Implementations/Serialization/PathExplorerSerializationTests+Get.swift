@@ -15,8 +15,8 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertEqual(try plist.get(for: "stringValue").string, StubPlistStruct().stringValue)
-        XCTAssertEqual(try plist.get(for: "intValue").int, StubPlistStruct().intValue)
+        XCTAssertEqual(try plist.get(for: "stringValue", detailedName: true).string, StubPlistStruct().stringValue)
+        XCTAssertEqual(try plist.get(for: "intValue", detailedName: true).int, StubPlistStruct().intValue)
     }
 
     func testSubscriptDict_ThrowsIfNotDict() throws {
@@ -49,7 +49,43 @@ extension PathExplorerSerializationTests {
 
         let plist = try Plist(data: data)
 
-        XCTAssertEqual(try plist.get(at: 2).string, "cheesecakes")
+        XCTAssertEqual(try plist.get(at: 2, detailedName: true).string, "cheesecakes")
+    }
+
+    func testSubscriptArrayLastIndex() throws {
+        let array = ["I", "love", "cheesecakes"]
+        let data = try PropertyListEncoder().encode(array)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(at: -1, detailedName: true).string, "cheesecakes")
+    }
+
+    func testSubscriptArrayNegativeIndex() throws {
+        let array = ["I", "love", "cheesecakes"]
+        let data = try PropertyListEncoder().encode(array)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(at: -2, detailedName: true).string, "love")
+    }
+
+    func testSubscriptArrayOneElementNegativeIndex() throws {
+        let array: [Any] = ["I"]
+        let data = try PropertyListSerialization.data(fromPropertyList: array, format: .xml, options: .zero)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(-1).string, "I")
+    }
+
+    func testSubscriptArrayOneElementNegativeIndexNotLast() throws {
+        let array: [Any] = [["cheesecakes", "pancakes"]]
+        let data = try PropertyListSerialization.data(fromPropertyList: array, format: .xml, options: .zero)
+
+        let plist = try Plist(data: data)
+
+        XCTAssertEqual(try plist.get(-1, 1).string, "pancakes")
     }
 
     func testSubscriptArray_ThrowsIfNotArray() throws {
@@ -104,7 +140,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceKey() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("name"))
+        let path = Path(elements: .slice(0, 1), "name")
 
         plist = try plist.get(path)
 
@@ -115,7 +151,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceIndex() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .index(1))
+        let path = Path(elements: .slice(0, 1), "episodes", 1)
 
         plist = try plist.get(path)
 
@@ -126,7 +162,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceCount() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .count)
+        let path = Path(elements: .slice(0, 1), "episodes", .count)
 
         plist = try plist.get(path)
 
@@ -137,7 +173,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceArraySlice() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .slice(.init(lower: 1, upper: 2)))
+        let path = Path(elements: .slice(0, 1), "episodes", .slice(1, 2))
 
         plist = try plist.get(path)
 
@@ -148,7 +184,7 @@ extension PathExplorerSerializationTests {
     func testGetArraySliceDictionaryFilter() throws {
         let data = try PropertyListEncoder().encode(charactersByName)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter(".*(z|Z).*"), .key("episodes"), .slice(.init(lower: 1, upper: 2)))
+        let path = Path(elements: .filter(".*(z|Z).*"), "episodes", .slice(1, 2))
 
         plist = try plist.get(path)
 
@@ -160,7 +196,7 @@ extension PathExplorerSerializationTests {
         let data = try PropertyListEncoder().encode(temperatures)
         let plist = try Plist(data: data)
 
-        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}[a-z]*n").value
+        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}[a-z]*n", detailedName: true).value
 
         let keys = try XCTUnwrap(value as? [String: Int])
         XCTAssertEqual(keys, ["Dublin": 19, "Berlin": 21])
@@ -170,7 +206,7 @@ extension PathExplorerSerializationTests {
         let data = try PropertyListEncoder().encode(ducks)
         let plist = try Plist(data: data)
 
-        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}i[a-z]{1}i").value
+        let value = try plist.getDictionaryFilter(with: "[A-Z]{1}i[a-z]{1}i", detailedName: true).value
 
         let keys = try XCTUnwrap(value as? [String])
         XCTAssertEqual(keys, ["Riri", "Fifi"])
@@ -209,7 +245,7 @@ extension PathExplorerSerializationTests {
     func testGetDictionaryCount() throws {
         let data = try PropertyListEncoder().encode(charactersByName)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter(".*(z|Z).*"), .count)
+        let path = Path(elements: .filter(".*(z|Z).*"), .count)
 
         plist = try plist.get(path)
 
@@ -220,7 +256,7 @@ extension PathExplorerSerializationTests {
     func testGetDictionaryFilterArraySlice() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .filter("episodes"))
+        let path = Path(elements: .slice(0, 1), .filter("episodes"))
 
         plist = try plist.get(path)
 
@@ -231,7 +267,7 @@ extension PathExplorerSerializationTests {
     func testGetDictionaryFilterDictionaryFilter() throws {
         let data = try PropertyListEncoder().encode(charactersByName)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter(".*(z|Z).*"), .filter("episodes"))
+        let path = Path(elements: .filter(".*(z|Z).*"), .filter("episodes"))
 
         plist = try plist.get(path)
 
@@ -288,19 +324,10 @@ extension PathExplorerSerializationTests {
         XCTAssertErrorsEqual(try plist.delete(path), .wrongUsage(of: .count, in: path))
     }
 
-    func testAddCount_ThrowsError() throws {
-        let data = try PropertyListEncoder().encode(StubStruct())
-        var plist = try Plist(data: data)
-        let path: Path = ["animals", "ducks", PathElement.count]
-
-        XCTAssertErrorsEqual(try plist.add("Woomy", at: path), .wrongUsage(of: .count, in: path))
-    }
-
     // MARK: - Keys list
 
     func testGetKeysListDict() throws {
-        let data = try PropertyListEncoder().encode(charactersByName)
-        let plist = try Plist(data: data)
+        let plist = Plist(value: charactersByName)
         let path: Path = [PathElement.keysList]
 
         XCTAssertEqual(try plist.get(path).value as? [String], ["Buzz", "Woody", "Zurg"])

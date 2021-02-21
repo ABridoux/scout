@@ -5,24 +5,21 @@
 
 extension String {
 
-    subscript(_ index: Int) -> Character {
-        let index = self.index(startIndex, offsetBy: index)
-        return self[index]
-    }
-
     /// Jaro-Winkler distance between two strings, to evaluate a potential match
     /// - Parameter string: The other string to evaluate the distance from
     /// - Returns: Double between 0 and 1. 0 means no match at all. 1 means a perfect equality between the two strings.
     ///
     /// Useful links:
     /// - [Wikipedia](https://en.wikipedia.org/wiki/Jaro–Winkler_distance)
-    public func jaroWinklerDistanceFrom(_ string: String) -> Double { JaroWinklerDistance(self, string).computeDistance() }
+    func jaroWinklerDistance(from string: String) -> Double { JaroWinklerDistance(self, string).computeDistance() }
 
-    public func bestJaroWinklerMatchIn(propositions: Set<String>) -> String? {
-        let sortedPropositions = propositions.sorted { self.jaroWinklerDistanceFrom($0) > self.jaroWinklerDistanceFrom($1) }
+    func bestJaroWinklerMatchIn(propositions: Set<String>) -> String? {
+        guard
+            let bestMath = propositions.max(by: { jaroWinklerDistance(from: $0) < jaroWinklerDistance(from: $1) }),
+            jaroWinklerDistance(from: bestMath) >= 0.5
+        else { return nil }
 
-        guard let firstMatch = sortedPropositions.first else { return nil }
-        return firstMatch.jaroWinklerDistanceFrom(self) >= 0.5 ? firstMatch : nil
+        return bestMath
     }
 }
 
@@ -46,7 +43,7 @@ private struct JaroWinklerDistance {
         count1 = string1.count
         count2 = string2.count
 
-        maxSpacing = max(string1.count, string2.count) / 2 - 1
+        maxSpacing = max(count1, count2) / 2 - 1
     }
 
     func computeMatches() -> [Int] {
@@ -59,15 +56,16 @@ private struct JaroWinklerDistance {
         return matches
     }
 
+    /// Match when the range defined by index +/- maxSpacing contains the current character
     func match(at index: Int) -> Bool {
-        // match when the range defined by index +/- maxSpacing contains the current character
         let lowerBound = max(index - maxSpacing, 0)
         let upperBound = min(index + maxSpacing, count1 - 1, count2 - 1)
+        let substring1 = string1[string1.index(string1.startIndex, offsetBy: index)].lowercased()
+        let lowerIndex = string2.index(string2.startIndex, offsetBy: lowerBound)
+        let upperIndex = string2.index(string2.startIndex, offsetBy: upperBound)
 
-        for i in lowerBound...upperBound {
-            if string1[index].lowercased() == string2[i].lowercased() {
-                return true
-            }
+        for character in string2[lowerIndex..<upperIndex] where substring1 == character.lowercased() {
+            return true
         }
         return false
     }
@@ -75,8 +73,22 @@ private struct JaroWinklerDistance {
     func computeTranspositions(in matches: [Int]) -> Double {
         var t = 0.0
 
-        for index in matches where string1[index] != string2[index] {
-            t += 1
+        let matchesCount = matches.count
+        var index = 0
+        var matchesIndex = 0
+
+        var iterator1 = string1.makeIterator()
+        var iterator2 = string2.makeIterator()
+
+        while let char1 = iterator1.next(), let char2 = iterator2.next() {
+            defer { index += 1 }
+            guard matchesIndex < matchesCount else { break }
+            guard matches[matchesIndex] == index else { continue }
+            matchesIndex += 1
+
+            if char1 != char2 {
+                t += 1
+            }
         }
 
         return t / 2.0
@@ -99,13 +111,20 @@ private struct JaroWinklerDistance {
     /// Compute the `l` in the formulae
     func computeCommonPrefixLength() -> Int {
         var length = 0
+        let maxCount = min(4, count1, count2)
+        var count = 0
+        var index1 = string1.startIndex
+        var index2 = string2.startIndex
 
-        for index in 0..<min(4, count1, count2) {
-            if string1[index] == string2[index] {
+        while count < maxCount {
+            if string1[index1] == string2[index2] {
                 length += 1
             } else {
-                return length
+                break
             }
+            count += 1
+            index1 = string1.index(after: index1)
+            index2 = string2.index(after: index2)
         }
         return length
     }

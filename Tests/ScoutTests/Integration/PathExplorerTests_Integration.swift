@@ -10,14 +10,15 @@ final class PathExplorerTestsIntegration: XCTestCase {
 
     // MARK: - Constants
 
-    let tom: Path = ["people", "Tom"]
-    let tomHeight: Path = ["people", "Tom", "height"]
-    let tomHobbies: Path = ["people", "Tom", "hobbies"]
-    let tomSecondHobby: Path = ["people", "Tom", "hobbies", 1]
-    let tomLastHobby: Path = ["people", "Tom", "hobbies", -1]
-    let suzanneFirstMovieTitle: Path = ["people", "Suzanne", "movies", 0, "title"]
-    let suzanneLastMovieTitle: Path = ["people", "Suzanne", "movies", -1, "title"]
-    let robertRunningRecordsSecondFirst: Path = ["people", "Robert", "running_records", 1, 0]
+    let tom: Path = ["Tom"]
+    let tomHeight: Path = ["Tom", "height"]
+    let tomHobbies: Path = ["Tom", "hobbies"]
+    let tomSecondHobby: Path = ["Tom", "hobbies", 1]
+    let tomLastHobby: Path = ["Tom", "hobbies", -1]
+    let tomAddLastHobby: Path = ["Tom", "hobbies", PathElement.count]
+    let suzanneFirstMovieTitle: Path = ["Suzanne", "movies", 0, "title"]
+    let suzanneLastMovieTitle: Path = ["Suzanne", "movies", -1, "title"]
+    let robertRunningRecordsSecondFirst: Path = ["Robert", "running_records", 1, 0]
 
     // MARK: - Properties
 
@@ -145,7 +146,7 @@ final class PathExplorerTestsIntegration: XCTestCase {
     }
 
     func testAddArrayLastIndex() {
-        testPathExplorersAdd(path: tomLastHobby, value: "playing music")
+        testPathExplorersAdd(path: tomAddLastHobby, value: "playing music")
     }
 
     func testAddNestedArrayIndex() {
@@ -166,7 +167,7 @@ final class PathExplorerTestsIntegration: XCTestCase {
     }
 
     func testAddNewArrayLast() {
-        testPathExplorersAdd(path: ["people", "Tom", "strengths", -1], value: "Never give up")
+        testPathExplorersAdd(path: ["people", "Tom", "strengths", PathElement.count], value: "Never give up")
     }
 
     func testAddNewDictAndArray() {
@@ -174,11 +175,10 @@ final class PathExplorerTestsIntegration: XCTestCase {
     }
 
     func testAddNestedArrayInArray() {
-        testPathExplorersAdd(path: ["people", "Robert", "running_records", 0, -1], value: 30)
+        testPathExplorersAdd(path: ["people", "Robert", "running_records", 0, PathElement.count], value: 30)
     }
 
     func testAddNestedArrayTwoLevels() {
-        // I know... who could possibly use that, right?
-        testPathExplorersAdd(path: ["people", "Robert", "running_records", 0, -1, 0], value: 25)
+        testPathExplorersAdd(path: ["people", "Robert", "running_records", 0, PathElement.count], value: 25)
     }
 }

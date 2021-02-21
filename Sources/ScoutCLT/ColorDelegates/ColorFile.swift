@@ -9,6 +9,12 @@ struct JsonColors: Codable {
     var keyValue: Int?
 }
 
+struct YamlColors: Codable {
+    var punctuation: Int?
+    var keyName: Int?
+    var keyValue: Int?
+}
+
 struct PlistColors: Codable {
     var tag: Int?
     var keyName: Int?
@@ -29,6 +35,7 @@ struct XmlColors: Codable {
 /// Plist file to specify custom colors
 struct ColorFile: Codable {
     var json: JsonColors?
+    var yaml: YamlColors?
     var plist: PlistColors?
     var xml: XmlColors?
 }

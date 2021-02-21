@@ -9,14 +9,10 @@ import Foundation
 
 extension Path: ExpressibleByArgument {
 
-    // MARK: - Constants
-
-    //    public static var defaultCompletionKind: CompletionKind { .custom(evaluatePath) }
-
     // MARK: - Initialization
 
     public init?(argument: String) {
-        try? self.init(string: argument)
+        self.init(string: argument)
     }
 
     // MARK: - Functions
@@ -60,11 +56,9 @@ extension Path: ExpressibleByArgument {
             argument.removeFirst()
         }
 
-        do {
-            let path = try Path(string: argument)
-            let newArgument = complete(path: path, in: data, with: pathExplorer)
-            argumentsCopy[arguments.count - 1] = newArgument
-        } catch {}
+        let path = Path(string: argument)
+        let newArgument = complete(path: path, in: data, with: pathExplorer)
+        argumentsCopy[arguments.count - 1] = newArgument
 
         return argumentsCopy
     }

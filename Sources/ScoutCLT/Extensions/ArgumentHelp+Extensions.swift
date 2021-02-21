@@ -12,8 +12,8 @@ extension ArgumentHelp {
             "Path in the data where to read the key value",
             discussion: """
                         A path is a sequence of keys separated with dots to navigate through the data.
-                        Use a dot '.' to subscript a dictionary. For example 'parent_key.child_key'.
-                        Use an integer enclosed by square brakets '[1]' to subscript an array. For example 'first_key.array[0].second_key'
+                        A dot '.' is used to subscript a dictionary. For example 'dictionary.key'.
+                        An integer enclosed by square brakets '[1]' is used to subscript an array. For example 'array[5]'.
                         """)
     }
 }

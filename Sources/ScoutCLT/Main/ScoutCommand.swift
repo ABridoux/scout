@@ -4,110 +4,126 @@
 // MIT license, see LICENSE file for details
 
 import Foundation
-import ArgumentParser
 import Scout
+import ArgumentParser
 import Lux
 
-private let abstract =
-"""
-Read and modify values in specific format file or data. Currently supported: Json, Plist and Xml.
-"""
+protocol ScoutCommand: ParsableCommand {
 
-private let discussion =
-"""
-To find advanced help and rich examples, please type `scout doc`.
+    /// A file path from which to read the data
+    var inputFilePath: String? { get }
 
+    /// A file path from which to read and write the data
+    var modifyFilePath: String? { get }
 
-Written by Alexis Bridoux.
-\u{001B}[38;5;88mhttps://github.com/ABridoux/scout\u{001B}[0;0m
-MIT license, see LICENSE file for details
-"""
+    /// Called with the correct `PathExplorer` when `inferPathExplorer(from:in:)` completes
+    func inferred<P: PathExplorer>(pathExplorer: P) throws
+}
 
-struct ScoutCommand: ParsableCommand {
+extension ScoutCommand {
 
-    // MARK: - Constants
+    // MARK: - Properties
 
-    static let configuration = CommandConfiguration(
-            commandName: "scout",
-            abstract: abstract,
-            discussion: discussion,
-            version: Scout.Version.current,
-            subcommands: [
-                ReadCommand.self,
-                SetCommand.self,
-                DeleteCommand.self,
-                AddCommand.self,
-                DocCommand.self,
-                InstallCompletionScriptCommand.self],
-            defaultSubcommand: ReadCommand.self)
+    var modifyFilePath: String? { nil }
 
     // MARK: - Functions
 
-    static func output<T: PathExplorer>(_ output: String?, dataWith pathExplorer: T, colorise: Bool, level: Int? = nil, csvSeparator: String? = nil) throws {
-
-        var csv: String?
-        if let separator = csvSeparator {
-            csv = try pathExplorer.exportCSV(separator: separator)
+    func run() throws {
+        var filePath: String?
+        switch (inputFilePath?.replacingTilde, modifyFilePath?.replacingTilde) {
+        case (.some(let path), nil): filePath = path
+        case (nil, .some(let path)): filePath = path
+        case (nil, nil): break
+        case (.some, .some): throw RuntimeError.invalidArgumentsCombination(description: "Combining (-i|--input) with (-m|--modify) is not allowed")
         }
 
-        if let output = output?.replacingTilde {
-            let fm = FileManager.default
-            let contents = try csv?.data(using: .utf8) ?? pathExplorer.exportData()
-            fm.createFile(atPath: output, contents: contents, attributes: nil)
-            return
-        }
-
-        // remaining part to output the data
-
-        // get the injector to inject color if necessary
-        let injector: TextInjector
-        switch pathExplorer.format {
-
-        case .json:
-            let jsonInjector = JSONInjector(type: .terminal)
-            if let colors = try ScoutCommand.getColorFile()?.json {
-                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
-            }
-            injector = jsonInjector
-
-        case .plist:
-
-            let plistInjector = PlistInjector(type: .terminal)
-            if let colors = try ScoutCommand.getColorFile()?.plist {
-                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
-            }
-            injector = plistInjector
-
-        case .xml:
-            let xmlInjector = XMLEnhancedInjector(type: .terminal)
-            if let colors = try ScoutCommand.getColorFile()?.xml {
-                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
-            }
-            injector = xmlInjector
-        }
-
-        if let csvOutput = csv {
-            print(csvOutput)
-            return
-        }
-
-        // shadow variable to fold if necessary
-        var pathExplorer = pathExplorer
-
-        // fold if specified
-        if let level = level {
-            pathExplorer.fold(upTo: level)
-        }
-
-        var output = try pathExplorer.exportString()
-        output = colorise ? injector.inject(in: output) : output
-        print(output)
+        let data = try readDataOrInputStream(from: filePath)
+        try inferPathExplorer(from: data, in: inputFilePath)
     }
 
-    static func getColorFile() throws -> ColorFile? {
+    private func standardInputLimitTimer() -> Timer {
+        let timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { (_) in
+            Self.exit(withError: RuntimeError.invalidData("Readind the input stream takes too much time"))
+        }
+        timer.tolerance = 0.2
+        return timer
+    }
+
+    /// Try to read data from the optional `filePath`. Otherwise, return the data from the standard input stream
+    func readDataOrInputStream(from filePath: String?) throws -> Data {
+        if let filePath = filePath {
+            return try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
+        }
+
+        let input = FileHandle.standardInput
+        return input.availableData
+    }
+
+    func inferPathExplorer(from data: Data, in inputFilePath: String?) throws {
+
+        if let json = try? Json(data: data) {
+            try inferred(pathExplorer: json)
+        } else if let plist = try? Plist(data: data) {
+            try inferred(pathExplorer: plist)
+        } else if let xml = try? Xml(data: data) {
+            try inferred(pathExplorer: xml)
+        } else if let yaml = try? Yaml(data: data) {
+            try inferred(pathExplorer: yaml)
+        } else {
+            if let filePath = inputFilePath {
+                throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")
+            } else {
+                throw RuntimeError.unknownFormat("The format of the input stream is not recognized")
+            }
+        }
+    }
+
+    /// Retrieve the color file to colorise the output if one is found
+    func getColorFile() throws -> ColorFile? {
         let colorFileURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".scout/Colors.plist")
         guard let data = try? Data(contentsOf: colorFileURL) else { return nil }
 
         return try PropertyListDecoder().decode(ColorFile.self, from: data)
+    }
+
+    func colorInjector(for format: Scout.DataFormat) throws -> TextInjector {
+        switch format {
+
+        case .json:
+            let jsonInjector = JSONInjector(type: .terminal)
+            if let colors = try getColorFile()?.json {
+                jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
+            }
+            return jsonInjector
+
+        case .plist:
+            let plistInjector = PlistInjector(type: .terminal)
+            if let colors = try getColorFile()?.plist {
+                plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
+            }
+            return plistInjector
+
+        case .yaml:
+            let yamlInjector = YAMLInjector(type: .terminal)
+            if let colors = try getColorFile()?.yaml {
+                yamlInjector.delegate = YAMLInjectorColorDelegate(colors: colors)
+            }
+            return yamlInjector
+
+        case .xml:
+            let xmlInjector = XMLEnhancedInjector(type: .terminal)
+            if let colors = try getColorFile()?.xml {
+                xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
+            }
+            return xmlInjector
+        }
+    }
+
+    /// Try to get the regex from the pattern, throwing a `RuntimeError` when failing
+    func regexFrom(pattern: String) throws -> NSRegularExpression {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            throw RuntimeError.invalidRegex(pattern)
+        }
+        return regex
     }
 }

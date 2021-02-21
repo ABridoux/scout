@@ -2,72 +2,69 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>people</key>
+	<key>Robert</key>
 	<dict>
-		<key>Tom</key>
-		<dict>
-			<key>height</key>
-			<integer>175</integer>
-			<key>age</key>
-			<integer>68</integer>
-			<key>hobbies</key>
+		<key>age</key>
+		<integer>23</integer>
+		<key>height</key>
+		<integer>181</integer>
+		<key>hobbies</key>
+		<array>
+			<string>video games</string>
+			<string>party</string>
+			<string>tennis</string>
+		</array>
+		<key>running_records</key>
+		<array>
 			<array>
-				<string>cooking</string>
-				<string>guitar</string>
+				<integer>10</integer>
+				<integer>12</integer>
+				<integer>9</integer>
+				<integer>10</integer>
 			</array>
-		</dict>
-		<key>Robert</key>
-		<dict>
-			<key>height</key>
-			<integer>181</integer>
-			<key>age</key>
-			<integer>23</integer>
-			<key>hobbies</key>
 			<array>
-				<string>video games</string>
-				<string>party</string>
-				<string>tennis</string>
+				<integer>9</integer>
+				<integer>12</integer>
+				<integer>11</integer>
 			</array>
-			<key>running_records</key>
-			<array>
-				<array>
-					<integer>10</integer>
-					<integer>12</integer>
-					<integer>9</integer>
-					<integer>10</integer>
-				</array>
-				<array>
-					<integer>9</integer>
-					<integer>12</integer>
-					<integer>11</integer>
-				</array>
-			</array>
-		</dict>
-		<!-- Comment -->
-		<key>Suzanne</key>
-		<dict>
-			<key>job</key>
-			<string>actress</string>
-			<key>movies</key>
-			<array>
-				<dict>
-					<key>title</key>
-					<string>Tomorrow is so far</string>
-					<key>awards</key>
-					<string>Best speech for a silent movie</string>
-				</dict>
-				<dict>
-					<key>title</key>
-					<string>Yesterday will never go</string>
-					<key>awards</key>
-					<string>Best title</string>
-				</dict>
-				<dict>
-					<key>title</key>
-					<string>What about today?</string>
-				</dict>
-			</array>
-		</dict>
+		</array>
+	</dict>
+	<key>Suzanne</key>
+	<dict>
+		<key>job</key>
+		<string>actress</string>
+		<key>movies</key>
+		<array>
+			<dict>
+				<key>awards</key>
+				<string>Best speech for a silent movie</string>
+				<key>title</key>
+				<string>Tomorrow is so far</string>
+			</dict>
+			<dict>
+				<key>awards</key>
+				<string>Best title</string>
+				<key>title</key>
+				<string>Yesterday will never go</string>
+			</dict>
+			<dict>
+				<key>title</key>
+				<string>What about today?</string>
+			</dict>
+		</array>
+	</dict>
+	<key>Tom</key>
+	<dict>
+		<key>age</key>
+		<integer>68</integer>
+		<key>height</key>
+		<integer>175</integer>
+		<key>hobbies</key>
+		<array>
+			<string>cooking</string>
+			<string>guitar</string>
+		</array>
 	</dict>
 </dict>
 </plist>
+

@@ -8,15 +8,27 @@ extension PathExplorerSerialization {
     typealias DictionaryValue = [String: Any]
     typealias ArrayValue = [Any]
 
+    static var dictionaryTypeDescription: String { GroupValue<DictionaryValue>.dictionary.typeDescription }
+    static var arrayTypeDescription: String { GroupValue<ArrayValue>.array.typeDescription }
+
     /// The  group types `value` can be casted as.
-    class GroupValue<Type> {
-        static var dictionary: GroupValue<DictionaryValue> { GroupValue<DictionaryValue>() }
-        static var array: GroupValue<ArrayValue> { GroupValue<ArrayValue>() }
+    struct GroupValue<Type> {
+        var typeDescription: String
 
-        static func dictionary<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[String: Value]> { GroupValue<[String: Value]>() }
-        static func array<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[Value]> { GroupValue<[Value]>() }
+        static var dictionary: GroupValue<DictionaryValue> { GroupValue<DictionaryValue>(typeDescription: "dictionary") }
+        static var array: GroupValue<ArrayValue> { GroupValue<ArrayValue>(typeDescription: "array") }
 
-        private init() {}
+        static func dictionary<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[String: Value]> {
+            GroupValue<[String: Value]>(typeDescription: "dictionary(\(Value.typeDescription)")
+
+        }
+        static func array<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[Value]> {
+            GroupValue<[Value]>(typeDescription: "array(\(Value.typeDescription)")
+        }
+
+        private init(typeDescription: String) {
+            self.typeDescription = typeDescription
+        }
     }
 
     /// Try to cast the given value as the given type (dictionary or array), throwing the error if not possible

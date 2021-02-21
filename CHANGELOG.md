@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [3.0.0](https://github.com/ABridoux/scout/tree/3.0.0) (21/02/2021)
+
+### Added
+- YAML support [#132] [#142]
+- Conversion from one format to another [#133]
+- Disabled colorisation when the output is piped [#140]
+- List paths in the data [#151] [#154]
+- Array subscript with a negative index [#152]
+- Made `Path` implement several `Collection` protocols [#171]
+
+### Changed
+- `set` functions adding a value to an array with the index `-1` removed. [#152]
+- Array slicing index targets a different range (shifted to the right) [#158]
+- `PathExplorer` requirements and default implementations changed [#163]
+- Optimized Jaro-Winkler match and removed the public access
+
 ## [2.0.0](https://github.com/ABridoux/scout/tree/2.0.0) (05/09/2020)
 
 ### Added
@@ -12,7 +28,7 @@ All notable changes to this project will be documented in this file. `Scout` adh
 - Delete empty dictionaries and arrays when left empty [#109]
 - Dictionary filtering [#112]
 - CSV export [#103]
-- Commands.md new examples [#117]
+- *Commands.md* new examples [#117]
 - CLT scout command help license [#117]
 - Get a dictionary keys [#121]
 - CLT *read* command new `--output` option to export the read data or the CSV export into a file.

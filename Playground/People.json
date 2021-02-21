@@ -1,50 +1,48 @@
 {
-  "people": {
-    "Tom": {
-      "height": 175,
-      "age": 68,
-      "hobbies": [
-        "cooking",
-        "guitar"
-      ]
-    },
-    "Robert": {
-      "height": 181,
-      "age": 23,
-      "hobbies": [
-        "video games",
-        "party",
-        "tennis"
+  "Tom" : {
+    "age" : 68,
+    "hobbies" : [
+      "cooking",
+      "guitar"
+    ],
+    "height" : 175
+  },
+  "Robert" : {
+    "age" : 23,
+    "hobbies" : [
+      "video games",
+      "party",
+      "tennis"
+    ],
+    "running_records" : [
+      [
+        10,
+        12,
+        9,
+        10
       ],
-      "running_records": [
-        [
-          10,
-          12,
-          9,
-          10
-        ],
-        [
-          9,
-          12,
-          11
-        ]
+      [
+        9,
+        12,
+        11
       ]
-    },
-    "Suzanne": {
-      "job": "actress",
-      "movies": [
-        {
-          "title": "Tomorrow is so far",
-          "awards": "Best speech for a silent movie"
-        },
-        {
-          "title": "Yesterday will never go",
-          "awards": "Best title"
-        },
-        {
-          "title": "What about today?"
-        }
-      ]
-    }
+    ],
+    "height" : 181
+  },
+  "Suzanne" : {
+    "job" : "actress",
+    "movies" : [
+      {
+        "title" : "Tomorrow is so far",
+        "awards" : "Best speech for a silent movie"
+      },
+      {
+        "title" : "Yesterday will never go",
+        "awards" : "Best title"
+      },
+      {
+        "title" : "What about today?"
+      }
+    ]
   }
 }

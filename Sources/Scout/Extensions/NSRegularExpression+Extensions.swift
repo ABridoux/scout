@@ -19,9 +19,9 @@ extension NSRegularExpression {
 
     // MARK: - Functions
 
-    func matches(in string: String) -> [String] {
-        let matches = self.matches(in: string, options: [], range: NSRange(location: 0, length: string.count))
-        return matches.map { String(string[$0.range]) }
+    func matches(in string: String) -> [Substring] {
+        let matches = self.matches(in: string, options: [], range: string.nsRange)
+        return matches.map { string[$0.range] }
     }
 
     /// Validate a string if the first match found by the regex is the overall string

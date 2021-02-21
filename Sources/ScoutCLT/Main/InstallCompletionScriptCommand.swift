@@ -70,7 +70,7 @@ struct InstallCompletionScriptCommand: ParsableCommand {
             try fileManager.removeItem(at: shellType.completionScript)
         }
 
-        let script = ScoutCommand.completionScript(for: shellType.shell)
+        let script = ScoutMainCommand.completionScript(for: shellType.shell)
         guard let data = script.data(using: .utf8) else {
             throw RuntimeError.completionScriptInstallation(description: "Unable to convert the script to valid data")
         }

@@ -30,6 +30,28 @@ extension PathExplorerSerializationTests {
         XCTAssertErrorsEqual(try plist.delete(deletePath), .subscriptWrongIndex(path: path, index: 4, arrayCount: 3))
     }
 
+    func testDeleteLastElement() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try Plist(data: data)
+        let path = Path("animals", "ducks", -1)
+
+        try plist.delete(path)
+
+        XCTAssertEqual(try plist.get("animals", "ducks", 1).string, "Fifi")
+        XCTAssertThrowsError(try plist.get("animals", "ducks", 2))
+    }
+
+    func testDeleteNegativeIndex() throws {
+        let data = try PropertyListEncoder().encode(StubStruct())
+        var plist = try Plist(data: data)
+        let path = Path("animals", "ducks", -2)
+
+        try plist.delete(path)
+
+        XCTAssertEqual(try plist.get("animals", "ducks", 1).string, "Loulou")
+        XCTAssertThrowsError(try plist.get("animals", "ducks", 2))
+    }
+
     func testDeleteLastElement_ThrowsIfEmpty() throws {
         let data = try PropertyListEncoder().encode([String]())
         var plist = try Plist(data: data)
@@ -57,7 +79,7 @@ extension PathExplorerSerializationTests {
     func testDeleteSliceKey() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("name"))
+        let path = Path(elements: .slice(0, 1), "name")
 
         try plist.delete(path)
 
@@ -69,7 +91,7 @@ extension PathExplorerSerializationTests {
     func testDeleteSliceIndex() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .index(0))
+        let path = Path(elements: .slice(0, 1), "episodes", 0)
 
         try plist.delete(path)
 
@@ -81,7 +103,7 @@ extension PathExplorerSerializationTests {
     func testDeleteSliceSlice() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .key("episodes"), .slice(Bounds(lower: 1, upper: 2)))
+        let path = Path(elements: .slice(0, 1), "episodes", .slice(1, 2))
 
         try plist .delete(path)
 
@@ -93,7 +115,7 @@ extension PathExplorerSerializationTests {
     func testDeleteSliceFilter() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(.init(lower: 0, upper: 1)), .filter("episodes|quote"))
+        let path = Path(elements: .slice(0, 1), .filter("episodes|quote"))
 
         try plist .delete(path)
 
@@ -118,7 +140,7 @@ extension PathExplorerSerializationTests {
     func testDeleteArrayStringFilter() throws {
         let data = try PropertyListEncoder().encode(ducks)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter("[A-Z]{1}i[a-z]{1}i"))
+        let path = Path(elements: .filter("[A-Z]{1}i[a-z]{1}i"))
 
         try plist.delete(path)
         let value = plist.value
@@ -180,7 +202,7 @@ extension PathExplorerSerializationTests {
     func testDeleteFilterFilter() throws {
         let data = try PropertyListEncoder().encode(charactersByName)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .filter("Woody|Buzz"), .filter("episodes|quote"))
+        let path = Path(elements: .filter("Woody|Buzz"), .filter("episodes|quote"))
 
         try plist.delete(path)
 
@@ -220,7 +242,7 @@ extension PathExplorerSerializationTests {
     func testDeleteIfEmptyAfterArraySlice() throws {
         let data = try PropertyListEncoder().encode(characters)
         var plist = try Plist(data: data)
-        let path = Path(pathElements: .slice(Bounds(lower: 0, upper: 1)), .filter(".*"))
+        let path = Path(elements: .slice(0, 1), .filter(".*"))
 
         try plist.delete(path, deleteIfEmpty: true)
 
@@ -237,5 +259,44 @@ extension PathExplorerSerializationTests {
         XCTAssertErrorsEqual(try plist.get("Woody", "episodes"), .subscriptMissingKey(path: Path("Woody"), key: "episodes", bestMatch: nil))
         XCTAssertErrorsEqual(try plist.get("Buzz", "episodes"), .subscriptMissingKey(path: Path("Buzz"), key: "episodes", bestMatch: nil))
         XCTAssertErrorsEqual(try plist.get("Zurg", "episodes"), .subscriptMissingKey(path: Path("Zurg"), key: "episodes", bestMatch: nil))
+    }
+
+    // MARK: - Regex pattern
+
+    func testDeleteKeyRegexPattern() throws {
+        let attributesKey = "attributes"
+        let attributes = ["duration": 20, "score": 500]
+        var games = [String: Any]()
+        games[attributesKey] = attributes
+        var firstPlayer: [String: Any] = ["name": "John", "rank": 1]
+        firstPlayer[attributesKey] = attributes
+        var secondPlayer: [String: Any] = ["name": "Maeva", "rank": 1]
+        secondPlayer[attributesKey] = attributes
+        games["players"] = [firstPlayer, secondPlayer]
+        var explorer = Plist(value: games)
+        let regex = try NSRegularExpression(pattern: "attributes")
+
+        try explorer.delete(regularExpression: regex, deleteIfEmpty: false)
+
+        XCTAssertErrorsEqual(try explorer.get("attributes"), .subscriptMissingKey(path: .empty, key: "attributes", bestMatch: nil))
+        XCTAssertErrorsEqual(try explorer.get("players", 0, "attributes"), .subscriptMissingKey(path: Path("players", 0), key: "attributes", bestMatch: nil))
+        XCTAssertErrorsEqual(try explorer.get("players", 1, "attributes"), .subscriptMissingKey(path: Path("players", 1), key: "attributes", bestMatch: nil))
+    }
+
+    func testDeleteKeyRegexPatternDeleteIfEmpty() throws {
+        let attributesKey = "attributes"
+        let attributes = ["duration": 20, "score": 500]
+        var games = [String: Any]()
+        games[attributesKey] = attributes
+        let firstPlayer = [attributesKey: attributes]
+        let secondPlayer = [attributesKey: attributes]
+        games["players"] = [firstPlayer, secondPlayer]
+        var explorer = Plist(value: games)
+        let regex = try NSRegularExpression(pattern: "attributes")
+
+        try explorer.delete(regularExpression: regex, deleteIfEmpty: true)
+
+        XCTAssertErrorsEqual(try explorer.get("attributes"), .subscriptMissingKey(path: .empty, key: "attributes", bestMatch: nil))
+        XCTAssertErrorsEqual(try explorer.get("players"), .subscriptMissingKey(path: .empty, key: "players", bestMatch: nil))
     }
 }

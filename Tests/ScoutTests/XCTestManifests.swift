@@ -8,7 +8,7 @@ extension ArrayExtensionsTests {
     static let __allTests__ArrayExtensionsTests = [
         ("testDeleteRange1", testDeleteRange1),
         ("testDeleteRange2", testDeleteRange2),
-        ("testDeleteRange3", testDeleteRange3),
+        ("testDeleteRange3", testDeleteRange3)
     ]
 }
 
@@ -29,7 +29,7 @@ extension BoundsTests {
         ("testNotEqualsBound", testNotEqualsBound),
         ("testNotEqualsBoundWithIdentifier", testNotEqualsBoundWithIdentifier),
         ("testRange_LowerNegativeGreaterThanUpperThrows", testRange_LowerNegativeGreaterThanUpperThrows),
-        ("testRange_UpperNegativeLesserThanLowerThrows", testRange_UpperNegativeLesserThanLowerThrows),
+        ("testRange_UpperNegativeLesserThanLowerThrows", testRange_UpperNegativeLesserThanLowerThrows)
     ]
 }
 
@@ -41,7 +41,7 @@ extension KeyTypeTests {
         ("testInitBoolFromString1", testInitBoolFromString1),
         ("testInitBoolFromString2", testInitBoolFromString2),
         ("testInitDoubleFromString", testInitDoubleFromString),
-        ("testInitIntFromString", testInitIntFromString),
+        ("testInitIntFromString", testInitIntFromString)
     ]
 }
 
@@ -51,7 +51,7 @@ extension NSRegularExpressionExtensionsTests {
     // to regenerate.
     static let __allTests__NSRegularExpressionExtensionsTests = [
         ("testValidate1", testValidate1),
-        ("testValidate2", testValidate2),
+        ("testValidate2", testValidate2)
     ]
 }
 
@@ -130,7 +130,7 @@ extension PathExplorerSerializationTests {
         ("testSubscriptDict", testSubscriptDict),
         ("testSubscriptDictSet", testSubscriptDictSet),
         ("testSubscriptWithArray", testSubscriptWithArray),
-        ("testSubscriptWithArraySet", testSubscriptWithArraySet),
+        ("testSubscriptWithArraySet", testSubscriptWithArraySet)
     ]
 }
 
@@ -151,7 +151,7 @@ extension PathExplorerTests {
         ("testConvertRealToReal", testConvertRealToReal),
         ("testConvertStringToBool", testConvertStringToBool),
         ("testConvertStringToInt", testConvertStringToInt),
-        ("testConvertStringToReal", testConvertStringToReal),
+        ("testConvertStringToReal", testConvertStringToReal)
     ]
 }
 
@@ -190,7 +190,7 @@ extension PathExplorerTestsIntegration {
         ("testSetDictKey", testSetDictKey),
         ("testSetNestedArrayInArrayIndex", testSetNestedArrayInArrayIndex),
         ("testSetNestedArrayIndex", testSetNestedArrayIndex),
-        ("testSetNestedArrayLastIndex", testSetNestedArrayLastIndex),
+        ("testSetNestedArrayLastIndex", testSetNestedArrayLastIndex)
     ]
 }
 
@@ -244,7 +244,7 @@ extension PathExplorerXMLTests {
         ("testSubscriptInt", testSubscriptInt),
         ("testSubscriptIntSet", testSubscriptIntSet),
         ("testSubscriptString", testSubscriptString),
-        ("testSubscriptStringSet", testSubscriptStringSet),
+        ("testSubscriptStringSet", testSubscriptStringSet)
     ]
 }
 
@@ -276,7 +276,7 @@ extension PathTests {
         ("testSeparator2", testSeparator2),
         ("testSeparator3", testSeparator3),
         ("testSeparator3WithBracketAndIndex", testSeparator3WithBracketAndIndex),
-        ("testSimpleKeys", testSimpleKeys),
+        ("testSimpleKeys", testSimpleKeys)
     ]
 }
 
@@ -285,7 +285,7 @@ extension StringExtensionsTests {
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__StringExtensionsTests = [
-        ("testEscape1", testEscape1),
+        ("testEscape1", testEscape1)
     ]
 }
 
@@ -297,7 +297,7 @@ extension String_JaroWinklerTests {
         ("testBestMatch", testBestMatch),
         ("testDIXON", testDIXON),
         ("testDWAYNE", testDWAYNE),
-        ("testMartha", testMartha),
+        ("testMartha", testMartha)
     ]
 }
 
@@ -313,7 +313,7 @@ public func __allTests() -> [XCTestCaseEntry] {
         testCase(PathExplorerXMLTests.__allTests__PathExplorerXMLTests),
         testCase(PathTests.__allTests__PathTests),
         testCase(StringExtensionsTests.__allTests__StringExtensionsTests),
-        testCase(String_JaroWinklerTests.__allTests__String_JaroWinklerTests),
+        testCase(String_JaroWinklerTests.__allTests__String_JaroWinklerTests)
     ]
 }
 #endif
