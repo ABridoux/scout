@@ -72,17 +72,17 @@ public enum PathElement: Hashable {
     // MARK: - Initialization
 
     init(from string: String) {
-        if let index = string.index {
+        if let index = string.indexPathElement {
             self = index
-        } else if let count = string.count {
+        } else if let count = string.countPathElement {
             self = count
-        } else if let keysList = string.keysList {
+        } else if let keysList = string.keysListPathElements {
             self = keysList
         } else if string == Self.defaultCountSymbol {
             self = .count
-        } else if let range = string.slice {
+        } else if let range = string.slicePathElement {
             self = range
-        } else if let filter = string.filter {
+        } else if let filter = string.filterPathElements {
             self = filter
         } else {
             self = .key(string)

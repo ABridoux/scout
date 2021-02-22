@@ -24,9 +24,10 @@ public protocol PathElementRepresentable {
 }
 
 extension String: PathElementRepresentable {
-    public var pathValue: PathElement { index ?? count ?? keysList ?? slice ?? filter ?? .key(self) }
+    public var pathValue: PathElement { indexPathElement ?? countPathElement ?? keysListPathElements ?? slicePathElement ?? filterPathElements ?? .key(self) }
 
-    var index: PathElement? {
+    /// Not `nil` if the string can be transformed to a `PathElement.index`
+    var indexPathElement: PathElement? {
         guard self.hasPrefix("["), self.hasSuffix("]") else {
             return nil
         }
@@ -39,11 +40,14 @@ extension String: PathElementRepresentable {
         return PathElement.index(index)
     }
 
-    var count: PathElement? { self == PathElement.count.description ? .count : nil }
+    /// Not `nil` if the string can be transformed to a `PathElement.count`
+    var countPathElement: PathElement? { self == PathElement.count.description ? .count : nil }
 
-    var keysList: PathElement? { self == PathElement.keysList.description ? .keysList : nil }
+    /// Not `nil` if the string can be transformed to a `PathElement.keysList`
+    var keysListPathElements: PathElement? { self == PathElement.keysList.description ? .keysList : nil }
 
-    var slice: PathElement? {
+    /// Not `nil` if the string can be transformed to a `PathElement.slice`
+    var slicePathElement: PathElement? {
         guard
             hasPrefix("["),
             hasSuffix("]")
@@ -78,7 +82,8 @@ extension String: PathElementRepresentable {
         return .slice(lower, upper)
     }
 
-    var filter: PathElement? {
+    /// Not `nil` if the string can be transformed to a `PathElement.filter`
+    var filterPathElements: PathElement? {
         guard isEnclosed(by: "#")  else { return nil }
         var copy = self
         copy.removeFirst()
