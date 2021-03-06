@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// `PathExplorer` which uses a serializer to parse data: Json, Plist and Yaml
+/// `PathExplorer` which uses a serialiser to parse data: Json, Plist and Yaml
 public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: - Properties
@@ -14,7 +14,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     var value: Any
 
-    /// If `false`, the empty dicitionaries or array will be removed rather than set. Default is `true`
+    /// If `false`, the empty dictionaries or array will be removed rather than set. Default is `true`
     var allowEmptyGroups = true
 
     /// `true` if the explorer has been folded
@@ -34,6 +34,38 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     public var bool: Bool? { value as? Bool }
     public var int: Int? { value as? Int }
     public var real: Double? { value as? Double }
+
+    public func array<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [Value]? {
+        var children = [Any]()
+        if let dict = value as? DictionaryValue {
+            children = Array(dict.values)
+        } else if let array = value as? ArrayValue {
+            children = array
+        }
+
+        for child in children where isGroup(value: child) {
+            // prevent nested values
+            return nil
+        }
+
+        return value as? [Value]
+    }
+
+    public func dictionary<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [String: Value]? {
+        var children = [Any]()
+        if let dict = value as? DictionaryValue {
+            children = Array(dict.values)
+        } else if let array = value as? ArrayValue {
+            children = array
+        }
+
+        for child in children where isGroup(value: child) {
+            // prevent nested values
+            return nil
+        }
+
+        return value as? [String: Value]
+    }
 
     public var stringValue: String {
         switch value {
@@ -67,8 +99,11 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     /// `Path` in the data leading to this sub path explorer
     public var readingPath = Path()
+}
 
-    // MARK: - Initialization
+// MARK: - Initialization
+
+extension PathExplorerSerialization {
 
     public init(data: Data) throws {
         let raw = try F.serialize(data: data)
@@ -91,7 +126,26 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         readingPath = path
     }
 
-    // MARK: - Functions
+    public init(stringLiteral value: String) {
+        self.init(value: value)
+    }
+
+    public init(booleanLiteral value: Bool) {
+        self.init(value: value)
+    }
+
+    public init(integerLiteral value: Int) {
+        self.init(value: value)
+    }
+
+    public init(floatLiteral value: Double) {
+        self.init(value: value)
+    }
+}
+
+// MARK: - PathExplorer Functions
+
+extension PathExplorerSerialization {
 
     // MARK: Get
 

@@ -8,23 +8,27 @@ public class KeyType<T: KeyAllowedType> {
 
     // MARK: - Constants
 
-    public static var string: StringType { StringType() }
-    public static var int: IntType { IntType() }
-    public static var real: RealType { RealType() }
-    public static var bool: BoolType { BoolType() }
+    public static var string: KeyTypes.StringType { KeyTypes.StringType() }
+    public static var int: KeyTypes.IntType { KeyTypes.IntType() }
+    public static var real: KeyTypes.RealType { KeyTypes.RealType() }
+    // Same as `real`
+    public static var double: KeyTypes.RealType { KeyTypes.RealType() }
+    public static var bool: KeyTypes.BoolType { KeyTypes.BoolType() }
 
     /// Used to try to automatically infer the type
-    public static var automatic: AutomaticType { AutomaticType() }
+    static var automatic: KeyTypes.AutomaticType { KeyTypes.AutomaticType() }
 
     // MARK: - Initialization
 
-    public init(_ type: T.Type) {}
-
-    public init() {}
+    init(_ type: T.Type) {}
+    fileprivate init() {}
 }
 
-public final class StringType: KeyType<String> {}
-public final class IntType: KeyType<Int> {}
-public final class RealType: KeyType<Double> {}
-public final class BoolType: KeyType<Bool> {}
-public final class AutomaticType: KeyType<AnyHashable> {}
+/// Namespace for the phantom types to cast a value
+public enum KeyTypes {
+    public final class StringType: KeyType<String> {}
+    public final class IntType: KeyType<Int> {}
+    public final class RealType: KeyType<Double> {}
+    public final class BoolType: KeyType<Bool> {}
+    final class AutomaticType: KeyType<AnyHashable> {}
+}

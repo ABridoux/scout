@@ -31,6 +31,14 @@ where
     /// Non-nil if the key is of the `Real` type
     var real: Double? { get }
 
+    /// Non `nil` if the key is an non-nested array of the given type
+    /// - note: The type `.any` does not allow nested values
+    func array<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [Value]?
+
+    /// Non `nil` if the key is a non-nested dictionary with the keys as the  given type
+    /// - note: The type `.any` does not allow nested values
+    func dictionary<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [String: Value]?
+
     /// String representation of value property (if value is nil this is empty String).
     var stringValue: String { get }
 
@@ -42,7 +50,6 @@ where
     // MARK: - Initialization
 
     init(data: Data) throws
-    init(value: Any)
 
     // MARK: - Functions
 

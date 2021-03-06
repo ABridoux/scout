@@ -228,6 +228,79 @@ final class PathExplorerXMLSerializationExportTests: XCTestCase {
 
         XCTAssertEqual(xml.description, "Hi!")
     }
+
+    // MARK: Types
+
+    func testGetBool() {
+        let xml: Xml = true
+
+        XCTAssertEqual(xml.bool, true)
+    }
+
+    func testGetInt() {
+        let xml: Xml = 20
+
+        XCTAssertEqual(xml.int, 20)
+    }
+
+    func testGetDouble() {
+        let xml: Xml = 1.2
+
+        XCTAssertEqual(xml.double, 1.2)
+    }
+
+    func testGetString() {
+        let xml: Xml = "Hi"
+
+        XCTAssertEqual(xml.string, "Hi")
+    }
+
+    func testGetStringArray() {
+        let root = AEXMLElement(name: "root")
+        let array = ["Hi", "friend"]
+        root.addChild(name: "child", value: "Hi")
+        root.addChild(name: "child", value: "friend")
+
+        let xml = Xml(element: root)
+
+        XCTAssertEqual(xml.array(.string), array)
+    }
+
+    func testGetIntDict() {
+        let root = AEXMLElement(name: "root")
+        let dict = ["Donald": 20, "Daisy": 30]
+        dict.forEach { (key, value) in
+            root.addChild(name: key, value: value.description)
+        }
+
+        let xml = Xml(element: root)
+
+        XCTAssertEqual(xml.dictionary(.int), dict)
+    }
+
+    func testGetNestedArrayNil() {
+        let root = AEXMLElement(name: "root")
+        root.addChild(name: "child", value: "Hi")
+        let nestedChild = AEXMLElement(name: "child")
+        nestedChild.addChild(name: "nestedChild", value: "friend")
+        root.addChild(nestedChild)
+
+        let xml = Xml(element: root)
+
+        XCTAssertNil(xml.array(.any))
+    }
+
+    func testGetNestedDictNil() {
+        let root = AEXMLElement(name: "root")
+        root.addChild(name: "child", value: "Hi")
+        let nestedChild = AEXMLElement(name: "child")
+        nestedChild.addChild(name: "nestedChild", value: "friend")
+        root.addChild(nestedChild)
+
+        let xml = Xml(element: root)
+
+        XCTAssertNil(xml.dictionary(.any))
+    }
 }
 
 extension PathExplorerXMLSerializationExportTests {

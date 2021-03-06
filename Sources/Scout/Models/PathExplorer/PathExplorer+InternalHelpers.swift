@@ -66,7 +66,7 @@ extension PathExplorer {
     /// - Returns: The value converted to the optimal type
     func convert<Type: KeyAllowedType>(_ value: Any, to type: KeyType<Type>) throws -> Type {
 
-        if !(type is AutomaticType) {
+        if !(type is KeyTypes.AutomaticType) {
             // avoid to try to infer the type if it's specified
             return try Type(value: value)
         }

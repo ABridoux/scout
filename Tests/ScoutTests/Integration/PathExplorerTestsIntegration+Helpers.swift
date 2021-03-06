@@ -4,7 +4,7 @@
 // MIT license, see LICENSE file for details
 
 import XCTest
-import Scout
+@testable import Scout
 
 extension PathExplorerTestsIntegration {
 

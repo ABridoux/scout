@@ -21,6 +21,36 @@ public struct PathExplorerXML: PathExplorer {
     public var int: Int? { element.int }
     public var real: Double? { element.double }
 
+    public func array<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [Value]? {
+        var array = [Value]()
+        for child in element.children {
+            if let value = type.value(from: child) {
+                array.append(value)
+            } else {
+                // one child value cannot be casted so exit
+                return nil
+            }
+        }
+
+        return array
+    }
+
+    public func dictionary<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [String: Value]? {
+        guard element.differentiableChildren else { return nil }
+
+        var dict = [String: Value]()
+        for child in element.children {
+            if let value = type.value(from: child) {
+                dict[child.name] = value
+            } else {
+                // one child value cannot be casted so exit
+                return nil
+            }
+        }
+
+        return dict
+    }
+
     public var stringValue: String { element.string.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     public var description: String {
@@ -37,8 +67,11 @@ public struct PathExplorerXML: PathExplorer {
     var isFolded = false
 
     static let foldedRegexPattern = #"(?<=>)\s*<\#(foldedKey)>\#(foldedMark)</\#(foldedKey)>\s*(?=<)"#
+}
 
-    // MARK: - Initialization
+// MARK: - Initialization
+
+extension PathExplorerXML {
 
     public init(data: Data) throws {
         let document = try AEXMLDocument(xml: data)
@@ -46,16 +79,36 @@ public struct PathExplorerXML: PathExplorer {
         readingPath.append(element.name)
     }
 
-    init(element: AEXMLElement, path: Path) {
+    public init(element: AEXMLElement, path: Path = .empty) {
         self.element = element
         readingPath = path
     }
 
+    @available(*, deprecated, message: "Use 'init(element:path)' instead")
     public init(value: Any) {
         element = AEXMLElement(name: "", value: String(describing: value), attributes: [:])
     }
 
-    // MARK: - Functions
+    public init(stringLiteral value: String) {
+        self.init(element: AEXMLElement(name: "root", value: value))
+    }
+
+    public init(booleanLiteral value: Bool) {
+        self.init(element: AEXMLElement(name: "root", value: value.description))
+    }
+
+    public init(integerLiteral value: Int) {
+        self.init(element: AEXMLElement(name: "root", value: value.description))
+    }
+
+    public init(floatLiteral value: Double) {
+        self.init(element: AEXMLElement(name: "root", value: value.description))
+    }
+}
+
+// MARK: - PathExplorer Functions
+
+extension PathExplorerXML {
 
     // MARK: Get
 
