@@ -255,7 +255,7 @@ extension PathExplorerSerialization {
         }
     }
 
-    public mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws {
+    public mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyTypes.KeyType<Type>) throws {
         guard !path.isEmpty else { return }
 
         let newValue = try convert(newValue, to: type)

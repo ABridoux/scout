@@ -258,12 +258,23 @@ final class PathExplorerXMLSerializationExportTests: XCTestCase {
     func testGetStringArray() {
         let root = AEXMLElement(name: "root")
         let array = ["Hi", "friend"]
-        root.addChild(name: "child", value: "Hi")
-        root.addChild(name: "child", value: "friend")
+        array.forEach { root.addChild(name: "child", value: $0) }
 
         let xml = Xml(element: root)
 
         XCTAssertEqual(xml.array(.string), array)
+    }
+
+    func testGetAnyArray() throws {
+        let root = AEXMLElement(name: "root")
+        root.addChild(name: "child", value: "20")
+        root.addChild(name: "child", value: "friend")
+
+        let xml = Xml(element: root)
+
+        let result = try XCTUnwrap(xml.array(.any))
+        XCTAssertEqual(result[0] as? Int, 20)
+        XCTAssertEqual(result[1] as? String, "friend")
     }
 
     func testGetIntDict() {

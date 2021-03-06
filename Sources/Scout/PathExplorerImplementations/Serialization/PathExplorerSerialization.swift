@@ -149,7 +149,7 @@ extension PathExplorerSerialization {
 
     // MARK: Get
 
-    public func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T {
+    public func get<T: KeyAllowedType>(_ path: Path, as type: KeyTypes.KeyType<T>) throws -> T {
         try T(value: get(path).value)
     }
 
@@ -203,7 +203,7 @@ extension PathExplorerSerialization {
 
     // MARK: Conversion
 
-    public func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type {
+    public func convertValue<Type: KeyAllowedType>(to type: KeyTypes.KeyType<Type>) throws -> Type {
         if let value = value as? Type {
             return value
         } else {

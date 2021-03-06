@@ -19,16 +19,16 @@ where
 
     // MARK: - Properties
 
-    /// Non-nil if the key is of the `String` type
+    /// Non `nil` if the key is of the `String` type
     var string: String? { get }
 
-    /// Non-nil if the key is of the `Bool` type
+    /// Non `nil` if the key is of the `Bool` type
     var bool: Bool? { get }
 
-    /// Non-nil if the key is of the `Integer` type
+    /// Non `nil` if the key is of the `Integer` type
     var int: Int? { get }
 
-    /// Non-nil if the key is of the `Real` type
+    /// Non `nil` if the key is of the `Real` type
     var real: Double? { get }
 
     /// Non `nil` if the key is an non-nested array of the given type
@@ -68,7 +68,7 @@ where
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
-    func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T
+    func get<T: KeyAllowedType>(_ path: Path, as type: KeyTypes.KeyType<T>) throws -> T
 
     // MARK: Set
 
@@ -90,7 +90,7 @@ where
     /// throwing an error if the conversion is not possible
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred.
-    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws
+    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyTypes.KeyType<Type>) throws
 
     // - Set key name
 
@@ -140,7 +140,7 @@ where
     ///
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
-    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws
+    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyTypes.KeyType<Type>) throws
 
     // MARK: - Paths
 
@@ -153,7 +153,7 @@ where
     // MARK: Conversion
 
     /// Try to convert the value held by the PathExplorer to the given type
-    func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type
+    func convertValue<Type: KeyAllowedType>(to type: KeyTypes.KeyType<Type>) throws -> Type
 
     // MARK: Export
 

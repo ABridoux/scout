@@ -25,7 +25,7 @@ extension PathExplorer {
     /// Use to name the single key when folding a dictionary
     static var foldedKey: String { "Folded" }
 
-    /// Use to replace the content of a dicionary or array when folding it
+    /// Use to replace the content of a dictionary or array when folding it
     static var foldedMark: String { "~~SCOUT_FOLDED~~" }
 }
 
@@ -64,7 +64,7 @@ extension PathExplorer {
     /// - Parameter type: The type to use to convert the value. Use `automatic` to let the function try the available types
     /// - Throws: PathExplorerError.valueConversionError when the value is not convertible to the type or  to be automatically converted
     /// - Returns: The value converted to the optimal type
-    func convert<Type: KeyAllowedType>(_ value: Any, to type: KeyType<Type>) throws -> Type {
+    func convert<Type: KeyAllowedType>(_ value: Any, to type: KeyTypes.KeyType<Type>) throws -> Type {
 
         if !(type is KeyTypes.AutomaticType) {
             // avoid to try to infer the type if it's specified

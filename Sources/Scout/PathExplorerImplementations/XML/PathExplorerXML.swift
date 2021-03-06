@@ -122,7 +122,7 @@ extension PathExplorerXML {
         return currentPathExplorer
     }
 
-    public func get<T>(_ path: Path, as type: KeyType<T>) throws -> T where T: KeyAllowedType {
+    public func get<T>(_ path: Path, as type: KeyTypes.KeyType<T>) throws -> T where T: KeyAllowedType {
         let explorer = try get(path)
 
         guard let value = explorer.element.value else {
@@ -133,13 +133,13 @@ extension PathExplorerXML {
 
     // MARK: Set
 
-    public mutating func set<Type>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws where Type: KeyAllowedType {
+    public mutating func set<Type>(_ path: Path, to newValue: Any, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
         try set(path, to: newValue)
     }
 
     // MARK: Add
 
-    public mutating func add<Type>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws where Type: KeyAllowedType {
+    public mutating func add<Type>(_ newValue: Any, at path: Path, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
         try add(newValue, at: path)
     }
 
@@ -191,7 +191,7 @@ extension PathExplorerXML {
 
     // MARK: Conversion
 
-    public func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type {
+    public func convertValue<Type: KeyAllowedType>(to type: KeyTypes.KeyType<Type>) throws -> Type {
         if let value = Type(stringValue) {
             return value
         } else {

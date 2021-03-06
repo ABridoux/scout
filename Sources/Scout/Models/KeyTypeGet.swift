@@ -67,14 +67,14 @@ extension KeyTypes.Get {
     public final class AnyValue: ValueType<Any> {
 
         override func value(from element: AEXMLElement) -> Any? {
-            if let string = element.value {
-                return string
-            } else if let int = element.int {
+            if let int = element.int {
                 return int
             } else if let double = element.double {
                 return double
             } else if let bool = element.bool {
                 return bool
+            } else if let string = element.value {
+                return string
             } else {
                 return nil
             }
