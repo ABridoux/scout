@@ -10,7 +10,7 @@ final class PathExplorerTests: XCTestCase {
 
     // MARK: - Constants
 
-    let pathExplorer = PathExplorerXML(value: "")
+    let pathExplorer: PathExplorerXML = ""
 
     // MARK: - Functions
 

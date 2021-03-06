@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// `PathExplorer` which uses a serializer to parse data: Json, Plist and Yaml
+/// `PathExplorer` which uses a serialiser to parse data: Json, Plist and Yaml
 public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: - Properties
@@ -14,7 +14,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     var value: Any
 
-    /// If `false`, the empty dicitionaries or array will be removed rather than set. Default is `true`
+    /// If `false`, the empty dictionaries or array will be removed rather than set. Default is `true`
     var allowEmptyGroups = true
 
     /// `true` if the explorer has been folded
@@ -35,6 +35,38 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     public var int: Int? { value as? Int }
     public var real: Double? { value as? Double }
 
+    public func array<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [Value]? {
+        var children = [Any]()
+        if let dict = value as? DictionaryValue {
+            children = Array(dict.values)
+        } else if let array = value as? ArrayValue {
+            children = array
+        }
+
+        for child in children where isGroup(value: child) {
+            // prevent nested values
+            return nil
+        }
+
+        return value as? [Value]
+    }
+
+    public func dictionary<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [String: Value]? {
+        var children = [Any]()
+        if let dict = value as? DictionaryValue {
+            children = Array(dict.values)
+        } else if let array = value as? ArrayValue {
+            children = array
+        }
+
+        for child in children where isGroup(value: child) {
+            // prevent nested values
+            return nil
+        }
+
+        return value as? [String: Value]
+    }
+
     public var stringValue: String {
         switch value {
         case let bool as Bool:
@@ -51,10 +83,15 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     }
 
     public var description: String {
-        if let description = try? exportString() {
-            return description
-        } else {
-            return "Unable to convert \(String(describing: self)) to a String. The serialization has thrown an error. Try the `exportString()` function"
+        guard isGroup(value: value) else {
+            // single values can be described
+            return String(describing: value)
+        }
+
+        do {
+            return try exportString()
+        } catch {
+            return "Unable to convert \(self) to a String. The serialization has thrown an error. Try the `exportString()` function"
         }
     }
 
@@ -62,8 +99,11 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     /// `Path` in the data leading to this sub path explorer
     public var readingPath = Path()
+}
 
-    // MARK: - Initialization
+// MARK: - Initialization
+
+extension PathExplorerSerialization {
 
     public init(data: Data) throws {
         let raw = try F.serialize(data: data)
@@ -73,7 +113,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         } else if let array = raw as? ArrayValue {
             value = array
         } else {
-            throw PathExplorerError.invalidData(serializationFormat: String(describing: F.self))
+            throw PathExplorerError.invalidData(description: "Cannot initialize a \(F.dataFormat.rawValue) object with the given data")
         }
     }
 
@@ -86,11 +126,30 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         readingPath = path
     }
 
-    // MARK: - Functions
+    public init(stringLiteral value: String) {
+        self.init(value: value)
+    }
+
+    public init(booleanLiteral value: Bool) {
+        self.init(value: value)
+    }
+
+    public init(integerLiteral value: Int) {
+        self.init(value: value)
+    }
+
+    public init(floatLiteral value: Double) {
+        self.init(value: value)
+    }
+}
+
+// MARK: - PathExplorer Functions
+
+extension PathExplorerSerialization {
 
     // MARK: Get
 
-    public func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T {
+    public func get<T: KeyAllowedType>(_ path: Path, as type: KeyTypes.KeyType<T>) throws -> T {
         try T(value: get(path).value)
     }
 
@@ -144,7 +203,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
 
     // MARK: Conversion
 
-    public func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type {
+    public func convertValue<Type: KeyAllowedType>(to type: KeyTypes.KeyType<Type>) throws -> Type {
         if let value = value as? Type {
             return value
         } else {

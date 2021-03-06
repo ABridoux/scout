@@ -31,7 +31,7 @@ extension PathExplorerSerialization {
             // the without-backslash option is available
             return string
         } else {
-            // we have to remvove the back slashes
+            // we have to remove the back slashes
             return string.replacingOccurrences(of: "\\", with: "")
         }
     }

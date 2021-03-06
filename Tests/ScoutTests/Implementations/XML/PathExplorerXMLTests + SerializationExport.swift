@@ -119,7 +119,7 @@ final class PathExplorerXMLSerializationExportTests: XCTestCase {
         XCTAssertEqual(array, [ducks, mouses])
     }
 
-    func testExportDictionaryOfDictonaries() throws {
+    func testExportDictionaryOfDictionaries() throws {
         let element = AEXMLElement(name: "animals")
         let ducks = ["Riri": 1, "Fifi": 2, "Loulou": 3]
         let ducksElement = AEXMLElement(name: "ducks")
@@ -201,6 +201,116 @@ final class PathExplorerXMLSerializationExportTests: XCTestCase {
         XCTAssertEqual(attributes["uncle"] as? String, "Scrooge")
         XCTAssertEqual(attributes["age"] as? Int, 70)
         XCTAssertEqual(value, ducks)
+    }
+
+    // MARK: Description
+
+    func testDescribeBool() {
+        let xml: Xml = true
+
+        XCTAssertEqual(xml.description, "true")
+    }
+
+    func testDescribeInt() {
+        let xml: Xml = 2
+
+        XCTAssertEqual(xml.description, "2")
+    }
+
+    func testDescribeDouble() {
+        let xml: Xml = 3.5
+
+        XCTAssertEqual(xml.description, "3.5")
+    }
+
+    func testDescribeString() {
+        let xml: Xml = "Hi!"
+
+        XCTAssertEqual(xml.description, "Hi!")
+    }
+
+    // MARK: Types
+
+    func testGetBool() {
+        let xml: Xml = true
+
+        XCTAssertEqual(xml.bool, true)
+    }
+
+    func testGetInt() {
+        let xml: Xml = 20
+
+        XCTAssertEqual(xml.int, 20)
+    }
+
+    func testGetDouble() {
+        let xml: Xml = 1.2
+
+        XCTAssertEqual(xml.double, 1.2)
+    }
+
+    func testGetString() {
+        let xml: Xml = "Hi"
+
+        XCTAssertEqual(xml.string, "Hi")
+    }
+
+    func testGetStringArray() {
+        let root = AEXMLElement(name: "root")
+        let array = ["Hi", "friend"]
+        array.forEach { root.addChild(name: "child", value: $0) }
+
+        let xml = Xml(element: root)
+
+        XCTAssertEqual(xml.array(.string), array)
+    }
+
+    func testGetAnyArray() throws {
+        let root = AEXMLElement(name: "root")
+        root.addChild(name: "child", value: "20")
+        root.addChild(name: "child", value: "friend")
+
+        let xml = Xml(element: root)
+
+        let result = try XCTUnwrap(xml.array(.any))
+        XCTAssertEqual(result[0] as? Int, 20)
+        XCTAssertEqual(result[1] as? String, "friend")
+    }
+
+    func testGetIntDict() {
+        let root = AEXMLElement(name: "root")
+        let dict = ["Donald": 20, "Daisy": 30]
+        dict.forEach { (key, value) in
+            root.addChild(name: key, value: value.description)
+        }
+
+        let xml = Xml(element: root)
+
+        XCTAssertEqual(xml.dictionary(.int), dict)
+    }
+
+    func testGetNestedArrayNil() {
+        let root = AEXMLElement(name: "root")
+        root.addChild(name: "child", value: "Hi")
+        let nestedChild = AEXMLElement(name: "child")
+        nestedChild.addChild(name: "nestedChild", value: "friend")
+        root.addChild(nestedChild)
+
+        let xml = Xml(element: root)
+
+        XCTAssertNil(xml.array(.any))
+    }
+
+    func testGetNestedDictNil() {
+        let root = AEXMLElement(name: "root")
+        root.addChild(name: "child", value: "Hi")
+        let nestedChild = AEXMLElement(name: "child")
+        nestedChild.addChild(name: "nestedChild", value: "friend")
+        root.addChild(nestedChild)
+
+        let xml = Xml(element: root)
+
+        XCTAssertNil(xml.dictionary(.any))
     }
 }
 

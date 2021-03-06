@@ -34,7 +34,7 @@ public extension PathExplorer {
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
-    func get<T: KeyAllowedType>(_ elements: PathElement..., as type: KeyType<T>) throws -> T {
+    func get<T: KeyAllowedType>(_ elements: PathElement..., as type: KeyTypes.KeyType<T>) throws -> T {
         try get(Path(elements), as: type)
     }
 }
@@ -65,7 +65,7 @@ public extension PathExplorer {
     /// throwing an error if the conversion is not possible
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred.
-    mutating func set<Type: KeyAllowedType>(_ elements: PathElement..., to newValue: Any, as type: KeyType<Type>) throws {
+    mutating func set<Type: KeyAllowedType>(_ elements: PathElement..., to newValue: Any, as type: KeyTypes.KeyType<Type>) throws {
         try set(Path(elements), to: newValue, as: type)
     }
 
@@ -139,7 +139,7 @@ public extension PathExplorer {
     ///
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
-    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at elements: PathElement..., as type: KeyType<Type>) throws {
+    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at elements: PathElement..., as type: KeyTypes.KeyType<Type>) throws {
         try add(newValue, at: Path(elements), as: type)
     }
 }

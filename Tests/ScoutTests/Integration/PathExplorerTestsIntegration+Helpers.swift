@@ -4,7 +4,7 @@
 // MIT license, see LICENSE file for details
 
 import XCTest
-import Scout
+@testable import Scout
 
 extension PathExplorerTestsIntegration {
 
@@ -31,7 +31,7 @@ extension PathExplorerTestsIntegration {
         var explorer = explorer
         do {
             try explorer.set(path, to: value.description)
-            let resultValue = try explorer.get(path).convertValue(to: KeyType(Value.self))
+            let resultValue = try explorer.get(path).convertValue(to: KeyTypes.KeyType(Value.self))
             XCTAssertEqual(resultValue, value, file: file, line: line)
         } catch {
             XCTFail("\(explorer.format): \(error.localizedDescription)", file: file, line: line)

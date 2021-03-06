@@ -3,28 +3,33 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
-/// Holds the types a key can have
-public class KeyType<T: KeyAllowedType> {
+/// Namespace for the phantom types to cast a value
+public enum KeyTypes {
 
-    // MARK: - Constants
+    /// Holds the types a key can have
+    public class KeyType<T: KeyAllowedType> {
 
-    public static var string: StringType { StringType() }
-    public static var int: IntType { IntType() }
-    public static var real: RealType { RealType() }
-    public static var bool: BoolType { BoolType() }
+        // MARK: - Constants
 
-    /// Used to try to automatically infer the type
-    public static var automatic: AutomaticType { AutomaticType() }
+        public static var string: StringType { KeyTypes.StringType() }
+        public static var int: IntType { KeyTypes.IntType() }
+        public static var real: RealType { KeyTypes.RealType() }
+        // Same as `real`
+        public static var double: RealType { KeyTypes.RealType() }
+        public static var bool: BoolType { KeyTypes.BoolType() }
 
-    // MARK: - Initialization
+        /// Used to try to automatically infer the type
+        public static var automatic: AutomaticType { KeyTypes.AutomaticType() }
 
-    public init(_ type: T.Type) {}
+        // MARK: - Initialization
 
-    public init() {}
+        init(_ type: T.Type) {}
+        fileprivate init() {}
+    }
+
+    public final class StringType: KeyTypes.KeyType<String> {}
+    public final class IntType: KeyTypes.KeyType<Int> {}
+    public final class RealType: KeyTypes.KeyType<Double> {}
+    public final class BoolType: KeyTypes.KeyType<Bool> {}
+    public final class AutomaticType: KeyTypes.KeyType<AnyHashable> {}
 }
-
-public final class StringType: KeyType<String> {}
-public final class IntType: KeyType<Int> {}
-public final class RealType: KeyType<Double> {}
-public final class BoolType: KeyType<Bool> {}
-public final class AutomaticType: KeyType<AnyHashable> {}
