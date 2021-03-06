@@ -11,15 +11,15 @@ public enum KeyTypes {
 
         // MARK: - Constants
 
-        public static var string: KeyTypes.StringType { KeyTypes.StringType() }
-        public static var int: KeyTypes.IntType { KeyTypes.IntType() }
-        public static var real: KeyTypes.RealType { KeyTypes.RealType() }
+        public static var string: StringType { KeyTypes.StringType() }
+        public static var int: IntType { KeyTypes.IntType() }
+        public static var real: RealType { KeyTypes.RealType() }
         // Same as `real`
-        public static var double: KeyTypes.RealType { KeyTypes.RealType() }
-        public static var bool: KeyTypes.BoolType { KeyTypes.BoolType() }
+        public static var double: RealType { KeyTypes.RealType() }
+        public static var bool: BoolType { KeyTypes.BoolType() }
 
         /// Used to try to automatically infer the type
-        static var automatic: KeyTypes.AutomaticType { KeyTypes.AutomaticType() }
+        public static var automatic: AutomaticType { KeyTypes.AutomaticType() }
 
         // MARK: - Initialization
 
@@ -31,5 +31,5 @@ public enum KeyTypes {
     public final class IntType: KeyTypes.KeyType<Int> {}
     public final class RealType: KeyTypes.KeyType<Double> {}
     public final class BoolType: KeyTypes.KeyType<Bool> {}
-    final class AutomaticType: KeyTypes.KeyType<AnyHashable> {}
+    public final class AutomaticType: KeyTypes.KeyType<AnyHashable> {}
 }
