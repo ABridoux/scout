@@ -119,7 +119,7 @@ final class PathExplorerXMLSerializationExportTests: XCTestCase {
         XCTAssertEqual(array, [ducks, mouses])
     }
 
-    func testExportDictionaryOfDictonaries() throws {
+    func testExportDictionaryOfDictionaries() throws {
         let element = AEXMLElement(name: "animals")
         let ducks = ["Riri": 1, "Fifi": 2, "Loulou": 3]
         let ducksElement = AEXMLElement(name: "ducks")
@@ -201,6 +201,32 @@ final class PathExplorerXMLSerializationExportTests: XCTestCase {
         XCTAssertEqual(attributes["uncle"] as? String, "Scrooge")
         XCTAssertEqual(attributes["age"] as? Int, 70)
         XCTAssertEqual(value, ducks)
+    }
+
+    // MARK: Description
+
+    func testDescribeBool() {
+        let xml: Xml = true
+
+        XCTAssertEqual(xml.description, "true")
+    }
+
+    func testDescribeInt() {
+        let xml: Xml = 2
+
+        XCTAssertEqual(xml.description, "2")
+    }
+
+    func testDescribeDouble() {
+        let xml: Xml = 3.5
+
+        XCTAssertEqual(xml.description, "3.5")
+    }
+
+    func testDescribeString() {
+        let xml: Xml = "Hi!"
+
+        XCTAssertEqual(xml.description, "Hi!")
     }
 }
 

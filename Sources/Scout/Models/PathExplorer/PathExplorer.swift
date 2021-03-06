@@ -117,7 +117,7 @@ where
     /// To add a key at the end of an array, specify the `PathElement.count`
     ///
     /// ### Non-existing key
-    /// Any non existing key encoutered in the path will be created.
+    /// Any non existing key encountered in the path will be created.
     mutating func add(_ newValue: Any, at path: Path) throws
 
     /// Add a value at the given path.
@@ -129,7 +129,7 @@ where
     /// To add a key at the end of an array, specify the `PathElement.count`
     ///
     /// ### Non-existing key
-    /// Any non existing key encoutered in the path will be created.
+    /// Any non existing key encountered in the path will be created.
     ///
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
@@ -140,7 +140,7 @@ where
     /// Returns all the paths leading to single or group values
     /// - Parameters:
     ///   - initialPath: Scope the return paths with this path as a starting point
-    ///   - filter: Optionnally provide a filter on the key and/or value. Default is `noFilter`
+    ///   - filter: Optionally provide a filter on the key and/or value. Default is `noFilter`
     func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path]
 
     // MARK: Conversion
@@ -154,6 +154,11 @@ where
     func exportData() throws -> Data
 
     /// Export the path explorer value to a String
+    ///
+    /// - note: The single values will be exported correspondingly to the data format.
+    /// For instance: `<string>Hello</string>` and not ust `Hello`.
+    /// To get only the value of the `PathExplorer` without the data , use `description`
+    /// or the corresponding type (e.g. `pathExplorer.int` or `pathExplorer.bool`)
     func exportString() throws -> String
 
     /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified

@@ -51,10 +51,15 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     }
 
     public var description: String {
-        if let description = try? exportString() {
-            return description
-        } else {
-            return "Unable to convert \(String(describing: self)) to a String. The serialization has thrown an error. Try the `exportString()` function"
+        guard isGroup(value: value) else {
+            // single values can be described
+            return String(describing: value)
+        }
+
+        do {
+            return try exportString()
+        } catch {
+            return "Unable to convert \(self) to a String. The serialization has thrown an error. Try the `exportString()` function"
         }
     }
 
@@ -73,7 +78,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
         } else if let array = raw as? ArrayValue {
             value = array
         } else {
-            throw PathExplorerError.invalidData(serializationFormat: String(describing: F.self))
+            throw PathExplorerError.invalidData(description: "Cannot initialize a \(F.dataFormat.rawValue) object with the given data")
         }
     }
 

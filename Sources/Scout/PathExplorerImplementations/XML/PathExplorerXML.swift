@@ -24,17 +24,11 @@ public struct PathExplorerXML: PathExplorer {
     public var stringValue: String { element.string.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     public var description: String {
-        // when priting out an element which has a parent, the identation will remain the same
-        // which is unwanted so remove the parent by copying the element (parent setter is internal)
-        let copy = element.copy()
-        copy.addChildren(element.children)
-        var description = copy.xml
-
-        if isFolded {
-            description = description.replacingOccurrences(of: Self.foldedRegexPattern, with: "...", options: .regularExpression)
+        if element.children.isEmpty, element.attributes.isEmpty, let value = element.value {
+            // single value
+            return value
         }
-
-        return description
+        return exportString()
     }
 
     public var format: DataFormat { .xml }
@@ -109,7 +103,19 @@ public struct PathExplorerXML: PathExplorer {
         return data
     }
 
-    public func exportString() throws -> String { description }
+    public func exportString() -> String {
+        // when printing out an element which has a parent, the indentation will remain the same
+        // which is unwanted so remove the parent by copying the element (parent setter is internal)
+        let copy = element.copy()
+        copy.addChildren(element.children)
+        var description = copy.xml
+
+        if isFolded {
+            description = description.replacingOccurrences(of: Self.foldedRegexPattern, with: "...", options: .regularExpression)
+        }
+
+        return description
+    }
 
     public mutating func fold(upTo level: Int) {
         guard level >= 0 else {
