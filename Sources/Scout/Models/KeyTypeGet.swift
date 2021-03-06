@@ -27,9 +27,10 @@ extension KeyTypes.Get {
         /// When dealing with arrays or dictionaries, export the elements as `Any`
         public static var any: AnyValue { AnyValue() }
 
+        /// Get the value `Value` from the `AEXMLElement`
+        /// - note: Do not call `super`
         func value(from element: AEXMLElement) -> Value? {
-            // should be overridden
-            fatalError()
+            preconditionFailure("Should be overridden")
         }
     }
 }
@@ -38,35 +39,35 @@ extension KeyTypes.Get {
 
     public final class StringValue: ValueType<String> {
 
-        override func value(from element: AEXMLElement) -> String? {
+        override final func value(from element: AEXMLElement) -> String? {
             element.value
         }
     }
 
     public final class IntValue: ValueType<Int> {
 
-        override func value(from element: AEXMLElement) -> Int? {
+        override final func value(from element: AEXMLElement) -> Int? {
             element.int
         }
     }
 
     public final class DoubleValue: ValueType<Double> {
 
-        override func value(from element: AEXMLElement) -> Double? {
+        override final func value(from element: AEXMLElement) -> Double? {
             element.double
         }
     }
 
     public final class BoolValue: ValueType<Bool> {
 
-        override func value(from element: AEXMLElement) -> Bool? {
+        override final func value(from element: AEXMLElement) -> Bool? {
             element.bool
         }
     }
 
     public final class AnyValue: ValueType<Any> {
 
-        override func value(from element: AEXMLElement) -> Any? {
+        override final func value(from element: AEXMLElement) -> Any? {
             if let int = element.int {
                 return int
             } else if let double = element.double {

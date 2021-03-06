@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [3.0.1](https://github.com/ABridoux/scout/tree/3.0.1) (06/03/2021)
+
+### Added
+- New functions `PathExplorer.array(:)`  and `PathExplorer.dictionary(:)` to get a `PathExplorer` value with a non-nested array and dictionary [#187]
+
+### Fixed
+- `PathExplorer.description` with a single value will now only return the value without the data format ceremony [#185]
+- `SerializationFormat.Json.serialize(value:)` will throw an error if the value is a single one (rather than crashing at runtime)  [#185]
+
 ## [3.0.0](https://github.com/ABridoux/scout/tree/3.0.0) (21/02/2021)
 
 ### Added
