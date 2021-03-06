@@ -49,6 +49,9 @@ extension SerializationFormats {
         }
 
         public static func serialize(value: Any) throws -> Data {
+            guard value is [String: Any] || value is [Any] else {
+                throw PathExplorerError.invalidData(description: "A JSON object cannot be instantiated with a single value.")
+            }
             if #available(OSX 10.15, *) {
                 return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes])
             } else {

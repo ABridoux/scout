@@ -7,7 +7,7 @@ import Foundation
 
 public enum PathExplorerError: LocalizedError, Equatable {
 
-    case invalidData(serializationFormat: String)
+    case invalidData(description: String)
     case invalidValue(String)
     case valueConversionError(value: String, type: String)
     case wrongValueForKey(value: String, element: PathElement)
@@ -37,7 +37,7 @@ public enum PathExplorerError: LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .invalidData(let type): return "Cannot intialize a \(String(describing: type)) object with the given data"
+        case .invalidData(let description): return description
         case .invalidValue(let value): return "The key value \(value) is invalid"
         case .valueConversionError(let value, let type): return "Unable to convert the value `\(value)` to the type \(type)"
         case .wrongElementToSubscript(let group, let element, let path): return "Wrong element \(element.description) to subscript the \(group) at '\(path)'"

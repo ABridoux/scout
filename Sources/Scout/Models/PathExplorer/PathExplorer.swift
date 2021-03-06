@@ -19,17 +19,25 @@ where
 
     // MARK: - Properties
 
-    /// Non-nil if the key is of the `String` type
+    /// Non `nil` if the key is of the `String` type
     var string: String? { get }
 
-    /// Non-nil if the key is of the `Bool` type
+    /// Non `nil` if the key is of the `Bool` type
     var bool: Bool? { get }
 
-    /// Non-nil if the key is of the `Integer` type
+    /// Non `nil` if the key is of the `Integer` type
     var int: Int? { get }
 
-    /// Non-nil if the key is of the `Real` type
+    /// Non `nil` if the key is of the `Real` type
     var real: Double? { get }
+
+    /// Non `nil` if the key is an non-nested array of the given type
+    /// - note: The type `.any` does not allow nested values
+    func array<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [Value]?
+
+    /// Non `nil` if the key is a non-nested dictionary with the keys as the  given type
+    /// - note: The type `.any` does not allow nested values
+    func dictionary<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [String: Value]?
 
     /// String representation of value property (if value is nil this is empty String).
     var stringValue: String { get }
@@ -42,7 +50,6 @@ where
     // MARK: - Initialization
 
     init(data: Data) throws
-    init(value: Any)
 
     // MARK: - Functions
 
@@ -61,7 +68,7 @@ where
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
-    func get<T: KeyAllowedType>(_ path: Path, as type: KeyType<T>) throws -> T
+    func get<T: KeyAllowedType>(_ path: Path, as type: KeyTypes.KeyType<T>) throws -> T
 
     // MARK: Set
 
@@ -83,7 +90,7 @@ where
     /// throwing an error if the conversion is not possible
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred.
-    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyType<Type>) throws
+    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: Any, as type: KeyTypes.KeyType<Type>) throws
 
     // - Set key name
 
@@ -117,7 +124,7 @@ where
     /// To add a key at the end of an array, specify the `PathElement.count`
     ///
     /// ### Non-existing key
-    /// Any non existing key encoutered in the path will be created.
+    /// Any non existing key encountered in the path will be created.
     mutating func add(_ newValue: Any, at path: Path) throws
 
     /// Add a value at the given path.
@@ -129,24 +136,24 @@ where
     /// To add a key at the end of an array, specify the `PathElement.count`
     ///
     /// ### Non-existing key
-    /// Any non existing key encoutered in the path will be created.
+    /// Any non existing key encountered in the path will be created.
     ///
     /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
     /// throwing an error if the conversion is not possible
-    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws
+    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyTypes.KeyType<Type>) throws
 
     // MARK: - Paths
 
     /// Returns all the paths leading to single or group values
     /// - Parameters:
     ///   - initialPath: Scope the return paths with this path as a starting point
-    ///   - filter: Optionnally provide a filter on the key and/or value. Default is `noFilter`
+    ///   - filter: Optionally provide a filter on the key and/or value. Default is `noFilter`
     func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path]
 
     // MARK: Conversion
 
     /// Try to convert the value held by the PathExplorer to the given type
-    func convertValue<Type: KeyAllowedType>(to type: KeyType<Type>) throws -> Type
+    func convertValue<Type: KeyAllowedType>(to type: KeyTypes.KeyType<Type>) throws -> Type
 
     // MARK: Export
 
@@ -154,6 +161,11 @@ where
     func exportData() throws -> Data
 
     /// Export the path explorer value to a String
+    ///
+    /// - note: The single values will be exported correspondingly to the data format.
+    /// For instance: `<string>Hello</string>` and not ust `Hello`.
+    /// To get only the value of the `PathExplorer` without the data , use `description`
+    /// or the corresponding type (e.g. `pathExplorer.int` or `pathExplorer.bool`)
     func exportString() throws -> String
 
     /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified

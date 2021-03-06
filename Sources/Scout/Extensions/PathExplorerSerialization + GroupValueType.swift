@@ -18,11 +18,11 @@ extension PathExplorerSerialization {
         static var dictionary: GroupValue<DictionaryValue> { GroupValue<DictionaryValue>(typeDescription: "dictionary") }
         static var array: GroupValue<ArrayValue> { GroupValue<ArrayValue>(typeDescription: "array") }
 
-        static func dictionary<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[String: Value]> {
+        static func dictionary<Value: KeyAllowedType>(_ value: KeyTypes.KeyType<Value>) -> GroupValue<[String: Value]> {
             GroupValue<[String: Value]>(typeDescription: "dictionary(\(Value.typeDescription)")
 
         }
-        static func array<Value: KeyAllowedType>(_ value: KeyType<Value>) -> GroupValue<[Value]> {
+        static func array<Value: KeyAllowedType>(_ value: KeyTypes.KeyType<Value>) -> GroupValue<[Value]> {
             GroupValue<[Value]>(typeDescription: "array(\(Value.typeDescription)")
         }
 

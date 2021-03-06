@@ -17,13 +17,13 @@ public protocol ValuePredicate {
 
 extension PathsFilter {
 
-    /// Specify a boleean expression to filter the value
+    /// Specify a boolean expression to filter the value
     ///
     /// The value is specified as the variable 'value' in the expression.
     /// - `value > 10`
     /// - `value hasPrefix 'Lou' && value hasSuffix 'lou'`
     ///
-    /// - note: Public wrapper around BoleeanExpressionEvaluation.Expression
+    /// - note: Public wrapper around BooleanExpressionEvaluation.Expression
     public final class ExpressionPredicate: ValuePredicate {
         private(set) var expression: Expression
 
@@ -48,7 +48,7 @@ extension PathsFilter {
             do {
                 return try expression.evaluate(with: ["value": String(describing: value)])
             } catch ExpressionError.mismatchingType {
-                // error of mistmatching type for `valueType`. Remove it from the supported types
+                // error of mismatching type for `valueType`. Remove it from the supported types
                 operatorsValueTypes.remove(valueType)
                 return false //ignore the error of wrong value type
             } catch {

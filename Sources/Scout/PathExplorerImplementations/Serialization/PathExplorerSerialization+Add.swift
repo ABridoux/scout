@@ -59,7 +59,7 @@ extension PathExplorerSerialization {
         }
     }
 
-    public mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyType<Type>) throws {
+    public mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyTypes.KeyType<Type>) throws {
         guard let lastElement = path.last else { return }
 
         let newValue = try convert(newValue, to: type)
