@@ -41,22 +41,25 @@ extension ScoutCommand {
         try inferPathExplorer(from: data, in: inputFilePath)
     }
 
-    private func standardInputLimitTimer() -> Timer {
-        let timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { (_) in
-            Self.exit(withError: RuntimeError.invalidData("Readind the input stream takes too much time"))
-        }
-        timer.tolerance = 0.2
-        return timer
-    }
-
     /// Try to read data from the optional `filePath`. Otherwise, return the data from the standard input stream
     func readDataOrInputStream(from filePath: String?) throws -> Data {
         if let filePath = filePath {
             return try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
         }
 
-        let input = FileHandle.standardInput
-        return input.availableData
+
+        if #available(OSX 10.15.4, *) {
+            do {
+                guard let standardInputData = try FileHandle.standardInput.readToEnd() else {
+                    throw RuntimeError.invalidData("Unable to get data from standard input")
+                }
+                return standardInputData
+            } catch {
+                throw RuntimeError.invalidData("Error while reading data from standard input. \(error.localizedDescription)")
+            }
+        } else {
+            return FileHandle.standardInput.readDataToEndOfFile()
+        }
     }
 
     func inferPathExplorer(from data: Data, in inputFilePath: String?) throws {
