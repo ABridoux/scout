@@ -95,7 +95,7 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 ### Insights
 
-The [wiki](https://www.woodys-findings.com/scout/wiki/home) gives more details to use those features. Also, the [Playground](Playground) folder 
+The [wiki](https://www.woodys-findings.com/scout/wiki/home) gives more details to use those features. Also, the [Playground](Playground) folder offers several commands to play with a *People* file in several formats. The same commands can be found on this [page](https://www.woodys-findings.com/scout/wiki/examples).
 
 #### CRUD functions for JSON, Plist and XML data format
 - add a value (Create)

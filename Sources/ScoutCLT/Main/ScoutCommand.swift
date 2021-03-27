@@ -47,13 +47,12 @@ extension ScoutCommand {
             return try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
         }
 
-
         if #available(OSX 10.15.4, *) {
             do {
-                guard let standardInputData = try FileHandle.standardInput.readToEnd() else {
-                    throw RuntimeError.invalidData("Unable to get data from standard input")
-                }
-                return standardInputData
+                return try FileHandle
+                    .standardInput
+                    .readToEnd()
+                    .unwrapOrThrow(error: .invalidData("Unable to get data from standard input"))
             } catch {
                 throw RuntimeError.invalidData("Error while reading data from standard input. \(error.localizedDescription)")
             }

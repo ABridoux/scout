@@ -22,7 +22,7 @@ extension SerializationFormats {
         }
 
         public static func serialize(data: Data) throws -> Any {
-             try PropertyListSerialization.propertyList(from: data, options: [], format: nil)
+            try PropertyListSerialization.propertyList(from: data, options: [], format: nil)
         }
 
         public static func serialize(value: Any) throws -> Data {
@@ -49,13 +49,13 @@ extension SerializationFormats {
         }
 
         public static func serialize(value: Any) throws -> Data {
-            guard value is [String: Any] || value is [Any] else {
-                throw PathExplorerError.invalidData(description: "A JSON object cannot be instantiated with a single value.")
+            guard JSONSerialization.isValidJSONObject(value) else {
+                throw PathExplorerError.invalidData(description: "Invalid JSON object.")
             }
             if #available(OSX 10.15, *) {
-                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes])
+                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes, .fragmentsAllowed])
             } else {
-                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
+                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .fragmentsAllowed])
             }
         }
     }
