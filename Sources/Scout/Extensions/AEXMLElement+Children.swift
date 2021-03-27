@@ -13,7 +13,7 @@ extension AEXMLElement {
     /// Name of the first child if one exists. Otherwise the parent key name will be used.
     var childrenName: String { children.first?.name ?? name }
 
-    /// The common name of all the children is one is found
+    /// The common name of all the children if one is found
     /// - note: Handles the case where the name is a path leading to the key when using dictionary filters
     var commonChildrenName: String? {
         guard

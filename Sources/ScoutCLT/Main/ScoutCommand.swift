@@ -53,8 +53,10 @@ extension ScoutCommand {
 
 //        if #available(OSX 10.15.4, *) {
 //            do {
-//                guard let standardInputData = try FileHandle.standardInput.readToEnd() else {
-//                    throw RuntimeError.invalidData("Unable to get data from standard input")
+//                return try FileHandle
+//                    .standardInput
+//                    .readToEnd()
+//                    .unwrapOrThrow(error: .invalidData("Unable to get data from standard input"))
 //                }
 //                return standardInputData
 //            } catch {
