@@ -45,17 +45,18 @@ extension SerializationFormats {
         }
 
         public static func serialize(data: Data) throws -> Any {
-             try JSONSerialization.jsonObject(with: data, options: [])
+            try JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])
         }
 
         public static func serialize(value: Any) throws -> Data {
             guard JSONSerialization.isValidJSONObject(value) else {
                 throw PathExplorerError.invalidData(description: "Invalid JSON object.")
             }
+            
             if #available(OSX 10.15, *) {
-                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes, .fragmentsAllowed])
+                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes])
             } else {
-                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .fragmentsAllowed])
+                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
             }
         }
     }
@@ -86,10 +87,8 @@ extension SerializationFormats {
 
         /// Required cast from `Any` to `NodeRepresentable`
         ///
-        /// It seems to be a general bug in Swift. When working with an `Any` value from a deserialized data, the
-        /// value cannot conform to a protocol if not casted.
-        ///
-        /// As the YAMS library is casting `Any` as `NodeRepresentable` the problem arises.
+        /// The YAMS library is casting `Any` as `NodeRepresentable` but is not declaring yet the conformance
+        /// of `NSArray` and `NSDictionary` to the `NodeRepresentable` protocol.
         /// - note:
         /// Linked references and issues:
         /// - [Stack Overflow](https://stackoverflow.com/questions/42033735/failing-cast-in-swift-from-any-to-protocol)
