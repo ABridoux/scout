@@ -14,7 +14,7 @@ public struct Path: Hashable {
 
     // MARK: - Properties
 
-    private var elements = [PathElement]()
+    private var elements: [PathElement] = []
 
     // MARK: - Initialization
 

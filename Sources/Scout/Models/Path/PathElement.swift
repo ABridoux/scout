@@ -50,7 +50,7 @@ public enum PathElement: Hashable {
         }
     }
 
-    /// Can subscript an array or a dictionay
+    /// Can subscript an array or a dictionary
     public var isGroupSubscripter: Bool {
         switch self {
         case .count, .keysList, .index, .slice, .filter: return true
@@ -129,7 +129,7 @@ extension PathElement: CustomStringConvertible {
     }
 
     /// Name of the path element when used as a key in  a dictionary
-    /// - note: Mainly used for the sliced and filtetered key names
+    /// - note: Mainly used for the sliced and filtered key names
     var keyName: String {
         switch self {
         case .key(let key): return key

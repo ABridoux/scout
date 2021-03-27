@@ -14,10 +14,10 @@ extension AEXMLElement {
 
     private struct GroupCount {
         var arrays = 0
-        var dicitionaries = 0
+        var dictionaries = 0
 
         var max: GroupValue {
-            if arrays > dicitionaries {
+            if arrays > dictionaries {
                 return .array
             }
             return .dictionary // dictionary in case of equality (arbitrary)
@@ -37,7 +37,7 @@ extension AEXMLElement {
             if child.children.count > 1, child.commonChildrenName != nil {
                 groupCounts.arrays += 1
             } else {
-                groupCounts.dicitionaries += 1
+                groupCounts.dictionaries += 1
             }
         }
 
