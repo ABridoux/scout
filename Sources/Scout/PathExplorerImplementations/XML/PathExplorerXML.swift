@@ -192,10 +192,6 @@ extension PathExplorerXML {
     // MARK: Conversion
 
     public func convertValue<Type: KeyAllowedType>(to type: KeyTypes.KeyType<Type>) throws -> Type {
-        if let value = Type(stringValue) {
-            return value
-        } else {
-            throw PathExplorerError.valueConversionError(value: stringValue, type: String(describing: Type.self))
-        }
+        try Type(value: stringValue)
     }
 }

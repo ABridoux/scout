@@ -85,4 +85,11 @@ final class PathExplorerSerializationValueConversionTests: XCTestCase {
 
         XCTAssertEqual(explorer.description, "3.5")
     }
+
+    func testData() {
+        let data = "123".data(using: .utf8)!
+        let explorer = Json(value: data)
+
+        XCTAssertEqual(explorer.description, data.base64EncodedString())
+    }
 }
