@@ -9,41 +9,51 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
     /// Prints all the elements in the path, with the default separator
     /// #### Complexity
-    /// O(n) with `n` number of elements in the path
-    public var description: String { computeDescription() }
+    /// O(n) where `n`: element's count
+    public var description: String {
+        var description = reduce(into: "", newDescription)
 
-    public var debugDescription: String { description }
-
-    func computeDescription(ignore: ((PathElement) -> Bool)? = nil) -> String {
-        var description = ""
-
-        forEach { element in
-            if let ignore = ignore, ignore(element) { return }
-
-            switch element {
-
-            case .index, .count, .slice, .keysList:
-                // remove the point added automatically to a path element
-                if description.hasSuffix(Self.defaultSeparator) {
-                    description.removeLast()
-                }
-                description.append(element.description)
-
-            case .filter(let pattern):
-                description.append("#\(pattern)#")
-
-            case .key:
-                description.append(element.description)
-            }
-
-            description.append(Self.defaultSeparator)
-        }
-
-        // remove the last point if any
         if description.hasSuffix(Self.defaultSeparator) {
             description.removeLast()
         }
 
         return description
+    }
+
+
+    /// Description of the reversed path
+    /// ### Complexity
+    /// O(n) where `n`: element's count
+    public var reversedDescription: String {
+        var description = reversed().reduce(into: "", newDescription)
+
+        if description.hasSuffix(Self.defaultSeparator) {
+            description.removeLast()
+        }
+
+        return description
+    }
+
+    public var debugDescription: String { description }
+
+    private func newDescription(from description: inout String, with element: PathElement) {
+
+        switch element {
+
+        case .index, .count, .slice, .keysList:
+            // remove the point added automatically to a path element
+            if description.hasSuffix(Self.defaultSeparator) {
+                description.removeLast()
+            }
+            description.append(element.description)
+
+        case .filter(let pattern):
+            description.append("#\(pattern)#")
+
+        case .key:
+            description.append(element.description)
+        }
+
+        description.append(Self.defaultSeparator)
     }
 }
