@@ -77,6 +77,8 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
             return String(double)
         case let string as String:
             return string
+        case let data as Data:
+            return data.base64EncodedString()
         default:
                 return ""
         }
@@ -85,7 +87,7 @@ public struct PathExplorerSerialization<F: SerializationFormat>: PathExplorer {
     public var description: String {
         guard isGroup(value: value) else {
             // single values can be described
-            return String(describing: value)
+            return stringValue
         }
 
         do {
