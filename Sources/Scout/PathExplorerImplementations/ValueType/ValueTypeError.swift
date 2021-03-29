@@ -52,7 +52,7 @@ public extension ValueTypeError {
     }
 
     static func wrongUsage(of element: PathElement) -> Self {
-        return ValueTypeError(description: "The element \(element) cannot be used here. \(element.usage)")
+        return ValueTypeError(description: "The element \(element.keyName) \(element) cannot be used here. \(element.usage)")
     }
 
     static func wrong(bounds: Bounds, arrayCount: Int) -> Self {
@@ -70,4 +70,3 @@ public extension ValueTypeError {
         ValueTypeError(description: "The string '\(regexPattern)' is not a valid regular expression pattern")
     }
 }
-

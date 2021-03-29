@@ -50,7 +50,7 @@ final class ValueTypeGetTests: XCTestCase {
     }
 
     func testGetMissingNestedNestedKey_Throws() throws {
-        XCTAssertErrorsEqual(try nestedNestedDict.get("firstKey", "secondKey" , "kirk"),
+        XCTAssertErrorsEqual(try nestedNestedDict.get("firstKey", "secondKey", "kirk"),
                              ValueTypeError.missing(key: "kirk", bestMatch: nil).with(path: "secondKey", "firstKey"))
     }
 
@@ -63,7 +63,9 @@ final class ValueTypeGetTests: XCTestCase {
     func testGetKeyFilter() throws {
         let dict: ValueTypeJson = ["woody": woody, "buzz": buzz, "zorg": zorg]
 
-        XCTAssertEqual(try dict.get(.filter("woody|buzz"), "name"), .filter(["woody_name": "Woody", "buzz_name": "Buzz"]))
+        XCTAssertEqual(try dict.get(.filter("woody|buzz"), "name"),
+                       .filter(["woody_name": "Woody", "buzz_name": "Buzz"])
+        )
     }
 
     // MARK: - Index

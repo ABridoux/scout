@@ -30,7 +30,7 @@ final class ValueTypeTests: XCTestCase {
     }
 
     func testEncodeDictionary() throws {
-        let dict = ValueTypeJson.dictionary(["firstKey": "Endo",  "secondKey": 23])
+        let dict = ValueTypeJson.dictionary(["firstKey": "Endo", "secondKey": 23])
 
         let data = try JSONEncoder().encode(dict)
 

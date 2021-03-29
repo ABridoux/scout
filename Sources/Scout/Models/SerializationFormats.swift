@@ -52,7 +52,7 @@ extension SerializationFormats {
             guard JSONSerialization.isValidJSONObject(value) else {
                 throw PathExplorerError.invalidData(description: "Invalid JSON object.")
             }
-            
+
             if #available(OSX 10.15, *) {
                 return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes])
             } else {

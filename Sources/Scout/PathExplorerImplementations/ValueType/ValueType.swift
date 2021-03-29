@@ -183,6 +183,23 @@ extension ValueType: ExpressibleByDictionaryLiteral {
 
 extension ValueType {
 
+    func int(_ value: Int) -> Self { .int(value) }
+    func double(_ value: Double) -> Self { .double(value) }
+    func string(_ value: String) -> Self { .string(value) }
+    func bool(_ value: Bool) -> Self { .bool(value) }
+    func data(_ value: Data) -> Self { .data(value) }
+    func array(_ value: ArrayValue) -> Self { .array(value) }
+    func dictionary(_ value: DictionaryValue) -> Self { .dictionary(value) }
+
+    // special
+    func count(_ value: Int) -> Self { .count(value) }
+    func keysList(_ value: [String]) -> Self { .keysList(value) }
+    func slice(_ value: ArrayValue) -> Self { .slice(value) }
+    func filter(_ value: DictionaryValue) -> Self { .filter(value) }
+}
+
+extension ValueType {
+
     public var int: Int? {
         switch self {
         case .int(let int), .count(let int): return int
@@ -250,3 +267,11 @@ extension ValueType: CustomStringConvertible {
         }
     }
 }
+
+// MARK: - Operators
+
+infix operator <^>
+
+/// Apply the left function to the right operand
+/// - note: Mainly used as synthetic sugar to avoid over use of brackets
+func <^><A, F>(lhs: (A) -> ValueType<F>, rhs: A) -> ValueType<F> { lhs(rhs) }
