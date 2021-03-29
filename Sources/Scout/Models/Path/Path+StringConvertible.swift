@@ -20,7 +20,6 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
         return description
     }
 
-
     /// Description of the reversed path
     /// ### Complexity
     /// O(n) where `n`: element's count

@@ -85,7 +85,7 @@ extension KeyTypes.Get {
             } else if let string = element.value {
                 return string
             }
-            
+
             // data element value is not valid
             return nil
         }

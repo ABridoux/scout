@@ -49,7 +49,7 @@ extension ValueType {
 
         case .filter(let dict):
             let newDict = try dict.map { try ("\($0.key)_\(key)", $0.value.get(key: key)) }
-            return .filter(Dictionary(uniqueKeysWithValues: newDict))
+            return filter <^> Dictionary(uniqueKeysWithValues: newDict)
 
         default:
             throw ValueTypeError.subscriptKeyNoDict
@@ -66,7 +66,6 @@ extension ValueType {
         case .slice(let array):
             let slice = try array.reduce([Self]()) { try $0 + [$1.get(index: index)] }
             return .slice(slice)
-
 
         default:
             throw ValueTypeError.subscriptIndexNoArray
@@ -85,7 +84,7 @@ extension ValueType {
     private func getKeysList() throws -> Self {
         switch self {
         case .dictionary(let dict), .filter(let dict):
-            return .keysList(dict.map(\.key).sorted())
+            return keysList <^> dict.map(\.key).sorted()
 
         default:
             throw ValueTypeError.wrongUsage(of: .keysList)
@@ -96,13 +95,13 @@ extension ValueType {
         switch self {
         case .array(let array):
             let range = try bounds.range(arrayCount: array.count)
-            return .slice(Array(array[range]))
+            return slice <^> Array(array[range])
 
         case .slice(let array):
-            return try .slice(array.map { try $0.getSlice(for: bounds) })
+            return try slice <^> array.map { try $0.getSlice(for: bounds) }
 
         case .filter(let dict):
-            return try .filter(dict.mapValues { try $0.getSlice(for: bounds) })
+            return try filter <^> dict.mapValues { try $0.getSlice(for: bounds) }
 
         default:
             throw ValueTypeError.wrongUsage(of: .slice(bounds))
@@ -117,10 +116,10 @@ extension ValueType {
             return .filter(dict.filter { regex.validate($0.key) })
 
         case .filter(let dict):
-            return try .filter(dict.mapValues {try $0.getFilter(with: pattern) })
+            return try filter <^> dict.mapValues {try $0.getFilter(with: pattern) }
 
         case .slice(let array):
-            return try .slice(array.map { try $0.getFilter(with: pattern) })
+            return try slice <^> array.map { try $0.getFilter(with: pattern) }
 
         default:
             throw ValueTypeError.wrongUsage(of: .filter(pattern))

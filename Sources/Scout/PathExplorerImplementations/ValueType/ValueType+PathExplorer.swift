@@ -5,7 +5,6 @@
 
 import Foundation
 
-extension ValueType{
+extension ValueType {
 
-    
 }

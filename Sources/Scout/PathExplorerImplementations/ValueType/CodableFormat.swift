@@ -25,7 +25,7 @@ public extension CodableFormats {
             try JSONEncoder().encode(value)
         }
 
-        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
             try JSONDecoder().decode(type, from: data)
         }
 
