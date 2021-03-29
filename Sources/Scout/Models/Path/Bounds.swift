@@ -65,6 +65,33 @@ public struct Bounds: Hashable {
 
         return lower...upper
     }
+
+    /// - Parameters:
+    ///   - arrayCount: The count of the array to slice
+    ///   - path: Path where the bounds is specified. Used to throw a relevant error
+    /// - Throws: If the bounds are invalid
+    /// - Returns: A range made from the lower and upper bounds
+    public func range(arrayCount: Int) throws -> ClosedRange<Int> {
+        let lower = self.lower.value < 0 ? arrayCount + self.lower.value : self.lower.value
+
+        let upper: Int
+        if self.upper == .last {
+            upper = arrayCount - 1
+        } else if self.upper.value < 0 { // deal with negative indexes
+            upper = arrayCount + self.upper.value
+        } else {
+            upper = self.upper.value
+        }
+
+        guard 0 <= lower, lower <= upper, upper <= arrayCount else {
+            throw ValueTypeError.wrong(bounds: self, arrayCount: arrayCount)
+        }
+
+        lastComputedLower = lower
+        lastComputedUpper = upper
+
+        return lower...upper
+    }
 }
 
 public extension Bounds {

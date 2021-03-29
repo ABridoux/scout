@@ -17,6 +17,14 @@ extension NSRegularExpression {
         }
     }
 
+    convenience init(with pattern: String) throws {
+        do {
+            try self.init(pattern: pattern)
+        } catch {
+            throw ValueTypeError.wrong(regexPattern: pattern)
+        }
+    }
+
     // MARK: - Functions
 
     func matches(in string: String) -> [Substring] {

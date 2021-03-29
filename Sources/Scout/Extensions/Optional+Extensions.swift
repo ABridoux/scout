@@ -19,3 +19,17 @@ func !!<T>(optional: T?, errorMessage: @autoclosure () -> String) -> T {
     }
     fatalError(errorMessage())
 }
+
+extension Optional {
+
+    func unwrapOrThrow(error: Error) throws -> Wrapped {
+        guard let wrapped = self else {
+            throw error
+        }
+        return wrapped
+    }
+
+    func unwrapOrThrow(_ error: ValueTypeError) throws -> Wrapped {
+        try unwrapOrThrow(error: error)
+    }
+}

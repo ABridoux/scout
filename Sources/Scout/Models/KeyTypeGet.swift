@@ -23,6 +23,7 @@ extension KeyTypes.Get {
         public static var int: IntValue { IntValue() }
         public static var double: DoubleValue { DoubleValue() }
         public static var bool: BoolValue { BoolValue() }
+        public static var data: DataValue { DataValue() }
 
         /// When dealing with arrays or dictionaries, export the elements as `Any`
         public static var any: AnyValue { AnyValue() }
@@ -65,6 +66,13 @@ extension KeyTypes.Get {
         }
     }
 
+    public final class DataValue: ValueType<Data> {
+
+        override final func value(from element: AEXMLElement) -> Data? {
+            element.string.data(using: .utf8)
+        }
+    }
+
     public final class AnyValue: ValueType<Any> {
 
         override final func value(from element: AEXMLElement) -> Any? {
@@ -76,9 +84,10 @@ extension KeyTypes.Get {
                 return bool
             } else if let string = element.value {
                 return string
-            } else {
-                return nil
             }
+
+            // data element value is not valid
+            return nil
         }
     }
 }
