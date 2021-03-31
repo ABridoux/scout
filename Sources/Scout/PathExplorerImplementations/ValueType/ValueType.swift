@@ -5,10 +5,11 @@
 
 import Foundation
 
-public indirect enum ValueType<Format: CodableFormat> {
+public indirect enum ValueType {
 
     public typealias ArrayValue = [ValueType]
     public typealias DictionaryValue = [String: ValueType]
+    typealias SlicePath = Slice<Path>
 
     // standard
     case int(Int)
@@ -21,7 +22,7 @@ public indirect enum ValueType<Format: CodableFormat> {
 
     // special
     case count(Int)
-    case keysList([String])
+    case keysList(Set<String>)
     case slice(ArrayValue)
     case filter(DictionaryValue)
 }
@@ -129,9 +130,9 @@ extension ValueType {
             self = try .dictionary(dict.mapValues { try ValueType(value: $0) })
         } else if let array = value as? [Any] {
             self = try .array(array.map { try ValueType(value: $0) })
+        } else {
+            throw PathExplorerError.invalidValue("The value \(value) cannot be serialized")
         }
-
-        throw PathExplorerError.invalidValue("The value \(value) cannot be serialized")
     }
 }
 
@@ -193,7 +194,7 @@ extension ValueType {
 
     // special
     func count(_ value: Int) -> Self { .count(value) }
-    func keysList(_ value: [String]) -> Self { .keysList(value) }
+    func keysList(_ value: Set<String>) -> Self { .keysList(value) }
     func slice(_ value: ArrayValue) -> Self { .slice(value) }
     func filter(_ value: DictionaryValue) -> Self { .filter(value) }
 }
@@ -237,7 +238,7 @@ extension ValueType {
         }
     }
 
-    public var dict: DictionaryValue? {
+    public var dictionary: DictionaryValue? {
         switch self {
         case .dictionary(let dict), .filter(let dict): return dict
         default: return nil
@@ -268,10 +269,49 @@ extension ValueType: CustomStringConvertible {
     }
 }
 
-// MARK: - Operators
+// MARK: - Helpers and Operators
+
+extension PathExplorerBis {
+
+    /// Add the element to the thrown error if any
+    func doAdd<T>(_ element: PathElementRepresentable, _ block: () throws -> T) rethrows -> T {
+        do {
+            return try block()
+        } catch var error as ValueTypeError {
+            error.path.append(element)
+            throw error
+        }
+    }
+
+    /// Add the element to the thrown error if any
+    func doAdd(_ element: PathElementRepresentable, _ block: () throws -> Void) rethrows {
+        do {
+            try block()
+        } catch var error as ValueTypeError {
+            error.path.append(element)
+            throw error
+        }
+    }
+}
 
 infix operator <^>
 
 /// Apply the left function to the right operand
 /// - note: Mainly used as synthetic sugar to avoid over use of brackets
-func <^><A, F>(lhs: (A) -> ValueType<F>, rhs: A) -> ValueType<F> { lhs(rhs) }
+func <^><A>(lhs: (A) -> ValueType, rhs: A) -> ValueType { lhs(rhs) }
+
+extension ValueType: EquatablePathExplorer {
+    public init(value: ValueType) {
+        self = value
+    }
+
+    public mutating func set(_ path: Path, to newValue: ValueType) throws {
+
+    }
+
+    public mutating func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type : KeyAllowedType {
+
+    }
+
+    public var debugDescription: String { description }
+}

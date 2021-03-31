@@ -15,7 +15,7 @@ extension ValueType {
         try get(path: Slice(path))
     }
 
-    private func get(path: Slice<Path>) throws -> Self {
+    private func get(path: SlicePath) throws -> Self {
         guard let firstElement = path.first else { return self }
         let remainder = path.dropFirst()
         let next: ValueType
@@ -29,14 +29,7 @@ extension ValueType {
         case .filter(let pattern): next = try getFilter(with: pattern)
         }
 
-        do {
-            return try next.get(path: remainder)
-        } catch var valueError as ValueTypeError {
-            valueError.path.append(firstElement)
-            throw valueError
-        } catch {
-            throw error
-        }
+        return try doAdd(firstElement) { try next.get(path: remainder) }
     }
 
     // MARK: - Helpers
@@ -44,8 +37,8 @@ extension ValueType {
     private func get(key: String) throws -> Self {
         switch self {
         case .dictionary(let dict):
-            return try dict[key]
-                .unwrapOrThrow(.missing(key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(dict.keys))))
+            return try dict
+                .getJaroWinkler(key: key)
 
         case .filter(let dict):
             let newDict = try dict.map { try ("\($0.key)_\(key)", $0.value.get(key: key)) }
@@ -84,7 +77,7 @@ extension ValueType {
     private func getKeysList() throws -> Self {
         switch self {
         case .dictionary(let dict), .filter(let dict):
-            return keysList <^> dict.map(\.key).sorted()
+            return keysList <^> Set(dict.keys)
 
         default:
             throw ValueTypeError.wrongUsage(of: .keysList)

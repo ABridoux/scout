@@ -40,6 +40,7 @@ extension PathExplorer {
     ///   - allowNegative: If false, the function will throw if a negative index is passed
     ///   - path: Path to use when throwing an error
     func computeIndex(from index: Int, arrayCount: Int, allowNegative: Bool, in path: Path) throws -> Int {
+        #warning("[TODO] To be tested separately")
         let computedIndex = (index < 0 && allowNegative) ? arrayCount + index : index
 
         guard 0 <= computedIndex, computedIndex < arrayCount else {

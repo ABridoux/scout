@@ -9,13 +9,11 @@ import XCTest
 
 final class ValueTypeTests: XCTestCase {
 
-    typealias ValueTypeJson = ValueType<CodableFormats.Json>
-
     func testDecodeDictionary() throws {
         let dict: [String: Any] = ["firstKey": 2, "secondKey": false]
         let data = try JSONSerialization.data(withJSONObject: dict)
 
-        let value = try JSONDecoder().decode(ValueTypeJson.self, from: data)
+        let value = try JSONDecoder().decode(ValueType.self, from: data)
 
         XCTAssertEqual(value, .dictionary(["firstKey": 2, "secondKey": false]))
     }
@@ -24,13 +22,13 @@ final class ValueTypeTests: XCTestCase {
         let array: [Any] = [2, false]
         let data = try JSONSerialization.data(withJSONObject: array)
 
-        let value = try JSONDecoder().decode(ValueTypeJson.self, from: data)
+        let value = try JSONDecoder().decode(ValueType.self, from: data)
 
         XCTAssertEqual(value, .array([2, false]))
     }
 
     func testEncodeDictionary() throws {
-        let dict = ValueTypeJson.dictionary(["firstKey": "Endo", "secondKey": 23])
+        let dict = ValueType.dictionary(["firstKey": "Endo", "secondKey": 23])
 
         let data = try JSONEncoder().encode(dict)
 
@@ -42,7 +40,7 @@ final class ValueTypeTests: XCTestCase {
     }
 
     func testEncodeArray() throws {
-        let array = ValueTypeJson.array(["Endo", 23])
+        let array = ValueType.array(["Endo", 23])
 
         let data = try JSONEncoder().encode(array)
 
@@ -57,7 +55,7 @@ final class ValueTypeTests: XCTestCase {
         let dict: [String: Any] = ["firstKey": 2, "secondKey": [false]]
         let data = try JSONSerialization.data(withJSONObject: dict)
 
-        let value = try JSONDecoder().decode(ValueTypeJson.self, from: data)
+        let value = try JSONDecoder().decode(ValueType.self, from: data)
 
         XCTAssertEqual(value, .dictionary(["firstKey": 2, "secondKey": .array([false])]))
     }
@@ -66,12 +64,8 @@ final class ValueTypeTests: XCTestCase {
         let array: [Any] = [2, [false]]
         let data = try JSONSerialization.data(withJSONObject: array)
 
-        let value = try JSONDecoder().decode(ValueTypeJson.self, from: data)
+        let value = try JSONDecoder().decode(ValueType.self, from: data)
 
-        XCTAssertEqual(value,
-                       .array(
-                        [2, .array([false])]
-                       )
-        )
+        XCTAssertEqual(value, .array([2, .array([false])]))
     }
 }
