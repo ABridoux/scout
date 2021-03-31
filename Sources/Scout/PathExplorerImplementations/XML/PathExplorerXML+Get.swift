@@ -80,7 +80,7 @@ extension PathExplorerXML {
 
         guard child.error == nil else {
             let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(element.children.map(\.name)))
-            throw PathExplorerError.subscriptMissingKey(path: readingPath, key: key, bestMatch: bestMatch)
+            throw ValueTypeError.missing(key: key, bestMatch: bestMatch).with(path: readingPath.reversed())
         }
 
         return child
@@ -144,10 +144,7 @@ extension PathExplorerXML {
         var keyChildren = [AEXMLElement]()
 
         // get the keys names
-        element.children.forEach { child in
-            let keyChild = AEXMLElement(name: "key", value: child.name)
-            keyChildren.append(keyChild)
-        }
+        element.children.forEach { keyChildren.append(.newChildElement(value: $0.name)) }
 
         // new element
         let copy = element.copy()
@@ -168,23 +165,25 @@ extension PathExplorerXML {
         let newKeyName = element.name + GroupSample.keySeparator + slice.keyName
         let copy = AEXMLElement(name: newKeyName, value: element.value, attributes: element.attributes)
         let path = readingPath.appending(slice)
-        let sliceRange = try bounds.range(arrayCount: element.children.count, path: path)
 
         var slicedChildren = [AEXMLElement]()
 
         if lastGroupSample != nil {
             slicedChildren = [AEXMLElement]()
-            element.children.forEach { child in
+
+            try element.children.forEach { child in
+                let sliceRange = try bounds.range(arrayCount: child.children.count, path: path)
                 let newChild = child.copy()
                 let newSlicedChildren = Array(child.children[sliceRange])
                 newChild.addChildren(newSlicedChildren)
                 slicedChildren.append(newChild)
             }
         } else {
+            let sliceRange = try bounds.range(arrayCount: element.children.count, path: path)
             slicedChildren = Array(element.children[sliceRange])
         }
 
-        // add the sliced chilren to copy
+        // add the sliced children to copy
         copy.addChildren(slicedChildren)
 
         return PathExplorerXML(element: copy, path: path)
@@ -202,13 +201,13 @@ extension PathExplorerXML {
             filteredChildren = [AEXMLElement]()
 
             element.children.forEach { child in
-                let newName: String
-                switch sample {
-                case .dictionaryFilter: newName = child.name + filterName
-                case .arraySlice: newName = child.name
-                }
+//                let newName: String
+//                switch sample {
+//                case .dictionaryFilter: newName = child.name + filterName
+//                case .arraySlice: newName = child.name
+//                }
 
-                let newChild = AEXMLElement(name: newName, value: child.value, attributes: child.attributes)
+                let newChild = AEXMLElement(name: child.name, value: child.value, attributes: child.attributes)
                 let newSlicedChildren = child.children.filter { regex.validate($0.name) }
                 newChild.addChildren(newSlicedChildren)
                 filteredChildren.append(newChild)

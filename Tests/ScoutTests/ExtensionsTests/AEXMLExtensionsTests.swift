@@ -41,4 +41,47 @@ final class AEXMLExtensionsTests: XCTestCase {
 
         XCTAssertEqual(root.bestChildrenGroupFit, .array)
     }
+
+    func testIsEqualChildrenCountNotEqual() {
+        let element = AEXMLElement(name: "riri")
+        element.addChild(name: "fifi")
+        let otherElement = AEXMLElement(name: "loulou")
+
+        XCTAssertFalse(element.isEqual(to: otherElement))
+    }
+
+    func testIsEqualNoChildren() {
+        let element = AEXMLElement(name: "riri")
+        element.value = "duck"
+        let otherElement = AEXMLElement(name: "riri")
+        otherElement.value = "duck"
+
+        XCTAssertTrue(element.isEqual(to: otherElement))
+    }
+
+    func testIsEqualChildren() {
+        let element = AEXMLElement(name: "riri")
+        element.value = "duck"
+        element.addChild(name: "fifi", value: "duck")
+        element.addChild(name: "loulou", value: "duck")
+
+        let otherElement = element.copy()
+        otherElement.addChild(name: "fifi", value: "duck")
+        otherElement.addChild(name: "loulou", value: "duck")
+
+        XCTAssertTrue(element.isEqual(to: otherElement))
+    }
+
+    func testIsEqualWithEqualChildrenValues() {
+        let element = AEXMLElement(name: "riri")
+        element.value = "duck"
+        element.addChild(name: "fifi", value: "duck")
+        element.addChild(name: "loulou", value: "duck")
+
+        let otherElement = element.copy()
+        otherElement.addChild(name: "fifi", value: "duck")
+        otherElement.addChild(name: "donald", value: "duck")
+
+        XCTAssertFalse(element.isEqual(to: otherElement))
+    }
 }

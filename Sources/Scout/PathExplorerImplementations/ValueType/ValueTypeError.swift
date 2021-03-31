@@ -22,11 +22,15 @@ public struct ValueTypeError: LocalizedError, Equatable {
 
 extension ValueTypeError {
 
-    func with(path: Path) -> Self {
+    public func with(path: Path) -> Self {
         ValueTypeError(path: path, description: description)
     }
 
-    func with(path: PathElement...) -> Self {
+    public func with(path: PathElement...) -> Self {
+        ValueTypeError(path: Path(path), description: description)
+    }
+
+    public func with(path: [PathElement]) -> Self {
         ValueTypeError(path: Path(path), description: description)
     }
 }
