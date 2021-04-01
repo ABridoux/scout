@@ -7,6 +7,12 @@ import AEXML
 
 extension AEXMLElement {
 
+    static var defaultArrayElementName: String { "element" }
+
+    static func newChildElement(value: String) -> AEXMLElement {
+        AEXMLElement(name: defaultArrayElementName, value: value)
+    }
+
     /// Copy of the element, without the children
     func copy() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
 
