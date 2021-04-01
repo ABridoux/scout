@@ -11,10 +11,6 @@ extension ValueType {
         try get(path: Slice(path))
     }
 
-    public func get(_ path: PathElement...) throws -> Self {
-        try get(path: Slice(path))
-    }
-
     private func get(path: SlicePath) throws -> Self {
         guard let firstElement = path.first else { return self }
         let remainder = path.dropFirst()

@@ -196,7 +196,7 @@ extension PathExplorerXML {
     }
 }
 
-extension PathExplorerXML: EquatablePathExplorer {
+extension PathExplorerXML {
     public var data: Data? {
         Data(base64Encoded: element.string)
     }

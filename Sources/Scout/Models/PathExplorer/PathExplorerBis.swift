@@ -65,8 +65,6 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     func get(_ path: Path) throws -> Self
 
-    func get(_ path: PathElement...) throws -> Self
-
     /// Get the key at the given path
     ///
     /// #### Negative index
@@ -185,17 +183,4 @@ where
 //    /// Replace the group values (array or dictionaries) sub values by a unique one
 //    /// holding a fold mark to be replaced when exporting the string
 //    mutating func fold(upTo level: Int)
-}
-
-protocol EquatablePathExplorer: PathExplorerBis {
-
-    /// `true` when self is equal to the provided other element.
-    /// #### Complexity
-    /// Most often `O(n)` where `n` is the children count.
-    func isEqual(to other: Self) -> Bool
-}
-
-extension EquatablePathExplorer where Self: Equatable {
-
-    func isEqual(to other: Self) -> Bool { self == other }
 }
