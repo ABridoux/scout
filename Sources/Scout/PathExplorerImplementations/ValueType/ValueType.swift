@@ -305,10 +305,6 @@ extension ValueType: EquatablePathExplorer {
         self = value
     }
 
-    public mutating func set(_ path: Path, to newValue: ValueType) throws {
-
-    }
-
     public mutating func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type : KeyAllowedType {
 
     }

@@ -9,15 +9,15 @@ import Foundation
 
 extension ValueType {
 
-    public mutating func set(_ path: Path, to newValue: Any) throws {
-        try set(path: Slice(path), to: Self(value: newValue))
+    public mutating func set(_ path: Path, to newValue: ValueType) throws {
+        try set(path: Slice(path), to: newValue)
     }
 
-    public mutating func set(_ path: PathElement..., to newValue: Any) throws {
+    public mutating func set(_ path: PathElement..., to newValue: ValueType) throws {
         try set(path: Path(path)[...], to: Self(value: newValue))
     }
 
-    private mutating func set(path: SlicePath, to newValue: Self) throws {
+    private mutating func set(path: SlicePath, to newValue: ValueType) throws {
         guard let firstElement = path.first else {
             return self = newValue
         }
