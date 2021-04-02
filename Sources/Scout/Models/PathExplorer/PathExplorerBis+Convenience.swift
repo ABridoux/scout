@@ -16,4 +16,7 @@ public extension PathExplorerBis {
     mutating func set(_ path: [PathElement], keyNameTo newKeyName: String) throws { try set(Path(path), keyNameTo: newKeyName) }
     mutating func set(_ path: PathElement..., keyNameTo newKeyName: String) throws { try set(path, keyNameTo: newKeyName) }
 
+    mutating func delete(_ path: [PathElement], deleteIfEmpty: Bool = false) throws { try delete(Path(path), deleteIfEmpty: deleteIfEmpty) }
+    mutating func delete(_ path: PathElement..., deleteIfEmpty: Bool = false) throws { try delete(path, deleteIfEmpty: deleteIfEmpty) }
+
 }

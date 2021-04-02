@@ -84,6 +84,15 @@ where
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
     mutating func set(_ path: Path, to newValue: ValueType) throws
 
+    /// Set the value of the key at the given path and returns a new modified `PathExplorer`
+    ///
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
+    ///
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
+    mutating func setting(_ path: Path, to newValue: ValueType) throws -> Self
+
     /// Set the value of the key at the given path
     ///
     /// #### Negative index
@@ -93,17 +102,25 @@ where
     /// throwing an error if the conversion is not possible
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred.
-    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws
+//    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws
 
     // - Set key name
 
-    /// Set the name of the key at the given path, specified as array
+    /// Set the name of the key at the given path
     ///
     /// #### Negative index
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary)
     mutating func set(_ path: Path, keyNameTo newKeyName: String) throws
+
+    /// Set the name of the key at the given path, and return a new modified `PathExplorer`
+    ///
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
+    ///
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary)
+    func setting(_ path: Path, keyNameTo keyName: String) throws -> Self
 
 //    // MARK: Delete
 //
@@ -114,7 +131,16 @@ where
 //    ///
 //    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion. Default: `false`
 //    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-//    mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws
+    mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws
+
+    /// Delete the key at the given path and returns a new modified `PathExplorer`
+    ///
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
+    ///
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion. Default: `false`
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    func deleting(_ path: Path, deleteIfEmpty: Bool) throws  -> Self
 //
 //    // MARK: Add
 //

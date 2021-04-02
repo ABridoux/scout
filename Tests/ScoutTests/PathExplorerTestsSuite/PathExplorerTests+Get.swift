@@ -119,10 +119,9 @@ final class PathExplorerGetTests: XCTestCase {
 
     func testGetKeyFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let dict: ValueType = ["woody": woody, "buzz": buzz, "zorg": zorg]
-        let expectedOutcome: ValueType = .filter(["woody_name": "Woody", "buzz_name": "Buzz"])
+        let expectedExplorer = P(value: .filter(["woody_name": "Woody", "buzz_name": "Buzz"]))
 
         let explorer = try P(value: dict).get(.filter("woody|buzz"), "name")
-        let expectedExplorer = P(value: expectedOutcome)
 
         XCTAssertExplorersEqual(explorer, expectedExplorer)
     }

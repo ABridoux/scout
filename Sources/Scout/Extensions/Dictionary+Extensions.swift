@@ -12,3 +12,14 @@ extension Dictionary where Key == String {
         try self[key].unwrapOrThrow(.missing(key: key, bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(keys))))
     }
 }
+
+extension Dictionary {
+
+    mutating func modifyEachValue(_ modify: (inout Value) throws -> Void) rethrows {
+        self = try mapValues { value in
+            var value = value
+            try modify(&value)
+            return value
+        }
+    }
+}

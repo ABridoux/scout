@@ -12,7 +12,6 @@ extension PathExplorerBis {
     ///   - index: Index to compute
     ///   - arrayCount: Array count
     func computeIndex(from index: Int, arrayCount: Int) throws -> Int {
-        #warning("[TODO] To be tested separately")
         let computedIndex = index < 0 ? arrayCount + index : index
 
         guard 0 <= computedIndex, computedIndex < arrayCount else {
