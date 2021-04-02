@@ -29,6 +29,7 @@ final class PathExplorerSetTests: XCTestCase {
 
         // key name
         try testSetKeyName(P.self)
+        try testNestedKeyName(P.self)
     }
 
     func testStub() throws {
@@ -109,12 +110,23 @@ final class PathExplorerSetTests: XCTestCase {
 
     func testSetKeyName<P: EquatablePathExplorer>(_ type: P.Type) throws {
         var explorer = P(value: ["toto": 2, "Endo": false])
-        let expected = P(value: ["tata": 2, "Endo": false])
+        let expectedExplorer = P(value: ["tata": 2, "Endo": false])
 
         try explorer.set("toto", keyNameTo: "tata")
 
-        XCTAssertExplorersEqual(explorer, expected)
+        XCTAssertExplorersEqual(explorer, expectedExplorer)
     }
+
+    func testNestedKeyName<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        var explorer = P(value: ["toto": ["Endo": 2]])
+        let expectedExplorer = P(value: ["toto": ["Socrate": 2]])
+
+        try explorer.set("toto", "Endo", keyNameTo: "Socrate")
+
+        XCTAssertExplorersEqual(explorer, expectedExplorer)
+    }
+
+    #warning("Test errors")
 }
 
 // MARK: - Helpers

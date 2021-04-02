@@ -13,8 +13,10 @@ extension ValueType {
         try set(path: Slice(path), to: newValue)
     }
 
-    public mutating func set(_ path: PathElement..., to newValue: ValueType) throws {
-        try set(path: Path(path)[...], to: Self(value: newValue))
+    public func setting(_ path: Path, to newValue: ValueType) throws -> Self{
+        var copy = self
+        try copy.set(path, to: newValue)
+        return copy
     }
 
     private mutating func set(path: SlicePath, to newValue: ValueType) throws {
@@ -67,13 +69,14 @@ extension ValueType {
         try set(path: Slice(path), keyName: keyName)
     }
 
-    public mutating func set(_ path: PathElement, keyNameTo keyName: String) throws {
-        try set(path: Path(path)[...], keyName: keyName)
+    public func setting(_ path: Path, keyNameTo keyName: String) throws -> Self {
+        var copy = self
+        try copy.set(path: Slice(path), keyName: keyName)
+        return copy
     }
 
     private mutating func set(path: SlicePath, keyName: String) throws {
-        guard let firstElement = path.first else {
-            assertionFailure("This case should not be possible")
+        guard let firstElement = path.first else { // empty path
             return
         }
 

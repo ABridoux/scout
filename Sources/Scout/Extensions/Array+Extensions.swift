@@ -26,3 +26,14 @@ extension Array {
         }
     }
 }
+
+extension Array {
+
+    mutating func modifyEach(_ modify: (inout Element) throws -> Void) rethrows {
+        try self = map { element in
+            var element = element
+            try modify(&element)
+            return element
+        }
+    }
+}

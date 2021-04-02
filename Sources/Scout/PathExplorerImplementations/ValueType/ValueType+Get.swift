@@ -33,8 +33,7 @@ extension ValueType {
     private func get(key: String) throws -> Self {
         switch self {
         case .dictionary(let dict):
-            return try dict
-                .getJaroWinkler(key: key)
+            return try dict.getJaroWinkler(key: key)
 
         case .filter(let dict):
             let newDict = try dict.map { try ("\($0.key)_\(key)", $0.value.get(key: key)) }

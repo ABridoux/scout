@@ -273,23 +273,21 @@ extension ValueType: CustomStringConvertible {
 
 extension PathExplorerBis {
 
-    /// Add the element to the thrown error if any
+    /// Add the element to the thrown `ValueTypeError` if any
     func doAdd<T>(_ element: PathElementRepresentable, _ block: () throws -> T) rethrows -> T {
         do {
             return try block()
-        } catch var error as ValueTypeError {
-            error.path.append(element)
-            throw error
+        } catch let error as ValueTypeError {
+            throw error.adding(element)
         }
     }
 
-    /// Add the element to the thrown error if any
+    /// Add the element to the thrown `ValueTypeError` if any
     func doAdd(_ element: PathElementRepresentable, _ block: () throws -> Void) rethrows {
         do {
             try block()
-        } catch var error as ValueTypeError {
-            error.path.append(element)
-            throw error
+        } catch let error as ValueTypeError {
+            throw error.adding(element)
         }
     }
 }

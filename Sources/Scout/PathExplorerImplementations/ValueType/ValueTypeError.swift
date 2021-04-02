@@ -7,15 +7,15 @@ import Foundation
 
 public struct ValueTypeError: LocalizedError, Equatable {
 
-    /// The reversed path leading to the error
-    /// - note: Use `reversedDescription` to compute the description of the reversed path efficiently
-    public var path = Path()
+    /// When an error is raised, the path will be built in the reversed order
+    private var reversedPath = Path()
+    public var path: Path { Path(elements: reversedPath.reversed()) }
     var description: String
 
-    public var errorDescription: String? { "[\(path.reversedDescription)] \(description)" }
+    public var errorDescription: String? { "[\(path.description)] \(description)" }
 
     init(path: Path = .empty, description: String) {
-        self.path = path
+        self.reversedPath = path
         self.description = description
     }
 }
@@ -32,6 +32,14 @@ extension ValueTypeError {
 
     public func with(path: [PathElement]) -> Self {
         ValueTypeError(path: Path(path), description: description)
+    }
+
+    public func with(path: Slice<Path>) -> Self {
+        ValueTypeError(path: Path(path), description: description)
+    }
+
+    public func adding(_ element: PathElementRepresentable) -> ValueTypeError {
+        ValueTypeError(path: reversedPath.appending(element), description: description)
     }
 }
 
