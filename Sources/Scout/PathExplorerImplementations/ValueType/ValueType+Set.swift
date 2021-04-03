@@ -13,7 +13,7 @@ extension ValueType {
         try set(path: Slice(path), to: newValue)
     }
 
-    public func setting(_ path: Path, to newValue: ValueType) throws -> Self{
+    public func setting(_ path: Path, to newValue: ValueType) throws -> Self {
         var copy = self
         try copy.set(path, to: newValue)
         return copy

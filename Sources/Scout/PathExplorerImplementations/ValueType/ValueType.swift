@@ -339,7 +339,7 @@ extension ValueType: EquatablePathExplorer {
         self = value
     }
 
-    public mutating func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type : KeyAllowedType {
+    public mutating func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
 
     }
 

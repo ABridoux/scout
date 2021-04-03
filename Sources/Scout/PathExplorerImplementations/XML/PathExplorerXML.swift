@@ -214,7 +214,7 @@ extension PathExplorerXML {
     public func set(_ path: Path, to newValue: ValueType) throws {
     }
 
-    public func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type : KeyAllowedType {
+    public func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
 
     }
 }
