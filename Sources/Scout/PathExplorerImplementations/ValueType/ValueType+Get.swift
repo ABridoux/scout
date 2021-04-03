@@ -15,7 +15,7 @@ extension ValueType {
         guard let firstElement = path.first else { return self }
         let remainder = path.dropFirst()
 
-        return try doSetPath(remainder.leftPart) {
+        return try doSettingPath(remainder.leftPart) {
             let next: ValueType
 
             switch firstElement {
