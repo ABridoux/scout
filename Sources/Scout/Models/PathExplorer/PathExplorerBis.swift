@@ -90,7 +90,7 @@ where
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    mutating func setting(_ path: Path, to newValue: ValueType) throws -> Self
+    func setting(_ path: Path, to newValue: ValueType) throws -> Self
 
     /// Set the value of the key at the given path
     ///
@@ -153,7 +153,9 @@ where
 //    ///
 //    /// ### Non-existing key
 //    /// Any non existing key encountered in the path will be created.
-//    mutating func add(_ newValue: Any, at path: Path) throws
+    mutating func add(_ value: ValueType, at path: Path) throws
+
+    func adding(_ value: ValueType, at path: Path) throws -> Self
 //
 //    /// Add a value at the given path.
 //    ///

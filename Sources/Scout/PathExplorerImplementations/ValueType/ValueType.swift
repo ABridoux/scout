@@ -319,7 +319,7 @@ extension PathExplorerBis {
     }
 
     /// do/catch on the provided block to catch a `ValueTypeError` and set the provided path on it
-    func doSetPath<T>(_ path: Slice<Path>, _ block: () throws -> T) rethrows -> T {
+    func doSettingPath<T>(_ path: Slice<Path>, _ block: () throws -> T) rethrows -> T {
         do {
             return try block()
         } catch let error as ValueTypeError {
