@@ -6,13 +6,10 @@
 import Foundation
 
 public struct ValueTypeError: LocalizedError, Equatable {
+    public private(set) var path: Path
+    let description: String
 
-    /// The reversed path leading to the error
-    /// - note: Use `reversedDescription` to compute the description of the reversed path efficiently
-    public var path = Path()
-    var description: String
-
-    public var errorDescription: String? { "[\(path.reversedDescription)] \(description)" }
+    public var errorDescription: String? { "[\(path.description)] \(description)" }
 
     init(path: Path = .empty, description: String) {
         self.path = path
@@ -20,18 +17,40 @@ public struct ValueTypeError: LocalizedError, Equatable {
     }
 }
 
+// MARK: - Path building
+
 extension ValueTypeError {
 
-    public func with(path: Path) -> Self {
-        ValueTypeError(path: path, description: description)
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty.
+    /// If the current path is not empty, self is returned
+    func with(path: Path) -> Self {
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: path, description: description)
     }
 
-    public func with(path: PathElement...) -> Self {
-        ValueTypeError(path: Path(path), description: description)
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty.
+    /// If the current path is not empty, self is returned
+    func with(path: PathElement...) -> Self {
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: Path(path), description: description)
     }
 
-    public func with(path: [PathElement]) -> Self {
-        ValueTypeError(path: Path(path), description: description)
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty.
+    /// If the current path is not empty, self is returned
+    func with(path: [PathElement]) -> Self {
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: Path(path), description: description)
+    }
+
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty.
+    /// If the current path is not empty, self is returned
+    func with(path: Slice<Path>) -> Self {
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: Path(path), description: description)
+    }
+
+    func adding(_ element: PathElementRepresentable) -> ValueTypeError {
+        ValueTypeError(path: path.appending(element), description: description)
     }
 }
 

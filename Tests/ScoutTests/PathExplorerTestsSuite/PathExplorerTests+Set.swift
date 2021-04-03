@@ -17,22 +17,27 @@ final class PathExplorerSetTests: XCTestCase {
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
         // key
         try testSetKey(P.self)
-        try testSetNestedKey(P.self)
-        try testSetKeyOnNonDictionaryThrows(P.self)
-        try testSetKeyOnNonDictionaryThrows_Nested(P.self)
+        try testSetKey_Nested(P.self)
+        try testSetKeyName_ThrowsOnNonDictionary(P.self)
+        try testSetKey_ThrowsOnNonDictionary_Nested(P.self)
 
         // index
         try testSetIndex(P.self)
-        try testSetNegativeIndex(P.self)
-        try testSetIndexOnNonArrayThrows(P.self)
-        try testSetIndexOnNonArrayThrows_Nested(P.self)
+        try testSetIndex_Negative(P.self)
+        try testSetIndex_Nested(P.self)
+        try testSetIndex_ThrowsOnNonArray(P.self)
+        try testSetIndex_ThrowsOnNonArray_Nested(P.self)
 
         // key name
-        try testSetKeyName(P.self)
+        try testSetKeyName_Key(P.self)
+        try testSetKeyName_NestedKey(P.self)
+        try testSetKeyName_NestedIndex(P.self)
+        try testSetKeyName_ThrowsOnNonDictionary(P.self)
+        try testSetKeyName_IndexThrowsOnNonArray(P.self)
     }
 
     func testStub() throws {
-        // use this function to launch a specific test with a specific PathExplorer
+        // use this function to launch a test with a specific PathExplorer
     }
 
     // MARK: - Key
@@ -47,7 +52,7 @@ final class PathExplorerSetTests: XCTestCase {
         )
     }
 
-    func testSetNestedKey<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testSetKey_Nested<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testSet(
             P.self,
             initial: ["toto": ["Riri": 2], "Endo": false],
@@ -57,13 +62,13 @@ final class PathExplorerSetTests: XCTestCase {
          )
     }
 
-    func testSetKeyOnNonDictionaryThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testSetKeyName_ThrowsOnNonDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
         var explorer = P(value: ["toto", 1])
 
         XCTAssertErrorsEqual(try explorer.set("toto", to: 1), .subscriptKeyNoDict)
     }
 
-    func testSetKeyOnNonDictionaryThrows_Nested<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testSetKey_ThrowsOnNonDictionary_Nested<P: EquatablePathExplorer>(_ type: P.Type) throws {
         var explorer = P(value: ["toto": [true]])
 
         XCTAssertErrorsEqual(try explorer.set("toto", "Endo", to: 1),
@@ -82,7 +87,7 @@ final class PathExplorerSetTests: XCTestCase {
         )
     }
 
-    func testSetNegativeIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testSetIndex_Negative<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testSet(
             P.self,
             initial: [1, false, "toto"],
@@ -92,13 +97,23 @@ final class PathExplorerSetTests: XCTestCase {
         )
     }
 
-    func testSetIndexOnNonArrayThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testSetIndex_Nested<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testSet(
+            P.self,
+            initial: [[1, 2, 3], [4, 5, 6]],
+            path: 1, 0,
+            value: "here",
+            expected: [[1, 2, 3], ["here", 5, 6]]
+        )
+    }
+
+    func testSetIndex_ThrowsOnNonArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
         var explorer = P(value: ["toto": 2, "Endo": false])
 
         XCTAssertErrorsEqual(try explorer.set(1, to: 2), .subscriptIndexNoArray)
     }
 
-    func testSetIndexOnNonArrayThrows_Nested<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testSetIndex_ThrowsOnNonArray_Nested<P: EquatablePathExplorer>(_ type: P.Type) throws {
         var explorer = P(value: [["Endo": 2]])
 
         XCTAssertErrorsEqual(try explorer.set(0, 1, to: 2),
@@ -107,13 +122,46 @@ final class PathExplorerSetTests: XCTestCase {
 
     // MARK: - Key name
 
-    func testSetKeyName<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        var explorer = P(value: ["toto": 2, "Endo": false])
-        let expected = P(value: ["tata": 2, "Endo": false])
+    func testSetKeyName_Key<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testSetKeyName(
+            P.self,
+            initial: ["toto": 2, "Endo": false],
+            path: "toto",
+            value: "tata",
+            expected: ["tata": 2, "Endo": false]
+        )
+    }
 
-        try explorer.set("toto", keyNameTo: "tata")
+    func testSetKeyName_NestedKey<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testSetKeyName(
+            P.self,
+            initial: ["toto": ["Endo": 2]],
+            path: "toto", "Endo",
+            value: "Socrate",
+            expected: ["toto": ["Socrate": 2]]
+        )
+    }
 
-        XCTAssertExplorersEqual(explorer, expected)
+    func testSetKeyName_NestedIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testSetKeyName(
+            P.self,
+            initial: [["toto": 2], ["toto": 1]],
+            path: 0, "toto",
+            value: "Endo",
+            expected: [["Endo": 2], ["toto": 1]]
+        )
+    }
+
+    func testSetKeyName_KeyThrowsOnNonDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        var explorer = P(value: [1, 2, 3])
+
+        XCTAssertErrorsEqual(try explorer.set(1, keyNameTo: "toto"), .subscriptKeyNoDict)
+    }
+
+    func testSetKeyName_IndexThrowsOnNonArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        var explorer = P(value: ["Toto": 10, "Endo": true])
+
+        XCTAssertErrorsEqual(try explorer.set(1, keyNameTo: "toto"), .wrongUsage(of: 1))
     }
 }
 
@@ -134,6 +182,23 @@ extension PathExplorerSetTests {
         let expectedExplorer = P(value: expected)
 
         try explorer.set(path, to: value)
+
+        XCTAssertExplorersEqual(explorer, expectedExplorer, file: file, line: line)
+    }
+
+    func testSetKeyName<P: EquatablePathExplorer>(
+        _ type: P.Type,
+        initial: ValueType,
+        path: PathElement...,
+        value: String,
+        expected: ValueType,
+        file: StaticString = #file,
+        line: UInt = #line)
+    throws {
+        var explorer = P(value: initial)
+        let expectedExplorer = P(value: expected)
+
+        try explorer.set(path, keyNameTo: value)
 
         XCTAssertExplorersEqual(explorer, expectedExplorer, file: file, line: line)
     }
