@@ -69,6 +69,7 @@ final class PathExplorerGetTests: XCTestCase {
 
     func testStub() throws {
         // use this function to launch a specific test with a specific PathExplorer
+        try testGetMissingNestedKeyThrows(ValueType.self)
     }
 
     // MARK: - Key
