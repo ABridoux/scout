@@ -27,6 +27,7 @@ extension ValueType {
             case .key(let key): try delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
             case .index(let index): try delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
             case .filter(let pattern): try deleteFilter(with: pattern, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
+            case .slice(let bounds): try deleteSlice(within: bounds, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
             default:
                 throw ValueTypeError.wrongUsage(of: element)
             }
@@ -39,7 +40,6 @@ extension ValueType {
         switch self {
 
         case .dictionary(var dict):
-
             var value = try dict.getJaroWinkler(key: key)
             let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
@@ -92,7 +92,7 @@ extension ValueType {
         }
     }
 
-    mutating func deleteFilter(with pattern: String, remainder: SlicePath, deleteIfEmpty: Bool) throws {
+    private mutating func deleteFilter(with pattern: String, remainder: SlicePath, deleteIfEmpty: Bool) throws {
         switch self {
 
         case .dictionary(let dict):
@@ -122,6 +122,37 @@ extension ValueType {
 
         default:
             throw ValueTypeError.wrongUsage(of: .filter(pattern))
+        }
+    }
+
+    private mutating func deleteSlice(within bounds: Bounds, remainder: SlicePath, deleteIfEmpty: Bool) throws {
+        switch self {
+
+        case .array(var array):
+            let range = try bounds.range(arrayCount: array.count)
+            let newRangeElements = try array[range].compactMap { (element) -> ValueType? in
+                var element = element
+                let shouldDelete = try element.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
+
+                if shouldDelete || (element.isEmpty && deleteIfEmpty) {
+                    return nil
+                } else {
+                    return element
+                }
+            }
+            array.replaceSubrange(range, with: newRangeElements)
+            self = .array(array)
+
+        case .slice(var array):
+            try array.modifyEach { try $0.deleteSlice(within: bounds, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
+            self = .slice(array)
+
+        case .filter(var dict):
+            try dict.modifyEachValue { try $0.deleteSlice(within: bounds, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
+            self = .filter(dict)
+
+        default:
+            throw ValueTypeError.wrongUsage(of: .slice(bounds))
         }
     }
 }

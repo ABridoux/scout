@@ -33,7 +33,6 @@ where
 
     var data: Data? { get }
 
-
 //    /// Non `nil` if the key is an non-nested array of the given type
 //    /// - note: The type `.any` does not allow nested values
 //    func array<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [Value]?
