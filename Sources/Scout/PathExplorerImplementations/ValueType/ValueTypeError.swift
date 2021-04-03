@@ -7,39 +7,49 @@ import Foundation
 
 public struct ValueTypeError: LocalizedError, Equatable {
 
-    /// When an error is raised, the path will be built in the reversed order
-    private var reversedPath = Path()
-    public var path: Path { Path(elements: reversedPath.reversed()) }
+    public private(set) var path: Path
     var description: String
 
     public var errorDescription: String? { "[\(path.description)] \(description)" }
 
     init(path: Path = .empty, description: String) {
-        self.reversedPath = path
+        self.path = path
         self.description = description
     }
 }
 
 extension ValueTypeError {
 
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty
+    /// If the current path is not empty, self is returned
     public func with(path: Path) -> Self {
-        ValueTypeError(path: path, description: description)
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: path, description: description)
     }
 
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty
+    /// If the current path is not empty, self is returned
     public func with(path: PathElement...) -> Self {
-        ValueTypeError(path: Path(path), description: description)
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: Path(path), description: description)
     }
 
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty
+    /// If the current path is not empty, self is returned
     public func with(path: [PathElement]) -> Self {
-        ValueTypeError(path: Path(path), description: description)
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: Path(path), description: description)
     }
 
+    /// Return a new `ValueTypeError` with the provided path, only when the current path is not empty
+    /// If the current path is not empty, self is returned
     public func with(path: Slice<Path>) -> Self {
-        ValueTypeError(path: Path(path), description: description)
+        guard self.path.isEmpty else { return self }
+        return ValueTypeError(path: Path(path), description: description)
     }
 
     public func adding(_ element: PathElementRepresentable) -> ValueTypeError {
-        ValueTypeError(path: reversedPath.appending(element), description: description)
+        ValueTypeError(path: path.appending(element), description: description)
     }
 }
 

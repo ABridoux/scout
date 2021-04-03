@@ -290,6 +290,42 @@ extension PathExplorerBis {
             throw error.adding(element)
         }
     }
+
+    /// Add the element to the thrown `ValueTypeError` if any
+    func doAdd<T>(_ element: PathElement, _ block: () throws -> T) rethrows -> T {
+        do {
+            return try block()
+        } catch let error as ValueTypeError {
+            throw error.adding(element)
+        }
+    }
+
+    /// Add the element to the thrown `ValueTypeError` if any
+    func doAdd(_ element: PathElement, _ block: () throws -> Void) rethrows {
+        do {
+            try block()
+        } catch let error as ValueTypeError {
+            throw error.adding(element)
+        }
+    }
+
+    /// do/catch on the provided block to catch a `ValueTypeError` and set the provided path on it
+    func doSettingPath(_ path: Slice<Path>, _ block: () throws -> Void) rethrows {
+        do {
+            try block()
+        } catch let error as ValueTypeError {
+            throw error.with(path: path)
+        }
+    }
+
+    /// do/catch on the provided block to catch a `ValueTypeError` and set the provided path on it
+    func doSetPath<T>(_ path: Slice<Path>, _ block: () throws -> T) rethrows -> T {
+        do {
+            return try block()
+        } catch let error as ValueTypeError {
+            throw error.with(path: path)
+        }
+    }
 }
 
 infix operator <^>

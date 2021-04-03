@@ -19,16 +19,17 @@ extension ValueType {
 
     /// Returns `true` if the end of the path is reached
     private mutating func delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
-        guard let firstElement = path.first else { // empty path
-            return true
-        }
-
+        guard let element = path.first else { return true}
         let remainder = path.dropFirst()
 
-        switch firstElement {
-        case .key(let key): try delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
-        case .index(let index): try delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
-        default: fatalError()
+        try doSettingPath(remainder.leftPart) {
+            switch element {
+            case .key(let key): try delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
+            case .index(let index): try delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
+            case .filter(let pattern): try deleteFilter(with: pattern, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
+            default:
+                throw ValueTypeError.wrongUsage(of: element)
+            }
         }
 
         return false
@@ -36,33 +37,26 @@ extension ValueType {
 
     private mutating func delete(key: String, remainder: SlicePath, deleteIfEmpty: Bool) throws {
         switch self {
+
         case .dictionary(var dict):
 
-            try doAdd(key) {
-                var value = try dict.getJaroWinkler(key: key)
-                let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
+            var value = try dict.getJaroWinkler(key: key)
+            let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
-                if shouldDelete || (value.isEmpty && deleteIfEmpty) {
-                    dict.removeValue(forKey: key)
-                } else {
-                    dict[key] = value
-                }
-
-                self = .dictionary(dict)
+            if shouldDelete || (value.isEmpty && deleteIfEmpty) {
+                dict.removeValue(forKey: key)
+            } else {
+                dict[key] = value
             }
+
+            self = .dictionary(dict)
 
         case .filter(var dict):
-            try doAdd(key) {
-                try dict.modifyEachValue { try $0.delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            }
-            
+            try dict.modifyEachValue { try $0.delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
             self = .filter(dict)
 
         case .slice(var array):
-            try doAdd(key) {
-                try array.modifyEach { try $0.delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            }
-
+            try array.modifyEach { try $0.delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
             self = .slice(array)
 
         default:
@@ -72,38 +66,62 @@ extension ValueType {
 
     private mutating func delete(index: Int, remainder: SlicePath, deleteIfEmpty: Bool) throws {
         switch self {
+
         case .array(var array):
+            let index = try computeIndex(from: index, arrayCount: array.count)
+            var value = array[index]
+            let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
-            try doAdd(index) {
-                let index = try computeIndex(from: index, arrayCount: array.count)
-                var value = array[index]
-                let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
-
-                if shouldDelete || (value.isEmpty && deleteIfEmpty) {
-                    array.remove(at: index)
-                } else {
-                    array[index] = value
-                }
-
-                self = .array(array)
+            if shouldDelete || (value.isEmpty && deleteIfEmpty) {
+                array.remove(at: index)
+            } else {
+                array[index] = value
             }
+            self = .array(array)
 
         case .slice(var array):
-            try doAdd(index) {
-                try array.modifyEach { try $0.delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            }
-
+            try array.modifyEach { try $0.delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
             self = .slice(array)
 
         case .filter(var dict):
-            try doAdd(index) {
-                try dict.modifyEachValue { try $0.delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            }
-
+            try dict.modifyEachValue { try $0.delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
             self = .filter(dict)
 
         default:
             throw ValueTypeError.subscriptIndexNoArray
+        }
+    }
+
+    mutating func deleteFilter(with pattern: String, remainder: SlicePath, deleteIfEmpty: Bool) throws {
+        switch self {
+
+        case .dictionary(let dict):
+            let regex = try NSRegularExpression(with: pattern)
+
+            let modified = try dict.compactMap { (key, value) -> (String, ValueType)? in
+                guard regex.validate(key) else { return (key, value) }
+                var value = value
+                let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
+
+                if shouldDelete || (value.isEmpty && deleteIfEmpty) {
+                    return nil
+                } else {
+                    return (key, value)
+                }
+            }
+
+            self = .dictionary(Dictionary(uniqueKeysWithValues: modified))
+
+        case .filter(var dict):
+            try dict.modifyEachValue { try $0.deleteFilter(with: pattern, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
+            self = .filter(dict)
+
+        case .slice(var array):
+            try array.modifyEach { try $0.deleteFilter(with: pattern, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
+            self = .slice(array)
+
+        default:
+            throw ValueTypeError.wrongUsage(of: .filter(pattern))
         }
     }
 }

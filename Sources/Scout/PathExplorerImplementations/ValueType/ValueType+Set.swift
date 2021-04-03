@@ -26,10 +26,12 @@ extension ValueType {
 
         let remainder = path.dropFirst()
 
-        switch firstElement {
-        case .key(let key): try set(key: key, to: newValue, remainder: remainder)
-        case .index(let index): try set(index: index, to: newValue, remainder: remainder)
-        default: throw ValueTypeError.wrongUsage(of: firstElement)
+        try doSettingPath(remainder.leftPart) {
+            switch firstElement {
+            case .key(let key): try set(key: key, to: newValue, remainder: remainder)
+            case .index(let index): try set(index: index, to: newValue, remainder: remainder)
+            default: throw ValueTypeError.wrongUsage(of: firstElement)
+            }
         }
     }
 
@@ -37,27 +39,21 @@ extension ValueType {
 
     private mutating func set(key: String, to newValue: ValueType, remainder: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-
-        try doAdd(key) {
-            var value = try dict.getJaroWinkler(key: key)
-            try value.set(path: remainder, to: newValue)
-            dict[key] = value
-            self = .dictionary(dict)
-        }
+        var value = try dict.getJaroWinkler(key: key)
+        try value.set(path: remainder, to: newValue)
+        dict[key] = value
+        self = .dictionary(dict)
     }
 
     // MARK: Index
 
     private mutating func set(index: Int, to newValue: Self, remainder: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
-
-        try doAdd(index) {
-            let index = try computeIndex(from: index, arrayCount: array.count)
-            var element = array[index]
-            try element.set(path: remainder, to: newValue)
-            array[index] = element
-            self = .array(array)
-        }
+        let index = try computeIndex(from: index, arrayCount: array.count)
+        var element = array[index]
+        try element.set(path: remainder, to: newValue)
+        array[index] = element
+        self = .array(array)
     }
 }
 
@@ -88,12 +84,10 @@ extension ValueType {
             }
 
             var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-            try doAdd(key) {
-                let value = try dict.getJaroWinkler(key: key)
-                dict.removeValue(forKey: key)
-                dict[keyName] = value
-                self = .dictionary(dict)
-            }
+            let value = try dict.getJaroWinkler(key: key)
+            dict.removeValue(forKey: key)
+            dict[keyName] = value
+            self = .dictionary(dict)
             return
         }
 
@@ -109,12 +103,10 @@ extension ValueType {
     private mutating func set(key: String, keyName: String, remainder: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
 
-        try doAdd(key) {
-            var value = try dict.getJaroWinkler(key: key)
-            try value.set(path: remainder, keyName: keyName)
-            dict[key] = value
-            self = .dictionary(dict)
-        }
+        var value = try dict.getJaroWinkler(key: key)
+        try value.set(path: remainder, keyName: keyName)
+        dict[key] = value
+        self = .dictionary(dict)
     }
 
     // MARK: Index
@@ -122,12 +114,10 @@ extension ValueType {
     private mutating func set(index: Int, keyName: String, remainder: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
 
-        try doAdd(index) {
-            let index = try computeIndex(from: index, arrayCount: array.count)
-            var element = array[index]
-            try element.set(path: remainder, keyName: keyName)
-            array[index] = element
-            self = .array(array)
-        }
+        let index = try computeIndex(from: index, arrayCount: array.count)
+        var element = array[index]
+        try element.set(path: remainder, keyName: keyName)
+        array[index] = element
+        self = .array(array)
     }
 }

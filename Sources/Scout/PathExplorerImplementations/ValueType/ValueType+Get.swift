@@ -14,18 +14,20 @@ extension ValueType {
     private func get(path: SlicePath) throws -> Self {
         guard let firstElement = path.first else { return self }
         let remainder = path.dropFirst()
-        let next: ValueType
 
-        switch firstElement {
-        case .key(let key): next = try get(key: key)
-        case .index(let index): next = try get(index: index)
-        case .count: next = try getCount()
-        case .keysList: next = try getKeysList()
-        case .slice(let bounds): next = try getSlice(for: bounds)
-        case .filter(let pattern): next = try getFilter(with: pattern)
+        return try doSetPath(remainder.leftPart) {
+            let next: ValueType
+
+            switch firstElement {
+            case .key(let key): next = try get(key: key)
+            case .index(let index): next = try get(index: index)
+            case .count: next = try getCount()
+            case .keysList: next = try getKeysList()
+            case .slice(let bounds): next = try getSlice(for: bounds)
+            case .filter(let pattern): next = try getFilter(with: pattern)
+            }
+            return try next.get(path: remainder)
         }
-
-        return try doAdd(firstElement) { try next.get(path: remainder) }
     }
 
     // MARK: - Helpers
