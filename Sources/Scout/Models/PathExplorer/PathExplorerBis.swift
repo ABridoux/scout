@@ -28,9 +28,10 @@ where
     /// Non `nil` if the key is of the `Integer` type
     var int: Int? { get }
 
-    /// Non `nil` if the key is of the `Real` type
+    /// Non `nil` if the key is of the `Double` type
     var real: Double? { get }
 
+    /// Non `nil` if the key is of the `Data` type
     var data: Data? { get }
 
 //    /// Non `nil` if the key is an non-nested array of the given type
@@ -43,11 +44,6 @@ where
 //
 //    /// String representation of value property (if value is nil this is empty String).
 //    var stringValue: String { get }
-//
-//    var format: DataFormat { get }
-//
-//    /// The path leading to the PathExplorer: firstKey.secondKey[index].thirdKey...
-//    var readingPath: Path { get }
 
     // MARK: - Initialization
 
@@ -55,7 +51,7 @@ where
 
     // MARK: - Functions
 
-    // MARK: Get
+    // MARK: - Get
 
     /// Get the key at the given path
     ///
@@ -64,15 +60,7 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     func get(_ path: Path) throws -> Self
 
-    /// Get the key at the given path
-    ///
-    /// #### Negative index
-    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
-    ///
-    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key), or the conversion is not possible
-//    func get<T: KeyAllowedType>(_ path: Path, as type: KeyTypes.KeyType<T>) throws -> T
-
-    // MARK: Set
+    // MARK: - Set
 
     /// Set the value of the key at the given path
     ///
@@ -92,18 +80,7 @@ where
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
     func setting(_ path: Path, to newValue: ValueType) throws -> Self
 
-    /// Set the value of the key at the given path
-    ///
-    /// #### Negative index
-    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
-    ///
-    /// - parameter type: Try to force the conversion of the `value` parameter to the given type
-    /// throwing an error if the conversion is not possible
-    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    /// - note: The type of the `value` parameter will be automatically inferred.
-//    mutating func set<Type: KeyAllowedType>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws
-
-    // - Set key name
+    // MARK: - Set key name
 
     /// Set the name of the key at the given path
     ///
@@ -121,18 +98,18 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary)
     func setting(_ path: Path, keyNameTo keyName: String) throws -> Self
 
-//    // MARK: Delete
-//
-//    /// Delete the key at the given path.
-//    ///
-//    /// #### Negative index
-//    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
-//    ///
-//    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion. Default: `false`
-//    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
+    // MARK: - Delete
+
+    /// Delete the key at the given path.
+    ///
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
+    ///
+    /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion. Default: `false`
+    /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws
 
-    /// Delete the key at the given path and returns a new modified `PathExplorer`
+    /// Delete the key at the given path and return a new modified `PathExplorer`
     ///
     /// #### Negative index
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
@@ -140,46 +117,41 @@ where
     /// - parameter deleteIfEmpty: When `true`, the dictionary or array holding the value will be deleted too if empty after the key deletion. Default: `false`
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     func deleting(_ path: Path, deleteIfEmpty: Bool) throws  -> Self
-//
-//    // MARK: Add
-//
-//    /// Add a value at the given path.
-//    ///
-//    /// #### Negative index
-//    /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
-//    ///
-//    /// #### Appending
-//    /// To add a key at the end of an array, specify the `PathElement.count`
-//    ///
-//    /// ### Non-existing key
-//    /// Any non existing key encountered in the path will be created.
+
+    // MARK: - Add
+
+    /// Add a value at the given path.
+    ///
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
+    ///
+    /// #### Appending
+    /// To add a key at the end of an array, specify the `PathElement.count`
+    ///
+    /// ### Non-existing key
+    /// Any non existing key encountered in the path will be created.
     mutating func add(_ value: ValueType, at path: Path) throws
 
+    /// Add a value at the given path, and return a new modified `PathExplorer`
+    ///
+    /// #### Negative index
+    /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
+    ///
+    /// #### Appending
+    /// To add a key at the end of an array, specify the `PathElement.count`
+    ///
+    /// ### Non-existing key
+    /// Any non existing key encountered in the path will be created.
     func adding(_ value: ValueType, at path: Path) throws -> Self
-//
-//    /// Add a value at the given path.
-//    ///
-//    /// #### Negative index
-//    /// It's possible to specify a negative index to target the last nth element. For example, -1 targets the last element and -3 the last 3rd element.
-//    ///
-//    /// #### Appending
-//    /// To add a key at the end of an array, specify the `PathElement.count`
-//    ///
-//    /// ### Non-existing key
-//    /// Any non existing key encountered in the path will be created.
-//    ///
-//    /// - parameter type: Try to force the conversion of the `value` parameter to the given type,
-//    /// throwing an error if the conversion is not possible
-//    mutating func add<Type: KeyAllowedType>(_ newValue: Any, at path: Path, as type: KeyTypes.KeyType<Type>) throws
-//
-//    // MARK: - Paths
-//
-//    /// Returns all the paths leading to single or group values
-//    /// - Parameters:
-//    ///   - initialPath: Scope the return paths with this path as a starting point
-//    ///   - filter: Optionally provide a filter on the key and/or value. Default is `noFilter`
-//    func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path]
-//
+
+    // MARK: - Paths listing
+
+    /// Returns all the paths leading to single or group values
+    /// - Parameters:
+    ///   - initialPath: Scope the returned paths with this path as a starting point
+    ///   - filter: Optionally provide a filter on the key and/or value. Default is `noFilter`
+    func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path]
+
 //    // MARK: Conversion
 //
 //    /// Try to convert the value held by the PathExplorer to the given type
