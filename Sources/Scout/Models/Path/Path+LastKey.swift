@@ -8,24 +8,15 @@ import Foundation
 extension Path {
 
     public var lastKeyElementName: String? {
-        let lastKey = last { (element) -> Bool in
-            if case .key = element { return true }
-            return false
-        }
-        guard case let .key(name) = lastKey else { return nil }
-        return name
+        reversed().first {
+            guard case .key = $0 else { return false }
+            return true
+        }?.key
     }
 
     /// Last key component matching the regular expression
     public func lastKeyComponent(matches regularExpression: NSRegularExpression) -> Bool {
-        let lastKey = last { (element) -> Bool in
-            if case .key = element {
-                return true
-            }
-            return false
-        }
-        guard case let .key(name) = lastKey else { return false }
-
-        return regularExpression.validate(name)
+        guard let key = lastKeyElementName else { return false }
+        return regularExpression.validate(key)
     }
 }

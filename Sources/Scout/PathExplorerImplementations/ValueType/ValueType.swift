@@ -201,6 +201,20 @@ extension ValueType {
 
 extension ValueType {
 
+    /// Associated value as `Any`
+    var any: Any {
+        switch self {
+        case .string(let string): return string
+        case .int(let int), .count(let int): return int
+        case .double(let double): return double
+        case .bool(let bool): return bool
+        case .data(let data): return data
+        case .array(let array), .slice(let array): return array
+        case .dictionary(let dict), .filter(let dict): return dict
+        case .keysList(let keys): return keys
+        }
+    }
+
     public var int: Int? {
         switch self {
         case .int(let int), .count(let int): return int
