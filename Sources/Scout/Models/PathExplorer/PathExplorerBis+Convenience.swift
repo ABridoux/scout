@@ -35,7 +35,7 @@ public extension PathExplorerBis {
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    mutating func set(_ path: [PathElement], to newValue: ValueType) throws { try set(Path(path), to: newValue) }
+    mutating func set(_ path: [PathElement], to newValue: ExplorerValue) throws { try set(Path(path), to: newValue) }
 
     /// Set the value of the key at the given path
     ///
@@ -44,7 +44,7 @@ public extension PathExplorerBis {
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    mutating func set(_ path: PathElement..., to newValue: ValueType) throws { try set(path, to: newValue) }
+    mutating func set(_ path: PathElement..., to newValue: ExplorerValue) throws { try set(path, to: newValue) }
 
     /// Set the value of the key at the given path, and return the modified explorer
     ///
@@ -53,7 +53,7 @@ public extension PathExplorerBis {
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    func setting(_ path: [PathElement], to newValue: ValueType) throws -> Self { try setting(Path(path), to: newValue) }
+    func setting(_ path: [PathElement], to newValue: ExplorerValue) throws -> Self { try setting(Path(path), to: newValue) }
 
     /// Set the value of the key at the given path and return a new modified `PathExplorer`
     ///
@@ -62,7 +62,7 @@ public extension PathExplorerBis {
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    func setting(_ path: PathElement..., to newValue: ValueType) throws -> Self { try setting(path, to: newValue) }
+    func setting(_ path: PathElement..., to newValue: ExplorerValue) throws -> Self { try setting(path, to: newValue) }
 }
 
 // MARK: - Set key name
@@ -166,7 +166,7 @@ public extension PathExplorerBis {
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    mutating func add(_ value: ValueType, at path: [PathElement]) throws { try add(value, at: Path(path)) }
+    mutating func add(_ value: ExplorerValue, at path: [PathElement]) throws { try add(value, at: Path(path)) }
 
     /// Add a value at the given path.
     ///
@@ -178,7 +178,7 @@ public extension PathExplorerBis {
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    mutating func add(_ value: ValueType, at path: PathElement...) throws { try add(value, at: path) }
+    mutating func add(_ value: ExplorerValue, at path: PathElement...) throws { try add(value, at: path) }
 
     /// Add a value at the given path, and return a new modified `PathExplorer`
     ///
@@ -190,7 +190,7 @@ public extension PathExplorerBis {
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    func adding(_ value: ValueType, at path: [PathElement]) throws -> Self { try adding(value, at: Path(path)) }
+    func adding(_ value: ExplorerValue, at path: [PathElement]) throws -> Self { try adding(value, at: Path(path)) }
 
     /// Add a value at the given path, and return a new modified `PathExplorer`
     ///
@@ -202,7 +202,7 @@ public extension PathExplorerBis {
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    func adding(_ value: ValueType, at path: PathElement...) throws -> Self { try adding(value, at: path) }
+    func adding(_ value: ExplorerValue, at path: PathElement...) throws -> Self { try adding(value, at: path) }
 }
 
 // MARK: - Paths listing

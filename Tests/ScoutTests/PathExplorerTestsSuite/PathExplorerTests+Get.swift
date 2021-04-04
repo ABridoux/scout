@@ -10,22 +10,22 @@ final class PathExplorerGetTests: XCTestCase {
 
     // MARK: - Properties
 
-    let dict: ValueType = ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5]
-    let nestedDict: ValueType = ["firstKey": ["secondKey": 23]]
-    let nestedNestedDict: ValueType = ["firstKey": ["secondKey": ["thirdKey": 23]]]
+    let dict: ExplorerValue = ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5]
+    let nestedDict: ExplorerValue = ["firstKey": ["secondKey": 23]]
+    let nestedNestedDict: ExplorerValue = ["firstKey": ["secondKey": ["thirdKey": 23]]]
 
-    let woody: ValueType = ["name": "Woody", "catchphrase": "I got a snake in my boot"]
-    let buzz: ValueType = ["name": "Buzz", "catchphrase": "To infinity and beyond"]
-    let zorg: ValueType = ["name": "Zorg", "catchphrase": "Destroy Buzz Lightyear"]
+    let woody: ExplorerValue = ["name": "Woody", "catchphrase": "I got a snake in my boot"]
+    let buzz: ExplorerValue = ["name": "Buzz", "catchphrase": "To infinity and beyond"]
+    let zorg: ExplorerValue = ["name": "Zorg", "catchphrase": "Destroy Buzz Lightyear"]
 
-    let array: ValueType = ["Endo", 1, false, 2.5]
-    let ducks: ValueType = ["Riri", "Fifi", "Loulou", "Donald", "Daisy"]
-    let matrix3x3: ValueType = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    let array: ExplorerValue = ["Endo", 1, false, 2.5]
+    let ducks: ExplorerValue = ["Riri", "Fifi", "Loulou", "Donald", "Daisy"]
+    let matrix3x3: ExplorerValue = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
     // MARK: - Functions
 
     func test() throws {
-        try test(ValueType.self)
+        try test(ExplorerValue.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -69,7 +69,7 @@ final class PathExplorerGetTests: XCTestCase {
 
     func testStub() throws {
         // use this function to launch a specific test with a specific PathExplorer
-        try testGetMissingNestedKeyThrows(ValueType.self)
+        try testGetMissingNestedKeyThrows(ExplorerValue.self)
     }
 
     // MARK: - Key
@@ -94,7 +94,7 @@ final class PathExplorerGetTests: XCTestCase {
         let explorer = P(value: dict)
 
         XCTAssertErrorsEqual(try explorer.get("tata"),
-                             ValueTypeError.missing(key: "tata", bestMatch: "toto"))
+                             ExplorerError.missing(key: "tata", bestMatch: "toto"))
     }
 
     func testGetNestedKey<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -107,7 +107,7 @@ final class PathExplorerGetTests: XCTestCase {
         let explorer = P(value: nestedDict)
 
         XCTAssertErrorsEqual(try explorer.get("firstKey", "kirk"),
-                        ValueTypeError.missing(key: "kirk", bestMatch: nil).with(path: "firstKey"))
+                        ExplorerError.missing(key: "kirk", bestMatch: nil).with(path: "firstKey"))
     }
 
     func testGetKeyNoDictionaryThrows_ValueType<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -119,7 +119,7 @@ final class PathExplorerGetTests: XCTestCase {
     // MARK: Filter
 
     func testGetKeyFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let dict: ValueType = ["woody": woody, "buzz": buzz, "zorg": zorg]
+        let dict: ExplorerValue = ["woody": woody, "buzz": buzz, "zorg": zorg]
         let expectedExplorer = P(value: .filter(["woody_name": "Woody", "buzz_name": "Buzz"]))
 
         let explorer = try P(value: dict).get(.filter("woody|buzz"), "name")
@@ -183,7 +183,7 @@ final class PathExplorerGetTests: XCTestCase {
 
     func testGetCountOnNonGroupThrows() throws {
         XCTAssertErrorsEqual(try array.get(0, .count),
-                             ValueTypeError.wrongUsage(of: .count).with(path: 0))
+                             ExplorerError.wrongUsage(of: .count).with(path: 0))
     }
 
     // MARK: - Keys list
@@ -204,7 +204,7 @@ final class PathExplorerGetTests: XCTestCase {
     // MARK: - Filter
 
     func testGetFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let dict: ValueType = ["Tom": 10, "Robert": true, "Suzanne": "Here"]
+        let dict: ExplorerValue = ["Tom": 10, "Robert": true, "Suzanne": "Here"]
         let explorer = P(value: dict)
         let expectedExplorer = P(value: .filter(["Tom": 10, "Robert": true]))
 
@@ -212,18 +212,18 @@ final class PathExplorerGetTests: XCTestCase {
     }
 
     func testGetFilterOfFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let dict: ValueType = ["woody": woody, "buzz": buzz, "zorg": zorg]
+        let dict: ExplorerValue = ["woody": woody, "buzz": buzz, "zorg": zorg]
         let explorer = P(value: dict)
-        let expectedOutcome: ValueType = .filter(["woody": .filter(["name": "Woody"]), "zorg": .filter(["name": "Zorg"])])
+        let expectedOutcome: ExplorerValue = .filter(["woody": .filter(["name": "Woody"]), "zorg": .filter(["name": "Zorg"])])
         let expectedExplorer = P(value: expectedOutcome)
 
         try XCTAssertExplorersEqual(explorer.get(.filter("woody|zorg"), .filter("name")), expectedExplorer)
     }
 
     func testGetFilterOnSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let array: ValueType = [woody, buzz, zorg]
+        let array: ExplorerValue = [woody, buzz, zorg]
         let explorer = P(value: array)
-        let expectedOutcome: ValueType = .slice([.filter(["name": "Woody"]), .filter(["name": "Buzz"])])
+        let expectedOutcome: ExplorerValue = .slice([.filter(["name": "Woody"]), .filter(["name": "Buzz"])])
         let expectedExplorer = P(value: expectedOutcome)
 
         try XCTAssertExplorersEqual(explorer.get(.slice(0, 1), .filter("name")), expectedExplorer)
@@ -251,9 +251,9 @@ final class PathExplorerGetTests: XCTestCase {
     }
 
     func testGetSliceOnFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let dict: ValueType = ["first": ducks, "second": ducks]
+        let dict: ExplorerValue = ["first": ducks, "second": ducks]
         let explorer = P(value: dict)
-        let expectedOutcome: ValueType = .filter(["first": .slice(["Fifi", "Loulou"])])
+        let expectedOutcome: ExplorerValue = .filter(["first": .slice(["Fifi", "Loulou"])])
         let expectedExplorer = P(value: expectedOutcome)
 
         try XCTAssertExplorersEqual(explorer.get(.filter("first"), .slice(1, 2)), expectedExplorer)

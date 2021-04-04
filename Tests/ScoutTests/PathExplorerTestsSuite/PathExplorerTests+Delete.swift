@@ -9,7 +9,7 @@ import XCTest
 final class PathExplorerDeleteTests: XCTestCase {
 
     func test() throws {
-        try test(ValueType.self)
+        try test(ExplorerValue.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -87,8 +87,8 @@ final class PathExplorerDeleteTests: XCTestCase {
     }
 
     func testDeleteKey_OnFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let initialSubDict: ValueType = ["Endo": true, "toto": 2.5]
-        let expectedSubDict: ValueType = ["Endo": true]
+        let initialSubDict: ExplorerValue = ["Endo": true, "toto": 2.5]
+        let expectedSubDict: ExplorerValue = ["Endo": true]
 
         try testDelete(
             P.self,
@@ -99,8 +99,8 @@ final class PathExplorerDeleteTests: XCTestCase {
     }
 
     func testDeleteKey_OnSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let initialSubDict: ValueType = ["Endo": true, "toto": 2.5]
-        let expectedSubDict: ValueType = ["Endo": true]
+        let initialSubDict: ExplorerValue = ["Endo": true, "toto": 2.5]
+        let expectedSubDict: ExplorerValue = ["Endo": true]
 
         try testDelete(
             P.self,
@@ -283,10 +283,10 @@ extension PathExplorerDeleteTests {
 
     func testDelete<P: EquatablePathExplorer>(
         _ type: P.Type,
-        initial: ValueType,
+        initial: ExplorerValue,
         path: PathElement...,
         deleteIfEmpty: Bool = false,
-        expected: ValueType,
+        expected: ExplorerValue,
         file: StaticString = #file,
         line: UInt = #line)
     throws {

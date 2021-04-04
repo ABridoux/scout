@@ -7,19 +7,19 @@ import Foundation
 
 // MARK: - Set
 
-extension ValueType {
+extension ExplorerValue {
 
-    public mutating func set(_ path: Path, to newValue: ValueType) throws {
+    public mutating func set(_ path: Path, to newValue: ExplorerValue) throws {
         try set(path: Slice(path), to: newValue)
     }
 
-    public func setting(_ path: Path, to newValue: ValueType) throws -> Self {
+    public func setting(_ path: Path, to newValue: ExplorerValue) throws -> Self {
         var copy = self
         try copy.set(path, to: newValue)
         return copy
     }
 
-    private mutating func set(path: SlicePath, to newValue: ValueType) throws {
+    private mutating func set(path: SlicePath, to newValue: ExplorerValue) throws {
         guard let firstElement = path.first else {
             return self = newValue
         }
@@ -30,14 +30,14 @@ extension ValueType {
             switch firstElement {
             case .key(let key): try set(key: key, to: newValue, remainder: remainder)
             case .index(let index): try set(index: index, to: newValue, remainder: remainder)
-            default: throw ValueTypeError.wrongUsage(of: firstElement)
+            default: throw ExplorerError.wrongUsage(of: firstElement)
             }
         }
     }
 
     // MARK: Key
 
-    private mutating func set(key: String, to newValue: ValueType, remainder: SlicePath) throws {
+    private mutating func set(key: String, to newValue: ExplorerValue, remainder: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
         var value = try dict.getJaroWinkler(key: key)
         try value.set(path: remainder, to: newValue)
@@ -59,7 +59,7 @@ extension ValueType {
 
 // MARK: - Set key name
 
-extension ValueType {
+extension ExplorerValue {
 
     public mutating func set(_ path: Path, keyNameTo keyName: String) throws {
         try set(path: Slice(path), keyName: keyName)
@@ -80,7 +80,7 @@ extension ValueType {
 
         if remainder.isEmpty {
             guard let key = firstElement.key else {
-                throw ValueTypeError.wrongUsage(of: firstElement)
+                throw ExplorerError.wrongUsage(of: firstElement)
             }
 
             var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
@@ -94,7 +94,7 @@ extension ValueType {
         switch firstElement {
         case .key(let key): try set(key: key, keyName: keyName, remainder: remainder)
         case .index(let index): try set(index: index, keyName: keyName, remainder: remainder)
-        default: throw ValueTypeError.wrongUsage(of: firstElement)
+        default: throw ExplorerError.wrongUsage(of: firstElement)
         }
     }
 

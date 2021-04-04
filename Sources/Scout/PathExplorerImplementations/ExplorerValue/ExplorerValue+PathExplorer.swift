@@ -5,6 +5,6 @@
 
 import Foundation
 
-extension ValueType {
+extension ExplorerValue {
 
 }

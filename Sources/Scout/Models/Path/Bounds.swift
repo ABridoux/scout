@@ -84,7 +84,7 @@ public struct Bounds: Hashable {
         }
 
         guard 0 <= lower, lower <= upper, upper <= arrayCount else {
-            throw ValueTypeError.wrong(bounds: self, arrayCount: arrayCount)
+            throw ExplorerError.wrong(bounds: self, arrayCount: arrayCount)
         }
 
         lastComputedLower = lower

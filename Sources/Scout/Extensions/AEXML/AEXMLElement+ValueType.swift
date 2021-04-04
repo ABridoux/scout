@@ -7,7 +7,7 @@ import AEXML
 
 extension AEXMLElement {
 
-    func setup(with valueType: ValueType) {
+    func setup(with valueType: ExplorerValue) {
         switch valueType {
         case .int(let int), .count(let int): value = String(int)
         case .double(let double): value = String(double)

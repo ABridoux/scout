@@ -21,7 +21,7 @@ extension NSRegularExpression {
         do {
             try self.init(pattern: pattern)
         } catch {
-            throw ValueTypeError.wrong(regexPattern: pattern)
+            throw ExplorerError.wrong(regexPattern: pattern)
         }
     }
 

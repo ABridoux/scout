@@ -201,7 +201,7 @@ extension PathExplorerXML {
         Data(base64Encoded: element.string)
     }
 
-    public init(value: ValueType) {
+    public init(value: ExplorerValue) {
         self.init(element: AEXMLElement(name: "root"))
 
         element.setup(with: value)
@@ -211,10 +211,10 @@ extension PathExplorerXML {
         element.isEqual(to: other.element)
     }
 
-    public func set(_ path: Path, to newValue: ValueType) throws {
+    public func set(_ path: Path, to newValue: ExplorerValue) throws {
     }
 
-    public func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
+    public func set<Type>(_ path: Path, to newValue: ExplorerValue, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
 
     }
 }

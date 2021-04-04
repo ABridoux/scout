@@ -5,18 +5,18 @@
 
 import Foundation
 
-extension ValueType {
+extension ExplorerValue {
 
-    public mutating func add(_ value: ValueType, at path: Path) throws {
+    public mutating func add(_ value: ExplorerValue, at path: Path) throws {
         self = try add(path: Slice(path), value: value)
     }
 
-    public func adding(_ value: ValueType, at path: Path) throws -> ValueType {
+    public func adding(_ value: ExplorerValue, at path: Path) throws -> ExplorerValue {
         try add(path: Slice(path), value: value)
     }
 
     /// Return `true` if the path is empty
-    private func add(path: SlicePath, value: ValueType) throws -> Self {
+    private func add(path: SlicePath, value: ExplorerValue) throws -> Self {
         guard let element = path.first else { return value }
         let remainder = path.dropFirst()
 
@@ -25,12 +25,12 @@ extension ValueType {
             case .key(let key): return try add(key: key, value: value, remainder: remainder)
             case .index(let index): return try add(index: index, value: value, remainder: remainder)
             case .count: return try addCount(value: value, remainder: remainder)
-            default: throw ValueTypeError.wrongUsage(of: element)
+            default: throw ExplorerError.wrongUsage(of: element)
             }
         }
     }
 
-    private func createValueToAdd(value: ValueType, path: SlicePath) throws -> ValueType {
+    private func createValueToAdd(value: ExplorerValue, path: SlicePath) throws -> ExplorerValue {
         guard let element = path.first else { return value }
         let remainder = path.dropFirst()
 
@@ -51,11 +51,11 @@ extension ValueType {
             return .array(array)
 
         default:
-            throw ValueTypeError.wrongUsage(of: element)
+            throw ExplorerError.wrongUsage(of: element)
         }
     }
 
-    private func add(key: String, value: ValueType, remainder: SlicePath) throws -> ValueType {
+    private func add(key: String, value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
         if let existingValue = dict[key] {
             dict[key] = try existingValue.add(path: remainder, value: value)
@@ -66,7 +66,7 @@ extension ValueType {
         return .dictionary(dict)
     }
 
-    private func add(index: Int, value: ValueType, remainder: SlicePath) throws -> ValueType {
+    private func add(index: Int, value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
         let index = try computeIndex(from: index, arrayCount: array.count)
         let newValue = try array[index].add(path: remainder, value: value)
@@ -80,7 +80,7 @@ extension ValueType {
         return .array(array)
     }
 
-    private func addCount(value: ValueType, remainder: SlicePath) throws -> ValueType {
+    private func addCount(value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
         if var array = self.array {
             let newValue = try createValueToAdd(value: value, path: remainder)
             array.append(newValue)

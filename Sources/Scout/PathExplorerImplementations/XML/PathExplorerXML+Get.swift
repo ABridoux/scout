@@ -80,7 +80,7 @@ extension PathExplorerXML {
 
         guard child.error == nil else {
             let bestMatch = key.bestJaroWinklerMatchIn(propositions: Set(element.children.map(\.name)))
-            throw ValueTypeError.missing(key: key, bestMatch: bestMatch).with(path: readingPath.reversed())
+            throw ExplorerError.missing(key: key, bestMatch: bestMatch).with(path: readingPath.reversed())
         }
 
         return child
