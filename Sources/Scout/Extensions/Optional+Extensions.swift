@@ -29,7 +29,7 @@ extension Optional {
         return wrapped
     }
 
-    func unwrapOrThrow(_ error: ValueTypeError) throws -> Wrapped {
+    func unwrapOrThrow(_ error: ExplorerError) throws -> Wrapped {
         try unwrapOrThrow(error: error)
     }
 }

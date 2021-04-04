@@ -5,13 +5,13 @@
 
 import Foundation
 
-extension ValueType {
+extension ExplorerValue {
 
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws {
         _ = try delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
     }
 
-    public func deleting(_ path: Path, deleteIfEmpty: Bool) throws -> ValueType {
+    public func deleting(_ path: Path, deleteIfEmpty: Bool) throws -> ExplorerValue {
         var copy = self
         try copy.delete(path, deleteIfEmpty: deleteIfEmpty)
         return copy
@@ -29,7 +29,7 @@ extension ValueType {
             case .filter(let pattern): try deleteFilter(with: pattern, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
             case .slice(let bounds): try deleteSlice(within: bounds, remainder: remainder, deleteIfEmpty: deleteIfEmpty)
             default:
-                throw ValueTypeError.wrongUsage(of: element)
+                throw ExplorerError.wrongUsage(of: element)
             }
         }
 
@@ -60,7 +60,7 @@ extension ValueType {
             self = .slice(array)
 
         default:
-            throw ValueTypeError.subscriptKeyNoDict
+            throw ExplorerError.subscriptKeyNoDict
         }
     }
 
@@ -88,7 +88,7 @@ extension ValueType {
             self = .filter(dict)
 
         default:
-            throw ValueTypeError.subscriptIndexNoArray
+            throw ExplorerError.subscriptIndexNoArray
         }
     }
 
@@ -98,7 +98,7 @@ extension ValueType {
         case .dictionary(let dict):
             let regex = try NSRegularExpression(with: pattern)
 
-            let modified = try dict.compactMap { (key, value) -> (String, ValueType)? in
+            let modified = try dict.compactMap { (key, value) -> (String, ExplorerValue)? in
                 guard regex.validate(key) else { return (key, value) }
                 var value = value
                 let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
@@ -121,7 +121,7 @@ extension ValueType {
             self = .slice(array)
 
         default:
-            throw ValueTypeError.wrongUsage(of: .filter(pattern))
+            throw ExplorerError.wrongUsage(of: .filter(pattern))
         }
     }
 
@@ -130,7 +130,7 @@ extension ValueType {
 
         case .array(var array):
             let range = try bounds.range(arrayCount: array.count)
-            let newRangeElements = try array[range].compactMap { (element) -> ValueType? in
+            let newRangeElements = try array[range].compactMap { (element) -> ExplorerValue? in
                 var element = element
                 let shouldDelete = try element.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
@@ -152,7 +152,7 @@ extension ValueType {
             self = .filter(dict)
 
         default:
-            throw ValueTypeError.wrongUsage(of: .slice(bounds))
+            throw ExplorerError.wrongUsage(of: .slice(bounds))
         }
     }
 }

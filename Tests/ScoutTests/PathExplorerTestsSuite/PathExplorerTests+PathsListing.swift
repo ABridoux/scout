@@ -11,7 +11,7 @@ final class PathExplorerPathsListingTests: XCTestCase {
     // MARK: - Functions
 
     func test() throws {
-        try test(ValueType.self)
+        try test(ExplorerValue.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -190,7 +190,7 @@ extension PathExplorerPathsListingTests {
 
     func testListPaths<P: EquatablePathExplorer>(
         _ type: P.Type,
-        explorer: ValueType,
+        explorer: ExplorerValue,
         leadingPath: [PathElement]? = nil,
         filter: PathsFilter,
         expectedPaths: [Path],

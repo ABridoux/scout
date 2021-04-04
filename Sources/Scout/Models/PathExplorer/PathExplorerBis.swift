@@ -47,9 +47,7 @@ where
 
     // MARK: - Initialization
 
-    init(value: ValueType)
-
-    // MARK: - Functions
+    init(value: ExplorerValue)
 
     // MARK: - Get
 
@@ -68,8 +66,7 @@ where
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    mutating func set(_ path: Path, to newValue: ValueType) throws
+    mutating func set(_ path: Path, to newValue: ExplorerValue) throws
 
     /// Set the value of the key at the given path and returns a new modified `PathExplorer`
     ///
@@ -78,7 +75,7 @@ where
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    func setting(_ path: Path, to newValue: ValueType) throws -> Self
+    func setting(_ path: Path, to newValue: ExplorerValue) throws -> Self
 
     // MARK: - Set key name
 
@@ -130,7 +127,7 @@ where
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    mutating func add(_ value: ValueType, at path: Path) throws
+    mutating func add(_ value: ExplorerValue, at path: Path) throws
 
     /// Add a value at the given path, and return a new modified `PathExplorer`
     ///
@@ -142,7 +139,7 @@ where
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    func adding(_ value: ValueType, at path: Path) throws -> Self
+    func adding(_ value: ExplorerValue, at path: Path) throws -> Self
 
     // MARK: - Paths listing
 
