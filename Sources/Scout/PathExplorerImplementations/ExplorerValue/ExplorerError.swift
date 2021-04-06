@@ -92,4 +92,8 @@ public extension ExplorerError {
     static func wrong(regexPattern: String) -> Self {
         ExplorerError(description: "The string '\(regexPattern)' is not a valid regular expression pattern")
     }
+
+    static func mismatchingType<T>(_ type: T.Type, value: ExplorerValue) -> Self {
+        ExplorerError(description: "ExplorerValue \(value) cannot be represented as \(T.self)")
+    }
 }

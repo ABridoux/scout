@@ -4,6 +4,8 @@
 // MIT license, see LICENSE file for details
 
 import Foundation
+import Yams
+import XMLCoder
 
 public protocol CodableFormat {
 
@@ -17,7 +19,7 @@ public enum CodableFormats {}
 
 public extension CodableFormats {
 
-    enum Json: CodableFormat {
+    enum JsonDefault: CodableFormat {
 
         public static var dataFormat: DataFormat { .json }
 
@@ -27,6 +29,54 @@ public extension CodableFormats {
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
             try JSONDecoder().decode(type, from: data)
+        }
+    }
+}
+
+public extension CodableFormats {
+
+    enum PlistDefault: CodableFormat {
+
+        public static var dataFormat: DataFormat { .plist }
+
+        public static func encode<E>(_ value: E) throws -> Data where E : Encodable {
+            try PropertyListEncoder().encode(value)
+        }
+
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+            try PropertyListDecoder().decode(type, from: data)
+        }
+    }
+}
+
+public extension CodableFormats {
+
+    enum YamlDefault: CodableFormat {
+
+        public static var dataFormat: DataFormat { .yaml }
+
+        public static func encode<E>(_ value: E) throws -> Data where E : Encodable {
+            try YAMLEncoder().encode(value).data(using: .utf8).unwrapOrThrow(.stringToData)
+        }
+
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+            try YAMLDecoder().decode(type, from: data)
+        }
+    }
+}
+
+public extension CodableFormats {
+
+    enum XmlDefault: CodableFormat {
+
+        public static var dataFormat: DataFormat { .xml }
+
+        public static func encode<E>(_ value: E) throws -> Data where E : Encodable {
+            try XMLEncoder().encode(value)
+        }
+
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+            try XMLDecoder().decode(type, from: data)
         }
     }
 }

@@ -251,6 +251,16 @@ extension ExplorerValue {
         default: return nil
         }
     }
+
+    public func array<T: ExplorerValueCreatable>(of type: T.Type) throws -> [T] {
+        let array = try self.array.unwrapOrThrow(.mismatchingType(ArrayValue.self, value: self))
+        return try array.map { try T(from: $0) }
+    }
+
+    public func dictionary<T: ExplorerValueCreatable>(of type: T.Type) throws -> [String: T] {
+        let dict = try dictionary.unwrapOrThrow(.mismatchingType(DictionaryValue.self, value: self))
+        return try dict.mapValues { try T(from: $0) }
+    }
 }
 
 // MARK: - CustomStringConvertible
