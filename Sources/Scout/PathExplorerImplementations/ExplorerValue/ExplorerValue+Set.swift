@@ -72,10 +72,7 @@ extension ExplorerValue {
     }
 
     private mutating func set(path: SlicePath, keyName: String) throws {
-        guard let firstElement = path.first else { // empty path
-            return
-        }
-
+        guard let firstElement = path.first else { return }
         let remainder = path.dropFirst()
 
         if remainder.isEmpty {

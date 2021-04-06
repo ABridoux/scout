@@ -36,4 +36,8 @@ extension Optional {
     func unwrapOrThrow(_ error: DecodingError) throws -> Wrapped {
         try unwrapOrThrow(error: error)
     }
+
+    func unwrapOrThrow(_ error: SerializationError) throws -> Wrapped {
+        try unwrapOrThrow(error: error)
+    }
 }

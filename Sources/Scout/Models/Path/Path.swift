@@ -72,7 +72,6 @@ public struct Path: Hashable {
     /// ### Excluded separators
     /// The following separators will not work: '[', ']', '(', ')'.
     ///
-    ///
     /// When using a special character for a [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
     /// it is required to quote it with "\\".
     public init(string: String, separator: String) throws {

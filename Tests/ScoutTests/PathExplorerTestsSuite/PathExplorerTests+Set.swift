@@ -181,7 +181,7 @@ extension PathExplorerSetTests {
         var explorer = P(value: initial)
         let expectedExplorer = P(value: expected)
 
-        try explorer.set(path, to: value)
+        try explorer.set(Path(path), to: value)
 
         XCTAssertExplorersEqual(explorer, expectedExplorer, file: file, line: line)
     }

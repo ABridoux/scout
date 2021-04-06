@@ -5,21 +5,27 @@
 
 import Foundation
 
+// MARK: - Protocols
+
 /// Can be represented as an `ExplorerValue`
-/// - note: Default implementation provided for type conforming to `Encodable`
+/// - note: Default implementation provided for types conforming to `Encodable`
 public protocol ExplorerValueRepresentable {
 
     func explorerValue() throws -> ExplorerValue
 }
 
 /// Can be instantiated from an `ExplorerValue`
-/// - note: Default implementation provided for type conforming to `Decodable`
+/// - note: Default implementation provided for types conforming to `Decodable`
 public protocol ExplorerValueCreatable {
 
     init(from explorerValue: ExplorerValue) throws
 }
 
+/// Can be represented as and instantiated from as `ExplorerValue`
+/// - note: Default implementation provided for types conforming to `Codable`
 public typealias ExplorerValueConvertible = ExplorerValueRepresentable & ExplorerValueCreatable
+
+// MARK: - Codable implementations
 
 public extension ExplorerValueRepresentable where Self: Encodable {
 
