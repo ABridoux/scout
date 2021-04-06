@@ -5,10 +5,11 @@
 
 import Foundation
 
-public indirect enum ValueType {
+/// The values a `PathExplorer` can take
+public indirect enum ExplorerValue {
 
-    public typealias ArrayValue = [ValueType]
-    public typealias DictionaryValue = [String: ValueType]
+    public typealias ArrayValue = [ExplorerValue]
+    public typealias DictionaryValue = [String: ExplorerValue]
     typealias SlicePath = Slice<Path>
 
     // standard
@@ -27,7 +28,7 @@ public indirect enum ValueType {
     case filter(DictionaryValue)
 }
 
-extension ValueType {
+extension ExplorerValue {
 
     var isSingle: Bool {
         !isGroup
@@ -62,11 +63,11 @@ extension ValueType {
 
 // MARK: - Hashable
 
-extension ValueType: Hashable {}
+extension ExplorerValue: Hashable {}
 
 // MARK: - Codable
 
-extension ValueType: Codable {
+extension ExplorerValue: Codable {
 
     public init(from decoder: Decoder) throws {
         if let container = try? decoder.singleValueContainer(), let value = Self.decodeSingleValue(from: container) {
@@ -79,7 +80,7 @@ extension ValueType: Codable {
         }
     }
 
-    private static func decodeSingleValue(from container: SingleValueDecodingContainer) -> ValueType? {
+    private static func decodeSingleValue(from container: SingleValueDecodingContainer) -> ExplorerValue? {
         if let int = try? container.decode(Int.self) {
             return .int(int)
         } else if let double = try? container.decode(Double.self) {
@@ -113,7 +114,7 @@ extension ValueType: Codable {
 
 // MARK: - Any
 
-extension ValueType {
+extension ExplorerValue {
 
     init(value: Any) throws {
         if let int = value as? Int {
@@ -127,9 +128,9 @@ extension ValueType {
         } else if let data = value as? Data {
             self = .data(data)
         } else if let dict = value as? [String: Any] {
-            self = try .dictionary(dict.mapValues { try ValueType(value: $0) })
+            self = try .dictionary(dict.mapValues { try ExplorerValue(value: $0) })
         } else if let array = value as? [Any] {
-            self = try .array(array.map { try ValueType(value: $0) })
+            self = try .array(array.map { try ExplorerValue(value: $0) })
         } else {
             throw PathExplorerError.invalidValue("The value \(value) cannot be serialized")
         }
@@ -138,68 +139,60 @@ extension ValueType {
 
 // MARK: - Expressible literal
 
-extension ValueType: ExpressibleByStringLiteral {
+extension ExplorerValue: ExpressibleByStringLiteral {
 
     public init(stringLiteral value: String) {
         self = .string(value)
     }
 }
 
-extension ValueType: ExpressibleByIntegerLiteral {
+extension ExplorerValue: ExpressibleByIntegerLiteral {
 
     public init(integerLiteral value: Int) {
         self = .int(value)
     }
 }
 
-extension ValueType: ExpressibleByFloatLiteral {
+extension ExplorerValue: ExpressibleByFloatLiteral {
 
     public init(floatLiteral value: Double) {
         self = .double(value)
     }
 }
 
-extension ValueType: ExpressibleByBooleanLiteral {
+extension ExplorerValue: ExpressibleByBooleanLiteral {
 
     public init(booleanLiteral value: Bool) {
         self  = .bool(value)
     }
 }
 
-extension ValueType: ExpressibleByArrayLiteral {
+extension ExplorerValue: ExpressibleByArrayLiteral {
 
-    public init(arrayLiteral elements: ValueType...) {
+    public init(arrayLiteral elements: ExplorerValue...) {
         self = .array(elements)
     }
 }
 
-extension ValueType: ExpressibleByDictionaryLiteral {
+extension ExplorerValue: ExpressibleByDictionaryLiteral {
 
-    public init(dictionaryLiteral elements: (String, ValueType)...) {
+    public init(dictionaryLiteral elements: (String, ExplorerValue)...) {
         self = .dictionary(Dictionary(uniqueKeysWithValues: elements))
     }
 }
 
 // MARK: - Convenience
 
-extension ValueType {
+extension ExplorerValue {
 
-    func int(_ value: Int) -> Self { .int(value) }
-    func double(_ value: Double) -> Self { .double(value) }
-    func string(_ value: String) -> Self { .string(value) }
-    func bool(_ value: Bool) -> Self { .bool(value) }
-    func data(_ value: Data) -> Self { .data(value) }
     func array(_ value: ArrayValue) -> Self { .array(value) }
     func dictionary(_ value: DictionaryValue) -> Self { .dictionary(value) }
-
-    // special
-    func count(_ value: Int) -> Self { .count(value) }
     func keysList(_ value: Set<String>) -> Self { .keysList(value) }
     func slice(_ value: ArrayValue) -> Self { .slice(value) }
     func filter(_ value: DictionaryValue) -> Self { .filter(value) }
 }
 
-extension ValueType {
+extension ExplorerValue {
 
     /// Associated value as `Any`
     var any: Any {
@@ -258,11 +251,21 @@ extension ValueType {
         default: return nil
         }
     }
+
+    public func array<T: ExplorerValueCreatable>(of type: T.Type) throws -> [T] {
+        let array = try self.array.unwrapOrThrow(.mismatchingType(ArrayValue.self, value: self))
+        return try array.map { try T(from: $0) }
+    }
+
+    public func dictionary<T: ExplorerValueCreatable>(of type: T.Type) throws -> [String: T] {
+        let dict = try dictionary.unwrapOrThrow(.mismatchingType(DictionaryValue.self, value: self))
+        return try dict.mapValues { try T(from: $0) }
+    }
 }
 
 // MARK: - CustomStringConvertible
 
-extension ValueType: CustomStringConvertible {
+extension ExplorerValue: CustomStringConvertible {
 
     public var description: String {
         switch self {
@@ -291,7 +294,7 @@ extension PathExplorerBis {
     func doAdd<T>(_ element: PathElementRepresentable, _ block: () throws -> T) rethrows -> T {
         do {
             return try block()
-        } catch let error as ValueTypeError {
+        } catch let error as ExplorerError {
             throw error.adding(element)
         }
     }
@@ -300,7 +303,7 @@ extension PathExplorerBis {
     func doAdd(_ element: PathElementRepresentable, _ block: () throws -> Void) rethrows {
         do {
             try block()
-        } catch let error as ValueTypeError {
+        } catch let error as ExplorerError {
             throw error.adding(element)
         }
     }
@@ -309,7 +312,7 @@ extension PathExplorerBis {
     func doAdd<T>(_ element: PathElement, _ block: () throws -> T) rethrows -> T {
         do {
             return try block()
-        } catch let error as ValueTypeError {
+        } catch let error as ExplorerError {
             throw error.adding(element)
         }
     }
@@ -318,7 +321,7 @@ extension PathExplorerBis {
     func doAdd(_ element: PathElement, _ block: () throws -> Void) rethrows {
         do {
             try block()
-        } catch let error as ValueTypeError {
+        } catch let error as ExplorerError {
             throw error.adding(element)
         }
     }
@@ -327,7 +330,7 @@ extension PathExplorerBis {
     func doSettingPath(_ path: Slice<Path>, _ block: () throws -> Void) rethrows {
         do {
             try block()
-        } catch let error as ValueTypeError {
+        } catch let error as ExplorerError {
             throw error.with(path: path)
         }
     }
@@ -336,7 +339,7 @@ extension PathExplorerBis {
     func doSettingPath<T>(_ path: Slice<Path>, _ block: () throws -> T) rethrows -> T {
         do {
             return try block()
-        } catch let error as ValueTypeError {
+        } catch let error as ExplorerError {
             throw error.with(path: path)
         }
     }
@@ -346,14 +349,14 @@ infix operator <^>
 
 /// Apply the left function to the right operand
 /// - note: Mainly used as synthetic sugar to avoid over use of brackets
-func <^><A>(lhs: (A) -> ValueType, rhs: A) -> ValueType { lhs(rhs) }
+func <^><A>(lhs: (A) -> ExplorerValue, rhs: A) -> ExplorerValue { lhs(rhs) }
 
-extension ValueType: EquatablePathExplorer {
-    public init(value: ValueType) {
+extension ExplorerValue: EquatablePathExplorer {
+    public init(value: ExplorerValue) {
         self = value
     }
 
-    public mutating func set<Type>(_ path: Path, to newValue: ValueType, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
+    public mutating func set<Type>(_ path: Path, to newValue: ExplorerValue, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
 
     }
 

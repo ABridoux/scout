@@ -17,7 +17,7 @@ where
     IntegerLiteralType == Int,
     FloatLiteralType == Double {
 
-    // MARK: - Properties
+    // MARK: - Conversion
 
     /// Non `nil` if the key is of the `String` type
     var string: String? { get }
@@ -34,22 +34,15 @@ where
     /// Non `nil` if the key is of the `Data` type
     var data: Data? { get }
 
-//    /// Non `nil` if the key is an non-nested array of the given type
-//    /// - note: The type `.any` does not allow nested values
-//    func array<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [Value]?
-//
-//    /// Non `nil` if the key is a non-nested dictionary with the keys as the  given type
-//    /// - note: The type `.any` does not allow nested values
-//    func dictionary<Value>(_ type: KeyTypes.Get.ValueType<Value>) -> [String: Value]?
-//
-//    /// String representation of value property (if value is nil this is empty String).
-//    var stringValue: String { get }
+    /// An array of the provided type
+    func array<T: ExplorerValueCreatable>(of type: T.Type) throws -> [T]
+
+    /// A dictionary of the provided type as values.
+    func dictionary<T: ExplorerValueCreatable>(of type: T.Type) throws -> [String: T]
 
     // MARK: - Initialization
 
-    init(value: ValueType)
-
-    // MARK: - Functions
+    init(value: ExplorerValue)
 
     // MARK: - Get
 
@@ -68,8 +61,7 @@ where
     /// It's possible to specify a negative index to target the last nth element of an array. For example, -1 targets the last element and -3 the last 3rd element.
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    mutating func set(_ path: Path, to newValue: ValueType) throws
+    mutating func set(_ path: Path, to newValue: ExplorerValue) throws
 
     /// Set the value of the key at the given path and returns a new modified `PathExplorer`
     ///
@@ -78,7 +70,7 @@ where
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
-    func setting(_ path: Path, to newValue: ValueType) throws -> Self
+    func setting(_ path: Path, to newValue: ExplorerValue) throws -> Self
 
     // MARK: - Set key name
 
@@ -130,7 +122,7 @@ where
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    mutating func add(_ value: ValueType, at path: Path) throws
+    mutating func add(_ value: ExplorerValue, at path: Path) throws
 
     /// Add a value at the given path, and return a new modified `PathExplorer`
     ///
@@ -142,7 +134,7 @@ where
     ///
     /// ### Non-existing key
     /// Any non existing key encountered in the path will be created.
-    func adding(_ value: ValueType, at path: Path) throws -> Self
+    func adding(_ value: ExplorerValue, at path: Path) throws -> Self
 
     // MARK: - Paths listing
 
@@ -151,35 +143,4 @@ where
     ///   - initialPath: Scope the returned paths with this path as a starting point
     ///   - filter: Optionally provide a filter on the key and/or value. Default is `noFilter`
     func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path]
-
-//    // MARK: Conversion
-//
-//    /// Try to convert the value held by the PathExplorer to the given type
-//    func convertValue<Type: KeyAllowedType>(to type: KeyTypes.KeyType<Type>) throws -> Type
-//
-//    // MARK: Export
-//
-//    /// Export the path explorer value to data
-//    func exportData() throws -> Data
-//
-//    /// Export the path explorer value to a String
-//    ///
-//    /// - note: The single values will be exported correspondingly to the data format.
-//    /// For instance: `<string>Hello</string>` and not ust `Hello`.
-//    /// To get only the value of the `PathExplorer` without the data , use `description`
-//    /// or the corresponding type (e.g. `pathExplorer.int` or `pathExplorer.bool`)
-//    func exportString() throws -> String
-//
-//    /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
-//    func exportCSV(separator: String?) throws -> String
-//
-//    /// Export the path explorer value to the specified format data with a default root name "root"
-//    func exportData(to format: DataFormat, rootName: String?) throws -> Data
-//
-//    /// Export the path explorer value to the specified format string data with a default root name "root"
-//    func exportString(to format: DataFormat, rootName: String?) throws -> String
-//
-//    /// Replace the group values (array or dictionaries) sub values by a unique one
-//    /// holding a fold mark to be replaced when exporting the string
-//    mutating func fold(upTo level: Int)
 }

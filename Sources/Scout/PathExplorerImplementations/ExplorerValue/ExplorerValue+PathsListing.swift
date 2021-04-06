@@ -5,7 +5,7 @@
 
 import Foundation
 
-extension ValueType {
+extension ExplorerValue {
 
     public func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path] {
         var paths: [Path] = []
@@ -52,10 +52,10 @@ extension ValueType {
             try dict.forEach { try $0.value.collectPaths(in: &paths, filter: filter, leadingPath: leadingPath.appending($0.key), lastKey: $0.key) }
 
         case .count:
-            throw ValueTypeError.wrongUsage(of: .count)
+            throw ExplorerError.wrongUsage(of: .count)
 
         case .keysList:
-            throw ValueTypeError.wrongUsage(of: .keysList)
+            throw ExplorerError.wrongUsage(of: .keysList)
         }
     }
 }

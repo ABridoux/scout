@@ -11,7 +11,7 @@ final class PathExplorerSetTests: XCTestCase {
     // MARK: - Functions
 
     func test() throws {
-        try test(ValueType.self)
+        try test(ExplorerValue.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -72,7 +72,7 @@ final class PathExplorerSetTests: XCTestCase {
         var explorer = P(value: ["toto": [true]])
 
         XCTAssertErrorsEqual(try explorer.set("toto", "Endo", to: 1),
-                             ValueTypeError.subscriptKeyNoDict.with(path: "toto"))
+                             ExplorerError.subscriptKeyNoDict.with(path: "toto"))
     }
 
     // MARK: - Index
@@ -117,7 +117,7 @@ final class PathExplorerSetTests: XCTestCase {
         var explorer = P(value: [["Endo": 2]])
 
         XCTAssertErrorsEqual(try explorer.set(0, 1, to: 2),
-                             ValueTypeError.subscriptIndexNoArray.with(path: 0))
+                             ExplorerError.subscriptIndexNoArray.with(path: 0))
     }
 
     // MARK: - Key name
@@ -171,27 +171,27 @@ extension PathExplorerSetTests {
 
     func testSet<P: EquatablePathExplorer>(
         _ type: P.Type,
-        initial: ValueType,
+        initial: ExplorerValue,
         path: PathElement...,
-        value: ValueType,
-        expected: ValueType,
+        value: ExplorerValue,
+        expected: ExplorerValue,
         file: StaticString = #file,
         line: UInt = #line)
     throws {
         var explorer = P(value: initial)
         let expectedExplorer = P(value: expected)
 
-        try explorer.set(path, to: value)
+        try explorer.set(Path(path), to: value)
 
         XCTAssertExplorersEqual(explorer, expectedExplorer, file: file, line: line)
     }
 
     func testSetKeyName<P: EquatablePathExplorer>(
         _ type: P.Type,
-        initial: ValueType,
+        initial: ExplorerValue,
         path: PathElement...,
         value: String,
-        expected: ValueType,
+        expected: ExplorerValue,
         file: StaticString = #file,
         line: UInt = #line)
     throws {

@@ -10,7 +10,7 @@ import XCTest
 final class PathExplorerAddTests: XCTestCase {
 
     func test() throws {
-        try test(ValueType.self)
+        try test(ExplorerValue.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -34,7 +34,7 @@ final class PathExplorerAddTests: XCTestCase {
 
     func testStub() throws {
         // use this function to launch a test with a specific PathExplorer
-        try testAddCount_Nested(ValueType.self)
+        try testAddCount_Nested(ExplorerValue.self)
     }
 
     // MARK: - Key
@@ -156,17 +156,17 @@ extension PathExplorerAddTests {
 
     func testAdd<P: EquatablePathExplorer>(
         _ type: P.Type,
-        initial: ValueType,
+        initial: ExplorerValue,
         path: PathElement...,
-        value: ValueType,
-        expected: ValueType,
+        value: ExplorerValue,
+        expected: ExplorerValue,
         file: StaticString = #file,
         line: UInt = #line)
     throws {
         var explorer = P(value: initial)
         let expectedExplorer = P(value: expected)
 
-        try explorer.add(value, at: path)
+        try explorer.add(value, at: Path(path))
 
         XCTAssertExplorersEqual(explorer, expectedExplorer, file: file, line: line)
     }

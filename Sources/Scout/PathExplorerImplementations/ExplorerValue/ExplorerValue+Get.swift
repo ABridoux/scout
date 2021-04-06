@@ -5,7 +5,7 @@
 
 import Foundation
 
-extension ValueType {
+extension ExplorerValue {
 
     public func get(_ path: Path) throws -> Self {
         try get(path: Slice(path))
@@ -16,7 +16,7 @@ extension ValueType {
         let remainder = path.dropFirst()
 
         return try doSettingPath(remainder.leftPart) {
-            let next: ValueType
+            let next: ExplorerValue
 
             switch firstElement {
             case .key(let key): next = try get(key: key)
@@ -42,7 +42,7 @@ extension ValueType {
             return filter <^> Dictionary(uniqueKeysWithValues: newDict)
 
         default:
-            throw ValueTypeError.subscriptKeyNoDict
+            throw ExplorerError.subscriptKeyNoDict
         }
     }
 
@@ -58,7 +58,7 @@ extension ValueType {
             return .slice(slice)
 
         default:
-            throw ValueTypeError.subscriptIndexNoArray
+            throw ExplorerError.subscriptIndexNoArray
         }
     }
 
@@ -67,7 +67,7 @@ extension ValueType {
         case .array(let array), .slice(let array): return .count(array.count)
         case .dictionary(let dict), .filter(let dict): return .count(dict.count)
         default:
-            throw ValueTypeError.wrongUsage(of: .count)
+            throw ExplorerError.wrongUsage(of: .count)
         }
     }
 
@@ -77,7 +77,7 @@ extension ValueType {
             return keysList <^> Set(dict.keys)
 
         default:
-            throw ValueTypeError.wrongUsage(of: .keysList)
+            throw ExplorerError.wrongUsage(of: .keysList)
         }
     }
 
@@ -94,7 +94,7 @@ extension ValueType {
             return try filter <^> dict.mapValues { try $0.getSlice(for: bounds) }
 
         default:
-            throw ValueTypeError.wrongUsage(of: .slice(bounds))
+            throw ExplorerError.wrongUsage(of: .slice(bounds))
         }
     }
 
@@ -112,7 +112,7 @@ extension ValueType {
             return try slice <^> array.map { try $0.getFilter(with: pattern) }
 
         default:
-            throw ValueTypeError.wrongUsage(of: .filter(pattern))
+            throw ExplorerError.wrongUsage(of: .filter(pattern))
         }
     }
 }

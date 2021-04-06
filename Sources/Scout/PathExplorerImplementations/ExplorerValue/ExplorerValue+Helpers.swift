@@ -15,7 +15,7 @@ extension PathExplorerBis {
         let computedIndex = index < 0 ? arrayCount + index : index
 
         guard 0 <= computedIndex, computedIndex < arrayCount else {
-            throw ValueTypeError.wrong(index: index, arrayCount: arrayCount)
+            throw ExplorerError.wrong(index: index, arrayCount: arrayCount)
         }
 
         return computedIndex
