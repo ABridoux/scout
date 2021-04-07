@@ -286,6 +286,11 @@ extension ExplorerValue: CustomStringConvertible {
     }
 }
 
+extension ExplorerValue: CustomDebugStringConvertible {
+
+    public var debugDescription: String { description }
+}
+
 // MARK: - Helpers and Operators
 
 extension PathExplorerBis {
@@ -345,7 +350,11 @@ extension PathExplorerBis {
     }
 }
 
-infix operator <^>
+precedencegroup SequencePrecedence {
+    associativity: left
+}
+
+infix operator <^>: SequencePrecedence
 
 /// Apply the left function to the right operand
 /// - note: Mainly used as synthetic sugar to avoid over use of brackets
@@ -355,10 +364,4 @@ extension ExplorerValue: EquatablePathExplorer {
     public init(value: ExplorerValue) {
         self = value
     }
-
-    public mutating func set<Type>(_ path: Path, to newValue: ExplorerValue, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
-
-    }
-
-    public var debugDescription: String { description }
 }

@@ -23,7 +23,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     }
 
     func testStub() throws {
-        try testExportCSV_SingleValues(CodableFormatPathExplorer<CodableFormats.JsonDefault>.self)
+        
     }
 
     func testExportCSV_SingleValues<P: SerializablePathExplorer>(_ type: P.Type) throws {
