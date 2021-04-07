@@ -31,3 +31,23 @@ public protocol SerializablePathExplorer: PathExplorerBis {
     /// holding a fold mark to be replaced when exporting the string
     mutating func fold(upTo level: Int)
 }
+
+public extension SerializablePathExplorer {
+
+    var defaultCSVSeparator: String { ";" }
+
+    /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
+    func exportCSV() throws -> String {
+        try exportCSV(separator: nil)
+    }
+
+    /// Export the path explorer value to the specified format data
+    func exportData(to format: DataFormat) throws -> Data {
+        try exportData(to: format, rootName: nil)
+    }
+
+    /// Export the path explorer value to the specified format string data
+    func exportString(to format: DataFormat) throws -> String {
+        try exportString(to: format, rootName: nil)
+    }
+}

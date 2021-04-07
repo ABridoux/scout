@@ -276,6 +276,6 @@ public extension PathExplorerBis {
     ///   - initialPath: Scope the returned paths with this path as a starting point
     ///   - filter: Optionally provide a filter on the key and/or value. Default is `noFilter`
     func listPaths(startingAt elements: PathElement..., filter: PathsFilter = .noFilter) throws -> [Path] {
-        try listPaths(startingAt: Path(elements), filter: .noFilter)
+        try listPaths(startingAt: Path(elements), filter: filter)
     }
 }
