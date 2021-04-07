@@ -27,9 +27,13 @@ public protocol SerializablePathExplorer: PathExplorerBis {
     /// Export the path explorer value to the specified format string data with a default root name "root"
     func exportString(to format: DataFormat, rootName: String?) throws -> String
 
-    /// Replace the group values (array or dictionaries) sub values by a unique one
-    /// holding a fold mark to be replaced when exporting the string
-    mutating func fold(upTo level: Int)
+    /// New explorer replacing the group values (array or dictionaries) sub values by a unique one
+    /// holding a fold mark to be replaced when exporting the string value.
+    /// - note: Use `exportFoldedString(upTo:)` to directly get the string value
+    func folded(upTo level: Int) -> Self
+
+    /// Folded explored description, replacing the group values (array or dictionaries) sub values by a single string "..."
+    func exportFoldedString(upTo level: Int) -> String
 }
 
 public extension SerializablePathExplorer {

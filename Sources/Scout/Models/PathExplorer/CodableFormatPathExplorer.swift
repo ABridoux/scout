@@ -116,7 +116,20 @@ extension CodableFormatPathExplorer: SerializablePathExplorer {
         try value.exportCSV(separator: separator ?? defaultCSVSeparator)
     }
 
-    public mutating func fold(upTo level: Int) {
-        fatalError()
+    public func folded(upTo level: Int) -> Self {
+        Self(value: value.folded(upTo: level))
+    }
+
+    public func exportFoldedString(upTo level: Int) -> String {
+        folded(upTo: level)
+            .description
+            .replacingOccurrences(of: Format.foldedRegexPattern, with: "...", options: .regularExpression)
+    }
+}
+
+extension CodableFormatPathExplorer: EquatablePathExplorer {
+
+    func isEqual(to other: CodableFormatPathExplorer<Format>) -> Bool {
+        value.isEqual(to: other.value)
     }
 }

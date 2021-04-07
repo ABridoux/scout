@@ -5,6 +5,20 @@
 
 extension ExplorerValue {
 
+    func exportCSV(separator: String) throws -> String {
+        switch self {
+        case .array(let array), .slice(let array):
+            return try exportCSV(array: array, separator: separator)
+
+        case .dictionary(let dict), .filter(let dict):
+            return try exportCSV(dictionary: dict, separator: separator)
+
+        case .keysList: return toCSV(separator: separator)
+
+        default: throw SerializationError.notCSVExportable(description: "")
+        }
+    }
+
     private func toCSV(separator: String) -> String {
         switch self {
         case .string, .bool, .int, .double, .data, .count:
@@ -18,20 +32,6 @@ extension ExplorerValue {
 
         case .keysList(let keys):
             return keys.map { $0.escapingCSV(separator) }.joined(separator: separator) + separator
-        }
-    }
-
-    func exportCSV(separator: String) throws -> String {
-        switch self {
-        case .array(let array), .slice(let array):
-            return try exportCSV(array: array, separator: separator)
-
-        case .dictionary(let dict), .filter(let dict):
-            return try exportCSV(dictionary: dict, separator: separator)
-
-        case .keysList: return toCSV(separator: separator)
-
-        default: throw SerializationError.notCSVExportable(description: "")
         }
     }
 
