@@ -113,7 +113,7 @@ extension CodableFormatPathExplorer: SerializablePathExplorer {
     }
 
     public func exportCSV(separator: String?) throws -> String {
-        fatalError()
+        try value.exportCSV(separator: separator ?? defaultCSVSeparator)
     }
 
     public mutating func fold(upTo level: Int) {
