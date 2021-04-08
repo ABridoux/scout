@@ -17,7 +17,7 @@ protocol ScoutCommand: ParsableCommand {
     var modifyFilePath: String? { get }
 
     /// Called with the correct `PathExplorer` when `inferPathExplorer(from:in:)` completes
-    func inferred<P: PathExplorer>(pathExplorer: P) throws
+    func inferred<P: SerializablePathExplorer>(pathExplorer: P) throws
 }
 
 extension ScoutCommand {
@@ -50,6 +50,9 @@ extension ScoutCommand {
         // The function `readDataToEndOfFile()` was deprecated since macOS 10.15.4
         // but now (macOS 11.2.2) it seems to be deprecated for never (100_000)).
         return FileHandle.standardInput.readDataToEndOfFile()
+
+//        return try input.data(using: .utf8)
+//            .unwrapOrThrow(error: .invalidData("Unable to get data from standard input"))
 
 //        if #available(OSX 10.15.4, *) {
 //            do {

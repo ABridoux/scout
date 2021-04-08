@@ -23,7 +23,7 @@ protocol SADCommand: ScoutCommand, ExportCommand {
     var outputFilePath: String? { get }
 
     /// Executed for each `pathsCollection` element
-    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathCollection.Element) throws
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathCollectionElement: PathCollection.Element) throws
 }
 
 extension SADCommand {
@@ -39,7 +39,7 @@ extension SADCommand {
             && !FileHandle.standardOutput.isPiped
     }
 
-    func inferred<P: PathExplorer>(pathExplorer: P) throws {
+    func inferred<P: SerializablePathExplorer>(pathExplorer: P) throws {
         let outputPath = modifyFilePath?.replacingTilde ?? outputFilePath?.replacingTilde
 
         var explorer = pathExplorer
@@ -57,7 +57,7 @@ extension SADCommand {
     ///   - colorise: `true` if the data should be colorised
     ///   - level: The level to fold the data
     ///   - csvSeparator: The csv separator to use to export the data
-    func printOutput<P: PathExplorer>(_ outputFilePath: String?, dataWith pathExplorer: P, colorise: Bool, level: Int? = nil) throws {
+    func printOutput<P: SerializablePathExplorer>(_ outputFilePath: String?, dataWith pathExplorer: P, colorise: Bool, level: Int? = nil) throws {
 
         if let output = outputFilePath?.replacingTilde {
             FileManager.default.createFile(atPath: output, contents: nil, attributes: nil)
@@ -89,20 +89,19 @@ extension SADCommand {
             break
         }
 
-        // shadow variable to fold if necessary
-        var pathExplorer = pathExplorer
-
         // fold if specified
-        if let level = level {
-            pathExplorer.fold(upTo: level)
-        }
+        let output: String
 
-        let output = try pathExplorer.exportString()
+        if let level = level {
+            output = try pathExplorer.exportFoldedString(upTo: level)
+        } else {
+            output = try pathExplorer.exportString()
+        }
 
         if let filePath = outputFilePath {
             try output.write(toFile: filePath, atomically: false, encoding: .utf8)
         } else {
-            try printOutput(output: output, with: pathExplorer.format)
+            try printOutput(output: output, with: P.Format.dataFormat)
         }
     }
 

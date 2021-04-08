@@ -14,8 +14,15 @@ public protocol CodableFormat {
     /// Regex used to find folded marks in the description of a folded explorer
     static var foldedRegexPattern: String { get }
 
-    static func encode<E: Encodable>(_ value: E) throws -> Data
+    static func encode<E: Encodable>(_ value: E, rootName: String?) throws -> Data
     static func decode<D: Decodable>(_ type: D.Type, from data: Data) throws -> D
+}
+
+public extension CodableFormat {
+
+    static func encode<E: Encodable>(_ value: E) throws -> Data {
+        try encode(value, rootName: nil)
+    }
 }
 
 private extension CodableFormat {
@@ -36,8 +43,10 @@ public extension CodableFormats {
             + #"|(?<=\{)\s*"\#(foldedKey)"\s*:\s*"\#(foldedMark)"\s*(?=\})"# // dict
         }
 
-        public static func encode<E: Encodable>(_ value: E) throws -> Data {
-            try JSONEncoder().encode(value)
+        public static func encode<E: Encodable>(_ value: E, rootName: String?) throws -> Data {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            return try encoder.encode(value)
         }
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
@@ -57,8 +66,10 @@ public extension CodableFormats {
             + #"|(?<=<dict>)\s*<key>\#(foldedKey)</key>\s*<string>\#(foldedMark)</string>\s*(?=</dict>)"# // dict
         }
 
-        public static func encode<E>(_ value: E) throws -> Data where E : Encodable {
-            try PropertyListEncoder().encode(value)
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
+            let encoder = PropertyListEncoder()
+            encoder.outputFormat = .xml
+            return try encoder.encode(value)
         }
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
@@ -78,7 +89,7 @@ public extension CodableFormats {
             + #"|\#(foldedKey)\s*:\s*\#(foldedMark)\s*(?=\n)"# // dict
         }
 
-        public static func encode<E>(_ value: E) throws -> Data where E : Encodable {
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
             try YAMLEncoder().encode(value).data(using: .utf8).unwrapOrThrow(.stringToData)
         }
 
@@ -95,8 +106,10 @@ public extension CodableFormats {
         public static var dataFormat: DataFormat { .xml }
         public static let foldedRegexPattern = #"(?<=>)\s*<\#(foldedKey)>\#(foldedMark)</\#(foldedKey)>\s*(?=<)"#
 
-        public static func encode<E>(_ value: E) throws -> Data where E : Encodable {
-            try XMLEncoder().encode(value)
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
+            let encoder = XMLEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            return try encoder.encode(value, withRootKey: rootName)
         }
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {

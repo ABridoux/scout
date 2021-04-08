@@ -16,6 +16,9 @@ public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorerBis 
     public func array<T>(of type: T.Type) throws -> [T] where T : ExplorerValueCreatable { try value.array(of: type) }
     public func dictionary<T>(of type: T.Type) throws -> [String : T] where T : ExplorerValueCreatable { try value.dictionary(of: type) }
 
+    public var isGroup: Bool { value.isGroup }
+    public var isSingle: Bool { value.isSingle }
+
     public var description: String { value.description }
     public var debugDescription: String { value.debugDescription }
 
@@ -102,7 +105,7 @@ extension CodableFormatPathExplorer: SerializablePathExplorer {
         case .json: return try CodableFormats.JsonDefault.encode(value)
         case .plist: return try CodableFormats.PlistDefault.encode(value)
         case .yaml: return try CodableFormats.YamlDefault.encode(value)
-        case .xml: return try CodableFormats.XmlDefault.encode(value)
+        case .xml: return try CodableFormats.XmlDefault.encode(value, rootName: rootName)
         }
     }
 
@@ -120,9 +123,9 @@ extension CodableFormatPathExplorer: SerializablePathExplorer {
         Self(value: value.folded(upTo: level))
     }
 
-    public func exportFoldedString(upTo level: Int) -> String {
-        folded(upTo: level)
-            .description
+    public func exportFoldedString(upTo level: Int) throws -> String {
+        try folded(upTo: level)
+            .exportString()
             .replacingOccurrences(of: Format.foldedRegexPattern, with: "...", options: .regularExpression)
     }
 }

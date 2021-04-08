@@ -30,13 +30,11 @@ public indirect enum ExplorerValue {
 
 extension ExplorerValue {
 
-    var isSingle: Bool {
-        !isGroup
-    }
+    public var isSingle: Bool { !isGroup }
 
-    var isGroup: Bool {
+    public var isGroup: Bool {
         switch self {
-        case .array, .dictionary: return true
+        case .array, .dictionary, .filter, .slice, .keysList: return true
         default: return false
         }
     }
@@ -70,43 +68,58 @@ extension ExplorerValue: Hashable {}
 extension ExplorerValue: Codable {
 
     public init(from decoder: Decoder) throws {
-        if let container = try? decoder.singleValueContainer(), let value = Self.decodeSingleValue(from: container) {
-            self = value
-        } else if let dict = try? DictionaryValue(from: decoder) {
+        if let dict = try? DictionaryValue(from: decoder) {
             self = .dictionary(dict)
-        } else {
-            let array = try ArrayValue(from: decoder)
+        } else if let array = try? ArrayValue(from: decoder){
             self = .array(array)
+        } else {
+            self = try .decodeSingleValue(from: decoder)
         }
     }
 
-    private static func decodeSingleValue(from container: SingleValueDecodingContainer) -> ExplorerValue? {
-        if let int = try? container.decode(Int.self) {
+    private static func decodeSingleValue(from decoder: Decoder) throws -> ExplorerValue {
+        if let int = try? Int(from: decoder) {
             return .int(int)
-        } else if let double = try? container.decode(Double.self) {
+        } else if let double = try? Double(from: decoder) {
             return .double(double)
-        } else if let string = try? container.decode(String.self) {
+        } else if let string = try? String(from: decoder) {
             return .string(string)
-        } else if let bool = try? container.decode(Bool.self) {
+        } else if let bool = try? Bool(from: decoder) {
             return .bool(bool)
-        } else if let data = try? container.decode(Data.self) {
+        } else {
+            let data = try Data(from: decoder)
             return .data(data)
         }
-
-        return nil
     }
 
     public func encode(to encoder: Encoder) throws {
-        var singleValueContainer = encoder.singleValueContainer()
-
         switch self {
-        case .int(let int), .count(let int): try singleValueContainer.encode(int)
-        case .double(let double): try singleValueContainer.encode(double)
-        case .string(let string): try singleValueContainer.encode(string)
-        case .bool(let bool): try singleValueContainer.encode(bool)
-        case .data(let data): try singleValueContainer.encode(data)
-        case .array(let array), .slice(let array): try array.encode(to: encoder)
-        case .dictionary(let dict), .filter(let dict): try dict.encode(to: encoder)
+        case .int(let int), .count(let int):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(int)
+
+        case .double(let double):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(double)
+
+        case .string(let string):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(string)
+
+        case .bool(let bool):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(bool)
+
+        case .data(let data):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(data)
+
+        case .array(let array), .slice(let array):
+            try array.encode(to: encoder)
+
+        case .dictionary(let dict), .filter(let dict):
+            try dict.encode(to: encoder)
+
         case .keysList(let array): try array.encode(to: encoder)
         }
     }

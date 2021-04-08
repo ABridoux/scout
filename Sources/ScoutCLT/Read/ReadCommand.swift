@@ -57,11 +57,11 @@ struct ReadCommand: ScoutCommand, ExportCommand {
 
     // MARK: - Functions
 
-    func inferred<P: PathExplorer>(pathExplorer: P) throws {
+    func inferred<P: SerializablePathExplorer>(pathExplorer: P) throws {
         let readingPath = self.readingPath ?? Path()
         var explorer = try pathExplorer.get(readingPath)
         let value = try getValue(from: &explorer)
-        let colorInjector = try self.colorInjector(for: exportFormat ?? explorer.format)
+        let colorInjector = try self.colorInjector(for: exportFormat ?? P.Format.dataFormat)
 
         if value == "" {
             throw RuntimeError.noValueAt(path: readingPath.description)
@@ -77,7 +77,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
         print(output)
     }
 
-    func getValue<Explorer: PathExplorer>(from explorer: inout Explorer) throws -> String {
+    func getValue<Explorer: SerializablePathExplorer>(from explorer: inout Explorer) throws -> String {
 
         switch try export() {
 
@@ -91,12 +91,12 @@ struct ReadCommand: ScoutCommand, ExportCommand {
             break
         }
 
-        if let level = level, outputFilePath == nil { // ignore folding when writing in a file
-            explorer.fold(upTo: level)
+        if explorer.isSingle {
+            return explorer.description
+        } else if let level = level, outputFilePath == nil { // ignore folding when writing in a file
+            return try explorer.exportFoldedString(upTo: level)
+        } else {
+            return try explorer.exportString()
         }
-
-        let value = !explorer.stringValue.isEmpty ? explorer.stringValue : explorer.description
-
-        return value
     }
 }

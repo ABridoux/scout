@@ -7,6 +7,8 @@ import Foundation
 
 public protocol SerializablePathExplorer: PathExplorerBis {
 
+    associatedtype Format: CodableFormat
+
     /// Export the path explorer value to data
     func exportData() throws -> Data
 
@@ -33,7 +35,7 @@ public protocol SerializablePathExplorer: PathExplorerBis {
     func folded(upTo level: Int) -> Self
 
     /// Folded explored description, replacing the group values (array or dictionaries) sub values by a single string "..."
-    func exportFoldedString(upTo level: Int) -> String
+    func exportFoldedString(upTo level: Int) throws -> String
 }
 
 public extension SerializablePathExplorer {

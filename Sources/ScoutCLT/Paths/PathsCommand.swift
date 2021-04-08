@@ -37,7 +37,7 @@ struct PathsCommand: ScoutCommand {
 
     // MARK: - Functions
 
-    func inferred<P>(pathExplorer: P) throws where P: PathExplorer {
+    func inferred<P>(pathExplorer: P) throws where P: PathExplorerBis {
         var pathsFilter = PathsFilter.targetOnly(valueTarget)
         let valuePredicates = self.valuePredicates.isEmpty ? nil : try self.valuePredicates.map { try PathsFilter.ExpressionPredicate(format: $0) }
         var keyRegex: NSRegularExpression?

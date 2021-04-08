@@ -50,7 +50,7 @@ struct DeleteCommand: SADCommand {
 
     // MARK: - Functions
 
-    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
         try pathExplorer.delete(pathCollectionElement, deleteIfEmpty: recursive)
     }
 }

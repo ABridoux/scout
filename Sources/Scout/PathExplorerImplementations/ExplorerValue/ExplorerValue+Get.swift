@@ -41,6 +41,9 @@ extension ExplorerValue {
             let newDict = try dict.map { try ("\($0.key)_\(key)", $0.value.get(key: key)) }
             return filter <^> Dictionary(uniqueKeysWithValues: newDict)
 
+        case .slice(let array):
+            return try slice <^> array.map { try $0.get(key: key) }
+
         default:
             throw ExplorerError.subscriptKeyNoDict
         }

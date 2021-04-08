@@ -11,13 +11,7 @@ protocol PathExplorerGet {
     func tryToGet(_ path: Path) throws
 }
 
-extension PathExplorerSerialization: PathExplorerGet {
-    func tryToGet(_ path: Path) throws {
-        _ = try get(path)
-    }
-}
-
-extension Xml: PathExplorerGet {
+extension CodableFormatPathExplorer: PathExplorerGet {
     func tryToGet(_ path: Path) throws {
         _ = try get(path)
     }

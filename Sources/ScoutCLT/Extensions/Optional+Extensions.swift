@@ -14,7 +14,7 @@ extension Optional {
         return wrapped
     }
 
-    func unwrapOrThrow(error: RuntimeError) throws -> Wrapped {
+    func unwrapOrThrow(_ error: RuntimeError) throws -> Wrapped {
         try unwrapOrThrow(error: error)
     }
 }
