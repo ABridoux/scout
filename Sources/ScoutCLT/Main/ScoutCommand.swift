@@ -47,19 +47,22 @@ extension ScoutCommand {
             return try Data(contentsOf: URL(fileURLWithPath: filePath.replacingTilde))
         }
 
+        // The function `readDataToEndOfFile()` was deprecated since macOS 10.15.4
+        // but now (macOS 11.2.2) it seems to be deprecated for never (100_000)).
+        return FileHandle.standardInput.readDataToEndOfFile()
 
-        if #available(OSX 10.15.4, *) {
-            do {
-                guard let standardInputData = try FileHandle.standardInput.readToEnd() else {
-                    throw RuntimeError.invalidData("Unable to get data from standard input")
-                }
-                return standardInputData
-            } catch {
-                throw RuntimeError.invalidData("Error while reading data from standard input. \(error.localizedDescription)")
-            }
-        } else {
-            return FileHandle.standardInput.readDataToEndOfFile()
-        }
+//        if #available(OSX 10.15.4, *) {
+//            do {
+//                guard let standardInputData = try FileHandle.standardInput.readToEnd() else {
+//                    throw RuntimeError.invalidData("Unable to get data from standard input")
+//                }
+//                return standardInputData
+//            } catch {
+//                throw RuntimeError.invalidData("Error while reading data from standard input. \(error.localizedDescription)")
+//            }
+//        } else {
+//            return FileHandle.standardInput.readDataToEndOfFile()
+//        }
     }
 
     func inferPathExplorer(from data: Data, in inputFilePath: String?) throws {

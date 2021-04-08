@@ -3,9 +3,13 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [3.0.3](https://github.com/ABridoux/scout/tree/3.0.3) (08/04/2021)
+### Fixed
+- Reading from standard input temporary fix for deprecation issue [#191]
+
 ## [3.0.2](https://github.com/ABridoux/scout/tree/3.0.2) (22/03/2021)
 ### Fixed
-- Reading from standard input [#
+- Reading from standard input [#191]
 
 ## [3.0.1](https://github.com/ABridoux/scout/tree/3.0.1) (06/03/2021)
 
