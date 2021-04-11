@@ -23,7 +23,7 @@ let package = Package(
             from: "4.5.0"),
         .package(
             url: "https://github.com/MaxDesiatov/XMLCoder",
-            from: "0.1.0"),
+            from: "0.12.0"),
         .package(
             url: "https://github.com/apple/swift-argument-parser",
             from: "0.0.1"),

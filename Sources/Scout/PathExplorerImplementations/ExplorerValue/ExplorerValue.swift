@@ -30,13 +30,11 @@ public indirect enum ExplorerValue {
 
 extension ExplorerValue {
 
-    var isSingle: Bool {
-        !isGroup
-    }
+    public var isSingle: Bool { !isGroup }
 
-    var isGroup: Bool {
+    public var isGroup: Bool {
         switch self {
-        case .array, .dictionary: return true
+        case .array, .dictionary, .filter, .slice, .keysList: return true
         default: return false
         }
     }
@@ -59,6 +57,13 @@ extension ExplorerValue {
             return false
         }
     }
+
+    var isNull: Bool {
+        if case let .string(string) = self, string == "null" {
+            return true
+        }
+        return false
+    }
 }
 
 // MARK: - Hashable
@@ -69,18 +74,46 @@ extension ExplorerValue: Hashable {}
 
 extension ExplorerValue: Codable {
 
-    public init(from decoder: Decoder) throws {
-        if let container = try? decoder.singleValueContainer(), let value = Self.decodeSingleValue(from: container) {
-            self = value
-        } else if let dict = try? DictionaryValue(from: decoder) {
-            self = .dictionary(dict)
-        } else {
-            let array = try ArrayValue(from: decoder)
-            self = .array(array)
+    private struct ExplorerCodingKey: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+
+        init?(intValue: Int) {
+            self.intValue = intValue
+            stringValue = String(intValue)
         }
     }
 
-    private static func decodeSingleValue(from container: SingleValueDecodingContainer) -> ExplorerValue? {
+    public init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: ExplorerCodingKey.self) {
+            var dict = DictionaryValue()
+            try container.allKeys.forEach { (key) in
+                let value = try container.decode(ExplorerValue.self, forKey: key)
+                guard !value.isNull else { return }
+                dict[key.stringValue] = value
+            }
+            self = .dictionary(dict)
+
+        } else if var container = try? decoder.unkeyedContainer() {
+            var array = ArrayValue()
+            while !container.isAtEnd {
+                let value = try container.decode(ExplorerValue.self)
+                guard !value.isNull else { continue }
+                array.append(value)
+            }
+            self = .array(array)
+
+        } else {
+            let container = try decoder.singleValueContainer()
+            self = try .decodeSingleValue(from: container)
+        }
+    }
+
+    private static func decodeSingleValue(from container: SingleValueDecodingContainer) throws -> ExplorerValue {
         if let int = try? container.decode(Int.self) {
             return .int(int)
         } else if let double = try? container.decode(Double.self) {
@@ -91,22 +124,43 @@ extension ExplorerValue: Codable {
             return .bool(bool)
         } else if let data = try? container.decode(Data.self) {
             return .data(data)
+        } else {
+            if container.decodeNil() {
+                return .string("null")
+            } else {
+                throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath)")
+            }
         }
-
-        return nil
     }
 
     public func encode(to encoder: Encoder) throws {
-        var singleValueContainer = encoder.singleValueContainer()
-
         switch self {
-        case .int(let int), .count(let int): try singleValueContainer.encode(int)
-        case .double(let double): try singleValueContainer.encode(double)
-        case .string(let string): try singleValueContainer.encode(string)
-        case .bool(let bool): try singleValueContainer.encode(bool)
-        case .data(let data): try singleValueContainer.encode(data)
-        case .array(let array), .slice(let array): try array.encode(to: encoder)
-        case .dictionary(let dict), .filter(let dict): try dict.encode(to: encoder)
+        case .int(let int), .count(let int):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(int)
+
+        case .double(let double):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(double)
+
+        case .string(let string):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(string)
+
+        case .bool(let bool):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(bool)
+
+        case .data(let data):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(data)
+
+        case .array(let array), .slice(let array):
+            try array.encode(to: encoder)
+
+        case .dictionary(let dict), .filter(let dict):
+            try dict.encode(to: encoder)
+
         case .keysList(let array): try array.encode(to: encoder)
         }
     }
@@ -292,63 +346,6 @@ extension ExplorerValue: CustomDebugStringConvertible {
 }
 
 // MARK: - Helpers and Operators
-
-extension PathExplorerBis {
-
-    /// Add the element to the thrown `ValueTypeError` if any
-    func doAdd<T>(_ element: PathElementRepresentable, _ block: () throws -> T) rethrows -> T {
-        do {
-            return try block()
-        } catch let error as ExplorerError {
-            throw error.adding(element)
-        }
-    }
-
-    /// Add the element to the thrown `ValueTypeError` if any
-    func doAdd(_ element: PathElementRepresentable, _ block: () throws -> Void) rethrows {
-        do {
-            try block()
-        } catch let error as ExplorerError {
-            throw error.adding(element)
-        }
-    }
-
-    /// Add the element to the thrown `ValueTypeError` if any
-    func doAdd<T>(_ element: PathElement, _ block: () throws -> T) rethrows -> T {
-        do {
-            return try block()
-        } catch let error as ExplorerError {
-            throw error.adding(element)
-        }
-    }
-
-    /// Add the element to the thrown `ValueTypeError` if any
-    func doAdd(_ element: PathElement, _ block: () throws -> Void) rethrows {
-        do {
-            try block()
-        } catch let error as ExplorerError {
-            throw error.adding(element)
-        }
-    }
-
-    /// do/catch on the provided block to catch a `ValueTypeError` and set the provided path on it
-    func doSettingPath(_ path: Slice<Path>, _ block: () throws -> Void) rethrows {
-        do {
-            try block()
-        } catch let error as ExplorerError {
-            throw error.with(path: path)
-        }
-    }
-
-    /// do/catch on the provided block to catch a `ValueTypeError` and set the provided path on it
-    func doSettingPath<T>(_ path: Slice<Path>, _ block: () throws -> T) rethrows -> T {
-        do {
-            return try block()
-        } catch let error as ExplorerError {
-            throw error.with(path: path)
-        }
-    }
-}
 
 precedencegroup SequencePrecedence {
     associativity: left

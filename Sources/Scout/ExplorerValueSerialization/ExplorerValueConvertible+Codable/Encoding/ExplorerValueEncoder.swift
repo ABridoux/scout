@@ -7,14 +7,14 @@ import Foundation
 
 final class ExplorerValueEncoder: Encoder {
     var codingPath: [CodingKey]
-    var userInfo: [CodingUserInfoKey : Any] = [:]
+    var userInfo: [CodingUserInfoKey: Any] = [:]
     var value: ExplorerValue!
 
     init(codingPath: [CodingKey] = []) {
         self.codingPath = codingPath
     }
 
-    func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
+    func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         value = .dictionary([:])
         return KeyedEncodingContainer(Container(codingPath: codingPath, encoder: self, path: .empty))
     }

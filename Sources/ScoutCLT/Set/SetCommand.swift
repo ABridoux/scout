@@ -17,6 +17,9 @@ struct SetCommand: SADCommand {
 
     // MARK: - Properties
 
+    @Flag(help: "The data format to read the input")
+    var dataFormat: DataFormat
+
     @Argument(help: PathAndValue.help)
     var pathsCollection = [PathAndValue]()
 
@@ -46,7 +49,7 @@ struct SetCommand: SADCommand {
 
     // MARK: - Functions
 
-    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
         let (path, value) = (pathCollectionElement.readingPath, pathCollectionElement.value)
 
         if pathCollectionElement.changeKey {
@@ -54,15 +57,30 @@ struct SetCommand: SADCommand {
             return
         }
 
+        let explorerValue: ExplorerValue
+
         if let forceType = pathCollectionElement.forceType {
+
             switch forceType {
-            case .string: try pathExplorer.set(path, to: value, as: .string)
-            case .real: try pathExplorer.set(path, to: value, as: .real)
-            case .int: try pathExplorer.set(path, to: value, as: .int)
-            case .bool: try pathExplorer.set(path, to: value, as: .bool)
+            case .string:
+                explorerValue = .string(value)
+
+            case .real:
+                let double = try Double(value).unwrapOrThrow(.valueConversion(value: value, type: "Double"))
+                explorerValue = .double(double)
+
+            case .int:
+                let int = try Int(value).unwrapOrThrow(.valueConversion(value: value, type: "Int"))
+                explorerValue = .int(int)
+
+            case .bool:
+                let bool = try Bool(value).unwrapOrThrow(.valueConversion(value: value, type: "Bool"))
+                explorerValue = .bool(bool)
             }
         } else {
-            try pathExplorer.set(path, to: value)
+            explorerValue = .init(fromSingle: value)
         }
+
+        try pathExplorer.set(path, to: explorerValue)
     }
 }

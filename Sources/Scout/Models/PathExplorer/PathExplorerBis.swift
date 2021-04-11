@@ -40,6 +40,12 @@ where
     /// A dictionary of the provided type as values.
     func dictionary<T: ExplorerValueCreatable>(of type: T.Type) throws -> [String: T]
 
+    /// `true` if the explorer is a group value (e.g. a dictionary or an array)
+    var isGroup: Bool { get }
+
+    /// `true` if the explorer is a single value (e.g. a string, an int...)
+    var isSingle: Bool { get }
+
     // MARK: - Initialization
 
     init(value: ExplorerValue)

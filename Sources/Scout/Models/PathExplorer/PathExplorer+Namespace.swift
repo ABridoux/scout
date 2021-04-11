@@ -18,8 +18,8 @@ public enum PathExplorers {
     public typealias Plist = PathExplorerSerialization<SerializationFormats.Plist>
     public typealias Yaml = PathExplorerSerialization<SerializationFormats.Yaml>
 
-//    public typealias Xml = CodableFormatPathExplorer<CodableFormats.XmlDefault>
-//    public typealias Json = CodableFormatPathExplorer<CodableFormats.JsonDefault>
-//    public typealias Plist = CodableFormatPathExplorer<CodableFormats.PlistDefault>
-//    public typealias Yaml = CodableFormatPathExplorer<CodableFormats.YamlDefault>
+    public typealias XmlBis = CodableFormatPathExplorer<CodableFormats.XmlDefault>
+    public typealias JsonBis = CodableFormatPathExplorer<CodableFormats.JsonDefault>
+    public typealias PlistBis = CodableFormatPathExplorer<CodableFormats.PlistDefault>
+    public typealias YamlBis = CodableFormatPathExplorer<CodableFormats.YamlDefault>
 }

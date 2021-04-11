@@ -23,13 +23,13 @@ final class PathExplorerCSVExportTests: XCTestCase {
     }
 
     func testStub() throws {
-        
+
     }
 
     func testExportCSV_SingleValues<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,
-            value:  ["Riri", "Fifi", "Loulou"],
+            value: ["Riri", "Fifi", "Loulou"],
             expected: "Riri;Fifi;Loulou;"
         )
     }
@@ -37,7 +37,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     func testExportCSV_ArrayOfDictionaries<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,
-            value:  [["name": "Riri", "age": 15], ["name": "Fifi", "age": 15], ["name": "Loulou", "age": 15]],
+            value: [["name": "Riri", "age": 15], ["name": "Fifi", "age": 15], ["name": "Loulou", "age": 15]],
             expected:
             """
             age;name;
@@ -51,7 +51,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     func testExportCSV_ArrayOfDictionaries_NestedDict<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,
-            value:  [["name": "Riri", "family": ["uncle": "Donald", "aunt": "Daisy"]],
+            value: [["name": "Riri", "family": ["uncle": "Donald", "aunt": "Daisy"]],
                      ["name": "Fifi", "family": ["uncle": "Donald", "aunt": "Daisy"]],
                      ["name": "Loulou", "family": ["uncle": "Donald", "aunt": "Daisy"]]],
             expected:
@@ -67,7 +67,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     func testExportCSV_ArrayOfDictionaries_NestedArray<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,
-            value:  [["name": "Riri", "brothers": ["Fifi", "Loulou"]],
+            value: [["name": "Riri", "brothers": ["Fifi", "Loulou"]],
                      ["name": "Fifi", "brothers": ["Riri", "Loulou"]],
                      ["name": "Loulou", "brothers": ["Riri", "Fifi"]]],
             expected:
@@ -83,7 +83,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     func testExportCSV_ArrayOfArrays<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,
-            value:  [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+            value: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
             expected:
             """
             1;2;3;
@@ -96,7 +96,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     func testExportCSV_DictionaryOfArrays<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,
-            value:  ["duckFamily": ["Donald", "Daisy"], "mouseFamily": ["Mickey", "Minnie"]],
+            value: ["duckFamily": ["Donald", "Daisy"], "mouseFamily": ["Mickey", "Minnie"]],
             expected:
             """
             duckFamily;Donald;Daisy;
@@ -108,7 +108,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     func testExportCSV_SeparatorIsQuoted<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,
-            value:  ["phrase with; separator", "phrase without separator"],
+            value: ["phrase with; separator", "phrase without separator"],
             expected:
             """
             "phrase with; separator";phrase without separator;

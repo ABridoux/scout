@@ -9,7 +9,7 @@ public struct ExplorerError: LocalizedError, Equatable {
     public private(set) var path: Path
     let description: String
 
-    public var errorDescription: String? { "[\(path.description)] \(description)" }
+    public var errorDescription: String? { "'\(path.description)' \(description)" }
 
     init(path: Path = .empty, description: String) {
         self.path = path

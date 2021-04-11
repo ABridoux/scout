@@ -54,9 +54,9 @@ extension SerializationFormats {
             }
 
             if #available(OSX 10.15, *) {
-                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes])
+                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .withoutEscapingSlashes, .fragmentsAllowed])
             } else {
-                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
+                return try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .fragmentsAllowed])
             }
         }
     }

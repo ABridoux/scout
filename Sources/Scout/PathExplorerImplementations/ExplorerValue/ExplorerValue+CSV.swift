@@ -94,7 +94,7 @@ extension ExplorerValue {
     /// #### Complexity
     /// `O(n)` where `n` is the number of elements in the array
     private func headers(in array: ArrayValue) throws -> [Path] {
-        try array.reduce([Path]()) { (keys, value) in
+        try array.reduce([Path]()) { (_, value) in
             guard value.isDictionary else { throw ExplorerError.mismatchingType(DictionaryValue.self, value: value) }
             return try value.listPaths(filter: .targetOnly(.single))
         }

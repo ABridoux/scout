@@ -77,4 +77,16 @@ final class ExplorerValueDecoderTests: XCTestCase {
         let expected = Toto(data: "here".data(using: .utf8)!)
         XCTAssertEqual(String(data: toto.data, encoding: .utf8), String(data: expected.data, encoding: .utf8))
     }
+
+    func testDecode_Nil() throws {
+        struct Toto: Codable, Equatable {
+            var string: String?
+        }
+
+        let value: ExplorerValue = [:]
+        let toto = try Toto(from: ExplorerValueDecoder(value))
+
+        let expected = Toto(string: nil)
+        XCTAssertEqual(toto, expected)
+    }
 }

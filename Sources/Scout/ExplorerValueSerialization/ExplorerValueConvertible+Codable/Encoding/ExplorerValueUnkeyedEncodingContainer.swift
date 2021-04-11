@@ -91,7 +91,7 @@ extension ExplorerValueEncoder {
             count += 1
         }
 
-        mutating func encode<T>(_ value: T) throws where T : Encodable {
+        mutating func encode<T>(_ value: T) throws where T: Encodable {
             if let data = value as? Data {
                 try encode(data)
                 return
@@ -103,7 +103,7 @@ extension ExplorerValueEncoder {
             count += 1
         }
 
-        mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
+        mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
             defer { count += 1 }
             return KeyedEncodingContainer(Container<NestedKey>(codingPath: codingPath, encoder: encoder, path: path.appending(.count)))
         }

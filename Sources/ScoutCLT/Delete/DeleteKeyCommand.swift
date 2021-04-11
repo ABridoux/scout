@@ -20,6 +20,9 @@ struct DeleteKeyCommand: SADCommand {
 
     var pathsCollection: [Path] { [Path("empty")] }
 
+    @Flag(help: "The data format to read the input")
+    var dataFormat: DataFormat
+
     @Argument(help: "The regular expression pattern the keys to delete have to match")
     var pattern: String
 
@@ -52,7 +55,7 @@ struct DeleteKeyCommand: SADCommand {
 
     // MARK: - Functions
 
-    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
         // postponed to 3.1.0
 
 //         will be called only once
