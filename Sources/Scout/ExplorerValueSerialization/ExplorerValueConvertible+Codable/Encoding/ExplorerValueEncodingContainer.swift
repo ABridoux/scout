@@ -74,10 +74,10 @@ extension ExplorerValueEncoder {
             try encoder.value.add(.data(value), at: path.appending(key.stringValue))
         }
 
-        mutating func encode<T>(_ value: T, forKey key: Key) throws where T : Encodable {
+        mutating func encode<T>(_ value: T, forKey key: Key) throws where T: Encodable {
             if let data = value as? Data {
                 try encode(data, forKey: key)
-                return 
+                return
             }
 
             let newEncoder = ExplorerValueEncoder()
@@ -85,7 +85,7 @@ extension ExplorerValueEncoder {
             try encoder.value.add(newEncoder.value, at: path.appending(key.stringValue))
         }
 
-        mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
+        mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
             KeyedEncodingContainer(Container<NestedKey>(codingPath: codingPath + [key], encoder: encoder, path: path.appending(key.stringValue)))
         }
 

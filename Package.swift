@@ -22,8 +22,8 @@ let package = Package(
             url: "https://github.com/tadija/AEXML.git",
             from: "4.5.0"),
         .package(
-            url: "https://github.com/MaxDesiatov/XMLCoder",
-            from: "0.1.0"),
+            url: "https://github.com/ShawnMoore/XMLParsing",
+            from: "0.0.3"),
         .package(
             url: "https://github.com/apple/swift-argument-parser",
             from: "0.0.1"),
@@ -43,7 +43,7 @@ let package = Package(
             name: "Scout",
             dependencies: [
                 "AEXML",
-                "XMLCoder",
+                "XMLParsing",
                 "Yams",
                 "BooleanExpressionEvaluation"]),
         .target(

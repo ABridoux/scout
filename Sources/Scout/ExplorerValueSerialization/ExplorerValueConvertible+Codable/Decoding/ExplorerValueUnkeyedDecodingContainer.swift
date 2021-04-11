@@ -107,7 +107,7 @@ extension ExplorerValueDecoder {
             return value
         }
 
-        mutating func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
+        mutating func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
             if T.self == Data.self {
                 return try decode(Data.self) as! T
             }
@@ -118,7 +118,7 @@ extension ExplorerValueDecoder {
             return decoded
         }
 
-        mutating func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+        mutating func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
             let value = array[currentIndex]
             return KeyedDecodingContainer(Container<NestedKey>(value: value, codingPath: codingPath, decoder: decoder))
         }

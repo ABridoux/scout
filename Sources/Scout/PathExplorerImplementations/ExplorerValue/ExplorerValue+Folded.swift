@@ -6,7 +6,7 @@
 import Foundation
 
 extension ExplorerValue {
-    
+
     private var foldedKey: String { Folding.foldedKey }
     private var foldedMark: String { Folding.foldedMark }
 

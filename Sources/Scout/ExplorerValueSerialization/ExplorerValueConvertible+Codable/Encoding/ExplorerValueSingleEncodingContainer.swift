@@ -74,7 +74,7 @@ extension ExplorerValueEncoder {
             try encoder.value.set(path, to: .data(value))
         }
 
-        mutating func encode<T>(_ value: T) throws where T : Encodable {
+        mutating func encode<T>(_ value: T) throws where T: Encodable {
             if let data = value as? Data {
                 try encode(data)
                 return

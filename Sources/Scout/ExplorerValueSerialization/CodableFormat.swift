@@ -5,7 +5,7 @@
 
 import Foundation
 import Yams
-import XMLCoder
+import XMLParsing
 
 public protocol CodableFormat {
 
@@ -66,13 +66,13 @@ public extension CodableFormats {
             + #"|(?<=<dict>)\s*<key>\#(foldedKey)</key>\s*<string>\#(foldedMark)</string>\s*(?=</dict>)"# // dict
         }
 
-        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
             let encoder = PropertyListEncoder()
             encoder.outputFormat = .xml
             return try encoder.encode(value)
         }
 
-        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
             try PropertyListDecoder().decode(type, from: data)
         }
     }
@@ -89,11 +89,11 @@ public extension CodableFormats {
             + #"|\#(foldedKey)\s*:\s*\#(foldedMark)\s*(?=\n)"# // dict
         }
 
-        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
             try YAMLEncoder().encode(value).data(using: .utf8).unwrapOrThrow(.stringToData)
         }
 
-        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
             try YAMLDecoder().decode(type, from: data)
         }
     }
@@ -106,13 +106,13 @@ public extension CodableFormats {
         public static var dataFormat: DataFormat { .xml }
         public static let foldedRegexPattern = #"(?<=>)\s*<\#(foldedKey)>\#(foldedMark)</\#(foldedKey)>\s*(?=<)"#
 
-        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
             let encoder = XMLEncoder()
             encoder.outputFormatting = .prettyPrinted
-            return try encoder.encode(value, withRootKey: rootName)
+            return try encoder.encode(value, withRootKey: rootName ?? "root")
         }
 
-        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
             try XMLDecoder().decode(type, from: data)
         }
     }

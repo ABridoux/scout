@@ -13,8 +13,8 @@ public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorerBis 
     public var int: Int? { value.int }
     public var real: Double? { value.real }
     public var data: Data? { value.data }
-    public func array<T>(of type: T.Type) throws -> [T] where T : ExplorerValueCreatable { try value.array(of: type) }
-    public func dictionary<T>(of type: T.Type) throws -> [String : T] where T : ExplorerValueCreatable { try value.dictionary(of: type) }
+    public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable { try value.array(of: type) }
+    public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable { try value.dictionary(of: type) }
 
     public var isGroup: Bool { value.isGroup }
     public var isSingle: Bool { value.isSingle }

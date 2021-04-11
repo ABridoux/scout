@@ -17,7 +17,7 @@ extension ExplorerValueDecoder {
             self.value = value
             self.codingPath = codingPath
             self.decoder = decoder
-            
+
             if case let .keysList(keys) = try? value.get(.keysList) {
                 allKeys = keys.compactMap(Key.init)
             }
@@ -126,7 +126,7 @@ extension ExplorerValueDecoder {
                 .unwrapOrThrow(.typeMismatch(Data.self, codingPath: codingPath + [key]))
         }
 
-        func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable {
+        func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
             let value = try valueFor(key: key)
 
             if T.self == Data.self {
@@ -137,7 +137,7 @@ extension ExplorerValueDecoder {
             return try T(from: decoder)
         }
 
-        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
             let value = try valueFor(key: key)
             return KeyedDecodingContainer(Container<NestedKey>(value: value, codingPath: codingPath + [key], decoder: decoder))
         }

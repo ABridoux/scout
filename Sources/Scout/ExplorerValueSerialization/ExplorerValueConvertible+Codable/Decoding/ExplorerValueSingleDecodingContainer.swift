@@ -74,7 +74,7 @@ extension ExplorerValueDecoder {
             try value.data.unwrapOrThrow(.typeMismatch(Data.self, codingPath: codingPath))
         }
 
-        func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
+        func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
             if T.self == Data.self {
                 return try decode(Data.self) as! T
             }

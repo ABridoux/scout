@@ -7,7 +7,7 @@ import Foundation
 
 final class ExplorerValueDecoder: Decoder {
     var codingPath: [CodingKey]
-    var userInfo: [CodingUserInfoKey : Any] = [:]
+    var userInfo: [CodingUserInfoKey: Any] = [:]
     let value: ExplorerValue
 
     init(_ value: ExplorerValue, codingPath: [CodingKey] = []) {
@@ -15,7 +15,7 @@ final class ExplorerValueDecoder: Decoder {
         self.codingPath = codingPath
     }
 
-    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
+    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         KeyedDecodingContainer(Container(value: value, codingPath: codingPath, decoder: self))
     }
 

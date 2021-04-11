@@ -21,8 +21,6 @@ final class PathExplorerGetTests: XCTestCase {
         try testGetKey_NoDictionaryThrows_ValueType(ExplorerValue.self)
     }
 
-    }
-
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
         // key
         try testGetKey(P.self)

@@ -70,7 +70,7 @@ extension ExplorerValue: Codable {
     public init(from decoder: Decoder) throws {
         if let dict = try? DictionaryValue(from: decoder) {
             self = .dictionary(dict)
-        } else if let array = try? ArrayValue(from: decoder){
+        } else if let array = try? ArrayValue(from: decoder) {
             self = .array(array)
         } else {
             self = try .decodeSingleValue(from: decoder)
