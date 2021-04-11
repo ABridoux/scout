@@ -78,4 +78,16 @@ final class ExplorerValueEncoderTests: XCTestCase {
 
         XCTAssertEqual(encoder.value, ["data": .data(data)])
     }
+
+    func testEncode_Nil() throws {
+        struct Toto: Codable, Equatable {
+            var string: String?
+        }
+
+        let toto = Toto(string: nil)
+        let encoder = ExplorerValueEncoder()
+        try toto.encode(to: encoder)
+
+        XCTAssertEqual(encoder.value, [:])
+    }
 }

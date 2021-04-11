@@ -18,6 +18,9 @@ struct DeleteCommand: SADCommand {
 
     // MARK: - Properties
 
+    @Flag(help: "The data format to read the input")
+    var dataFormat: DataFormat
+
     @Argument(help: "Paths to indicate the keys to be deleted")
     var pathsCollection = [Path]()
 

@@ -16,6 +16,8 @@ protocol ScoutCommand: ParsableCommand {
     /// A file path from which to read and write the data
     var modifyFilePath: String? { get }
 
+    var dataFormat: Scout.DataFormat { get }
+
     /// Called with the correct `PathExplorer` when `inferPathExplorer(from:in:)` completes
     func inferred<P: SerializablePathExplorer>(pathExplorer: P) throws
 }
@@ -38,7 +40,7 @@ extension ScoutCommand {
         }
 
         let data = try readDataOrInputStream(from: filePath)
-        try inferPathExplorer(from: data, in: inputFilePath)
+        try makePathExplorer(for: dataFormat, from: data)
     }
 
     /// Try to read data from the optional `filePath`. Otherwise, return the data from the standard input stream
@@ -70,16 +72,38 @@ extension ScoutCommand {
 //        }
     }
 
+    func makePathExplorer(for dataFormat: Scout.DataFormat, from data: Data) throws {
+        do {
+            switch dataFormat {
+            case .json:
+                let json = try Json(data: data)
+                try inferred(pathExplorer: json)
+            case .plist:
+                let plist = try Plist(data: data)
+                try inferred(pathExplorer: plist)
+            case .yaml:
+                let yaml = try Yaml(data: data)
+                try inferred(pathExplorer: yaml)
+            case .xml:
+                let xml = try Xml(data: data)
+                try inferred(pathExplorer: xml)
+            }
+        } catch {
+            throw RuntimeError.unknownFormat("The input cannot be read as \(dataFormat).\n\(error).\n\(error.localizedDescription)")
+        }
+    }
+
+    @available(*, deprecated, message: "Useless with the new required dataFormat flag.")
     func inferPathExplorer(from data: Data, in inputFilePath: String?) throws {
 
         if let json = try? Json(data: data) {
             try inferred(pathExplorer: json)
         } else if let plist = try? Plist(data: data) {
             try inferred(pathExplorer: plist)
-        } else if let xml = try? Xml(data: data) {
-            try inferred(pathExplorer: xml)
         } else if let yaml = try? Yaml(data: data) {
             try inferred(pathExplorer: yaml)
+        } else if let xml = try? Xml(data: data) {
+            try inferred(pathExplorer: xml)
         } else {
             if let filePath = inputFilePath {
                 throw RuntimeError.unknownFormat("The format of the file at \(filePath) is not recognized")

@@ -31,6 +31,9 @@ struct ReadCommand: ScoutCommand, ExportCommand {
             && !FileHandle.standardOutput.isPiped
     }
 
+    @Flag(help: "The data format to read the input")
+    var dataFormat: Scout.DataFormat
+
     @Argument(help: .readingPath)
     var readingPath: Path?
 

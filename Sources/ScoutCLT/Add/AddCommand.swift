@@ -18,6 +18,9 @@ struct AddCommand: SADCommand {
 
     // MARK: - Properties
 
+    @Flag(help: "The data format to read the input")
+    var dataFormat: DataFormat
+
     @Argument(help: PathAndValue.help)
     var pathsCollection = [PathAndValue]()
 
