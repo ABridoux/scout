@@ -51,4 +51,18 @@ extension AEXMLElement {
 
         return true
     }
+
+    /// All children names. `nil` if two names are reused
+    var uniqueChildrenNames: Set<String>? {
+        var names = Set<String>()
+
+        for child in children {
+            if names.contains(child.name), names.count > 1 {
+                return nil
+            }
+            names.insert(child.name)
+        }
+
+        return names
+    }
 }

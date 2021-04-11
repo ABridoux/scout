@@ -109,7 +109,7 @@ extension ExplorerValue {
             return .filter(dict.filter { regex.validate($0.key) })
 
         case .filter(let dict):
-            return try filter <^> dict.mapValues {try $0.getFilter(with: pattern) }
+            return try filter <^> dict.mapValues { try $0.getFilter(with: pattern) }
 
         case .slice(let array):
             return try slice <^> array.map { try $0.getFilter(with: pattern) }

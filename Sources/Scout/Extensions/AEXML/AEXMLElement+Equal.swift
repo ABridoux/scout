@@ -15,7 +15,7 @@ extension AEXMLElement {
 
         if children.isEmpty, other.children.isEmpty {
             return attributes == other.attributes
-                && (name == other.name || name == "root" || other.name == "root") // root names are not always the same
+                && (name == other.name || [name, other.name].contains("root") || [name, other.name].contains(Self.defaultName)) // root names are not always the same
                 && value == other.value
         }
 

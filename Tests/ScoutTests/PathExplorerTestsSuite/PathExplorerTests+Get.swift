@@ -16,52 +16,57 @@ final class PathExplorerGetTests: XCTestCase {
 
     // MARK: - Functions
 
-    func test() throws {
+    func testExplorerValue() throws {
         try test(ExplorerValue.self)
-        try testGetKey_NoDictionaryThrows_ValueType(ExplorerValue.self)
+
+        // specific tests for serializable values
+        try testGetKey_ThrowsOnNoDictionary(ExplorerValue.self)
+        try testGetIndex_ThrowsOnNoArray(ExplorerValue.self)
+        try testGetCount_ThrowsOnNonGroup()
+        try testGetKeysList_ThrowsOnNonDictionary(ExplorerValue.self)
+        try testGetFilter_ThrowsOnNonDictionary(ExplorerValue.self)
+        try testGetSlice_ThrowsOnNonArray(ExplorerValue.self)
+    }
+
+    func testExplorerXML() throws {
+        try test(ExplorerXML.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
         // key
         try testGetKey(P.self)
-        try testGetMissingKeyThrows(P.self)
-        try testGetMissingKeyThrows_BestMatch(P.self)
-        try testGetNestedKey(P.self)
-        try testGetMissingNestedKeyThrows(P.self)
-        try testGetKeyFilter(P.self)
+        try testGetKey_MissingThrows(P.self)
+        try testGetKey_MissingKeyThrows_BestMatch(P.self)
+        try testGetKey_NestedKey(P.self)
+        try testGet_MissingNestedKeyThrows(P.self)
 
         // index
         try testGetIndex(P.self)
-        try testGetLastIndex(P.self)
-        try testGetNegativeIndex(P.self)
-        try testGetIndexNoArrayThrows(P.self)
-        try testGetIndexSlice(P.self)
+        try testGetIndex_LastIndex(P.self)
+        try testGetIndex_NegativeIndex(P.self)
 
         // count
         try testGetArrayCount(P.self)
         try testGetDictionaryCount(P.self)
-        try testGetCountOnNonGroupThrows()
 
         // keys list
         try testGetKeysList(P.self)
-        try testGetKeysListOnNonDictionaryThrows(P.self)
 
         // filter
         try testGetFilter(P.self)
-        try testGetFilterOfFilter(P.self)
-        try testGetFilterOnSlice(P.self)
-        try testGetFilterOnNonDictionaryThrows(P.self)
+        try testGetFilter_ThenKey(P.self)
+        try testGetFilter_AfterFilter(P.self)
+        try testGetFilter_AfterSlice(P.self)
 
         // slice
         try testGetSlice(P.self)
-        try testGetSliceOfSlice(P.self)
-        try testGetSliceOnFilter(P.self)
-        try testGetSliceOnNonArrayThrows(P.self)
+        try testGetSlice_ThenIndex(P.self)
+        try testGetSlice_AfterSlice(P.self)
+        try testGetSlice_AfterFilter(P.self)
     }
 
     func testStub() throws {
         // use this function to launch a specific test with a specific PathExplorer
-        try testGetMissingNestedKeyThrows(ExplorerValue.self)
     }
 
     // MARK: - Key
@@ -75,48 +80,37 @@ final class PathExplorerGetTests: XCTestCase {
         try XCTAssertExplorersEqual(explorer.get("score"), 12.5)
     }
 
-    func testGetMissingKeyThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetKey_MissingThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5])
 
         XCTAssertErrorsEqual(try explorer.get("Donald"),
                              .missing(key: "Donald", bestMatch: nil))
     }
 
-    func testGetMissingKeyThrows_BestMatch<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetKey_MissingKeyThrows_BestMatch<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5])
 
         XCTAssertErrorsEqual(try explorer.get("tata"),
                              ExplorerError.missing(key: "tata", bestMatch: "toto"))
     }
 
-    func testGetNestedKey<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetKey_NestedKey<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["firstKey": ["secondKey": 23]])
 
         XCTAssertEqual(try explorer.get("firstKey", "secondKey").int, 23)
     }
 
-    func testGetMissingNestedKeyThrows<P: PathExplorerBis>(_ type: P.Type) throws {
+    func testGet_MissingNestedKeyThrows<P: PathExplorerBis>(_ type: P.Type) throws {
         let explorer = P(value: ["firstKey": ["secondKey": 23]])
 
         XCTAssertErrorsEqual(try explorer.get("firstKey", "kirk"),
                         ExplorerError.missing(key: "kirk", bestMatch: nil).with(path: "firstKey"))
     }
 
-    func testGetKey_NoDictionaryThrows_ValueType<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetKey_ThrowsOnNoDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo", 1, false, 2.5])
 
         XCTAssertErrorsEqual(try explorer.get("toto"), .subscriptKeyNoDict)
-    }
-
-    // MARK: Filter
-
-    func testGetKeyFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        try testGet(
-            P.self,
-            value: ["woody": woody, "buzz": buzz, "zorg": zorg],
-            path: .filter("woody|buzz"), "name",
-            expected: .filter(["woody_name": "Woody", "buzz_name": "Buzz"])
-        )
     }
 
     // MARK: - Index
@@ -130,33 +124,22 @@ final class PathExplorerGetTests: XCTestCase {
         XCTAssertEqual(try explorer.get(3).real, 2.5)
     }
 
-    func testGetLastIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetIndex_LastIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo", 1, false, 2.5])
 
         try XCTAssertExplorersEqual(explorer.get(-1), 2.5)
     }
 
-    func testGetNegativeIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetIndex_NegativeIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo", 1, false, 2.5])
 
         try XCTAssertExplorersEqual(explorer.get(-2), false)
     }
 
-    func testGetIndexNoArrayThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetIndex_ThrowsOnNoArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5])
 
         XCTAssertErrorsEqual(try explorer.get(1), .subscriptIndexNoArray)
-    }
-
-    // MARK: Slice
-
-    func testGetIndexSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        try testGet(
-            P.self,
-            value: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
-            path: .slice(0, 1), 1,
-            expected: .slice([2, 5])
-        )
     }
 
     // MARK: - Count
@@ -179,7 +162,7 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetCountOnNonGroupThrows() throws {
+    func testGetCount_ThrowsOnNonGroup() throws {
         let array: ExplorerValue = ["Endo", 1, false, 2.5]
 
         XCTAssertErrorsEqual(try array.get(0, .count),
@@ -197,7 +180,7 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetKeysListOnNonDictionaryThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetKeysList_ThrowsOnNonDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo", 1, false, 2.5])
 
         XCTAssertErrorsEqual(try explorer.get(.keysList), .wrongUsage(of: .keysList))
@@ -214,8 +197,16 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetFilterOfFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetFilter_ThenKey<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testGet(
+            P.self,
+            value: ["woody": woody, "buzz": buzz, "zorg": zorg],
+            path: .filter("woody|buzz"), "name",
+            expected: .filter(["woody_name": "Woody", "buzz_name": "Buzz"])
+        )
+    }
 
+    func testGetFilter_AfterFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testGet(
             P.self,
             value: ["woody": woody, "buzz": buzz, "zorg": zorg],
@@ -227,7 +218,7 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetFilterOnSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetFilter_AfterSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testGet(
             P.self,
             value: [woody, buzz, zorg],
@@ -238,7 +229,7 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetFilterOnNonDictionaryThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetFilter_ThrowsOnNonDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo", 1, false, 2.5])
         XCTAssertErrorsEqual(try explorer.get(.filter("toto")),
                              .wrongUsage(of: .filter("toto"))
@@ -256,7 +247,16 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetSliceOfSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetSlice_ThenIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testGet(
+            P.self,
+            value: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+            path: .slice(0, 1), 1,
+            expected: .slice([2, 5])
+        )
+    }
+
+    func testGetSlice_AfterSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testGet(
             P.self,
             value: ["Riri", "Fifi", "Loulou", "Donald", "Daisy"],
@@ -265,7 +265,7 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetSliceOnFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetSlice_AfterFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testGet(
             P.self,
             value: ["first": ["Riri", "Fifi", "Loulou", "Donald", "Daisy"],
@@ -275,7 +275,7 @@ final class PathExplorerGetTests: XCTestCase {
         )
     }
 
-    func testGetSliceOnNonArrayThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
+    func testGetSlice_ThrowsOnNonArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Tom": 10, "Robert": true, "Suzanne": "Here"])
 
         XCTAssertErrorsEqual(try explorer.get(.slice(0, 1)), .wrongUsage(of: .slice(0, 1)))
