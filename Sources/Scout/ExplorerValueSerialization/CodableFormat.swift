@@ -5,7 +5,7 @@
 
 import Foundation
 import Yams
-import XMLParsing
+import XMLCoder
 
 public protocol CodableFormat {
 

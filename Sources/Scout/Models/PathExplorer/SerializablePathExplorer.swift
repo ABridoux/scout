@@ -9,6 +9,8 @@ public protocol SerializablePathExplorer: PathExplorerBis {
 
     associatedtype Format: CodableFormat
 
+    init(data: Data) throws
+
     /// Export the path explorer value to data
     func exportData() throws -> Data
 

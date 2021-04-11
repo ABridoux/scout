@@ -72,24 +72,28 @@ extension ScoutCommand {
 //        }
     }
 
-    func makePathExplorer(for dataFormat: Scout.DataFormat, from data: Data) throws {
+    private func makeExplorer<P: SerializablePathExplorer>(_ type: P.Type, from data: Data) throws -> P {
         do {
-            switch dataFormat {
-            case .json:
-                let json = try Json(data: data)
-                try inferred(pathExplorer: json)
-            case .plist:
-                let plist = try Plist(data: data)
-                try inferred(pathExplorer: plist)
-            case .yaml:
-                let yaml = try Yaml(data: data)
-                try inferred(pathExplorer: yaml)
-            case .xml:
-                let xml = try Xml(data: data)
-                try inferred(pathExplorer: xml)
-            }
+            return try P(data: data)
         } catch {
-            throw RuntimeError.unknownFormat("The input cannot be read as \(dataFormat).\n\(error).\n\(error.localizedDescription)")
+            throw RuntimeError.unknownFormat("The input cannot be read as \(dataFormat).\n\(error.localizedDescription)")
+        }
+    }
+
+    func makePathExplorer(for dataFormat: Scout.DataFormat, from data: Data) throws {
+        switch dataFormat {
+        case .json:
+            let json = try makeExplorer(Json.self, from: data)
+            try inferred(pathExplorer: json)
+        case .plist:
+            let plist = try makeExplorer(Plist.self, from: data)
+            try inferred(pathExplorer: plist)
+        case .yaml:
+            let yaml = try makeExplorer(Yaml.self, from: data)
+            try inferred(pathExplorer: yaml)
+        case .xml:
+            let xml = try makeExplorer(Xml.self, from: data)
+            try inferred(pathExplorer: xml)
         }
     }
 

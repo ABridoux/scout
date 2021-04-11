@@ -1,41 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<People>
+<people>
     <Tom>
-        <age>68</age>
-        <hobbies>cooking</hobbies>
-        <hobbies>guitar</hobbies>
         <height>175</height>
+        <age>68</age>
+        <hobbies>
+            <hobby>cooking</hobby>
+            <hobby>guitar</hobby>
+        </hobbies>
     </Tom>
+
+    <Robert>
+        <height>181</height>
+        <age>23</age>
+        <hobbies>
+            <hobby>video games</hobby>
+            <hobby>party</hobby>
+            <hobby>tennis</hobby>
+        </hobbies>
+        <running_records>
+            <records>
+                <record>10</record>
+                <record>12</record>
+                <record>9</record>
+                <record>10</record>
+            </records>
+            <records>
+                <record>9</record>
+                <record>12</record>
+                <record>11</record>
+            </records>
+        </running_records>
+    </Robert>
+
     <Suzanne>
         <job>actress</job>
         <movies>
-            <title>Tomorrow is so far</title>
-            <awards>Best speech for a silent movie</awards>
-        </movies>
-        <movies>
-            <title>Yesterday will never go</title>
-            <awards>Best title</awards>
-        </movies>
-        <movies>
-            <title>What about today?</title>
+            <movie>
+                <title>Tomorrow is so far</title>
+                <awards>Best speech for a silent movie</awards>
+            </movie>
+            <movie>
+                <title>Yesterday will never go</title>
+                <awards>Best title</awards>
+            </movie>
+            <movie>
+                <title>What about today?</title>
+            </movie>
         </movies>
     </Suzanne>
-    <Robert>
-        <running_records>
-            <running_records>10</running_records>
-            <running_records>12</running_records>
-            <running_records>9</running_records>
-            <running_records>10</running_records>
-        </running_records>
-        <running_records>
-            <running_records>9</running_records>
-            <running_records>12</running_records>
-            <running_records>11</running_records>
-        </running_records>
-        <hobbies>video games</hobbies>
-        <hobbies>party</hobbies>
-        <hobbies>tennis</hobbies>
-        <height>181</height>
-        <age>23</age>
-    </Robert>
-</People>
+</people>
