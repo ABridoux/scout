@@ -159,7 +159,7 @@ extension PathExplorerXML {
     public func exportString() -> String {
         // when printing out an element which has a parent, the indentation will remain the same
         // which is unwanted so remove the parent by copying the element (parent setter is internal)
-        let copy = element.copy()
+        let copy = element.copyFlat()
         copy.addChildren(element.children)
         var description = copy.xml
 

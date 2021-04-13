@@ -133,6 +133,18 @@ public struct ExplorerXML {
         element.addChild(explorer.element)
     }
 
+    func addChildren(_ children: [ExplorerXML]) {
+        element.addChildren(children.map(\.element))
+    }
+
+    func removeFromParent() {
+        element.removeFromParent()
+    }
+
+    func removeChildrenFromParent() {
+        element.children.forEach { $0.removeFromParent() }
+    }
+
     var childrenCount: Int { element.children.count }
 
     var children: [ExplorerXML] {
@@ -157,6 +169,22 @@ public struct ExplorerXML {
         element.name = name
         return ExplorerXML(element: element)
     }
+
+    func set(name: String) {
+        element.name = name
+    }
+
+    func set(value: String) {
+        element.value = value   
+    }
+}
+
+extension ExplorerXML {
+
+    /// A new `ExplorerXML` with a new element and new children, keeping the name, value and attributes
+    func copy() -> Self {
+        ExplorerXML(element: element.copy())
+    }
 }
 
 extension ExplorerXML {
@@ -167,38 +195,6 @@ extension ExplorerXML {
 }
 
 extension ExplorerXML: PathExplorerBis {
-
-    public mutating func set(_ path: Path, to newValue: ExplorerValue) throws {
-
-    }
-
-    public func setting(_ path: Path, to newValue: ExplorerValue) throws -> ExplorerXML {
-        self
-    }
-
-    public mutating func set(_ path: Path, keyNameTo newKeyName: String) throws {
-
-    }
-
-    public func setting(_ path: Path, keyNameTo keyName: String) throws -> ExplorerXML {
-        self
-    }
-
-    public mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws {
-
-    }
-
-    public func deleting(_ path: Path, deleteIfEmpty: Bool) throws -> ExplorerXML {
-        self
-    }
-
-    public mutating func add(_ value: ExplorerValue, at path: Path) throws {
-
-    }
-
-    public func adding(_ value: ExplorerValue, at path: Path) throws -> ExplorerXML {
-        self
-    }
 
     public func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path] {
         []

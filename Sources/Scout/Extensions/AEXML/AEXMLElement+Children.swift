@@ -14,7 +14,7 @@ extension AEXMLElement {
     }
 
     /// Copy of the element, without the children
-    func copy() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
+    func copyFlat() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
 
     /// Name of the first child if one exists. Otherwise the parent key name will be used.
     var childrenName: String { children.first?.name ?? name }

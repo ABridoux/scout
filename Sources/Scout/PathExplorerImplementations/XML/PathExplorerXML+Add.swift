@@ -86,7 +86,7 @@ extension PathExplorerXML {
 
     mutating func insertChild(named keyName: String, withValue value: String, at index: Int) {
         // we have to copy the element as we cannot modify its children
-        let copy = element.copy()
+        let copy = element.copyFlat()
 
         // parse the children and just adding them until we reach index to insert the new child
         for childIndex in 0...element.children.count {

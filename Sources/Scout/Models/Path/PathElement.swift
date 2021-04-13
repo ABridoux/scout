@@ -88,10 +88,6 @@ public enum PathElement: Hashable {
             self = .key(string)
         }
     }
-
-    public static func slice(_ lower: Bounds.Bound, _ upper: Bounds.Bound) -> PathElement {
-        .slice(Bounds(lower: lower, upper: upper))
-    }
 }
 
 extension PathElement: ExpressibleByStringLiteral {
