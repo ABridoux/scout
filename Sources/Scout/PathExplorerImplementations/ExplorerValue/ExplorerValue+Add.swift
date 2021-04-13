@@ -15,7 +15,7 @@ extension ExplorerValue {
         try add(path: Slice(path), value: value)
     }
 
-    /// Return `true` if the path is empty
+    /// Return the value if it should be added to the parent
     private func add(path: SlicePath, value: ExplorerValue) throws -> Self {
         guard let element = path.first else { return value }
         let remainder = path.dropFirst()

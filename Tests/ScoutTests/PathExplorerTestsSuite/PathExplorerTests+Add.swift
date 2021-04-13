@@ -9,8 +9,15 @@ import XCTest
 
 final class PathExplorerAddTests: XCTestCase {
 
-    func test() throws {
+    func testExplorerValue() throws {
         try test(ExplorerValue.self)
+
+        // specific tests for serializable values
+        try testAddKey_ThrowsOnNonDictionary(ExplorerValue.self)
+    }
+
+    func testExplorerXML() throws {
+        try test(ExplorerXML.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -19,13 +26,14 @@ final class PathExplorerAddTests: XCTestCase {
         try testAddKey_NestedKey(P.self)
         try testAddKey_NestedIndex(P.self)
         try testAddKey_UnknownKeyIsCreated(P.self)
-        try testAddKey_ThrowsOnNonDictionary(P.self)
+        try testAddKey_GroupValue(P.self)
 
         // index
         try testAddIndex(P.self)
         try testAddIndex_Negative(P.self)
         try testAddIndex_NestedIndex(P.self)
         try testAddIndex_NestedKey(P.self)
+        try testAddIndex_GroupValue(P.self)
 
         // count
         try testAddCount(P.self)
@@ -34,7 +42,7 @@ final class PathExplorerAddTests: XCTestCase {
 
     func testStub() throws {
         // use this function to launch a test with a specific PathExplorer
-        try testAddCount_Nested(ExplorerValue.self)
+        try testAddCount_Nested(ExplorerXML.self)
     }
 
     // MARK: - Key
@@ -76,6 +84,16 @@ final class PathExplorerAddTests: XCTestCase {
             path: "Socrate", "Riri",
             value: 2.5,
             expected: ["Endo": ["Toto": 2], "Socrate": ["Riri": 2.5]]
+        )
+    }
+
+    func testAddKey_GroupValue<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testAdd(
+            P.self,
+            initial: ["Endo": 2, "Toto": true],
+            path: "ducks",
+            value: ["Riri", "Fifi", "Loulou"],
+            expected: ["Endo": 2, "Toto": true, "ducks": ["Riri", "Fifi", "Loulou"]]
         )
     }
 
@@ -124,6 +142,16 @@ final class PathExplorerAddTests: XCTestCase {
             path: "Toto", 1,
             value: "here",
             expected: ["Endo": 1, "Toto": [1, "here", 2, 3]]
+        )
+    }
+
+    func testAddIndex_GroupValue<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testAdd(
+            P.self,
+            initial: [1, true, "hello"],
+            path: 2,
+            value: [true, false],
+            expected: [1, true, [true, false], "hello"]
         )
     }
 

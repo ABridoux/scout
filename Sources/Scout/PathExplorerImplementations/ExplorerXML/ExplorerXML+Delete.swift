@@ -8,7 +8,7 @@ import Foundation
 extension ExplorerXML {
 
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws {
-        _ = try delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
+        _ = try _delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
     }
 
     public func deleting(_ path: Path, deleteIfEmpty: Bool) throws -> ExplorerXML {
@@ -18,7 +18,7 @@ extension ExplorerXML {
     }
 
     /// Returns `true` if the element should be deleted
-    private func delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
+    private func _delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
         guard let element = path.first else { return true }
 
         let remainder = path.dropFirst()
@@ -39,7 +39,7 @@ extension ExplorerXML {
 
     private func delete(key: String, deleteIfEmpty: Bool, remainder: SlicePath) throws {
         let next = try getJaroWinkler(key: key)
-        if try next.delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
+        if try next._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
             next.removeFromParent()
         }
     }
@@ -47,7 +47,7 @@ extension ExplorerXML {
     private func delete(index: Int, deleteIfEmpty: Bool, remainder: SlicePath) throws {
         let index = try computeIndex(from: index, arrayCount: childrenCount)
         let next = children[index]
-        if try next.delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
+        if try next._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
             next.removeFromParent()
         }
     }
@@ -57,7 +57,7 @@ extension ExplorerXML {
         try children
             .filter { regex.validate($0.name) }
             .forEach { child in
-                if try child.delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
+                if try child._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
                     child.removeFromParent()
                 }
             }
@@ -66,7 +66,7 @@ extension ExplorerXML {
     private func deleteSlice(within bounds: Bounds, deleteIfEmpty: Bool, remainder: SlicePath) throws {
         let range = try bounds.range(arrayCount: childrenCount)
         try children[range].forEach { child in
-            if try child.delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
+            if try child._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
                 child.removeFromParent()
             }
         }

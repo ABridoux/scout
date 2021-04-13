@@ -10,7 +10,7 @@ import Foundation
 extension ExplorerXML {
 
     public mutating func set(_ path: Path, to newValue: ExplorerValue) throws {
-        try set(path: Slice(path), to: newValue)
+        try _set(path: Slice(path), to: .explorerValue(newValue))
     }
 
     public func setting(_ path: Path, to newValue: ExplorerValue) throws -> ExplorerXML {
@@ -19,9 +19,21 @@ extension ExplorerXML {
         return modified
     }
 
-    private func set(path: SlicePath, to newValue: ExplorerValue) throws {
+    /// Set the path to the given AEXMLElement rather than an `ExplorerValue`
+    public mutating func set(_ path: Path, to newElement: Element) throws {
+        try _set(path: Slice(path), to: .xmlElement(newElement))
+    }
+
+    /// Set the path to the given AEXMLElement rather than an `ExplorerValue`
+    public func setting(_ path: Path, to newElement: Element) throws -> ExplorerXML {
+        var modified = copy()
+        try modified.set(path, to: newElement)
+        return modified
+    }
+
+    private func _set(path: SlicePath, to newValue: ValueSetter) throws {
         guard let element = path.first else {
-            try set(newValue: newValue)
+            set(value: newValue)
             return
         }
 
@@ -31,38 +43,14 @@ extension ExplorerXML {
         try doSettingPath(leftPart) {
             switch element {
             case .key(let key):
-                try getJaroWinkler(key: key).set(path: remainder, to: newValue)
+                try getJaroWinkler(key: key)._set(path: remainder, to: newValue)
 
             case .index(let index):
                 let index = try computeIndex(from: index, arrayCount: childrenCount)
-                try children[index].set(path: remainder, to: newValue)
+                try children[index]._set(path: remainder, to: newValue)
 
             default: throw ExplorerError.wrongUsage(of: element)
             }
-        }
-    }
-
-    private func set(newValue: ExplorerValue) throws {
-        switch newValue {
-        case .string(let string): set(value: string)
-        case .int(let int), .count(let int): set(value: int.description)
-        case .double(let double): set(value: double.description)
-        case .bool(let bool): set(value: bool.description)
-        case .data(let data): set(value: data.base64EncodedString())
-
-        case .keysList(let keys):
-            removeChildrenFromParent()
-            let newChildren = keys.map { ExplorerXML(name: "key", value: $0) }
-            addChildren(newChildren)
-
-        case .array(let array), .slice(let array):
-            removeChildrenFromParent()
-            addChildren(array.map(ExplorerXML.init))
-
-        case .dictionary(let dict), .filter(let dict):
-            removeChildrenFromParent()
-            let newChildren = dict.map { ExplorerXML(value: $0.value).with(name: $0.key) }
-            addChildren(newChildren)
         }
     }
 }

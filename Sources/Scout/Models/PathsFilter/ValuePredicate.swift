@@ -50,7 +50,7 @@ extension PathsFilter {
             } catch ExpressionError.mismatchingType {
                 // error of mismatching type for `valueType`. Remove it from the supported types
                 operatorsValueTypes.remove(valueType)
-                return false //ignore the error of wrong value type
+                return false // ignore the error of wrong value type
             } catch {
                 throw PathExplorerError.predicateError(predicate: expression.description, description: error.localizedDescription)
             }

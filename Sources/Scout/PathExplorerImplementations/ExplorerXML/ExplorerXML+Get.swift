@@ -22,7 +22,7 @@ extension ExplorerXML {
             let next: ExplorerXML
 
             switch element {
-            case .key(let key): next = try get(key: key, groupSample: groupSample)
+            case .key(let key): next = try _get(key: key, groupSample: groupSample)
             case .index(let index): next = try get(index: index, groupSample: groupSample)
             case .count: next = getCount()
             case .keysList: next = getKeysList()
@@ -34,13 +34,13 @@ extension ExplorerXML {
         }
     }
 
-    private func get(key: String, groupSample: GroupSample?) throws -> Self {
+    private func _get(key: String, groupSample: GroupSample?) throws -> Self {
         switch groupSample {
         case nil: return try getJaroWinkler(key: key)
 
         case .slice, .filter:
             return try copyMappingChildren {
-                try $0.get(key: key, groupSample: nil).with(name: "\($0.name)_\(key)")
+                try $0._get(key: key, groupSample: nil).with(name: "\($0.name)_\(key)")
             }
         }
     }
@@ -56,7 +56,7 @@ extension ExplorerXML {
     }
 
     private func getCount() -> Self {
-        ExplorerXML(name: "count", value: childrenCount)
+        ExplorerXML(name: "count", value: childrenCount.description)
     }
 
     private func getKeysList() -> Self {

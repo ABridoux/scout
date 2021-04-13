@@ -11,7 +11,7 @@ public struct ExplorerXML {
     // MARK: - Constants
 
     typealias SlicePath = Slice<Path>
-    typealias Element = AEXMLElement
+    public typealias Element = AEXMLElement
 
     // MARK: - Properties
 
@@ -28,10 +28,12 @@ public struct ExplorerXML {
     public var data: Data? { nil }
 
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable {
+        #warning("[TODO] array conversion")
         fatalError()
     }
 
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
+        #warning("[TODO] dict conversion")
         fatalError()
     }
 
@@ -46,7 +48,7 @@ public struct ExplorerXML {
 
         // when printing out an element which has a parent, the indentation will remain the same
         // which is unwanted so remove the parent by copying the element (parent setter is internal)
-        let copy = element.copy()
+        let copy = element.copyFlat()
         copy.addChildren(element.children)
         return copy.xml
     }
@@ -59,8 +61,8 @@ public struct ExplorerXML {
         self.element = element
     }
 
-    init(name: String, value: CustomStringConvertible) {
-        self.init(element: Element(name: name, value: value.description))
+    init(name: String, value: String? = nil) {
+        self.init(element: Element(name: name, value: value))
     }
 
     public init(value: ExplorerValue) {
@@ -72,9 +74,9 @@ public struct ExplorerXML {
 
         switch value {
         case .string(let string): self.init(name: name, value: string)
-        case .int(let int), .count(let int): self.init(name: name, value: int)
-        case .double(let double): self.init(name: name, value: double)
-        case .bool(let bool): self.init(name: name, value: bool)
+        case .int(let int), .count(let int): self.init(name: name, value: int.description)
+        case .double(let double): self.init(name: name, value: double.description)
+        case .bool(let bool): self.init(name: name, value: bool.description)
         case .data(let data): self.init(name: name, value: data.base64EncodedString())
 
         case .keysList(let keys):
@@ -147,8 +149,15 @@ public struct ExplorerXML {
 
     var childrenCount: Int { element.children.count }
 
+    /// Name of the first child if one exists. Otherwise the parent key name will be used.
+    var childrenName: String { element.childrenName }
+
     var children: [ExplorerXML] {
-        element.children.map { ExplorerXML(element: $0) }
+        get { element.children.map { ExplorerXML(element: $0) }}
+        set {
+            element.children.forEach { $0.removeFromParent() }
+            newValue.forEach { element.addChild($0.element) }
+        }
     }
 
     func getJaroWinkler(key: String) throws -> Self {
@@ -175,7 +184,46 @@ public struct ExplorerXML {
     }
 
     func set(value: String) {
-        element.value = value   
+        element.value = value
+    }
+
+    func set(value: ValueSetter) {
+        switch value {
+        case .explorerValue(let value): set(newValue: value)
+        case .xmlElement(let element): set(newElement: element)
+        }
+    }
+
+    private func set(newElement: Element) {
+        element.name = newElement.name
+        element.value = newElement.value
+        element.attributes = newElement.attributes
+        element.children.forEach { $0.removeFromParent() }
+        newElement.children.forEach { element.addChild($0) }
+    }
+
+    private func set(newValue: ExplorerValue) {
+        switch newValue {
+        case .string(let string): set(value: string)
+        case .int(let int), .count(let int): set(value: int.description)
+        case .double(let double): set(value: double.description)
+        case .bool(let bool): set(value: bool.description)
+        case .data(let data): set(value: data.base64EncodedString())
+
+        case .keysList(let keys):
+            removeChildrenFromParent()
+            let newChildren = keys.map { ExplorerXML(name: "key", value: $0) }
+            addChildren(newChildren)
+
+        case .array(let array), .slice(let array):
+            removeChildrenFromParent()
+            addChildren(array.map(ExplorerXML.init))
+
+        case .dictionary(let dict), .filter(let dict):
+            removeChildrenFromParent()
+            let newChildren = dict.map { ExplorerXML(value: $0.value).with(name: $0.key) }
+            addChildren(newChildren)
+        }
     }
 }
 
@@ -191,6 +239,14 @@ extension ExplorerXML {
 
     enum GroupSample {
         case filter, slice
+    }
+}
+
+extension ExplorerXML {
+
+    enum ValueSetter {
+        case explorerValue(ExplorerValue)
+        case xmlElement(Element)
     }
 }
 
