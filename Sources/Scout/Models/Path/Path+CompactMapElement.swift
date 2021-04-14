@@ -9,22 +9,12 @@ public extension Path {
 
     /// Retrieve all the index elements
     var compactMapIndexes: [Int] {
-        compactMap {
-            if case let .index(index) = $0 {
-                return index
-            }
-            return nil
-        }
+        compactMap(\.index)
     }
 
     /// Retrieve all the key elements
     var compactMapKeys: [String] {
-        compactMap {
-            if case let .key(name) = $0 {
-                return name
-            }
-            return nil
-        }
+        compactMap(\.key)
     }
 
     /// Retrieve all the slices bounds elements

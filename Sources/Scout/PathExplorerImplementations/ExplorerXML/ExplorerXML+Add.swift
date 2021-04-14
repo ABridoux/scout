@@ -12,7 +12,9 @@ extension ExplorerXML {
     }
 
     public func adding(_ value: ExplorerValue, at path: Path) throws -> ExplorerXML {
-        self
+        var copy = self.copy()
+        try copy.add(value, at: path)
+        return copy
     }
 
     /// Return the value if it should be added to the parent

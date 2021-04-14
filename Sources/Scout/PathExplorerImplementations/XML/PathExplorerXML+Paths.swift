@@ -33,7 +33,7 @@ extension PathExplorerXML {
         if filter.singleAllowed, let value = element.value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty {
             var isParentArrayAndNameValid = false
             if let parent = element.parent {
-                // allow children of an array when the paren name is a match
+                // allow children of an array when the parent name is a match
                 isParentArrayAndNameValid = !parent.differentiableChildren && filter.validate(key: parent.name)
             }
 

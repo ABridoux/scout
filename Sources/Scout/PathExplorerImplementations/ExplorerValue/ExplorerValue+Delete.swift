@@ -8,7 +8,7 @@ import Foundation
 extension ExplorerValue {
 
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws {
-        _ = try delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
+        _ = try _delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
     }
 
     public func deleting(_ path: Path, deleteIfEmpty: Bool) throws -> ExplorerValue {
@@ -18,7 +18,7 @@ extension ExplorerValue {
     }
 
     /// Returns `true` if the end of the path is reached
-    private mutating func delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
+    private mutating func _delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
         guard let element = path.first else { return true}
         let remainder = path.dropFirst()
 
@@ -41,7 +41,7 @@ extension ExplorerValue {
 
         case .dictionary(var dict):
             var value = try dict.getJaroWinkler(key: key)
-            let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
+            let shouldDelete = try value._delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
             if shouldDelete || (value.isEmpty && deleteIfEmpty) {
                 dict.removeValue(forKey: key)
@@ -70,7 +70,7 @@ extension ExplorerValue {
         case .array(var array):
             let index = try computeIndex(from: index, arrayCount: array.count)
             var value = array[index]
-            let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
+            let shouldDelete = try value._delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
             if shouldDelete || (value.isEmpty && deleteIfEmpty) {
                 array.remove(at: index)
@@ -101,7 +101,7 @@ extension ExplorerValue {
             let modified = try dict.compactMap { (key, value) -> (String, ExplorerValue)? in
                 guard regex.validate(key) else { return (key, value) }
                 var value = value
-                let shouldDelete = try value.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
+                let shouldDelete = try value._delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
                 if shouldDelete || (value.isEmpty && deleteIfEmpty) {
                     return nil
@@ -132,7 +132,7 @@ extension ExplorerValue {
             let range = try bounds.range(arrayCount: array.count)
             let newRangeElements = try array[range].compactMap { (element) -> ExplorerValue? in
                 var element = element
-                let shouldDelete = try element.delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
+                let shouldDelete = try element._delete(path: remainder, deleteIfEmpty: deleteIfEmpty)
 
                 if shouldDelete || (element.isEmpty && deleteIfEmpty) {
                     return nil

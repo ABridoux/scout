@@ -8,10 +8,15 @@ import Foundation
 extension ExplorerValue {
 
     public func get(_ path: Path) throws -> Self {
-        try get(path: Slice(path))
+        try _get(path: Slice(path), detailedName: true)
     }
 
-    private func get(path: SlicePath) throws -> Self {
+    func getNoDetailedName(_ path: Path) throws -> Self {
+        try _get(path: Slice(path), detailedName: false)
+    }
+
+    /// - parameter detailedName: When `true`, the key name after a filter will be composed of the parent key followed by the child key
+    private func _get(path: SlicePath, detailedName: Bool) throws -> Self {
         guard let firstElement = path.first else { return self }
         let remainder = path.dropFirst()
 
@@ -19,30 +24,31 @@ extension ExplorerValue {
             let next: ExplorerValue
 
             switch firstElement {
-            case .key(let key): next = try get(key: key)
+            case .key(let key): next = try get(key: key, detailedName: detailedName)
             case .index(let index): next = try get(index: index)
             case .count: next = try getCount()
             case .keysList: next = try getKeysList()
             case .slice(let bounds): next = try getSlice(for: bounds)
             case .filter(let pattern): next = try getFilter(with: pattern)
             }
-            return try next.get(path: remainder)
+            return try next._get(path: remainder, detailedName: detailedName)
         }
     }
 
     // MARK: - Helpers
 
-    private func get(key: String) throws -> Self {
+    private func get(key: String, detailedName: Bool) throws -> Self {
         switch self {
         case .dictionary(let dict):
             return try dict.getJaroWinkler(key: key)
 
         case .filter(let dict):
-            let newDict = try dict.map { try ("\($0.key)_\(key)", $0.value.get(key: key)) }
+            let computeName: (String) -> String = { detailedName ? "\($0)_\(key)" : $0 }
+            let newDict = try dict.map { try (computeName($0.key), $0.value.get(key: key, detailedName: detailedName)) }
             return filter <^> Dictionary(uniqueKeysWithValues: newDict)
 
         case .slice(let array):
-            return try slice <^> array.map { try $0.get(key: key) }
+            return try slice <^> array.map { try $0.get(key: key, detailedName: detailedName) }
 
         default:
             throw ExplorerError.subscriptKeyNoDict
@@ -106,7 +112,7 @@ extension ExplorerValue {
         switch self {
         case .dictionary(let dict):
             let regex = try NSRegularExpression(with: pattern)
-            return .filter(dict.filter { regex.validate($0.key) })
+            return filter <^> dict.filter { regex.validate($0.key) }
 
         case .filter(let dict):
             return try filter <^> dict.mapValues { try $0.getFilter(with: pattern) }

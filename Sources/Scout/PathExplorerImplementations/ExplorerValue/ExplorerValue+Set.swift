@@ -8,7 +8,7 @@
 extension ExplorerValue {
 
     public mutating func set(_ path: Path, to newValue: ExplorerValue) throws {
-        try set(path: Slice(path), to: newValue)
+        try _set(path: Slice(path), to: newValue)
     }
 
     public func setting(_ path: Path, to newValue: ExplorerValue) throws -> Self {
@@ -17,7 +17,7 @@ extension ExplorerValue {
         return copy
     }
 
-    private mutating func set(path: SlicePath, to newValue: ExplorerValue) throws {
+    private mutating func _set(path: SlicePath, to newValue: ExplorerValue) throws {
         guard let firstElement = path.first else {
             return self = newValue
         }
@@ -38,7 +38,7 @@ extension ExplorerValue {
     private mutating func set(key: String, to newValue: ExplorerValue, remainder: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
         var value = try dict.getJaroWinkler(key: key)
-        try value.set(path: remainder, to: newValue)
+        try value._set(path: remainder, to: newValue)
         dict[key] = value
         self = .dictionary(dict)
     }
@@ -49,7 +49,7 @@ extension ExplorerValue {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
         let index = try computeIndex(from: index, arrayCount: array.count)
         var element = array[index]
-        try element.set(path: remainder, to: newValue)
+        try element._set(path: remainder, to: newValue)
         array[index] = element
         self = .array(array)
     }

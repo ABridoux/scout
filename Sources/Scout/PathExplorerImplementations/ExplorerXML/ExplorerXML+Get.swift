@@ -8,10 +8,14 @@ import Foundation
 extension ExplorerXML {
 
     public func get(_ path: Path) throws -> ExplorerXML {
-        try get(path: Slice(path))
+        try _get(path: Slice(path), detailedName: true)
     }
 
-    private func get(path: SlicePath) throws -> Self {
+    func getNoDetailedName(_ path: Path) throws -> ExplorerXML {
+        try _get(path: Slice(path), detailedName: false)
+    }
+
+    private func _get(path: SlicePath, detailedName: Bool) throws -> Self {
         guard let element = path.first else { return self }
 
         let remainder = path.dropFirst()
@@ -22,7 +26,7 @@ extension ExplorerXML {
             let next: ExplorerXML
 
             switch element {
-            case .key(let key): next = try _get(key: key, groupSample: groupSample)
+            case .key(let key): next = try get(key: key, groupSample: groupSample, detailedName: detailedName)
             case .index(let index): next = try get(index: index, groupSample: groupSample)
             case .count: next = getCount()
             case .keysList: next = getKeysList()
@@ -30,17 +34,18 @@ extension ExplorerXML {
             case .slice(let bounds): next = try getSlice(within: bounds, groupSample: groupSample)
             }
 
-            return try next.get(path: remainder)
+            return try next._get(path: remainder, detailedName: detailedName)
         }
     }
 
-    private func _get(key: String, groupSample: GroupSample?) throws -> Self {
+    private func get(key: String, groupSample: GroupSample?, detailedName: Bool) throws -> Self {
         switch groupSample {
         case nil: return try getJaroWinkler(key: key)
 
         case .slice, .filter:
+            let computeName: (String) -> String = { detailedName ? "\($0)_\(key)" : $0 }
             return try copyMappingChildren {
-                try $0._get(key: key, groupSample: nil).with(name: "\($0.name)_\(key)")
+                try $0.get(key: key, groupSample: nil, detailedName: detailedName).with(name: computeName($0.name))
             }
         }
     }

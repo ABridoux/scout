@@ -6,7 +6,7 @@
 import Foundation
 import AEXML
 
-public struct ExplorerXML {
+public struct ExplorerXML: PathExplorerBis {
 
     // MARK: - Constants
 
@@ -23,6 +23,7 @@ public struct ExplorerXML {
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
     public var real: Double? { element.double }
+    var valueAsAny: Any { int ?? real ?? bool ?? string ?? "" }
 
     /// Always `nil` on XML
     public var data: Data? { nil }
@@ -152,6 +153,9 @@ public struct ExplorerXML {
     /// Name of the first child if one exists. Otherwise the parent key name will be used.
     var childrenName: String { element.childrenName }
 
+    /// `true` if all the children have a different name
+    var differentiableChildren: Bool { element.differentiableChildren }
+
     var children: [ExplorerXML] {
         get { element.children.map { ExplorerXML(element: $0) }}
         set {
@@ -247,13 +251,6 @@ extension ExplorerXML {
     enum ValueSetter {
         case explorerValue(ExplorerValue)
         case xmlElement(Element)
-    }
-}
-
-extension ExplorerXML: PathExplorerBis {
-
-    public func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path] {
-        []
     }
 }
 
