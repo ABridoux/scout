@@ -14,7 +14,7 @@ extension AEXMLElement {
     }
 
     /// Copy of the element, without the children
-    func copy() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
+    func copyFlat() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
 
     /// Name of the first child if one exists. Otherwise the parent key name will be used.
     var childrenName: String { children.first?.name ?? name }
@@ -50,5 +50,19 @@ extension AEXMLElement {
         }
 
         return true
+    }
+
+    /// All children names. `nil` if two names are reused
+    var uniqueChildrenNames: Set<String>? {
+        var names = Set<String>()
+
+        for child in children {
+            if names.contains(child.name), names.count > 1 {
+                return nil
+            }
+            names.insert(child.name)
+        }
+
+        return names
     }
 }

@@ -8,15 +8,15 @@ import Foundation
 extension ExplorerValue {
 
     public mutating func add(_ value: ExplorerValue, at path: Path) throws {
-        self = try add(path: Slice(path), value: value)
+        self = try _add(path: Slice(path), value: value)
     }
 
     public func adding(_ value: ExplorerValue, at path: Path) throws -> ExplorerValue {
-        try add(path: Slice(path), value: value)
+        try _add(path: Slice(path), value: value)
     }
 
-    /// Return `true` if the path is empty
-    private func add(path: SlicePath, value: ExplorerValue) throws -> Self {
+    /// Return the value if it should be added to the parent
+    private func _add(path: SlicePath, value: ExplorerValue) throws -> Self {
         guard let element = path.first else { return value }
         let remainder = path.dropFirst()
 
@@ -58,7 +58,7 @@ extension ExplorerValue {
     private func add(key: String, value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
         if let existingValue = dict[key] {
-            dict[key] = try existingValue.add(path: remainder, value: value)
+            dict[key] = try existingValue._add(path: remainder, value: value)
         } else {
             dict[key] = try createValueToAdd(value: value, path: remainder)
         }
@@ -69,7 +69,7 @@ extension ExplorerValue {
     private func add(index: Int, value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
         let index = try computeIndex(from: index, arrayCount: array.count)
-        let newValue = try array[index].add(path: remainder, value: value)
+        let newValue = try array[index]._add(path: remainder, value: value)
 
         if remainder.isEmpty {
             #warning("This behavior is the current one but is strange. A new PathElement should be offered to differentiate between insertion and modification")

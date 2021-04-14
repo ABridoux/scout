@@ -8,8 +8,16 @@ import XCTest
 
 final class PathExplorerDeleteTests: XCTestCase {
 
-    func test() throws {
+    func testExplorerValue() throws {
         try test(ExplorerValue.self)
+
+        // specific tests for serializable values
+        try testDeleteKeyNoDictThrows(ExplorerValue.self)
+        try testDeleteIndexNoArrayThrows(ExplorerValue.self)
+    }
+
+    func testExplorerXML() throws {
+        try test(ExplorerXML.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -17,7 +25,6 @@ final class PathExplorerDeleteTests: XCTestCase {
         try testDeleteKey(P.self)
         try testDeleteKey_Nested(P.self)
         try testDeleteKey_DeleteIfEmpty(P.self)
-        try testDeleteKeyNoDictThrows(P.self)
         try testDeleteKey_OnFilter(P.self)
         try testDeleteKey_OnSlice(P.self)
 
@@ -25,7 +32,6 @@ final class PathExplorerDeleteTests: XCTestCase {
         try testDeleteIndex(P.self)
         try testDeleteIndex_Nested(P.self)
         try testDeleteIndex_IfEmpty(P.self)
-        try testDeleteIndexNoArrayThrows(P.self)
         try testDeleteIndex_OnSlice(P.self)
         try testDeleteIndex_OnFilter(P.self)
 
@@ -87,26 +93,28 @@ final class PathExplorerDeleteTests: XCTestCase {
     }
 
     func testDeleteKey_OnFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let initialSubDict: ExplorerValue = ["Endo": true, "toto": 2.5]
-        let expectedSubDict: ExplorerValue = ["Endo": true]
-
         try testDelete(
             P.self,
-            initial: .filter(["Riri": initialSubDict, "Fifi": initialSubDict, "Loulou": initialSubDict]),
-            path: "toto",
-            expected: .filter(["Riri": expectedSubDict, "Fifi": expectedSubDict, "Loulou": expectedSubDict])
+            initial: ["Riri": ["Endo": true, "toto": 2.5],
+                      "Fifi": ["Endo": true, "toto": 2.5],
+                      "Loulou": ["Endo": true, "toto": 2.5]],
+            path: .filter(".*"), "toto",
+            expected: ["Riri": ["Endo": true],
+                       "Fifi": ["Endo": true],
+                       "Loulou": ["Endo": true]]
         )
     }
 
     func testDeleteKey_OnSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let initialSubDict: ExplorerValue = ["Endo": true, "toto": 2.5]
-        let expectedSubDict: ExplorerValue = ["Endo": true]
-
         try testDelete(
             P.self,
-            initial: .slice([initialSubDict, initialSubDict, initialSubDict]),
-            path: "toto",
-            expected: .slice([expectedSubDict, expectedSubDict, expectedSubDict])
+            initial: [["Endo": true, "toto": 2.5],
+                      ["Endo": true, "toto": 2.5],
+                      ["Endo": true, "toto": 2.5]],
+            path: .slice(.first, .last), "toto",
+            expected: [["Endo": true],
+                       ["Endo": true],
+                       ["Endo": true]]
         )
     }
 
@@ -149,18 +157,18 @@ final class PathExplorerDeleteTests: XCTestCase {
     func testDeleteIndex_OnSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testDelete(
             P.self,
-            initial: .slice([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
-            path: 1,
-            expected: .slice([[1, 3], [4, 6], [7, 9]])
+            initial: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+            path: .sliceAll, 1,
+            expected: [[1, 3], [4, 6], [7, 9]]
         )
     }
 
     func testDeleteIndex_OnFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testDelete(
             P.self,
-            initial: .filter(["Riri": [1, 2, 3], "Fifi": [1, 2, 3]]),
-            path: 0,
-            expected: .filter(["Riri": [2, 3], "Fifi": [2, 3]])
+            initial: ["Riri": [1, 2, 3], "Fifi": [1, 2, 3]],
+            path: .filterAll, 0,
+            expected: ["Riri": [2, 3], "Fifi": [2, 3]]
         )
     }
 
@@ -206,18 +214,18 @@ final class PathExplorerDeleteTests: XCTestCase {
     func testDeleteFilter_OnSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testDelete(
             P.self,
-            initial: .slice([["score": 20.5, "rank": 2], ["score": 20.5, "rank": 2], ["score": 20.5, "rank": 2]]),
-            path: .filter("score"),
-            expected: .slice([["rank": 2], ["rank": 2], ["rank": 2]])
+            initial: [["score": 20.5, "rank": 2], ["score": 20.5, "rank": 2], ["score": 20.5, "rank": 2]],
+            path: .sliceAll, .filter("score"),
+            expected: [["rank": 2], ["rank": 2], ["rank": 2]]
         )
     }
 
     func testDeleteFilter_OnFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testDelete(
             P.self,
-            initial: .filter(["Rick": ["score": 20.5, "rank": 2, "rewards": true], "Morty": ["score": 20.5, "rank": 2, "rewards": true]]),
-            path: .filter("score|rank"),
-            expected: .filter(["Rick": ["rewards": true], "Morty": ["rewards": true]])
+            initial: ["Rick": ["score": 20.5, "rank": 2, "rewards": true], "Morty": ["score": 20.5, "rank": 2, "rewards": true]],
+            path: .filterAll, .filter("score|rank"),
+            expected: ["Rick": ["rewards": true], "Morty": ["rewards": true]]
         )
     }
 
@@ -263,18 +271,18 @@ final class PathExplorerDeleteTests: XCTestCase {
     func testDeleteSlice_OnSlice<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testDelete(
             P.self,
-            initial: .slice([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
-            path: .slice(1, 2),
-            expected: .slice([[1], [4], [7]])
+            initial: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+            path: .sliceAll, .slice(1, 2),
+            expected: [[1], [4], [7]]
         )
     }
 
     func testDeleteSlice_OnFilter<P: EquatablePathExplorer>(_ type: P.Type) throws {
         try testDelete(
             P.self,
-            initial: .filter(["Rick": [1, 2, 3], "Morty": [1, 2, 3]]),
-            path: .slice(1, .last),
-            expected: .filter(["Rick": [1], "Morty": [1]])
+            initial: ["Rick": [1, 2, 3], "Morty": [1, 2, 3]],
+            path: .filterAll, .slice(1, .last),
+            expected: ["Rick": [1], "Morty": [1]]
         )
     }
 }

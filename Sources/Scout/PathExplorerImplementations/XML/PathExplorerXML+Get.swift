@@ -147,7 +147,7 @@ extension PathExplorerXML {
         element.children.forEach { keyChildren.append(.newChildElement(value: $0.name)) }
 
         // new element
-        let copy = element.copy()
+        let copy = element.copyFlat()
         copy.name = copy.name + PathElement.keysList.description
         copy.addChildren(keyChildren.sorted { $0.string < $1.string })
         return PathExplorerXML(element: copy, path: readingPath.appending(.keysList))
@@ -173,7 +173,7 @@ extension PathExplorerXML {
 
             try element.children.forEach { child in
                 let sliceRange = try bounds.range(arrayCount: child.children.count, path: path)
-                let newChild = child.copy()
+                let newChild = child.copyFlat()
                 let newSlicedChildren = Array(child.children[sliceRange])
                 newChild.addChildren(newSlicedChildren)
                 slicedChildren.append(newChild)

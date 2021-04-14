@@ -10,8 +10,12 @@ final class PathExplorerPathsListingTests: XCTestCase {
 
     // MARK: - Functions
 
-    func test() throws {
+    func testExplorerValue() throws {
         try test(ExplorerValue.self)
+    }
+
+    func testExplorerXML() throws {
+        try test(ExplorerXML.self)
     }
 
     func test<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -32,6 +36,7 @@ final class PathExplorerPathsListingTests: XCTestCase {
 
         // initial path
         try testListPath_InitialPath(P.self)
+        try testListPath_InitialPath_Filter(P.self)
 
         // error
         try testCountElementThrows(P.self)
@@ -40,6 +45,7 @@ final class PathExplorerPathsListingTests: XCTestCase {
 
     func testStub() throws {
         // use this function to launch a test with a specific PathExplorer
+        try testListPaths_SingleAndGroup_Regex(ExplorerXML.self)
     }
 
     // MARK: - Target only
@@ -51,7 +57,9 @@ final class PathExplorerPathsListingTests: XCTestCase {
                                    ["name": "Mister MV", "score": 20]],
                        "duration": 30],
             filter: .targetOnly(.single),
-            expectedPaths: [Path("duration"), Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
+            expectedPaths: [Path("duration"),
+                            Path("players", 0, "name"), Path("players", 0, "score"),
+                            Path("players", 1, "name"), Path("players", 1, "score")]
         )
     }
 
@@ -73,12 +81,8 @@ final class PathExplorerPathsListingTests: XCTestCase {
             filter: .targetOnly(.singleAndGroup),
             expectedPaths: [Path("duration"),
                             Path("players"),
-                            Path("players", 0),
-                            Path("players", 0, "name"),
-                            Path("players", 0, "score"),
-                            Path("players", 1),
-                            Path("players", 1, "name"),
-                            Path("players", 1, "score")]
+                            Path("players", 0), Path("players", 0, "name"), Path("players", 0, "score"),
+                            Path("players", 1), Path("players", 1, "name"), Path("players", 1, "score")]
         )
     }
 
@@ -165,22 +169,35 @@ final class PathExplorerPathsListingTests: XCTestCase {
                        "duration": 30],
             leadingPath: ["players"],
             filter: .noFilter,
-            expectedPaths: [Path("players", 0, "name"), Path("players", 0, "score"), Path("players", 1, "name"), Path("players", 1, "score")]
+            expectedPaths: [Path("players", 0), Path("players", 0, "name"), Path("players", 0, "score"),
+                            Path("players", 1), Path("players", 1, "name"), Path("players", 1, "score")]
+        )
+    }
+
+    func testListPath_InitialPath_Filter<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testListPaths(
+            P.self,
+            explorer: ["Riri": ["score": 30, "rank": 1],
+                       "Fifi": ["score": 30, "rank": 1],
+                       "Loulou": ["score": 30, "rank": 1]],
+            leadingPath: [.filter("Riri|Fifi"), "score"],
+            filter: .noFilter,
+            expectedPaths: [Path("Fifi", "score"), Path("Riri", "score")]
         )
     }
 
     // MARK: - Errors
 
     func testCountElementThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let explorer = P(value: .count(1))
+        let explorer = P(value: [1, 2, 3])
 
-        XCTAssertErrorsEqual(try explorer.listPaths(startingAt: nil, filter: .noFilter), .wrongUsage(of: .count))
+        XCTAssertErrorsEqual(try explorer.listPaths(startingAt: .count, filter: .noFilter), .wrongUsage(of: .count))
     }
 
     func testKeysListElementThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let explorer = P(value: .keysList([]))
+        let explorer = P(value: ["ducks": ["Riri", "Fifi", "Loulou"]])
 
-        XCTAssertErrorsEqual(try explorer.listPaths(startingAt: nil, filter: .noFilter), .wrongUsage(of: .keysList))
+        XCTAssertErrorsEqual(try explorer.listPaths(startingAt: .keysList, filter: .noFilter), .wrongUsage(of: .keysList))
     }
 }
 

@@ -65,7 +65,7 @@ final class AEXMLExtensionsTests: XCTestCase {
         element.addChild(name: "fifi", value: "duck")
         element.addChild(name: "loulou", value: "duck")
 
-        let otherElement = element.copy()
+        let otherElement = element.copyFlat()
         otherElement.addChild(name: "fifi", value: "duck")
         otherElement.addChild(name: "loulou", value: "duck")
 
@@ -78,7 +78,7 @@ final class AEXMLExtensionsTests: XCTestCase {
         element.addChild(name: "fifi", value: "duck")
         element.addChild(name: "loulou", value: "duck")
 
-        let otherElement = element.copy()
+        let otherElement = element.copyFlat()
         otherElement.addChild(name: "fifi", value: "duck")
         otherElement.addChild(name: "donald", value: "duck")
 

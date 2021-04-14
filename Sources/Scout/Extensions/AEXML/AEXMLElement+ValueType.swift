@@ -31,4 +31,15 @@ extension AEXMLElement {
             }
         }
     }
+
+    /// Returns a new element with new children, keeping the name, value and attributes
+    func copy() -> AEXMLElement {
+        let newElement = AEXMLElement(name: name, value: value, attributes: attributes)
+        if children.isEmpty {
+            return newElement
+        }
+
+        children.forEach { newElement.addChild($0.copyFlat()) }
+        return newElement
+    }
 }

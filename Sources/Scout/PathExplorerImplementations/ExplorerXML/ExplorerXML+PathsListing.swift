@@ -5,14 +5,17 @@
 
 import Foundation
 
-extension ExplorerValue {
+extension ExplorerXML {
 
     public func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path] {
         var paths: [Path] = []
 
-        if let path = initialPath {
-            let explorer = try getNoDetailedName(path)
-            try explorer.collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: path, filter: filter))
+        if let initialPath = initialPath {
+            if let first = initialPath.first(where: { [.count, .keysList].contains($0) }) {
+                throw ExplorerError.wrongUsage(of: first)
+            }
+            let explorer = try getNoDetailedName(initialPath)
+            try explorer.collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: initialPath, filter: filter))
         } else {
             try collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: .empty, filter: filter))
         }
@@ -20,50 +23,28 @@ extension ExplorerValue {
         return paths.map { $0.flattened() }.sortedByKeysAndIndexes()
     }
 
-    /// Explorer self and add the relevant paths to the array
-    /// - Parameters:
-    ///   - paths: Array of paths where to add paths
-    ///   - filter: A filter allowing to filter the path
-    ///   - leadingPath: The starting path leading to the explorer
-    ///   - lastKey: The last encountered key element value
     private func collectPaths(in paths: inout [Path], filter: PathsFilter, pathValidation: PathValidation) throws {
-        switch self {
-        case .int, .double, .bool, .data, .string:
-            guard filter.singleAllowed, pathValidation.isValid else { return }
-
-            if try filter.validate(value: any) {
+        if pathValidation.isValid {
+            if filter.singleAllowed, children.isEmpty, try filter.validate(value: valueAsAny) {
                 paths.append(pathValidation.leading)
             }
 
-        case .array(let array), .slice(let array):
-            if filter.groupAllowed, pathValidation.isValid {
+            if filter.groupAllowed, !children.isEmpty, filter.validate(key: name) {
                 paths.append(pathValidation.leading)
             }
+        }
 
-            try array.enumerated()
-                .forEach { (index, element) in
-                    try element.collectPaths(in: &paths, filter: filter, pathValidation: pathValidation.appendingLeading(index))
-                }
-
-        case .dictionary(let dict), .filter(let dict):
-            if filter.groupAllowed, pathValidation.isValid {
-                paths.append(pathValidation.leading)
-            }
-
-            try dict.forEach { (key, value) in
-                try value.collectPaths( in: &paths, filter: filter, pathValidation: pathValidation.appendingLeading(key))
-            }
-
-        case .count:
-            throw ExplorerError.wrongUsage(of: .count)
-
-        case .keysList:
-            throw ExplorerError.wrongUsage(of: .keysList)
+        if differentiableChildren {
+            try children
+                .forEach { try $0.collectPaths(in: &paths, filter: filter, pathValidation: pathValidation.appendingLeading($0.name)) }
+        } else {
+            try children.enumerated()
+                .forEach { try $1.collectPaths(in: &paths, filter: filter, pathValidation: pathValidation.appendingLeading($0)) }
         }
     }
 }
 
-extension ExplorerValue {
+extension ExplorerXML {
 
     /// Holds the logic to validate a path built during paths listing
     private struct PathValidation {
