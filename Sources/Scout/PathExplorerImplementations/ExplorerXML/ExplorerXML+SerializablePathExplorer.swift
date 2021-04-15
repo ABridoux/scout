@@ -17,10 +17,10 @@ extension ExplorerXML: SerializablePathExplorer {
 
     /// Export the path explorer value to data
     public func exportData() throws -> Data {
-        try xml.data(using: .utf8).unwrapOrThrow(.dataToString)
+        try description.data(using: .utf8).unwrapOrThrow(.dataToString)
     }
 
-    public func exportString() throws -> String { xml }
+    public func exportString() throws -> String { description }
 
     public func exportData(to format: DataFormat, rootName: String?) throws -> Data {
         switch format {

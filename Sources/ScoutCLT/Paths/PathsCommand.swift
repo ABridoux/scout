@@ -30,12 +30,12 @@ struct PathsCommand: ScoutCommand {
     var inputFilePath: String?
 
     @Option(name: [.short, .customLong("key")], help: "Specify a regular expression to filter the keys")
-    var keyRegexPattren: String?
+    var keyRegexPattern: String?
 
     @Option(name: [.short, .customLong("value")], help: "Specify a predicate to filter the values of the paths. Several predicates can be specified. A value validated by any of the predicates will be valid.")
     var valuePredicates = [String]()
 
-    @Flag(help: "Target single values (stirng, number, bool), group values (array, dictionary), or both.")
+    @Flag(help: "Target single values (string, number, bool), group values (array, dictionary), or both.")
     var valueTarget = PathsFilter.ValueTarget.singleAndGroup
 
     // MARK: - Functions
@@ -45,7 +45,7 @@ struct PathsCommand: ScoutCommand {
         let valuePredicates = self.valuePredicates.isEmpty ? nil : try self.valuePredicates.map { try PathsFilter.ExpressionPredicate(format: $0) }
         var keyRegex: NSRegularExpression?
 
-        if let pattern = keyRegexPattren {
+        if let pattern = keyRegexPattern {
             keyRegex = try regexFrom(pattern: pattern)
         }
 
@@ -76,7 +76,7 @@ struct PathsCommand: ScoutCommand {
             pathsFilter = .keyAndValue(keyRegex: regex, valuePredicates: predicates)
         }
 
-        let paths = try pathExplorer.listPaths(startingAt: initialPath, filter: pathsFilter)
+        let paths = try pathExplorer.listPaths(startingAt: initialPath, filter: pathsFilter).sortedByKeysAndIndexes()
 
         paths.forEach { print($0.flattened()) }
     }

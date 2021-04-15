@@ -22,7 +22,7 @@ public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorerBis 
     public var description: String { value.description }
     public var debugDescription: String { value.debugDescription }
 
-    public init(value: ExplorerValue) {
+    public init(value: ExplorerValue, name: String?) {
         self.value = value
     }
 
@@ -105,14 +105,17 @@ extension CodableFormatPathExplorer: SerializablePathExplorer {
         case .json: return try CodableFormats.JsonDefault.encode(value)
         case .plist: return try CodableFormats.PlistDefault.encode(value)
         case .yaml: return try CodableFormats.YamlDefault.encode(value)
-        case .xml: return try CodableFormats.XmlDefault.encode(value, rootName: rootName)
+        case .xml: return try ExplorerXML(value: value, name: rootName).exportData()
         }
     }
 
     public func exportString(to format: DataFormat, rootName: String?) throws -> String {
-        try String(data: exportData(to: format, rootName: rootName),
-                   encoding: .utf8)
-            .unwrapOrThrow(.dataToString)
+        switch format {
+        case .json, .plist, .yaml:
+            return try String(data: exportData(to: format, rootName: rootName), encoding: .utf8).unwrapOrThrow(.dataToString)
+
+        case .xml: return try ExplorerXML(value: value, name: rootName).exportString()
+        }
     }
 
     public func exportCSV(separator: String?) throws -> String {

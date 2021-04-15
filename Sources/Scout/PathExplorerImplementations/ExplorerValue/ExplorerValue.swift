@@ -358,7 +358,7 @@ infix operator <^>: SequencePrecedence
 func <^><A>(lhs: (A) -> ExplorerValue, rhs: A) -> ExplorerValue { lhs(rhs) }
 
 extension ExplorerValue: EquatablePathExplorer {
-    public init(value: ExplorerValue) {
+    public init(value: ExplorerValue, name: String?) {
         self = value
     }
 }

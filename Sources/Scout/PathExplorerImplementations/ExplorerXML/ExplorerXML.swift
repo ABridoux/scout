@@ -75,11 +75,7 @@ public struct ExplorerXML: PathExplorerBis {
             return value
         }
 
-        // when printing out an element which has a parent, the indentation will remain the same
-        // which is unwanted so remove the parent by copying the element (parent setter is internal)
-        let copy = element.copyFlat()
-        copy.addChildren(element.children)
-        return copy.xml
+        return element.xmlSpaces
     }
 
     public var debugDescription: String { description }
@@ -96,11 +92,7 @@ public struct ExplorerXML: PathExplorerBis {
         self.init(element: Element(name: name, value: value))
     }
 
-    public init(value: ExplorerValue) {
-        self.init(value: value, name: nil)
-    }
-
-    private init(value: ExplorerValue, name: String?) {
+    public init(value: ExplorerValue, name: String?) {
         let name = name ?? Element.defaultName
 
         switch value {
