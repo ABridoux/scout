@@ -7,6 +7,8 @@ import AEXML
 
 extension AEXMLElement {
 
+    static let defaultName = "element"
+
     func isEqual(to other: AEXMLElement) -> Bool {
 
         if children.count != other.children.count {

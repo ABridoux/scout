@@ -8,14 +8,19 @@ import XCTest
 
 final class PathExplorerCSVExportTests: XCTestCase {
 
-    func test() throws {
+    func testExplorerValue() throws {
         try test(CodableFormatPathExplorer<CodableFormats.JsonDefault>.self)
+    }
+
+    func testExplorerXML() throws {
+        try test(ExplorerXML.self)
     }
 
     func test<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV_SingleValues(P.self)
         try testExportCSV_ArrayOfDictionaries(P.self)
         try testExportCSV_ArrayOfDictionaries_NestedDict(P.self)
+        try testExportCSV_ArrayOfDictionaries_NestedDifferentDicts(P.self)
         try testExportCSV_ArrayOfDictionaries_NestedArray(P.self)
         try testExportCSV_ArrayOfArrays(P.self)
         try testExportCSV_DictionaryOfArrays(P.self)
@@ -23,7 +28,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
     }
 
     func testStub() throws {
-
+        // use this function to launch a test with a specific PathExplorer
     }
 
     func testExportCSV_SingleValues<P: SerializablePathExplorer>(_ type: P.Type) throws {
@@ -60,6 +65,22 @@ final class PathExplorerCSVExportTests: XCTestCase {
             Daisy;Donald;Riri;
             Daisy;Donald;Fifi;
             Daisy;Donald;Loulou;
+            """
+        )
+    }
+
+    func testExportCSV_ArrayOfDictionaries_NestedDifferentDicts<P: SerializablePathExplorer>(_ type: P.Type) throws {
+        try testExportCSV(
+            P.self,
+            value: [["name": "Riri", "family": ["aunt": "Daisy"]],
+                     ["name": "Fifi", "family": ["uncle": "Donald", "aunt": "Daisy"]],
+                     ["name": "Loulou", "family": ["uncle": "Donald"]]],
+            expected:
+            """
+            family.aunt;family.uncle;name;
+            Daisy;NULL;Riri;
+            Daisy;Donald;Fifi;
+            NULL;Donald;Loulou;
             """
         )
     }

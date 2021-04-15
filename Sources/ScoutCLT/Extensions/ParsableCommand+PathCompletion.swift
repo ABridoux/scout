@@ -16,3 +16,9 @@ extension CodableFormatPathExplorer: PathExplorerGet {
         _ = try get(path)
     }
 }
+
+extension ExplorerXML: PathExplorerGet {
+    func tryToGet(_ path: Path) throws {
+        _ = try get(path)
+    }
+}

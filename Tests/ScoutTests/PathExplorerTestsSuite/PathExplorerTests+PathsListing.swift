@@ -220,7 +220,7 @@ extension PathExplorerPathsListingTests {
         if let path = leadingPath {
             initialPath = Path(path)
         }
-        let paths = try explorer.listPaths(startingAt: initialPath, filter: filter)
+        let paths = try explorer.listPaths(startingAt: initialPath, filter: filter).sortedByKeysAndIndexes()
 
         XCTAssertEqual(paths, expectedPaths, file: file, line: line)
     }

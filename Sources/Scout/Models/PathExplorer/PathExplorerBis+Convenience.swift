@@ -5,6 +5,13 @@
 
 import Foundation
 
+public extension PathExplorerBis {
+
+    init(value: ExplorerValue) {
+        self.init(value: value, name: nil)
+    }
+}
+
 // MARK: - Get
 
 public extension PathExplorerBis {

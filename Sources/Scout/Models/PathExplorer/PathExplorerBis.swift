@@ -48,7 +48,7 @@ where
 
     // MARK: - Initialization
 
-    init(value: ExplorerValue)
+    init(value: ExplorerValue, name: String?)
 
     // MARK: - Get
 

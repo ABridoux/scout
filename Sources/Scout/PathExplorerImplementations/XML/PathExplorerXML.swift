@@ -195,26 +195,3 @@ extension PathExplorerXML {
         try Type(value: stringValue)
     }
 }
-
-extension PathExplorerXML {
-    public var data: Data? {
-        Data(base64Encoded: element.string)
-    }
-
-    public init(value: ExplorerValue) {
-        self.init(element: AEXMLElement(name: "root"))
-
-        element.setup(with: value)
-    }
-
-    public func isEqual(to other: PathExplorerXML) -> Bool {
-        element.isEqual(to: other.element)
-    }
-
-    public func set(_ path: Path, to newValue: ExplorerValue) throws {
-    }
-
-    public func set<Type>(_ path: Path, to newValue: ExplorerValue, as type: KeyTypes.KeyType<Type>) throws where Type: KeyAllowedType {
-
-    }
-}

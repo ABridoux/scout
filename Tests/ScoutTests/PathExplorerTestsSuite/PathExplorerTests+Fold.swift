@@ -8,8 +8,12 @@ import XCTest
 
 final class PathExplorerFoldTests: XCTestCase {
 
-    func test() throws {
+    func testExplorerValue() throws {
         try test(CodableFormatPathExplorer<CodableFormats.JsonDefault>.self)
+    }
+
+    func testExplorerXML() throws {
+        try test(ExplorerXML.self)
     }
 
     func test<P: SerializablePathExplorer & EquatablePathExplorer>(_ type: P.Type) throws {

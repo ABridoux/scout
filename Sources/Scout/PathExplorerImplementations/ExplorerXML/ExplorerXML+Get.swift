@@ -70,7 +70,7 @@ extension ExplorerXML {
             let newChild = ExplorerXML(name: "key", value: key)
             copy.addChild(newChild)
         }
-        return copy
+        return copy.with(name: "\(name)_keys")
     }
 
     private func getFilter(with pattern: String, groupSample: GroupSample?) throws -> Self {

@@ -101,7 +101,7 @@ extension SADCommand {
         if let filePath = outputFilePath {
             try output.write(toFile: filePath, atomically: false, encoding: .utf8)
         } else {
-            try printOutput(output: output, with: P.Format.dataFormat)
+            try printOutput(output: output, with: P.format)
         }
     }
 

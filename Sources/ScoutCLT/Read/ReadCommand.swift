@@ -31,7 +31,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
             && !FileHandle.standardOutput.isPiped
     }
 
-    @Flag(help: "The data format to read the input")
+    @Option(name: [.customShort("f", allowingJoined: true), .customLong("format")], help: "The data format to read the input")
     var dataFormat: Scout.DataFormat
 
     @Argument(help: .readingPath)
@@ -43,7 +43,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
     @Option(name: [.short, .customLong("output")], help: "Write the read data into the file at the given path", completion: .file())
     var outputFilePath: String?
 
-    @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
+    @Flag(help: "Highlight the output. --no-color or --nc to prevent it")
     var color = ColorFlag.color
 
     @Option(name: [.short, .long], help: "Fold the data at the given depth level")
@@ -64,7 +64,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
         let readingPath = self.readingPath ?? Path()
         var explorer = try pathExplorer.get(readingPath)
         let value = try getValue(from: &explorer)
-        let colorInjector = try self.colorInjector(for: exportFormat ?? P.Format.dataFormat)
+        let colorInjector = try self.colorInjector(for: exportFormat ?? P.format)
 
         if value == "" {
             throw RuntimeError.noValueAt(path: readingPath.description)
@@ -100,6 +100,12 @@ struct ReadCommand: ScoutCommand, ExportCommand {
             return try explorer.exportFoldedString(upTo: level)
         } else {
             return try explorer.exportString()
+        }
+    }
+
+    func validate() throws {
+        if let level = level, level < 0 {
+            throw ValidationError(message: "The level to fold the data with the -l|--level option should be greater than 0")
         }
     }
 }

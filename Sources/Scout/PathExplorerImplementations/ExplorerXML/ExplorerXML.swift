@@ -23,19 +23,44 @@ public struct ExplorerXML: PathExplorerBis {
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
     public var real: Double? { element.double }
+
     var valueAsAny: Any { int ?? real ?? bool ?? string ?? "" }
+
+    /// Complexity: `O(h)`  where `h` is the larger height to last child
+    var explorerValue: ExplorerValue {
+        if children.isEmpty {
+            return singleExplorerValue
+        }
+
+        if let names = element.uniqueChildrenNames, names.count > 1 { // dict
+            let dict = children.map { (key: $0.name, value: $0.explorerValue) }
+            return .dictionary(Dictionary(uniqueKeysWithValues: dict))
+        } else { // array
+            return .array(children.map { $0.explorerValue })
+        }
+    }
+
+    private var singleExplorerValue: ExplorerValue {
+        if let int = Int(element.string) {
+            return .int(int)
+        } else if let double = Double(element.string) {
+            return .double(double)
+        } else if let bool = Bool(element.string) {
+            return .bool(bool)
+        } else {
+            return .string(element.string)
+        }
+    }
 
     /// Always `nil` on XML
     public var data: Data? { nil }
 
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable {
-        #warning("[TODO] array conversion")
-        fatalError()
+        try children.map { try T(from: $0.explorerValue) }
     }
 
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
-        #warning("[TODO] dict conversion")
-        fatalError()
+        try Dictionary(uniqueKeysWithValues: children.map { try ($0.name, T(from: $0.explorerValue)) })
     }
 
     public var isGroup: Bool { !element.children.isEmpty }
@@ -47,14 +72,12 @@ public struct ExplorerXML: PathExplorerBis {
             return value
         }
 
-        // when printing out an element which has a parent, the indentation will remain the same
-        // which is unwanted so remove the parent by copying the element (parent setter is internal)
-        let copy = element.copyFlat()
-        copy.addChildren(element.children)
-        return copy.xml
+        return element.xmlSpaces
     }
 
     public var debugDescription: String { description }
+
+    var xml: String { element.xml }
 
     // MARK: - Initialization
 
@@ -66,11 +89,7 @@ public struct ExplorerXML: PathExplorerBis {
         self.init(element: Element(name: name, value: value))
     }
 
-    public init(value: ExplorerValue) {
-        self.init(value: value, name: nil)
-    }
-
-    private init(value: ExplorerValue, name: String?) {
+    public init(value: ExplorerValue, name: String?) {
         let name = name ?? Element.defaultName
 
         switch value {
@@ -155,6 +174,9 @@ public struct ExplorerXML: PathExplorerBis {
 
     /// `true` if all the children have a different name
     var differentiableChildren: Bool { element.differentiableChildren }
+
+    /// `true` if all children have the same name
+    var childrenHaveCommonName: Bool { element.commonChildrenName != nil }
 
     var children: [ExplorerXML] {
         get { element.children.map { ExplorerXML(element: $0) }}
