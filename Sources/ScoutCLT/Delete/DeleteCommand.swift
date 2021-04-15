@@ -18,8 +18,8 @@ struct DeleteCommand: SADCommand {
 
     // MARK: - Properties
 
-    @Flag(help: "The data format to read the input")
-    var dataFormat: DataFormat
+    @Option(name: [.customShort("f", allowingJoined: true), .customLong("format")], help: "The data format to read the input")
+    var dataFormat: Scout.DataFormat
 
     @Argument(help: "Paths to indicate the keys to be deleted")
     var pathsCollection = [Path]()
@@ -33,7 +33,7 @@ struct DeleteCommand: SADCommand {
     @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path", completion: .file())
     var modifyFilePath: String?
 
-    @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
+    @Flag(help: "Highlight the output. --no-color or --nc to prevent it")
     var color = ColorFlag.color
 
     @Option(name: [.short, .long], help: "Fold the data at the given depth level")

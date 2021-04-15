@@ -52,18 +52,15 @@ public struct ExplorerXML: PathExplorerBis {
         }
     }
 
-
     /// Always `nil` on XML
     public var data: Data? { nil }
 
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable {
-        #warning("[TODO] array conversion")
-        fatalError()
+        try children.map { try T(from: $0.explorerValue) }
     }
 
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
-        #warning("[TODO] dict conversion")
-        fatalError()
+        try Dictionary(uniqueKeysWithValues: children.map { try ($0.name, T(from: $0.explorerValue)) })
     }
 
     public var isGroup: Bool { !element.children.isEmpty }

@@ -15,7 +15,7 @@ public extension Collection where SubSequence == Slice<Path> {
         while let element = iterator.next(), let otherElement = otherIterator.next(), element == otherElement {
             lastIndex += 1
         }
-        
+
         return self[0..<lastIndex]
     }
 }
