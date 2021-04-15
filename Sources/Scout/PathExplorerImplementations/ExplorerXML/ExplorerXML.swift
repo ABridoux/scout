@@ -23,7 +23,35 @@ public struct ExplorerXML: PathExplorerBis {
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
     public var real: Double? { element.double }
+
     var valueAsAny: Any { int ?? real ?? bool ?? string ?? "" }
+
+    /// Complexity: `O(h)`  where `h` is the larger height to last child
+    var explorerValue: ExplorerValue {
+        if children.isEmpty {
+            return singleExplorerValue
+        }
+
+        if let names = element.uniqueChildrenNames, names.count > 1 { // dict
+            let dict = children.map { (key: $0.name, value: $0.explorerValue) }
+            return .dictionary(Dictionary(uniqueKeysWithValues: dict))
+        } else { // array
+            return .array(children.map { $0.explorerValue })
+        }
+    }
+
+    private var singleExplorerValue: ExplorerValue {
+        if let int = Int(element.string) {
+            return .int(int)
+        } else if let double = Double(element.string) {
+            return .double(double)
+        } else if let bool = Bool(element.string) {
+            return .bool(bool)
+        } else {
+            return .string(element.string)
+        }
+    }
+
 
     /// Always `nil` on XML
     public var data: Data? { nil }
@@ -55,6 +83,8 @@ public struct ExplorerXML: PathExplorerBis {
     }
 
     public var debugDescription: String { description }
+
+    var xml: String { element.xml }
 
     // MARK: - Initialization
 
@@ -155,6 +185,9 @@ public struct ExplorerXML: PathExplorerBis {
 
     /// `true` if all the children have a different name
     var differentiableChildren: Bool { element.differentiableChildren }
+
+    /// `true` if all children have the same name
+    var childrenHaveCommonName: Bool { element.commonChildrenName != nil }
 
     var children: [ExplorerXML] {
         get { element.children.map { ExplorerXML(element: $0) }}

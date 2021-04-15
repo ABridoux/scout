@@ -39,19 +39,19 @@ extension PathExplorerXML {
         var headers = Set<String>()
         var values = [[String]]()
 
-        // epxlore a first time to get the key names
+        // explore a first time to get the key names
         exploreGroup(element: element) { (key, _) in
             if key != "" {
                 headers.insert(key)
             }
         }
 
-        let sortedHeaders = Array(headers).sorted()
         var headersIndexes = [String: Int]()
         let headersCount = headers.count
-        for (index, header) in sortedHeaders.enumerated() {
-            headersIndexes[header] = index
-        }
+        let sortedHeaders = headers.sorted()
+        sortedHeaders
+            .enumerated()
+            .forEach { (index, header) in headersIndexes[header] = index }
 
         // explore a second time to get the values
         element.children.forEach { child in

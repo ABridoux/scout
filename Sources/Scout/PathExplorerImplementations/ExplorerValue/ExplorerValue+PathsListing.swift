@@ -17,7 +17,7 @@ extension ExplorerValue {
             try collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: .empty, filter: filter))
         }
 
-        return paths.map { $0.flattened() }.sortedByKeysAndIndexes()
+        return paths.map { $0.flattened() }
     }
 
     /// Explorer self and add the relevant paths to the array

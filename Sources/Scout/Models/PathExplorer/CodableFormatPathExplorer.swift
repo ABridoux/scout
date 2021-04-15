@@ -85,7 +85,7 @@ public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorerBis 
 
 extension CodableFormatPathExplorer: SerializablePathExplorer {
 
-    public var format: DataFormat { Format.dataFormat }
+    public static var format: DataFormat { Format.dataFormat }
 
     public init(data: Data) throws {
         value = try Format.decode(ExplorerValue.self, from: data)

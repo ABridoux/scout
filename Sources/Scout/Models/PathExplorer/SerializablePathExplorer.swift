@@ -7,7 +7,7 @@ import Foundation
 
 public protocol SerializablePathExplorer: PathExplorerBis {
 
-    associatedtype Format: CodableFormat
+    static var format: DataFormat { get }
 
     init(data: Data) throws
 
@@ -43,6 +43,7 @@ public protocol SerializablePathExplorer: PathExplorerBis {
 public extension SerializablePathExplorer {
 
     var defaultCSVSeparator: String { ";" }
+    var nullCSVValue: String { "NULL" }
 
     /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
     func exportCSV() throws -> String {

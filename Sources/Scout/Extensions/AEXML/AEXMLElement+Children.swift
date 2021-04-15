@@ -65,4 +65,16 @@ extension AEXMLElement {
 
         return names
     }
+
+    func getJaroWinkler(key: String) throws -> AEXMLElement {
+        return try children
+            .first { $0.name == key }
+            .unwrapOrThrow(
+                .missing(
+                    key: key,
+                    bestMatch: key.bestJaroWinklerMatchIn(propositions: Set(children.map(\.name)))
+                )
+            )
+    }
+
 }

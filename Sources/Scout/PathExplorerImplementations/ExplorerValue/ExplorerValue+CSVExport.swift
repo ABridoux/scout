@@ -51,11 +51,20 @@ extension ExplorerValue {
     }
 
     private func exportCSV(arrayOfDictionaries: ArrayValue, headers: [Path], separator: String) throws -> String {
-        let headersLine = ExplorerValue.array(headers.lazy.map(\.description).map(ExplorerValue.string)).toCSV(separator: separator) + "\n"
+        let headersLine = ExplorerValue.array(headers.lazy.map(\.description).map(ExplorerValue.string))
+            .toCSV(separator: separator) + "\n"
 
-        var csvString = try arrayOfDictionaries.reduce(headersLine) { (csvString, value) in
-            let line = try headers.map { try value.get($0).description.escapingCSV(separator) }.joined(separator: separator)
-            return "\(csvString)\(line)\(separator)\n"
+        var csvString = arrayOfDictionaries.reduce(headersLine) { (csvString, value) in
+            let line = value.exploreReduce(initial: "", paths: headers) { (csvString, result) in
+
+                let string: String
+                switch result {
+                case .success(let explorer): string = explorer.description.escapingCSV(separator)
+                case .failure: string = "NULL"
+                }
+                return "\(csvString)\(string)\(separator)"
+            }
+            return "\(csvString)\(line)\n"
         }
 
         csvString.removeLast()
@@ -77,13 +86,14 @@ extension ExplorerValue {
         var csvString = try dictionary
             .sorted { $0.key < $1.key }
             .reduce("") { (csvString, element) in
-            let (key, value) = element
-            guard let array = value.array, array.allSatisfy(\.isSingle) else {
-                throw ExplorerError.mismatchingType(ArrayValue.self, value: value)
-            }
+                let (key, value) = element
+
+                guard let array = value.array, array.allSatisfy(\.isSingle) else {
+                    throw ExplorerError.mismatchingType(ArrayValue.self, value: value)
+                }
 
                 let line = value.toCSV(separator: separator)
-            return "\(csvString)\(key)\(separator)\(line)\n"
+                return "\(csvString)\(key)\(separator)\(line)\n"
         }
 
         csvString.removeLast()
@@ -93,10 +103,10 @@ extension ExplorerValue {
     /// The headers for the array of dictionaries
     /// #### Complexity
     /// `O(n)` where `n` is the number of elements in the array
-    private func headers(in array: ArrayValue) throws -> [Path] {
-        try array.reduce([Path]()) { (_, value) in
+    private func headers(in array: ArrayValue) throws -> Set<Path> {
+        try array.reduce(into: Set<Path>()) { (paths, value) in
             guard value.isDictionary else { throw ExplorerError.mismatchingType(DictionaryValue.self, value: value) }
-            return try value.listPaths(filter: .targetOnly(.single))
+            try value.listPaths(filter: .targetOnly(.single)).forEach { paths.insert($0) }
         }
     }
 }

@@ -64,7 +64,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
         let readingPath = self.readingPath ?? Path()
         var explorer = try pathExplorer.get(readingPath)
         let value = try getValue(from: &explorer)
-        let colorInjector = try self.colorInjector(for: exportFormat ?? P.Format.dataFormat)
+        let colorInjector = try self.colorInjector(for: exportFormat ?? P.format)
 
         if value == "" {
             throw RuntimeError.noValueAt(path: readingPath.description)
