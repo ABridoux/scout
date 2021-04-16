@@ -58,6 +58,10 @@ extension ExplorerError {
 
 public extension ExplorerError {
 
+    static func invalid(value: Any) -> Self {
+        ExplorerError(description: "The value \(value) is not convertible to ExplorerValue")
+    }
+
     static func missing(key: String, bestMatch: String?) -> Self {
         ExplorerError(description: "Missing key '\(key)' in dictionary. Best match found: '\(bestMatch ?? "none")'")
     }
@@ -95,5 +99,9 @@ public extension ExplorerError {
 
     static func mismatchingType<T>(_ type: T.Type, value: ExplorerValue) -> Self {
         ExplorerError(description: "ExplorerValue \(value) cannot be represented as \(T.self)")
+    }
+
+    static func predicateNotEvaluatable(_ predicate: String, description: String) -> Self {
+        ExplorerError(description: #"Unable to evaluate the predicate "\#(predicate)". \#(description)"#)
     }
 }

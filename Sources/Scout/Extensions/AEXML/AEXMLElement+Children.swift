@@ -24,13 +24,13 @@ extension AEXMLElement {
     var commonChildrenName: String? {
         guard
             let firstChild = children.first,
-            let name = firstChild.name.components(separatedBy: GroupSample.keySeparator).last
+            let name = firstChild.name.components(separatedBy: ExplorerXML.GroupSample.keySeparator).last
         else {
             return nil
         }
 
         for child in children {
-            if child.name.components(separatedBy: GroupSample.keySeparator).last != name {
+            if child.name.components(separatedBy: ExplorerXML.GroupSample.keySeparator).last != name {
                 return nil
             }
         }

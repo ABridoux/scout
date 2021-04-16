@@ -186,7 +186,7 @@ extension ExplorerValue {
         } else if let array = value as? [Any] {
             self = try .array(array.map { try ExplorerValue(value: $0) })
         } else {
-            throw PathExplorerError.invalidValue("The value \(value) cannot be serialized")
+            throw ExplorerError.invalid(value: value)
         }
     }
 }

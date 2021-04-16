@@ -9,14 +9,6 @@ extension NSRegularExpression {
 
     // MARK: - Initialization
 
-    convenience init(pattern: String, path: Path) throws {
-        do {
-            try self.init(pattern: pattern)
-        } catch {
-            throw PathExplorerError.wrongRegularExpression(pattern: pattern, in: path)
-        }
-    }
-
     convenience init(with pattern: String) throws {
         do {
             try self.init(pattern: pattern)

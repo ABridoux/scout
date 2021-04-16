@@ -12,7 +12,7 @@ public protocol ValuePredicate {
     /// Evaluate the predicate with the value.
     ///
     /// - note: Ignore the error of mismatching types between the value and an operand and return `false`
-    func evaluate(with value: Any) throws -> Bool
+    func evaluate(with value: ExplorerValue) throws -> Bool
 }
 
 extension PathsFilter {
@@ -39,8 +39,8 @@ extension PathsFilter {
         /// Evaluate the predicate with the value.
         ///
         /// - note: Ignore the error of mismatching types between the value and an operand and return `false`
-        public func evaluate(with value: Any) throws -> Bool {
-            let valueType = type(of: value)
+        public func evaluate(with value: ExplorerValue) throws -> Bool {
+            let valueType = try type(of: value)
 
             // exit immediately if the operators do not support the value type
             guard operatorsValueTypes.contains(valueType) else { return false }
@@ -52,18 +52,16 @@ extension PathsFilter {
                 operatorsValueTypes.remove(valueType)
                 return false // ignore the error of wrong value type
             } catch {
-                throw PathExplorerError.predicateError(predicate: expression.description, description: error.localizedDescription)
+                throw ExplorerError.predicateNotEvaluatable(expression.description, description: error.localizedDescription)
             }
         }
 
-        func type(of value: Any) -> ValueType {
-            // use the initialisation from any allowing a string value
-            if let _ = try? Double(value: value) {
-                return .double
-            } else if let _ = try? Bool(value: value) {
-                return .bool
-            } else {
-                return .string
+        func type(of value: ExplorerValue) throws -> ValueType {
+            switch value {
+            case .double, .int: return .double
+            case .bool: return .bool
+            case .string: return .string
+            default: throw ExplorerError.predicateNotEvaluatable(expression.description, description: "Unsupported type for value \(value)")
             }
         }
     }
@@ -74,14 +72,14 @@ extension PathsFilter {
     /// Specify a function to filter the value
     public final class FunctionPredicate: ValuePredicate {
 
-        public typealias Evaluation = (Any) throws -> Bool
+        public typealias Evaluation = (ExplorerValue) throws -> Bool
         public var evaluation: Evaluation
 
         public init(evaluation: @escaping Evaluation) {
             self.evaluation = evaluation
         }
 
-        public func evaluate(with value: Any) throws -> Bool {
+        public func evaluate(with value: ExplorerValue) throws -> Bool {
             try evaluation(value)
         }
     }

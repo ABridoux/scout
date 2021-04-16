@@ -33,9 +33,9 @@ extension ExplorerXML: SerializablePathExplorer {
 
     public func exportString(to format: DataFormat, rootName: String?) throws -> String {
         switch format {
-        case .json: return try PathExplorers.JsonBis(value: explorerValue).exportString()
-        case .plist: return try PathExplorers.PlistBis(value: explorerValue).exportString()
-        case .yaml: return try PathExplorers.YamlBis(value: explorerValue).exportString()
+        case .json: return try PathExplorers.Json(value: explorerValue).exportString()
+        case .plist: return try PathExplorers.Plist(value: explorerValue).exportString()
+        case .yaml: return try PathExplorers.Yaml(value: explorerValue).exportString()
         case .xml: return try exportString()
         }
     }

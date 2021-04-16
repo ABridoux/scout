@@ -31,7 +31,7 @@ extension ExplorerValue {
         case .int, .double, .bool, .data, .string:
             guard filter.singleAllowed, pathValidation.isValid else { return }
 
-            if try filter.validate(value: any) {
+            if try filter.validate(value: self) {
                 paths.append(pathValidation.leading)
             }
 

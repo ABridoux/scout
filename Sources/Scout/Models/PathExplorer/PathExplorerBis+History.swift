@@ -52,7 +52,7 @@ private final class History<Explorer: PathExplorerBis> {
                 try exploringHandler(.failure(error))
                 return
             } catch {
-                assertionFailure("The explorer should throw an explorer error")
+                assertionFailure("The explorer should throw an ExplorerError")
                 return
             }
 

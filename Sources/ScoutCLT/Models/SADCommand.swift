@@ -79,7 +79,7 @@ extension SADCommand {
                 try exported.write(to: URL(fileURLWithPath: output))
             } else {
                 guard let string = String(data: exported, encoding: .utf8) else {
-                    throw PathExplorerError.dataToStringConversionError
+                    throw SerializationError.dataToString
                 }
                 try printOutput(output: string, with: format)
             }

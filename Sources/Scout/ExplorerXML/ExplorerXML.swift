@@ -265,6 +265,8 @@ extension ExplorerXML {
 
     enum GroupSample {
         case filter, slice
+
+        static var keySeparator: String { "_" }
     }
 }
 

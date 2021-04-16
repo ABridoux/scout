@@ -14,7 +14,7 @@ extension ExplorerXML {
     private func _exportCSV(separator: String) throws -> String {
         if children.allSatisfy(\.isSingle) { // array of singles
             return try exportAsArrayOfSingles(separator: separator)
-        } else if differentiableChildren { // dictionary of array
+        } else if differentiableChildren { // dictionary of arrays
             return try exportAsDictionaryOfArrays(separator: separator)
         } else if children.allSatisfy(\.childrenHaveCommonName) { // array of arrays
             return try exportAsArrayOfArrays(separator: separator)
