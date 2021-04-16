@@ -53,12 +53,6 @@ extension ExplorerValue {
             try dict.forEach { (key, value) in
                 try value.collectPaths( in: &paths, filter: filter, pathValidation: pathValidation.appendingLeading(key))
             }
-
-        case .count:
-            throw ExplorerError.wrongUsage(of: .count)
-
-        case .keysList:
-            throw ExplorerError.wrongUsage(of: .keysList)
         }
     }
 }

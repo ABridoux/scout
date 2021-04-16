@@ -18,7 +18,7 @@ extension ExplorerValueDecoder {
             self.codingPath = codingPath
             self.decoder = decoder
 
-            if case let .keysList(keys) = try? value.get(.keysList) {
+            if let keys = try? value.get(.keysList).array(of: String.self) {
                 allKeys = keys.compactMap(Key.init)
             }
         }

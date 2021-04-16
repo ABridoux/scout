@@ -117,18 +117,10 @@ public struct ExplorerXML: PathExplorer {
 
         switch value {
         case .string(let string): self.init(name: name, value: string)
-        case .int(let int), .count(let int): self.init(name: name, value: int.description)
+        case .int(let int): self.init(name: name, value: int.description)
         case .double(let double): self.init(name: name, value: double.description)
         case .bool(let bool): self.init(name: name, value: bool.description)
         case .data(let data): self.init(name: name, value: data.base64EncodedString())
-
-        case .keysList(let keys):
-            let element = Element(name: name)
-            self.init(element: element)
-            keys.forEach { (key) in
-                let explorer = ExplorerXML(name: "key", value: key)
-                addChild(explorer)
-            }
 
         case .array(let array), .slice(let array):
             let element = Element(name: name)
@@ -272,15 +264,10 @@ extension ExplorerXML {
     private func set(newValue: ExplorerValue) {
         switch newValue {
         case .string(let string): set(value: string)
-        case .int(let int), .count(let int): set(value: int.description)
+        case .int(let int): set(value: int.description)
         case .double(let double): set(value: double.description)
         case .bool(let bool): set(value: bool.description)
         case .data(let data): set(value: data.base64EncodedString())
-
-        case .keysList(let keys):
-            removeChildrenFromParent()
-            let newChildren = keys.map { ExplorerXML(name: "key", value: $0) }
-            addChildren(newChildren)
 
         case .array(let array), .slice(let array):
             removeChildrenFromParent()

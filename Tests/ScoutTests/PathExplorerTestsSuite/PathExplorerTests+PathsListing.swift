@@ -37,10 +37,6 @@ final class PathExplorerPathsListingTests: XCTestCase {
         // initial path
         try testListPath_InitialPath(P.self)
         try testListPath_InitialPath_Filter(P.self)
-
-        // error
-        try testCountElementThrows(P.self)
-        try testKeysListElementThrows(P.self)
     }
 
     func testStub() throws {
@@ -184,20 +180,6 @@ final class PathExplorerPathsListingTests: XCTestCase {
             filter: .noFilter,
             expectedPaths: [Path("Fifi", "score"), Path("Riri", "score")]
         )
-    }
-
-    // MARK: - Errors
-
-    func testCountElementThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let explorer = P(value: [1, 2, 3])
-
-        XCTAssertErrorsEqual(try explorer.listPaths(startingAt: .count, filter: .noFilter), .wrongUsage(of: .count))
-    }
-
-    func testKeysListElementThrows<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        let explorer = P(value: ["ducks": ["Riri", "Fifi", "Loulou"]])
-
-        XCTAssertErrorsEqual(try explorer.listPaths(startingAt: .keysList, filter: .noFilter), .wrongUsage(of: .keysList))
     }
 }
 

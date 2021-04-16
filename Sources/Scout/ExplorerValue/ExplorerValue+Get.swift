@@ -81,8 +81,8 @@ extension ExplorerValue {
 
     private func getCount() throws -> Self {
         switch self {
-        case .array(let array), .slice(let array): return .count(array.count)
-        case .dictionary(let dict), .filter(let dict): return .count(dict.count)
+        case .array(let array), .slice(let array): return .int(array.count)
+        case .dictionary(let dict), .filter(let dict): return .int(dict.count)
         default:
             throw ExplorerError.wrongUsage(of: .count)
         }
@@ -90,8 +90,7 @@ extension ExplorerValue {
 
     private func getKeysList() throws -> Self {
         switch self {
-        case .dictionary(let dict), .filter(let dict):
-            return keysList <^> Set(dict.keys)
+        case .dictionary(let dict), .filter(let dict): return array <^> dict.keys.sorted().map(ExplorerValue.string)
 
         default:
             throw ExplorerError.wrongUsage(of: .keysList)

@@ -23,10 +23,6 @@ public indirect enum ExplorerValue {
     case array(ArrayValue)
     case dictionary(DictionaryValue)
 
-    // special
-    case count(Int)
-    case keysList(Set<String>)
-
     // group sample
     case slice(ArrayValue)
     case filter(DictionaryValue)
@@ -38,7 +34,7 @@ extension ExplorerValue {
 
     public var isGroup: Bool {
         switch self {
-        case .array, .dictionary, .filter, .slice, .keysList: return true
+        case .array, .dictionary, .filter, .slice: return true
         default: return false
         }
     }
@@ -139,7 +135,7 @@ extension ExplorerValue: Codable {
 
     public func encode(to encoder: Encoder) throws {
         switch self {
-        case .int(let int), .count(let int):
+        case .int(let int):
             var singleValueContainer = encoder.singleValueContainer()
             try singleValueContainer.encode(int)
 
@@ -164,8 +160,6 @@ extension ExplorerValue: Codable {
 
         case .dictionary(let dict), .filter(let dict):
             try dict.encode(to: encoder)
-
-        case .keysList(let array): try array.encode(to: encoder)
         }
     }
 }
@@ -245,7 +239,6 @@ extension ExplorerValue {
 
     func array(_ value: ArrayValue) -> Self { .array(value) }
     func dictionary(_ value: DictionaryValue) -> Self { .dictionary(value) }
-    func keysList(_ value: Set<String>) -> Self { .keysList(value) }
     func slice(_ value: ArrayValue) -> Self { .slice(value) }
     func filter(_ value: DictionaryValue) -> Self { .filter(value) }
 }
@@ -256,19 +249,18 @@ extension ExplorerValue {
     var any: Any {
         switch self {
         case .string(let string): return string
-        case .int(let int), .count(let int): return int
+        case .int(let int): return int
         case .double(let double): return double
         case .bool(let bool): return bool
         case .data(let data): return data
         case .array(let array), .slice(let array): return array
         case .dictionary(let dict), .filter(let dict): return dict
-        case .keysList(let keys): return keys
         }
     }
 
     public var int: Int? {
         switch self {
-        case .int(let int), .count(let int): return int
+        case .int(let int): return int
         default: return nil
         }
     }
@@ -298,7 +290,6 @@ extension ExplorerValue {
     public var array: ArrayValue? {
         switch self {
         case .array(let array), .slice(let array): return array
-        case .keysList(let array): return array.map { .string($0) }
         default: return nil
         }
     }
@@ -327,7 +318,7 @@ extension ExplorerValue: CustomStringConvertible {
 
     public var description: String {
         switch self {
-        case .int(let int), .count(let int): return int.description
+        case .int(let int): return int.description
         case .double(let double): return double.description
         case .string(let string): return string
         case .bool(let bool): return bool.description
@@ -338,8 +329,6 @@ extension ExplorerValue: CustomStringConvertible {
         case .dictionary(let dict), .filter(let dict):
             let elements = dict.map { "\($0.key): \($0.value)" }.joined(separator: ",")
             return "[\(elements)]"
-        case .keysList(let array):
-            return "[\(array.joined(separator: ","))]"
         }
     }
 }

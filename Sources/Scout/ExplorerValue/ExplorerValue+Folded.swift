@@ -28,8 +28,6 @@ extension ExplorerValue {
             } else {
                 return dictionary <^> dict.mapValues { $0.folded(upTo: level - 1) }
             }
-
-        case .count, .keysList: return self
         }
     }
 }

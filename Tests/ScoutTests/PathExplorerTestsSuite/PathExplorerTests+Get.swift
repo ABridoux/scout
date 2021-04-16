@@ -158,7 +158,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["Endo", 1, false, 2.5],
             path: .count,
-            expected: .count(4)
+            expected: .int(4)
         )
     }
 
@@ -167,7 +167,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5],
             path: .count,
-            expected: .count(4)
+            expected: .int(4)
         )
     }
 
@@ -185,7 +185,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5],
             path: .keysList,
-            expected: .keysList(["Endo", "toto", "Riri", "score"])
+            expected: ["Endo", "Riri", "score", "toto"]
         )
     }
 
