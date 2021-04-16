@@ -57,14 +57,6 @@ extension ExplorerValue {
 
             self = .dictionary(dict)
 
-        case .filter(var dict):
-            try dict.modifyEachValue { try $0.delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .filter(dict)
-
-        case .slice(var array):
-            try array.modifyEach { try $0.delete(key: key, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .slice(array)
-
         default:
             throw ExplorerError.subscriptKeyNoDict
         }
@@ -84,14 +76,6 @@ extension ExplorerValue {
                 array[index] = value
             }
             self = .array(array)
-
-        case .slice(var array):
-            try array.modifyEach { try $0.delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .slice(array)
-
-        case .filter(var dict):
-            try dict.modifyEachValue { try $0.delete(index: index, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .filter(dict)
 
         default:
             throw ExplorerError.subscriptIndexNoArray
@@ -118,14 +102,6 @@ extension ExplorerValue {
 
             self = .dictionary(Dictionary(uniqueKeysWithValues: modified))
 
-        case .filter(var dict):
-            try dict.modifyEachValue { try $0.deleteFilter(with: pattern, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .filter(dict)
-
-        case .slice(var array):
-            try array.modifyEach { try $0.deleteFilter(with: pattern, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .slice(array)
-
         default:
             throw ExplorerError.wrongUsage(of: .filter(pattern))
         }
@@ -148,14 +124,6 @@ extension ExplorerValue {
             }
             array.replaceSubrange(range, with: newRangeElements)
             self = .array(array)
-
-        case .slice(var array):
-            try array.modifyEach { try $0.deleteSlice(within: bounds, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .slice(array)
-
-        case .filter(var dict):
-            try dict.modifyEachValue { try $0.deleteSlice(within: bounds, remainder: remainder, deleteIfEmpty: deleteIfEmpty) }
-            self = .filter(dict)
 
         default:
             throw ExplorerError.wrongUsage(of: .slice(bounds))
