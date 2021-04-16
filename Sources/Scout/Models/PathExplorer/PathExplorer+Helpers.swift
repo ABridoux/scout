@@ -5,7 +5,7 @@
 
 import Foundation
 
-extension PathExplorerBis {
+extension PathExplorer {
 
     /// Add the element to the thrown `ValueTypeError` if any
     func doAdd<T>(_ element: PathElementRepresentable, _ block: () throws -> T) rethrows -> T {

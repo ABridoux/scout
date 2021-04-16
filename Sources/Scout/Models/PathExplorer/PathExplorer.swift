@@ -6,7 +6,7 @@
 import Foundation
 
 /// Wrap different structs to explore several format: Json, Plist and Xml
-public protocol PathExplorerBis: CustomStringConvertible, CustomDebugStringConvertible,
+public protocol PathExplorer: CustomStringConvertible, CustomDebugStringConvertible,
     ExpressibleByStringLiteral,
     ExpressibleByBooleanLiteral,
     ExpressibleByIntegerLiteral,

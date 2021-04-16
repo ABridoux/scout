@@ -6,7 +6,7 @@
 import Foundation
 import AEXML
 
-public struct ExplorerXML: PathExplorerBis {
+public struct ExplorerXML: PathExplorer {
 
     // MARK: - Constants
 

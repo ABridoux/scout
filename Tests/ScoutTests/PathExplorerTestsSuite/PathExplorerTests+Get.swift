@@ -100,7 +100,7 @@ final class PathExplorerGetTests: XCTestCase {
         XCTAssertEqual(try explorer.get("firstKey", "secondKey").int, 23)
     }
 
-    func testGet_MissingNestedKeyThrows<P: PathExplorerBis>(_ type: P.Type) throws {
+    func testGet_MissingNestedKeyThrows<P: PathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["firstKey": ["secondKey": 23]])
 
         XCTAssertErrorsEqual(try explorer.get("firstKey", "kirk"),

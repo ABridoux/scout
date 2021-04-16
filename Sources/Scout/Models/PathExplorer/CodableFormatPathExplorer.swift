@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorerBis {
+public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorer {
     private var value: ExplorerValue
 
     public var string: String? { value.string }

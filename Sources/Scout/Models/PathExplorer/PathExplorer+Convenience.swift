@@ -5,7 +5,7 @@
 
 import Foundation
 
-public extension PathExplorerBis {
+public extension PathExplorer {
 
     init(value: ExplorerValue) {
         self.init(value: value, name: nil)
@@ -14,7 +14,7 @@ public extension PathExplorerBis {
 
 // MARK: - Get
 
-public extension PathExplorerBis {
+public extension PathExplorer {
 
     /// Get the key at the given path
     ///
@@ -33,7 +33,7 @@ public extension PathExplorerBis {
 
 // MARK: - Set
 
-public extension PathExplorerBis {
+public extension PathExplorer {
 
     // MARK: Mutating
 
@@ -96,7 +96,7 @@ public extension PathExplorerBis {
 
 // MARK: - Set key name
 
-public extension PathExplorerBis {
+public extension PathExplorer {
 
     /// Set the name of the key at the given path
     ///
@@ -133,7 +133,7 @@ public extension PathExplorerBis {
 
 // MARK: - Delete
 
-public extension PathExplorerBis {
+public extension PathExplorer {
 
     /// Delete the key at the given path.
     ///
@@ -183,7 +183,7 @@ public extension PathExplorerBis {
 
 // MARK: - Add
 
-public extension PathExplorerBis {
+public extension PathExplorer {
 
     // MARK: Mutating
 
@@ -268,7 +268,7 @@ public extension PathExplorerBis {
 
 // MARK: - Paths listing
 
-public extension PathExplorerBis {
+public extension PathExplorer {
 
     /// Returns all the paths leading to single or group values
     /// - Parameters:

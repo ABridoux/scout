@@ -5,7 +5,7 @@
 
 import Foundation
 
-extension PathExplorerBis {
+extension PathExplorer {
 
     /// Get the provided paths and execute the block for each of them.
     ///
@@ -28,7 +28,7 @@ extension PathExplorerBis {
     }
 }
 
-private final class History<Explorer: PathExplorerBis> {
+private final class History<Explorer: PathExplorer> {
     let origin: Explorer
     private(set) var lastExploredPath: Slice<Path> = Slice(Path.empty)
     private(set) var lastExplorers: ArraySlice<Explorer> = []

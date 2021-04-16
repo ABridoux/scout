@@ -5,7 +5,7 @@
 
 import Foundation
 
-protocol EquatablePathExplorer: PathExplorerBis {
+protocol EquatablePathExplorer: PathExplorer {
 
     /// `true` when self is equal to the provided other element.
     /// #### Complexity

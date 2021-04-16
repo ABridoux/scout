@@ -50,7 +50,7 @@ struct AddCommand: SADCommand {
 
     // MARK: - Functions
 
-    func perform<P: PathExplorerBis>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
+    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
         let (path, value) = (pathCollectionElement.readingPath, pathCollectionElement.value)
 
         let explorerValue: ExplorerValue

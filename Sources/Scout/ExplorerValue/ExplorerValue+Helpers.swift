@@ -5,7 +5,7 @@
 
 import Foundation
 
-extension PathExplorerBis {
+extension PathExplorer {
 
     /// Compute the index, positive or negative. Negative index uses the array count.
     /// - Parameters:

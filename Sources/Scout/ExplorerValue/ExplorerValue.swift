@@ -12,18 +12,22 @@ public indirect enum ExplorerValue {
     public typealias DictionaryValue = [String: ExplorerValue]
     typealias SlicePath = Slice<Path>
 
-    // standard
+    // single
     case int(Int)
     case double(Double)
     case string(String)
     case bool(Bool)
     case data(Data)
+
+    // group
     case array(ArrayValue)
     case dictionary(DictionaryValue)
 
     // special
     case count(Int)
     case keysList(Set<String>)
+
+    // group sample
     case slice(ArrayValue)
     case filter(DictionaryValue)
 }
