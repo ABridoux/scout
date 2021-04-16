@@ -42,7 +42,7 @@ extension ExplorerValue {
 
         case .index:
             var array = ArrayValue()
-            array.append(try createValueToAdd(value: value, path: remainder))
+            try array.append(createValueToAdd(value: value, path: remainder))
             return .array(array)
 
         case .count:

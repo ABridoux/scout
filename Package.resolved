@@ -56,15 +56,6 @@
         }
       },
       {
-        "package": "XMLCoder",
-        "repositoryURL": "https://github.com/MaxDesiatov/XMLCoder",
-        "state": {
-          "branch": null,
-          "revision": "b8fa7fe4c0849f8a64cc246e71c5d976809222e4",
-          "version": "0.12.0"
-        }
-      },
-      {
         "package": "Yams",
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
