@@ -15,16 +15,18 @@ public struct ExplorerXML: PathExplorer {
 
     // MARK: - Properties
 
-    private let element: AEXMLElement
+    // MARK: Element
 
+    private let element: AEXMLElement
     var name: String { element.name }
+    var xml: String { element.xml }
+
+    // MARK: PathExplorer
 
     public var string: String? { element.string.trimmingCharacters(in: .whitespacesAndNewlines) == "" ? nil : element.string }
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
     public var real: Double? { element.double }
-
-    var valueAsAny: Any { int ?? real ?? bool ?? string ?? "" }
 
     /// Complexity: `O(h)`  where `h` is the larger height to last child
     var explorerValue: ExplorerValue {
@@ -76,8 +78,6 @@ public struct ExplorerXML: PathExplorer {
     }
 
     public var debugDescription: String { description }
-
-    var xml: String { element.xml }
 
     // MARK: - Initialization
 
@@ -148,8 +148,11 @@ public struct ExplorerXML: PathExplorer {
     public init(floatLiteral value: Double) {
         element = Element(name: Element.defaultName, value: value.description)
     }
+}
 
-    // MARK: - Functions
+// MARK: - Children
+
+extension ExplorerXML {
 
     func addChild(_ explorer: ExplorerXML) {
         element.addChild(explorer.element)
@@ -199,6 +202,11 @@ public struct ExplorerXML: PathExplorer {
         try children.forEach { child in try copy.addChild(transform(child)) }
         return copy
     }
+}
+
+// MARK: - Setters
+
+extension ExplorerXML {
 
     func with(name: String) -> Self {
         element.name = name
@@ -220,6 +228,7 @@ public struct ExplorerXML: PathExplorer {
         }
     }
 
+    /// Set a new element while trying to keep the name, value and attributes
     private func set(newElement: Element) {
         element.name = newElement.name
         element.value = newElement.value
@@ -272,6 +281,7 @@ extension ExplorerXML {
 
 extension ExplorerXML {
 
+    /// Wrapper to more easily handle setting an ExplorerValue or Element
     enum ValueSetter {
         case explorerValue(ExplorerValue)
         case xmlElement(Element)
@@ -279,6 +289,7 @@ extension ExplorerXML {
 }
 
 extension ExplorerXML: EquatablePathExplorer {
+
     func isEqual(to other: ExplorerXML) -> Bool {
         element.isEqual(to: other.element)
     }

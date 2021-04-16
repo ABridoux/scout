@@ -5,8 +5,12 @@
 
 import Foundation
 
-public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorer {
-    private var value: ExplorerValue
+/// A `PathExplorer` using an `ExplorerValue` and can be encoded/decoded with the provided `CodableFormat`
+public struct CodablePathExplorer<Format: CodableFormat>: PathExplorer {
+
+    // MARK: - Properties
+
+    private(set) var value: ExplorerValue
 
     public var string: String? { value.string }
     public var bool: Bool? { value.bool }
@@ -21,6 +25,8 @@ public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorer {
 
     public var description: String { value.description }
     public var debugDescription: String { value.debugDescription }
+
+    // MARK: - Initialization
 
     public init(value: ExplorerValue, name: String?) {
         self.value = value
@@ -41,6 +47,8 @@ public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorer {
     public init(floatLiteral value: Double) {
         self.value = ExplorerValue(floatLiteral: value)
     }
+
+    // MARK: - Functions
 
     public func get(_ path: Path) throws -> Self {
         Self(value: try value.get(path))
@@ -83,59 +91,9 @@ public struct CodableFormatPathExplorer<Format: CodableFormat>: PathExplorer {
     }
 }
 
-extension CodableFormatPathExplorer: SerializablePathExplorer {
+extension CodablePathExplorer: EquatablePathExplorer {
 
-    public static var format: DataFormat { Format.dataFormat }
-
-    public init(data: Data) throws {
-        value = try Format.decode(ExplorerValue.self, from: data)
-    }
-
-    public func exportData() throws -> Data {
-        try Format.encode(value)
-    }
-
-    public func exportString() throws -> String {
-        try String(data: exportData(), encoding: .utf8)
-            .unwrapOrThrow(.dataToString)
-    }
-
-    public func exportData(to format: DataFormat, rootName: String?) throws -> Data {
-        switch format {
-        case .json: return try CodableFormats.JsonDefault.encode(value)
-        case .plist: return try CodableFormats.PlistDefault.encode(value)
-        case .yaml: return try CodableFormats.YamlDefault.encode(value)
-        case .xml: return try ExplorerXML(value: value, name: rootName).exportData()
-        }
-    }
-
-    public func exportString(to format: DataFormat, rootName: String?) throws -> String {
-        switch format {
-        case .json, .plist, .yaml:
-            return try String(data: exportData(to: format, rootName: rootName), encoding: .utf8).unwrapOrThrow(.dataToString)
-
-        case .xml: return try ExplorerXML(value: value, name: rootName).exportString()
-        }
-    }
-
-    public func exportCSV(separator: String?) throws -> String {
-        try value.exportCSV(separator: separator ?? defaultCSVSeparator)
-    }
-
-    public func folded(upTo level: Int) -> Self {
-        Self(value: value.folded(upTo: level))
-    }
-
-    public func exportFoldedString(upTo level: Int) throws -> String {
-        try folded(upTo: level)
-            .exportString()
-            .replacingOccurrences(of: Format.foldedRegexPattern, with: "...", options: .regularExpression)
-    }
-}
-
-extension CodableFormatPathExplorer: EquatablePathExplorer {
-
-    func isEqual(to other: CodableFormatPathExplorer<Format>) -> Bool {
+    func isEqual(to other: CodablePathExplorer<Format>) -> Bool {
         value.isEqual(to: other.value)
     }
 }

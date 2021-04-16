@@ -11,7 +11,7 @@ protocol PathExplorerGet {
     func tryToGet(_ path: Path) throws
 }
 
-extension CodableFormatPathExplorer: PathExplorerGet {
+extension CodablePathExplorer: PathExplorerGet {
     func tryToGet(_ path: Path) throws {
         _ = try get(path)
     }

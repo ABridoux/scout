@@ -5,6 +5,7 @@
 
 import Foundation
 
+/// Internal protocol to declare how to test equality to another PathExplorer of the same type without publicly declare conformance to  `Equatable`
 protocol EquatablePathExplorer: PathExplorer {
 
     /// `true` when self is equal to the provided other element.
