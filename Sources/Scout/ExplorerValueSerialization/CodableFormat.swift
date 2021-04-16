@@ -5,7 +5,6 @@
 
 import Foundation
 import Yams
-import XMLCoder
 
 public protocol CodableFormat {
 
@@ -95,25 +94,6 @@ public extension CodableFormats {
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
             try YAMLDecoder().decode(type, from: data)
-        }
-    }
-}
-
-public extension CodableFormats {
-
-    enum XmlDefault: CodableFormat {
-
-        public static var dataFormat: DataFormat { .xml }
-        public static let foldedRegexPattern = #"(?<=>)\s*<\#(foldedKey)>\#(foldedMark)</\#(foldedKey)>\s*(?=<)"#
-
-        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
-            let encoder = XMLEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            return try encoder.encode(value, withRootKey: rootName ?? "root")
-        }
-
-        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
-            try XMLDecoder().decode(type, from: data)
         }
     }
 }

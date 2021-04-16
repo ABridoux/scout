@@ -9,7 +9,7 @@ import XCTest
 final class PathExplorerFoldTests: XCTestCase {
 
     func testExplorerValue() throws {
-        try test(CodableFormatPathExplorer<CodableFormats.JsonDefault>.self)
+        try test(CodablePathExplorer<CodableFormats.JsonDefault>.self)
     }
 
     func testExplorerXML() throws {

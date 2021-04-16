@@ -5,7 +5,8 @@
 
 import Foundation
 
-public protocol SerializablePathExplorer: PathExplorerBis {
+/// A `PathExplorer` which can be instantiated from data and export itself to another format
+public protocol SerializablePathExplorer: PathExplorer {
 
     static var format: DataFormat { get }
 

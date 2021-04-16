@@ -69,15 +69,17 @@ extension Path: ExpressibleByArgument {
         var pathWithoutLast = path
         _ = pathWithoutLast.popLast()
 
-        do {
-            try pathExplorer.tryToGet(path)
-            return path.description
-        } catch let PathExplorerError.subscriptMissingKey(path: _, key: _, bestMatch: bestMatch) {
-            if let bestMatch = bestMatch {
-                let path = pathWithoutLast.appending(bestMatch).description
-                return path
-            }
-        } catch {}
+        // Might be better to deprecate
+
+//        do {
+//            try pathExplorer.tryToGet(path)
+//            return path.description
+//        } catch let ExplorerError.missing(key: key, bestMatch: bestMatch) {
+//            if let bestMatch = bestMatch {
+//                let path = pathWithoutLast.appending(bestMatch).description
+//                return path
+//            }
+//        } catch {}
 
         return path.description
     }

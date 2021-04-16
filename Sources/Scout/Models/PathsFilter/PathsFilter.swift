@@ -51,7 +51,7 @@ public enum PathsFilter {
     }
 
     /// Validate a value when the filter has a value predicate. `true` otherwise
-    func validate(value: Any) throws -> Bool {
+    func validate(value: ExplorerValue) throws -> Bool {
         switch self {
         case .value(let predicates), .keyAndValue(_, let predicates):
             for predicate in predicates {

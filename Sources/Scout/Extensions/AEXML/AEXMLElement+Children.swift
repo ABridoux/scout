@@ -13,6 +13,17 @@ extension AEXMLElement {
         AEXMLElement(name: defaultArrayElementName, value: value)
     }
 
+    /// Returns a new element with new children, keeping the name, value and attributes
+    func copy() -> AEXMLElement {
+        let newElement = AEXMLElement(name: name, value: value, attributes: attributes)
+        if children.isEmpty {
+            return newElement
+        }
+
+        children.forEach { newElement.addChild($0.copyFlat()) }
+        return newElement
+    }
+
     /// Copy of the element, without the children
     func copyFlat() -> AEXMLElement { AEXMLElement(name: name, value: value, attributes: attributes) }
 
@@ -24,13 +35,13 @@ extension AEXMLElement {
     var commonChildrenName: String? {
         guard
             let firstChild = children.first,
-            let name = firstChild.name.components(separatedBy: GroupSample.keySeparator).last
+            let name = firstChild.name.components(separatedBy: ExplorerXML.GroupSample.keySeparator).last
         else {
             return nil
         }
 
         for child in children {
-            if child.name.components(separatedBy: GroupSample.keySeparator).last != name {
+            if child.name.components(separatedBy: ExplorerXML.GroupSample.keySeparator).last != name {
                 return nil
             }
         }

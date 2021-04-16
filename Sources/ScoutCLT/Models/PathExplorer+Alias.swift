@@ -5,7 +5,7 @@
 
 import Scout
 
-typealias Xml = PathExplorers.XmlBis
-typealias Json = PathExplorers.JsonBis
-typealias Plist = PathExplorers.PlistBis
-typealias Yaml = PathExplorers.YamlBis
+typealias Xml = PathExplorers.Xml
+typealias Json = PathExplorers.Json
+typealias Plist = PathExplorers.Plist
+typealias Yaml = PathExplorers.Yaml
