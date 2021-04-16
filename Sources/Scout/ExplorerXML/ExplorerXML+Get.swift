@@ -7,13 +7,21 @@ import Foundation
 
 extension ExplorerXML {
 
+    // MARK: - PathExplorer
+
     public func get(_ path: Path) throws -> ExplorerXML {
         try _get(path: Slice(path), detailedName: true)
     }
 
+    /// Prevent name compositions when subscripting a slice with a key
+    ///
+    /// When a key subscript a filter, the name of the new value is composed
+    /// of the slice name followed, by key. This behavior is sometimes unwanted.
     func getNoDetailedName(_ path: Path) throws -> ExplorerXML {
         try _get(path: Slice(path), detailedName: false)
     }
+
+    // MARK: General function
 
     private func _get(path: SlicePath, detailedName: Bool) throws -> Self {
         guard let element = path.first else { return self }
@@ -38,9 +46,20 @@ extension ExplorerXML {
         }
     }
 
+    // MARK: PathElement
+
     private func get(key: String, groupSample: GroupSample?, detailedName: Bool) throws -> Self {
         switch groupSample {
-        case nil: return try getJaroWinkler(key: key)
+        case nil:
+            do {
+                return try getJaroWinkler(key: key)
+            } catch {
+                if let attribute = attribute(named: key) {
+                    return ExplorerXML(name: key, value: attribute)
+                } else {
+                    throw error
+                }
+            }
 
         case .slice, .filter:
             let computeName: (String) -> String = { detailedName ? "\($0)_\(key)" : $0 }

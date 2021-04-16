@@ -7,6 +7,8 @@ import Foundation
 
 extension ExplorerXML {
 
+    // MARK: PathExplorer
+
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws {
         _ = try _delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
     }
@@ -16,6 +18,8 @@ extension ExplorerXML {
         try modified.delete(path, deleteIfEmpty: deleteIfEmpty)
         return modified
     }
+
+    // MARK: General function
 
     /// Returns `true` if the element should be deleted
     private func _delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
@@ -36,6 +40,8 @@ extension ExplorerXML {
 
         return false
     }
+
+    // MARK: PathElement
 
     private func delete(key: String, deleteIfEmpty: Bool, remainder: SlicePath) throws {
         let next = try getJaroWinkler(key: key)

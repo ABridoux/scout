@@ -25,7 +25,7 @@ extension ExplorerXML {
 
     private func collectPaths(in paths: inout [Path], filter: PathsFilter, pathValidation: PathValidation) throws {
         if pathValidation.isValid {
-            if filter.singleAllowed, children.isEmpty, try filter.validate(value: explorerValue) {
+            if filter.singleAllowed, children.isEmpty, try filter.validate(value: explorerValue()) {
                 paths.append(pathValidation.leading)
             }
 

@@ -20,6 +20,7 @@ public struct ExplorerXML: PathExplorer {
     private let element: AEXMLElement
     var name: String { element.name }
     var xml: String { element.xml }
+    func attribute(named name: String) -> String? { element.attributes[name] }
 
     // MARK: PathExplorer
 
@@ -28,29 +29,51 @@ public struct ExplorerXML: PathExplorer {
     public var int: Int? { element.int }
     public var real: Double? { element.double }
 
-    /// Complexity: `O(h)`  where `h` is the larger height to last child
-    var explorerValue: ExplorerValue {
+    /// The `ExplorerValue` conversion of the XML element
+    /// ### Complexity
+    /// `O(n)`  where `n` is the sum of all children
+    ///
+    /// ### Attributes
+    /// If a XML element has attributes and `keepingAttributes` is `true`,
+    /// the format of the returned `ExplorerValue` will be modified to
+    /// a dictionary with two keys:"attributes" which holds the attributes of the element as `[String: String]`
+    /// and "value" which holds the `ExplorerValue` conversion of the element.
+    public func explorerValue(keepingAttributes: Bool = true) -> ExplorerValue {
         if children.isEmpty {
-            return singleExplorerValue
+            return singleExplorerValue(keepingAttributes: keepingAttributes)
         }
 
         if let names = element.uniqueChildrenNames, names.count > 1 { // dict
-            let dict = children.map { (key: $0.name, value: $0.explorerValue) }
-            return .dictionary(Dictionary(uniqueKeysWithValues: dict))
+            let dict = children.map { (key: $0.name, value: $0.explorerValue(keepingAttributes: keepingAttributes)) }
+            let dictValue = ExplorerValue.dictionary(Dictionary(uniqueKeysWithValues: dict))
+            return keepingAttributes ? valueWithAttributes(value: dictValue) : dictValue
         } else { // array
-            return .array(children.map { $0.explorerValue })
+
+            let arrayValue = ExplorerValue.array(children.map { $0.explorerValue(keepingAttributes: keepingAttributes) })
+            return keepingAttributes ? valueWithAttributes(value: arrayValue) : arrayValue
         }
     }
 
-    private var singleExplorerValue: ExplorerValue {
-        if let int = Int(element.string) {
-            return .int(int)
-        } else if let double = Double(element.string) {
-            return .double(double)
-        } else if let bool = Bool(element.string) {
-            return .bool(bool)
+    private func singleExplorerValue(keepingAttributes: Bool) -> ExplorerValue {
+        let value: ExplorerValue
+        if let int = element.int {
+            value = .int(int)
+        } else if let double = element.double {
+            value = .double(double)
+        } else if let bool = element.bool {
+            value = .bool(bool)
         } else {
-            return .string(element.string)
+            value = .string(element.string)
+        }
+
+        return keepingAttributes ? valueWithAttributes(value: value) : value
+    }
+
+    private func valueWithAttributes(value: ExplorerValue) -> ExplorerValue {
+        if element.attributes.isEmpty {
+            return value
+        } else {
+            return .dictionary(["attributes": element.attributes.explorerValue(), "value": value])
         }
     }
 
@@ -58,11 +81,11 @@ public struct ExplorerXML: PathExplorer {
     public var data: Data? { nil }
 
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable {
-        try children.map { try T(from: $0.explorerValue) }
+        try children.map { try T(from: $0.explorerValue()) }
     }
 
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
-        try Dictionary(uniqueKeysWithValues: children.map { try ($0.name, T(from: $0.explorerValue)) })
+        try Dictionary(uniqueKeysWithValues: children.map { try ($0.name, T(from: $0.explorerValue())) })
     }
 
     public var isGroup: Bool { !element.children.isEmpty }
@@ -215,6 +238,15 @@ extension ExplorerXML {
 
     func set(name: String) {
         element.name = name
+    }
+
+    func set(attributes: [String: String]) {
+        element.attributes = attributes
+    }
+
+    func with(attributes: [String: String]) -> Self {
+        element.attributes = attributes
+        return self
     }
 
     func set(value: String) {

@@ -7,13 +7,21 @@ import Foundation
 
 extension ExplorerValue {
 
+    // MARK: PathExplorer
+
     public func get(_ path: Path) throws -> Self {
         try _get(path: Slice(path), detailedName: true)
     }
 
+    /// Prevent name compositions when subscripting a slice with a key
+    ///
+    /// When a key subscript a filter, the name of the new value is composed
+    /// of the slice name followed, by key. This behavior is sometimes unwanted.
     func getNoDetailedName(_ path: Path) throws -> Self {
         try _get(path: Slice(path), detailedName: false)
     }
+
+    // MARK: General function
 
     /// - parameter detailedName: When `true`, the key name after a filter will be composed of the parent key followed by the child key
     private func _get(path: SlicePath, detailedName: Bool) throws -> Self {
@@ -35,7 +43,7 @@ extension ExplorerValue {
         }
     }
 
-    // MARK: - Helpers
+    // MARK: PathElement
 
     private func get(key: String, detailedName: Bool) throws -> Self {
         switch self {

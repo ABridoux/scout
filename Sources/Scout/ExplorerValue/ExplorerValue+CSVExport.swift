@@ -36,17 +36,20 @@ extension ExplorerValue {
     }
 
     private func exportCSV(array: ArrayValue, separator: String) throws -> String {
-        if let headers = try? self.headers(in: array).sortedByKeysAndIndexes() {
+        if let headers = self.headers(in: array)?.sortedByKeysAndIndexes() {
             return try exportCSV(arrayOfDictionaries: array, headers: headers, separator: separator)
 
         } else if array.allSatisfy(\.isArray) {
-            return try exportCSV(arrayOfArrays: array, separator: separator)
+            let arrays = array.compactMap(\.array)
+            return try exportCSV(arrayOfArrays: arrays, separator: separator)
 
         } else if array.allSatisfy(\.isSingle) {
             return toCSV(separator: separator)
 
         } else {
-            throw SerializationError.notCSVExportable(description: "Array is not composed of dictionaries only, arrays only or single values only.")
+            throw SerializationError.notCSVExportable(
+                description: "The value can either be an array of dictionaries, an array of arrays, an array of single values or a dictionary of arrays"
+            )
         }
     }
 
@@ -71,10 +74,9 @@ extension ExplorerValue {
         return csvString
     }
 
-    private func exportCSV(arrayOfArrays: ArrayValue, separator: String) throws -> String {
-        var csvString = try arrayOfArrays.reduce("") { (csvString, value) in
-            guard value.isArray else { throw ExplorerError.mismatchingType(ArrayValue.self, value: value) }
-            let line = value.toCSV(separator: separator)
+    private func exportCSV(arrayOfArrays: [ArrayValue], separator: String) throws -> String {
+        var csvString = arrayOfArrays.reduce("") { (csvString, arrayValue) in
+            let line = Self.array(arrayValue).toCSV(separator: separator)
             return "\(csvString)\(line)\n"
         }
 
@@ -89,7 +91,7 @@ extension ExplorerValue {
                 let (key, value) = element
 
                 guard let array = value.array, array.allSatisfy(\.isSingle) else {
-                    throw ExplorerError.mismatchingType(ArrayValue.self, value: value)
+                    throw SerializationError.notCSVExportable(description: "The array for key \(key) in the dictionary to export is not composed of single values only")
                 }
 
                 let line = value.toCSV(separator: separator)
@@ -103,9 +105,10 @@ extension ExplorerValue {
     /// The headers for the array of dictionaries
     /// #### Complexity
     /// `O(n)` where `n` is the number of elements in the array
-    private func headers(in array: ArrayValue) throws -> Set<Path> {
-        try array.reduce(into: Set<Path>()) { (paths, value) in
-            guard value.isDictionary else { throw ExplorerError.mismatchingType(DictionaryValue.self, value: value) }
+    private func headers(in array: ArrayValue) -> Set<Path>? {
+        guard array.allSatisfy(\.isDictionary) else { return nil }
+
+        return try? array.reduce(into: Set<Path>()) { (paths, value) in
             try value.listPaths(filter: .targetOnly(.single)).forEach { paths.insert($0) }
         }
     }

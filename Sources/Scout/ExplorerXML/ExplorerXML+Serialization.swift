@@ -24,18 +24,18 @@ extension ExplorerXML: SerializablePathExplorer {
 
     public func exportData(to format: DataFormat, rootName: String?) throws -> Data {
         switch format {
-        case .json: return try CodableFormats.JsonDefault.encode(explorerValue, rootName: rootName)
-        case .plist: return try CodableFormats.PlistDefault.encode(explorerValue, rootName: rootName)
-        case .yaml: return try CodableFormats.YamlDefault.encode(explorerValue, rootName: rootName)
+        case .json: return try CodableFormats.JsonDefault.encode(explorerValue(), rootName: rootName)
+        case .plist: return try CodableFormats.PlistDefault.encode(explorerValue(), rootName: rootName)
+        case .yaml: return try CodableFormats.YamlDefault.encode(explorerValue(), rootName: rootName)
         case .xml: return try exportData()
         }
     }
 
     public func exportString(to format: DataFormat, rootName: String?) throws -> String {
         switch format {
-        case .json: return try PathExplorers.Json(value: explorerValue).exportString()
-        case .plist: return try PathExplorers.Plist(value: explorerValue).exportString()
-        case .yaml: return try PathExplorers.Yaml(value: explorerValue).exportString()
+        case .json: return try PathExplorers.Json(value: explorerValue()).exportString()
+        case .plist: return try PathExplorers.Plist(value: explorerValue()).exportString()
+        case .yaml: return try PathExplorers.Yaml(value: explorerValue()).exportString()
         case .xml: return try exportString()
         }
     }

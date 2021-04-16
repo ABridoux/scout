@@ -27,6 +27,7 @@ final class PathExplorerAddTests: XCTestCase {
         try testAddKey_NestedIndex(P.self)
         try testAddKey_UnknownKeyIsCreated(P.self)
         try testAddKey_GroupValue(P.self)
+        try testAddKey_ThrowsIfWrongElement(P.self)
 
         // index
         try testAddIndex(P.self)
@@ -38,6 +39,7 @@ final class PathExplorerAddTests: XCTestCase {
         // count
         try testAddCount(P.self)
         try testAddCount_Nested(P.self)
+        try testAddCount_EmptyArray(P.self)
     }
 
     func testStub() throws {
@@ -101,6 +103,12 @@ final class PathExplorerAddTests: XCTestCase {
         var explorer = P(value: [1, 2, 3])
 
         try XCTAssertErrorsEqual(explorer.add("to", at: "ta"), .subscriptKeyNoDict)
+    }
+
+    func testAddKey_ThrowsIfWrongElement<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        var explorer = P(value: [1, 2, 3])
+
+        try XCTAssertErrorsEqual(explorer.add("to", at: .keysList), .wrongUsage(of: .keysList))
     }
 
     // MARK: - Index
@@ -174,6 +182,16 @@ final class PathExplorerAddTests: XCTestCase {
             path: .count, 0,
             value: "here",
             expected: [[1, 2], [1, 2], [1, 2], ["here"]]
+        )
+    }
+
+    func testAddCount_EmptyArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testAdd(
+            P.self,
+            initial: [1, 2],
+            path: 0, .count,
+            value: "here",
+            expected: [["here"], 2]
         )
     }
 }
