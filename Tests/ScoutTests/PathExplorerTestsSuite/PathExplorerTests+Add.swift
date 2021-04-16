@@ -191,7 +191,7 @@ final class PathExplorerAddTests: XCTestCase {
             initial: [1, 2],
             path: 0, .count,
             value: "here",
-            expected: [["here"], 2]
+            expected: [["here"], 1, 2]
         )
     }
 }

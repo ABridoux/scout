@@ -52,7 +52,7 @@ extension ExplorerValue {
         let index = try computeIndex(from: index, arrayCount: array.count)
         let newValue = try array[index]._add(path: remainder, value: value)
 
-        if remainder.isEmpty {
+        if array.allSatisfy(\.isSingle) {
             #warning("This behavior is the current one but is strange. A new PathElement should be offered to differentiate between insertion and modification")
             array.insert(newValue, at: index)
         } else {
