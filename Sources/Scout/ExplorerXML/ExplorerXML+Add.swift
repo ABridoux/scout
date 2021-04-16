@@ -55,9 +55,9 @@ extension ExplorerXML {
     private func add(value: ValueSetter, at index: Int, remainder: SlicePath) throws {
         let index = try computeIndex(from: index, arrayCount: childrenCount)
 
-        if remainder.isEmpty {
+        if children.allSatisfy(\.isSingle) {
             let childToInsert = ExplorerXML(name: childrenName)
-            childToInsert.set(value: value)
+            try childToInsert._add(value: value, at: remainder)
             var newChildren = children
             newChildren.insert(childToInsert, at: index)
             removeChildrenFromParent()
