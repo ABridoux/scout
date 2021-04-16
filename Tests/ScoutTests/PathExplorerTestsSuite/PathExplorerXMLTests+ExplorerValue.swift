@@ -96,6 +96,6 @@ extension ExplorerXMLExplorerValueTests {
         expected: ExplorerValue,
         file: StaticString = #file,
         line: UInt = #line) {
-        XCTAssertEqual(initial.explorerValue, expected)
+        XCTAssertEqual(initial.explorerValue(), expected)
     }
 }

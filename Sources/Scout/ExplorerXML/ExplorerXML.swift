@@ -34,23 +34,27 @@ public struct ExplorerXML: PathExplorer {
     /// `O(n)`  where `n` is the sum of all children
     ///
     /// ### Attributes
-    /// If a XML element has attributes, the format of the returned `ExplorerValue` will be modified to
+    /// If a XML element has attributes and `keepingAttributes` is `true`,
+    /// the format of the returned `ExplorerValue` will be modified to
     /// a dictionary with two keys:"attributes" which holds the attributes of the element as `[String: String]`
     /// and "value" which holds the `ExplorerValue` conversion of the element.
-    public var explorerValue: ExplorerValue {
+    public func explorerValue(keepingAttributes: Bool = true) -> ExplorerValue {
         if children.isEmpty {
-            return singleExplorerValue
+            return singleExplorerValue(keepingAttributes: keepingAttributes)
         }
 
         if let names = element.uniqueChildrenNames, names.count > 1 { // dict
-            let dict = children.map { (key: $0.name, value: $0.explorerValue) }
-            return valueWithAttributes <^> .dictionary(Dictionary(uniqueKeysWithValues: dict))
+            let dict = children.map { (key: $0.name, value: $0.explorerValue(keepingAttributes: keepingAttributes)) }
+            let dictValue = ExplorerValue.dictionary(Dictionary(uniqueKeysWithValues: dict))
+            return keepingAttributes ? valueWithAttributes(value: dictValue) : dictValue
         } else { // array
-            return valueWithAttributes <^> .array(children.map(\.explorerValue))
+
+            let arrayValue = ExplorerValue.array(children.map { $0.explorerValue(keepingAttributes: keepingAttributes) })
+            return keepingAttributes ? valueWithAttributes(value: arrayValue) : arrayValue
         }
     }
 
-    private var singleExplorerValue: ExplorerValue {
+    private func singleExplorerValue(keepingAttributes: Bool) -> ExplorerValue {
         let value: ExplorerValue
         if let int = element.int {
             value = .int(int)
@@ -62,7 +66,7 @@ public struct ExplorerXML: PathExplorer {
             value = .string(element.string)
         }
 
-        return valueWithAttributes(value: value)
+        return keepingAttributes ? valueWithAttributes(value: value) : value
     }
 
     private func valueWithAttributes(value: ExplorerValue) -> ExplorerValue {
@@ -77,11 +81,11 @@ public struct ExplorerXML: PathExplorer {
     public var data: Data? { nil }
 
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable {
-        try children.map { try T(from: $0.explorerValue) }
+        try children.map { try T(from: $0.explorerValue()) }
     }
 
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
-        try Dictionary(uniqueKeysWithValues: children.map { try ($0.name, T(from: $0.explorerValue)) })
+        try Dictionary(uniqueKeysWithValues: children.map { try ($0.name, T(from: $0.explorerValue())) })
     }
 
     public var isGroup: Bool { !element.children.isEmpty }

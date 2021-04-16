@@ -56,7 +56,7 @@ extension ExplorerXML {
             } catch {
                 if let attribute = attribute(named: key) {
                     return ExplorerXML(name: key, value: attribute)
-                } else  {
+                } else {
                     throw error
                 }
             }
