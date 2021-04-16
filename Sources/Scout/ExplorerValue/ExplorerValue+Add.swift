@@ -7,6 +7,8 @@ import Foundation
 
 extension ExplorerValue {
 
+    // MARK: PathExplorer
+
     public mutating func add(_ value: ExplorerValue, at path: Path) throws {
         self = try _add(path: Slice(path), value: value)
     }
@@ -14,6 +16,8 @@ extension ExplorerValue {
     public func adding(_ value: ExplorerValue, at path: Path) throws -> ExplorerValue {
         try _add(path: Slice(path), value: value)
     }
+
+    // MARK: General function
 
     /// Return the value if it should be added to the parent
     private func _add(path: SlicePath, value: ExplorerValue) throws -> Self {
@@ -30,30 +34,7 @@ extension ExplorerValue {
         }
     }
 
-    private func createValueToAdd(value: ExplorerValue, path: SlicePath) throws -> ExplorerValue {
-        guard let element = path.first else { return value }
-        let remainder = path.dropFirst()
-
-        switch element {
-        case .key(let key):
-            var dict = DictionaryValue()
-            dict[key] = try createValueToAdd(value: value, path: remainder)
-            return .dictionary(dict)
-
-        case .index:
-            var array = ArrayValue()
-            try array.append(createValueToAdd(value: value, path: remainder))
-            return .array(array)
-
-        case .count:
-            var array = ArrayValue()
-            try array.append(createValueToAdd(value: value, path: remainder))
-            return .array(array)
-
-        default:
-            throw ExplorerError.wrongUsage(of: element)
-        }
-    }
+    // MARK: PathElement
 
     private func add(key: String, value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
@@ -87,6 +68,37 @@ extension ExplorerValue {
             return .array(array)
         } else {
             return try createValueToAdd(value: value, path: [.count] + remainder)
+        }
+    }
+}
+
+// MARK: - Helpers
+
+extension ExplorerValue {
+
+    private func createValueToAdd(value: ExplorerValue, path: SlicePath) throws -> ExplorerValue {
+        guard let element = path.first else { return value }
+        let remainder = path.dropFirst()
+
+        switch element {
+        case .key(let key):
+            var dict = DictionaryValue()
+            dict[key] = try createValueToAdd(value: value, path: remainder)
+            return .dictionary(dict)
+
+        case .index:
+            var array = ArrayValue()
+            try array.append(createValueToAdd(value: value, path: remainder))
+            return .array(array)
+
+        case .count:
+            var array = ArrayValue()
+            try array.append(createValueToAdd(value: value, path: remainder))
+            return .array(array)
+
+        default:
+            assertionFailure("This case should be handled before in the _add function")
+            throw ExplorerError.wrongUsage(of: element)
         }
     }
 }

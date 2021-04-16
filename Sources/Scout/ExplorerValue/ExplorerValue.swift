@@ -359,7 +359,7 @@ infix operator <^>: SequencePrecedence
 
 /// Apply the left function to the right operand
 /// - note: Mainly used as synthetic sugar to avoid over use of brackets
-func <^><A>(lhs: (A) -> ExplorerValue, rhs: A) -> ExplorerValue { lhs(rhs) }
+func <^><A, B>(lhs: (A) -> B, rhs: A) -> B { lhs(rhs) }
 
 extension ExplorerValue: EquatablePathExplorer {
     public init(value: ExplorerValue, name: String?) {

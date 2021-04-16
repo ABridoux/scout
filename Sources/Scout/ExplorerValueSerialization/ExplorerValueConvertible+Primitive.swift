@@ -7,7 +7,7 @@ import Foundation
 
 extension String: ExplorerValueConvertible {
 
-    public func explorerValue() throws -> ExplorerValue { .string(self) }
+    public func explorerValue() -> ExplorerValue { .string(self) }
 
     public init(from explorerValue: ExplorerValue) throws {
         self = try explorerValue.string.unwrapOrThrow(.mismatchingType(String.self, value: explorerValue))
@@ -16,7 +16,7 @@ extension String: ExplorerValueConvertible {
 
 extension Int: ExplorerValueConvertible {
 
-    public func explorerValue() throws -> ExplorerValue { .int(self) }
+    public func explorerValue() -> ExplorerValue { .int(self) }
 
     public init(from explorerValue: ExplorerValue) throws {
         self = try explorerValue.int.unwrapOrThrow(.mismatchingType(Int.self, value: explorerValue))
@@ -25,7 +25,7 @@ extension Int: ExplorerValueConvertible {
 
 extension Double: ExplorerValueConvertible {
 
-    public func explorerValue() throws -> ExplorerValue { .double(self) }
+    public func explorerValue() -> ExplorerValue { .double(self) }
 
     public init(from explorerValue: ExplorerValue) throws {
         self = try explorerValue.double.unwrapOrThrow(.mismatchingType(Double.self, value: explorerValue))
@@ -34,7 +34,7 @@ extension Double: ExplorerValueConvertible {
 
 extension Bool: ExplorerValueConvertible {
 
-    public func explorerValue() throws -> ExplorerValue { .bool(self) }
+    public func explorerValue() -> ExplorerValue { .bool(self) }
 
     public init(from explorerValue: ExplorerValue) throws {
         self = try explorerValue.bool.unwrapOrThrow(.mismatchingType(Bool.self, value: explorerValue))
@@ -43,7 +43,7 @@ extension Bool: ExplorerValueConvertible {
 
 extension Data: ExplorerValueConvertible {
 
-    public func explorerValue() throws -> ExplorerValue { .data(self) }
+    public func explorerValue() -> ExplorerValue { .data(self) }
 
     public init(from explorerValue: ExplorerValue) throws {
         self = try explorerValue.data.unwrapOrThrow(.mismatchingType(Data.self, value: explorerValue))
@@ -70,4 +70,40 @@ extension Dictionary: ExplorerValueConvertible where Key == String, Value: Explo
             .unwrapOrThrow(.mismatchingType([String: ExplorerValue].self, value: explorerValue))
             .mapValues { try Value(from: $0) }
     }
+}
+
+// MARK: Array with primitives
+
+extension Array where Element == String {
+    public func explorerValue() -> ExplorerValue { .array(map { $0.explorerValue() })}
+}
+
+extension Array where Element == Double {
+    public func explorerValue() -> ExplorerValue { .array(map { $0.explorerValue() })}
+}
+
+extension Array where Element == Bool {
+    public func explorerValue() -> ExplorerValue { .array(map { $0.explorerValue() })}
+}
+
+extension Array where Element == Data {
+    public func explorerValue() -> ExplorerValue { .array(map { $0.explorerValue() })}
+}
+
+// MARK: Dictionary with primitives
+
+extension Dictionary where Key == String, Value == String {
+    public func explorerValue() -> ExplorerValue { .dictionary(mapValues { $0.explorerValue() })}
+}
+
+extension Dictionary where Key == String, Value == Double {
+    public func explorerValue() -> ExplorerValue { .dictionary(mapValues { $0.explorerValue() })}
+}
+
+extension Dictionary where Key == String, Value == Bool {
+    public func explorerValue() -> ExplorerValue { .dictionary(mapValues { $0.explorerValue() })}
+}
+
+extension Dictionary where Key == String, Value == Data {
+    public func explorerValue() -> ExplorerValue { .dictionary(mapValues { $0.explorerValue() })}
 }

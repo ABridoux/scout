@@ -9,6 +9,8 @@ import Foundation
 
 extension ExplorerXML {
 
+    // MARK: PathExplorer
+
     public mutating func set(_ path: Path, to newValue: ExplorerValue) throws {
         try _set(path: Slice(path), to: .explorerValue(newValue))
     }
@@ -30,6 +32,8 @@ extension ExplorerXML {
         try modified.set(path, to: newElement)
         return modified
     }
+
+    // MARK: General function
 
     private func _set(path: SlicePath, to newValue: ValueSetter) throws {
         guard let element = path.first else {

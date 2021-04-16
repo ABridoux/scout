@@ -7,6 +7,8 @@ import Foundation
 
 extension ExplorerValue {
 
+    // MARK: PathExplorer
+
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws {
         _ = try _delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
     }
@@ -16,6 +18,8 @@ extension ExplorerValue {
         try copy.delete(path, deleteIfEmpty: deleteIfEmpty)
         return copy
     }
+
+    // MARK: General function
 
     /// Returns `true` if the end of the path is reached
     private mutating func _delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
@@ -35,6 +39,8 @@ extension ExplorerValue {
 
         return false
     }
+
+    // MARK: PathElement
 
     private mutating func delete(key: String, remainder: SlicePath, deleteIfEmpty: Bool) throws {
         switch self {

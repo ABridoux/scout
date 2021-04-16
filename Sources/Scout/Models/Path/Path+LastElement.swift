@@ -34,16 +34,4 @@ extension Collection where Element == PathElement {
 
         return nil
     }
-
-    var firstGroupSample: ExplorerXML.GroupSample? {
-        for element in self {
-            switch element {
-            case .filter: return .filter
-            case .slice: return .slice
-            default: continue
-            }
-        }
-
-        return nil
-    }
 }

@@ -113,6 +113,15 @@ final class PathExplorerGetTests: XCTestCase {
         XCTAssertErrorsEqual(try explorer.get("toto"), .subscriptKeyNoDict)
     }
 
+    // MARK: XML specific
+
+    func testGetKey_XMLAttribute() throws {
+        let explorer = ExplorerXML(value: 1).with(attributes: ["toto": "2", "Endo": "true"])
+        let expected = ExplorerXML(value: true)
+
+        try XCTAssertExplorersEqual(explorer.get("Endo"), expected)
+    }
+
     // MARK: - Index
 
     func testGetIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {

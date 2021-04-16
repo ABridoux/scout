@@ -20,6 +20,7 @@ public struct ExplorerXML: PathExplorer {
     private let element: AEXMLElement
     var name: String { element.name }
     var xml: String { element.xml }
+    func attribute(named name: String) -> String? { element.attributes[name] }
 
     // MARK: PathExplorer
 
@@ -28,29 +29,47 @@ public struct ExplorerXML: PathExplorer {
     public var int: Int? { element.int }
     public var real: Double? { element.double }
 
-    /// Complexity: `O(h)`  where `h` is the larger height to last child
-    var explorerValue: ExplorerValue {
+    /// The `ExplorerValue` conversion of the XML element
+    /// ### Complexity
+    /// `O(n)`  where `n` is the sum of all children
+    ///
+    /// ### Attributes
+    /// If a XML element has attributes, the format of the returned `ExplorerValue` will be modified to
+    /// a dictionary with two keys:"attributes" which holds the attributes of the element as `[String: String]`
+    /// and "value" which holds the `ExplorerValue` conversion of the element.
+    public var explorerValue: ExplorerValue {
         if children.isEmpty {
             return singleExplorerValue
         }
 
         if let names = element.uniqueChildrenNames, names.count > 1 { // dict
             let dict = children.map { (key: $0.name, value: $0.explorerValue) }
-            return .dictionary(Dictionary(uniqueKeysWithValues: dict))
+            return valueWithAttributes <^> .dictionary(Dictionary(uniqueKeysWithValues: dict))
         } else { // array
-            return .array(children.map { $0.explorerValue })
+            return valueWithAttributes <^> .array(children.map(\.explorerValue))
         }
     }
 
     private var singleExplorerValue: ExplorerValue {
-        if let int = Int(element.string) {
-            return .int(int)
-        } else if let double = Double(element.string) {
-            return .double(double)
-        } else if let bool = Bool(element.string) {
-            return .bool(bool)
+        let value: ExplorerValue
+        if let int = element.int {
+            value = .int(int)
+        } else if let double = element.double {
+            value = .double(double)
+        } else if let bool = element.bool {
+            value = .bool(bool)
         } else {
-            return .string(element.string)
+            value = .string(element.string)
+        }
+
+        return valueWithAttributes(value: value)
+    }
+
+    private func valueWithAttributes(value: ExplorerValue) -> ExplorerValue {
+        if element.attributes.isEmpty {
+            return value
+        } else {
+            return .dictionary(["attributes": element.attributes.explorerValue(), "value": value])
         }
     }
 
@@ -215,6 +234,15 @@ extension ExplorerXML {
 
     func set(name: String) {
         element.name = name
+    }
+
+    func set(attributes: [String: String]) {
+        element.attributes = attributes
+    }
+
+    func with(attributes: [String: String]) -> Self {
+        element.attributes = attributes
+        return self
     }
 
     func set(value: String) {

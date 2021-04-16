@@ -7,6 +7,8 @@
 
 extension ExplorerValue {
 
+    // MARK: PathExplorer
+
     public mutating func set(_ path: Path, to newValue: ExplorerValue) throws {
         try _set(path: Slice(path), to: newValue)
     }
@@ -16,6 +18,8 @@ extension ExplorerValue {
         try copy.set(path, to: newValue)
         return copy
     }
+
+    // MARK: General function
 
     private mutating func _set(path: SlicePath, to newValue: ExplorerValue) throws {
         guard let firstElement = path.first else {
@@ -33,7 +37,7 @@ extension ExplorerValue {
         }
     }
 
-    // MARK: Key
+    // MARK: PathElement
 
     private mutating func set(key: String, to newValue: ExplorerValue, remainder: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
@@ -42,8 +46,6 @@ extension ExplorerValue {
         dict[key] = value
         self = .dictionary(dict)
     }
-
-    // MARK: Index
 
     private mutating func set(index: Int, to newValue: Self, remainder: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
@@ -59,17 +61,21 @@ extension ExplorerValue {
 
 extension ExplorerValue {
 
+    // MARK: PathExplorer
+
     public mutating func set(_ path: Path, keyNameTo keyName: String) throws {
-        try set(path: Slice(path), keyName: keyName)
+        try _set(path: Slice(path), keyName: keyName)
     }
 
     public func setting(_ path: Path, keyNameTo keyName: String) throws -> Self {
         var copy = self
-        try copy.set(path: Slice(path), keyName: keyName)
+        try copy._set(path: Slice(path), keyName: keyName)
         return copy
     }
 
-    private mutating func set(path: SlicePath, keyName: String) throws {
+    // MARK: General function
+
+    private mutating func _set(path: SlicePath, keyName: String) throws {
         guard let firstElement = path.first else { return }
         let remainder = path.dropFirst()
 
@@ -93,25 +99,23 @@ extension ExplorerValue {
         }
     }
 
-    // MARK: Key
+    // MARK: PathElement
 
     private mutating func set(key: String, keyName: String, remainder: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
 
         var value = try dict.getJaroWinkler(key: key)
-        try value.set(path: remainder, keyName: keyName)
+        try value._set(path: remainder, keyName: keyName)
         dict[key] = value
         self = .dictionary(dict)
     }
-
-    // MARK: Index
 
     private mutating func set(index: Int, keyName: String, remainder: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
 
         let index = try computeIndex(from: index, arrayCount: array.count)
         var element = array[index]
-        try element.set(path: remainder, keyName: keyName)
+        try element._set(path: remainder, keyName: keyName)
         array[index] = element
         self = .array(array)
     }

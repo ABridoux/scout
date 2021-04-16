@@ -7,6 +7,8 @@ import Foundation
 
 extension ExplorerXML {
 
+    // MARK: PathExplorer
+
     public mutating func add(_ value: ExplorerValue, at path: Path) throws {
         try _add(value: .explorerValue(value), at: Slice(path))
     }
@@ -16,6 +18,8 @@ extension ExplorerXML {
         try copy.add(value, at: path)
         return copy
     }
+
+    // MARK: General function
 
     /// Return the value if it should be added to the parent
     private func _add(value: ValueSetter, at path: SlicePath) throws {
@@ -35,6 +39,8 @@ extension ExplorerXML {
             }
         }
     }
+
+    // MARK: PathElement
 
     private func add(value: ValueSetter, for key: String, remainder: SlicePath) throws {
         if let next = try? getJaroWinkler(key: key) {
