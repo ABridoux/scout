@@ -25,7 +25,7 @@ extension ExplorerValueDecoder {
 
         func contains(_ key: Key) -> Bool {
             switch value {
-            case .dictionary(let dict), .filter(let dict):
+            case .dictionary(let dict):
                 return dict.keys.contains(key.stringValue)
             default: return false
             }

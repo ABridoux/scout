@@ -10,113 +10,74 @@ extension ExplorerXML {
     // MARK: - PathExplorer
 
     public func get(_ path: Path) throws -> ExplorerXML {
-        try _get(path: Slice(path), detailedName: true)
-    }
-
-    /// Prevent name compositions when subscripting a slice with a key
-    ///
-    /// When a key subscript a filter, the name of the new value is composed
-    /// of the slice name followed, by key. This behavior is sometimes unwanted.
-    func getNoDetailedName(_ path: Path) throws -> ExplorerXML {
-        try _get(path: Slice(path), detailedName: false)
+        try _get(path: Slice(path))
     }
 
     // MARK: General function
 
-    private func _get(path: SlicePath, detailedName: Bool) throws -> Self {
-        guard let element = path.first else { return self }
+    private func _get(path: SlicePath) throws -> Self {
+        guard let head = path.first else { return self }
+        let tail = path.dropFirst()
 
-        let remainder = path.dropFirst()
-        let leftPart = remainder.leftPart
-        let groupSample = leftPart.lastGroupSample
-
-        return try doSettingPath(leftPart) {
-            let next: ExplorerXML
-
-            switch element {
-            case .key(let key): next = try get(key: key, groupSample: groupSample, detailedName: detailedName)
-            case .index(let index): next = try get(index: index, groupSample: groupSample)
-            case .count: next = getCount()
-            case .keysList: next = getKeysList()
-            case .filter(let pattern): next = try getFilter(with: pattern, groupSample: groupSample)
-            case .slice(let bounds): next = try getSlice(within: bounds, groupSample: groupSample)
+        return try doSettingPath(tail.leftPart) {
+            switch head {
+            case .key(let key): return try get(key: key, tail: tail)
+            case .index(let index): return  try get(index: index, tail: tail)
+            case .count: return try getCount(tail: tail)
+            case .keysList: return try getKeysList(tail: tail)
+            case .filter(let pattern): return try getFilter(with: pattern, tail: tail)
+            case .slice(let bounds): return try getSlice(within: bounds, tail: tail)
             }
-
-            return try next._get(path: remainder, detailedName: detailedName)
         }
     }
 
     // MARK: PathElement
 
-    private func get(key: String, groupSample: GroupSample?, detailedName: Bool) throws -> Self {
-        switch groupSample {
-        case nil:
-            do {
-                return try getJaroWinkler(key: key)
-            } catch {
-                if let attribute = attribute(named: key) {
-                    return ExplorerXML(name: key, value: attribute)
-                } else {
-                    throw error
-                }
-            }
-
-        case .slice, .filter:
-            let computeName: (String) -> String = { detailedName ? "\($0)_\(key)" : $0 }
-            return try copyMappingChildren {
-                try $0.get(key: key, groupSample: nil, detailedName: detailedName).with(name: computeName($0.name))
+    private func get(key: String, tail: SlicePath) throws -> Self {
+        do {
+            return try getJaroWinkler(key: key)._get(path: tail)
+        } catch {
+            if let attribute = attribute(named: key) {
+                return try ExplorerXML(name: key, value: attribute)._get(path: tail)
+            } else {
+                throw error
             }
         }
     }
 
-    private func get(index: Int, groupSample: GroupSample?) throws -> Self {
-        switch groupSample {
-        case nil:
-            let index = try computeIndex(from: index, arrayCount: children.count)
-            return children[index]
-
-        case .slice, .filter: return try copyMappingChildren { try $0.get(index: index, groupSample: nil) }
-        }
+    private func get(index: Int, tail: SlicePath) throws -> Self {
+        let index = try computeIndex(from: index, arrayCount: children.count)
+        return children[index]
     }
 
-    private func getCount() -> Self {
-        ExplorerXML(name: "count", value: childrenCount.description)
+    private func getCount(tail: SlicePath) throws -> Self {
+        try ExplorerXML(name: "count", value: childrenCount.description)._get(path: tail)
     }
 
-    private func getKeysList() -> Self {
+    private func getKeysList(tail: SlicePath) throws -> Self {
         let copy = copyWithoutChildren()
         children.map(\.name).forEach { key in
             let newChild = ExplorerXML(name: "key", value: key)
             copy.addChild(newChild)
         }
-        return copy.with(name: "\(name)_keys")
+        return try copy.with(name: "\(name)_keys")._get(path: tail)
     }
 
-    private func getFilter(with pattern: String, groupSample: GroupSample?) throws -> Self {
-        switch groupSample {
-        case nil:
-            let regex = try NSRegularExpression(with: pattern)
-            let copy = copyWithoutChildren()
-            children
-                .filter { regex.validate($0.name) }
-                .forEach { copy.addChild($0) }
+    private func getFilter(with pattern: String, tail: SlicePath) throws -> Self {
+        let regex = try NSRegularExpression(with: pattern)
+        var copy = copyWithoutChildren()
+        copy.children = try children
+            .lazy
+            .filter { regex.validate($0.name) }
+            .map { try $0._get(path: tail).with(name: $0.name) }
 
-            return copy
-
-        case .slice, .filter: return try copyMappingChildren { try $0.getFilter(with: pattern, groupSample: nil) }
-        }
+        return copy
     }
 
-    private func getSlice(within bounds: Bounds, groupSample: GroupSample?) throws -> Self {
-        switch groupSample {
-        case nil:
-            let range = try bounds.range(arrayCount: childrenCount)
-            let copy = copyWithoutChildren()
-            children[range].forEach { copy.addChild($0) }
-            return copy
-
-        case .slice, .filter:
-            return try copyMappingChildren { try $0.getSlice(within: bounds, groupSample: nil) }
-        }
+    private func getSlice(within bounds: Bounds, tail: SlicePath) throws -> Self {
+        let range = try bounds.range(arrayCount: childrenCount)
+        var copy = copyWithoutChildren()
+        copy.children = try children[range].map { try $0._get(path: tail) }
+        return copy
     }
 }

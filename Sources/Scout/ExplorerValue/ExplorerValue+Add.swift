@@ -21,36 +21,35 @@ extension ExplorerValue {
 
     /// Return the value if it should be added to the parent
     private func _add(path: SlicePath, value: ExplorerValue) throws -> Self {
-        guard let element = path.first else { return value }
-        let remainder = path.dropFirst()
+        guard let (head, tail) = path.cutHead() else { return value }
 
-        return try doSettingPath(remainder.leftPart) {
-            switch element {
-            case .key(let key): return try add(key: key, value: value, remainder: remainder)
-            case .index(let index): return try add(index: index, value: value, remainder: remainder)
-            case .count: return try addCount(value: value, remainder: remainder)
-            default: throw ExplorerError.wrongUsage(of: element)
+        return try doSettingPath(tail.leftPart) {
+            switch head {
+            case .key(let key): return try add(key: key, value: value, tail: tail)
+            case .index(let index): return try add(index: index, value: value, tail: tail)
+            case .count: return try addCount(value: value, tail: tail)
+            default: throw ExplorerError.wrongUsage(of: head)
             }
         }
     }
 
     // MARK: PathElement
 
-    private func add(key: String, value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
+    private func add(key: String, value: ExplorerValue, tail: SlicePath) throws -> ExplorerValue {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
         if let existingValue = dict[key] {
-            dict[key] = try existingValue._add(path: remainder, value: value)
+            dict[key] = try existingValue._add(path: tail, value: value)
         } else {
-            dict[key] = try createValueToAdd(value: value, path: remainder)
+            dict[key] = try createValueToAdd(value: value, path: tail)
         }
 
         return .dictionary(dict)
     }
 
-    private func add(index: Int, value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
+    private func add(index: Int, value: ExplorerValue, tail: SlicePath) throws -> ExplorerValue {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
         let index = try computeIndex(from: index, arrayCount: array.count)
-        let newValue = try array[index]._add(path: remainder, value: value)
+        let newValue = try array[index]._add(path: tail, value: value)
 
         if array.allSatisfy(\.isSingle) {
             #warning("This behavior is the current one but is strange. A new PathElement should be offered to differentiate between insertion and modification")
@@ -61,13 +60,13 @@ extension ExplorerValue {
         return .array(array)
     }
 
-    private func addCount(value: ExplorerValue, remainder: SlicePath) throws -> ExplorerValue {
+    private func addCount(value: ExplorerValue, tail: SlicePath) throws -> ExplorerValue {
         if var array = self.array {
-            let newValue = try createValueToAdd(value: value, path: remainder)
+            let newValue = try createValueToAdd(value: value, path: tail)
             array.append(newValue)
             return .array(array)
         } else {
-            return try createValueToAdd(value: value, path: [.count] + remainder)
+            return try createValueToAdd(value: value, path: [.count] + tail)
         }
     }
 }
@@ -78,22 +77,22 @@ extension ExplorerValue {
 
     private func createValueToAdd(value: ExplorerValue, path: SlicePath) throws -> ExplorerValue {
         guard let element = path.first else { return value }
-        let remainder = path.dropFirst()
+        let tail = path.dropFirst()
 
         switch element {
         case .key(let key):
             var dict = DictionaryValue()
-            dict[key] = try createValueToAdd(value: value, path: remainder)
+            dict[key] = try createValueToAdd(value: value, path: tail)
             return .dictionary(dict)
 
         case .index:
             var array = ArrayValue()
-            try array.append(createValueToAdd(value: value, path: remainder))
+            try array.append(createValueToAdd(value: value, path: tail))
             return .array(array)
 
         case .count:
             var array = ArrayValue()
-            try array.append(createValueToAdd(value: value, path: remainder))
+            try array.append(createValueToAdd(value: value, path: tail))
             return .array(array)
 
         default:

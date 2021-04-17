@@ -11,7 +11,7 @@ extension ExplorerValue {
         var paths: [Path] = []
 
         if let path = initialPath {
-            let explorer = try getNoDetailedName(path)
+            let explorer = try get(path)
             try explorer.collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: path, filter: filter))
         } else {
             try collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: .empty, filter: filter))
@@ -35,7 +35,7 @@ extension ExplorerValue {
                 paths.append(pathValidation.leading)
             }
 
-        case .array(let array), .slice(let array):
+        case .array(let array):
             if filter.groupAllowed, pathValidation.isValid {
                 paths.append(pathValidation.leading)
             }
@@ -45,7 +45,7 @@ extension ExplorerValue {
                     try element.collectPaths(in: &paths, filter: filter, pathValidation: pathValidation.appendingLeading(index))
                 }
 
-        case .dictionary(let dict), .filter(let dict):
+        case .dictionary(let dict):
             if filter.groupAllowed, pathValidation.isValid {
                 paths.append(pathValidation.leading)
             }

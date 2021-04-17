@@ -8,14 +8,10 @@ import Foundation
 public extension Path {
 
     /// Retrieve all the index elements
-    var compactMapIndexes: [Int] {
-        compactMap(\.index)
-    }
+    var compactMapIndexes: [Int] { compactMap(\.index) }
 
     /// Retrieve all the key elements
-    var compactMapKeys: [String] {
-        compactMap(\.key)
-    }
+    var compactMapKeys: [String] { compactMap(\.key) }
 
     /// Retrieve all the slices bounds elements
     var compactMapSlices: [Bounds] {

@@ -67,6 +67,7 @@ final class PathExplorerGetTests: XCTestCase {
 
     func testStub() throws {
         // use this function to launch a specific test with a specific PathExplorer
+        try testGetFilter_ThenKey(ExplorerValue.self)
     }
 
     // MARK: - Key
@@ -202,7 +203,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["Tom": 10, "Robert": true, "Suzanne": "Here"],
             path: .filter("Tom|Robert"),
-            expected: .filter(["Tom": 10, "Robert": true])
+            expected: ["Tom": 10, "Robert": true]
         )
     }
 
@@ -211,7 +212,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["woody": woody, "buzz": buzz, "zorg": zorg],
             path: .filter("woody|buzz"), "name",
-            expected: .filter(["woody_name": "Woody", "buzz_name": "Buzz"])
+            expected: ["woody": "Woody", "buzz": "Buzz"]
         )
     }
 
@@ -220,10 +221,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["woody": woody, "buzz": buzz, "zorg": zorg],
             path: .filter("woody|zorg"), .filter("name"),
-            expected: .filter(
-                ["woody": .filter(["name": "Woody"]),
-                 "zorg": .filter(["name": "Zorg"])]
-                )
+            expected: ["woody": ["name": "Woody"], "zorg": ["name": "Zorg"]]
         )
     }
 
@@ -232,9 +230,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: [woody, buzz, zorg],
             path: .slice(0, 1), .filter("name"),
-            expected: .slice(
-                [.filter(["name": "Woody"]), .filter(["name": "Buzz"])]
-            )
+            expected: [["name": "Woody"], ["name": "Buzz"]]
         )
     }
 
@@ -252,7 +248,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["Riri", "Fifi", "Loulou", "Donald", "Daisy"],
             path: .slice(1, -2),
-            expected: .slice(["Fifi", "Loulou", "Donald"])
+            expected: ["Fifi", "Loulou", "Donald"]
         )
     }
 
@@ -261,7 +257,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
             path: .slice(0, 1), 1,
-            expected: .slice([2, 5])
+            expected: [2, 5]
         )
     }
 
@@ -270,7 +266,7 @@ final class PathExplorerGetTests: XCTestCase {
             P.self,
             value: ["Riri", "Fifi", "Loulou", "Donald", "Daisy"],
             path: .slice(1, -2),
-            expected: .slice(["Fifi", "Loulou", "Donald"])
+            expected: ["Fifi", "Loulou", "Donald"]
         )
     }
 
@@ -280,7 +276,7 @@ final class PathExplorerGetTests: XCTestCase {
             value: ["first": ["Riri", "Fifi", "Loulou", "Donald", "Daisy"],
                     "second": ["Riri", "Fifi", "Loulou", "Donald", "Daisy"]],
             path: .filter("first"), .slice(1, 2),
-            expected: .filter(["first": .slice(["Fifi", "Loulou"])])
+            expected: ["first": ["Fifi", "Loulou"]]
         )
     }
 

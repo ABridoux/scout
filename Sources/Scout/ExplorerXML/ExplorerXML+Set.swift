@@ -36,24 +36,21 @@ extension ExplorerXML {
     // MARK: General function
 
     private func _set(path: SlicePath, to newValue: ValueSetter) throws {
-        guard let element = path.first else {
+        guard let (head, tail) = path.cutHead() else {
             set(value: newValue)
             return
         }
 
-        let remainder = path.dropFirst()
-        let leftPart = remainder.leftPart
-
-        try doSettingPath(leftPart) {
-            switch element {
+        try doSettingPath(tail.leftPart) {
+            switch head {
             case .key(let key):
-                try getJaroWinkler(key: key)._set(path: remainder, to: newValue)
+                try getJaroWinkler(key: key)._set(path: tail, to: newValue)
 
             case .index(let index):
                 let index = try computeIndex(from: index, arrayCount: childrenCount)
-                try children[index]._set(path: remainder, to: newValue)
+                try children[index]._set(path: tail, to: newValue)
 
-            default: throw ExplorerError.wrongUsage(of: element)
+            default: throw ExplorerError.wrongUsage(of: head)
             }
         }
     }
@@ -77,16 +74,16 @@ extension ExplorerXML {
             return
         }
 
-        let remainder = path.dropFirst()
+        let tail = path.dropFirst()
 
-        try doSettingPath(remainder.leftPart) {
+        try doSettingPath(tail.leftPart) {
             switch element {
             case .key(let key):
-                try getJaroWinkler(key: key).set(path: remainder, keyNameTo: newKeyName)
+                try getJaroWinkler(key: key).set(path: tail, keyNameTo: newKeyName)
 
             case .index(let index):
                 let index = try computeIndex(from: index, arrayCount: childrenCount)
-                try children[index].set(path: remainder, keyNameTo: newKeyName)
+                try children[index].set(path: tail, keyNameTo: newKeyName)
 
             default: throw ExplorerError.wrongUsage(of: element)
             }

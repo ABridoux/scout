@@ -23,18 +23,16 @@ extension ExplorerXML {
 
     /// Returns `true` if the element should be deleted
     private func _delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
-        guard let element = path.first else { return true }
+        guard let (head, tail) = path.cutHead() else { return true }
 
-        let remainder = path.dropFirst()
-
-        try doSettingPath(remainder.leftPart) {
-            switch element {
-            case .key(let key): try delete(key: key, deleteIfEmpty: deleteIfEmpty, remainder: remainder)
-            case .index(let index): try delete(index: index, deleteIfEmpty: deleteIfEmpty, remainder: remainder)
-            case .filter(let pattern): try deleteFilter(with: pattern, deleteIfEmpty: deleteIfEmpty, remainder: remainder)
-            case .slice(let bounds): try deleteSlice(within: bounds, deleteIfEmpty: deleteIfEmpty, remainder: remainder)
+        try doSettingPath(tail.leftPart) {
+            switch head {
+            case .key(let key): try delete(key: key, deleteIfEmpty: deleteIfEmpty, tail: tail)
+            case .index(let index): try delete(index: index, deleteIfEmpty: deleteIfEmpty, tail: tail)
+            case .filter(let pattern): try deleteFilter(with: pattern, deleteIfEmpty: deleteIfEmpty, tail: tail)
+            case .slice(let bounds): try deleteSlice(within: bounds, deleteIfEmpty: deleteIfEmpty, tail: tail)
             case .count, .keysList:
-                throw ExplorerError.wrongUsage(of: element)
+                throw ExplorerError.wrongUsage(of: head)
             }
         }
 
@@ -43,36 +41,36 @@ extension ExplorerXML {
 
     // MARK: PathElement
 
-    private func delete(key: String, deleteIfEmpty: Bool, remainder: SlicePath) throws {
+    private func delete(key: String, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let next = try getJaroWinkler(key: key)
-        if try next._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
+        if try next._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
             next.removeFromParent()
         }
     }
 
-    private func delete(index: Int, deleteIfEmpty: Bool, remainder: SlicePath) throws {
+    private func delete(index: Int, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let index = try computeIndex(from: index, arrayCount: childrenCount)
         let next = children[index]
-        if try next._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
+        if try next._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
             next.removeFromParent()
         }
     }
 
-    private func deleteFilter(with pattern: String, deleteIfEmpty: Bool, remainder: SlicePath) throws {
+    private func deleteFilter(with pattern: String, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let regex = try NSRegularExpression(with: pattern)
         try children
             .filter { regex.validate($0.name) }
             .forEach { child in
-                if try child._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
+                if try child._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
                     child.removeFromParent()
                 }
             }
     }
 
-    private func deleteSlice(within bounds: Bounds, deleteIfEmpty: Bool, remainder: SlicePath) throws {
+    private func deleteSlice(within bounds: Bounds, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let range = try bounds.range(arrayCount: childrenCount)
         try children[range].forEach { child in
-            if try child._delete(path: remainder, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
+            if try child._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
                 child.removeFromParent()
             }
         }
