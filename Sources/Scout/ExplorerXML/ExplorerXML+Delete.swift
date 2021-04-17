@@ -10,6 +10,7 @@ extension ExplorerXML {
     // MARK: PathExplorer
 
     public mutating func delete(_ path: Path, deleteIfEmpty: Bool) throws {
+        if referenceIsShared() { self = copy() }
         _ = try _delete(path: Slice(path), deleteIfEmpty: deleteIfEmpty)
     }
 
