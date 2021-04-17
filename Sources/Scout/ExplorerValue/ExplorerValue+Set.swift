@@ -22,36 +22,35 @@ extension ExplorerValue {
     // MARK: General function
 
     private mutating func _set(path: SlicePath, to newValue: ExplorerValue) throws {
-        guard let firstElement = path.first else {
-            return self = newValue
+        guard let (head, tail) = path.cutHead() else {
+            self = newValue
+            return
         }
 
-        let remainder = path.dropFirst()
-
-        try doSettingPath(remainder.leftPart) {
-            switch firstElement {
-            case .key(let key): try set(key: key, to: newValue, remainder: remainder)
-            case .index(let index): try set(index: index, to: newValue, remainder: remainder)
-            default: throw ExplorerError.wrongUsage(of: firstElement)
+        try doSettingPath(tail.leftPart) {
+            switch head {
+            case .key(let key): try set(key: key, to: newValue, tail: tail)
+            case .index(let index): try set(index: index, to: newValue, tail: tail)
+            default: throw ExplorerError.wrongUsage(of: head)
             }
         }
     }
 
     // MARK: PathElement
 
-    private mutating func set(key: String, to newValue: ExplorerValue, remainder: SlicePath) throws {
+    private mutating func set(key: String, to newValue: ExplorerValue, tail: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
         var value = try dict.getJaroWinkler(key: key)
-        try value._set(path: remainder, to: newValue)
+        try value._set(path: tail, to: newValue)
         dict[key] = value
         self = .dictionary(dict)
     }
 
-    private mutating func set(index: Int, to newValue: Self, remainder: SlicePath) throws {
+    private mutating func set(index: Int, to newValue: Self, tail: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
         let index = try computeIndex(from: index, arrayCount: array.count)
         var element = array[index]
-        try element._set(path: remainder, to: newValue)
+        try element._set(path: tail, to: newValue)
         array[index] = element
         self = .array(array)
     }
@@ -77,9 +76,9 @@ extension ExplorerValue {
 
     private mutating func _set(path: SlicePath, keyName: String) throws {
         guard let firstElement = path.first else { return }
-        let remainder = path.dropFirst()
+        let tail = path.dropFirst()
 
-        if remainder.isEmpty {
+        if tail.isEmpty {
             guard let key = firstElement.key else {
                 throw ExplorerError.wrongUsage(of: firstElement)
             }
@@ -93,29 +92,29 @@ extension ExplorerValue {
         }
 
         switch firstElement {
-        case .key(let key): try set(key: key, keyName: keyName, remainder: remainder)
-        case .index(let index): try set(index: index, keyName: keyName, remainder: remainder)
+        case .key(let key): try set(key: key, keyName: keyName, tail: tail)
+        case .index(let index): try set(index: index, keyName: keyName, tail: tail)
         default: throw ExplorerError.wrongUsage(of: firstElement)
         }
     }
 
     // MARK: PathElement
 
-    private mutating func set(key: String, keyName: String, remainder: SlicePath) throws {
+    private mutating func set(key: String, keyName: String, tail: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
 
         var value = try dict.getJaroWinkler(key: key)
-        try value._set(path: remainder, keyName: keyName)
+        try value._set(path: tail, keyName: keyName)
         dict[key] = value
         self = .dictionary(dict)
     }
 
-    private mutating func set(index: Int, keyName: String, remainder: SlicePath) throws {
+    private mutating func set(index: Int, keyName: String, tail: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
 
         let index = try computeIndex(from: index, arrayCount: array.count)
         var element = array[index]
-        try element._set(path: remainder, keyName: keyName)
+        try element._set(path: tail, keyName: keyName)
         array[index] = element
         self = .array(array)
     }

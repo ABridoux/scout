@@ -17,11 +17,9 @@ extension ExplorerXML {
 
     private func _get(path: SlicePath) throws -> Self {
         guard let head = path.first else { return self }
-
         let tail = path.dropFirst()
-        let leftPart = tail.leftPart
 
-        return try doSettingPath(leftPart) {
+        return try doSettingPath(tail.leftPart) {
             switch head {
             case .key(let key): return try get(key: key, tail: tail)
             case .index(let index): return  try get(index: index, tail: tail)
