@@ -22,10 +22,6 @@ public indirect enum ExplorerValue {
     // group
     case array(ArrayValue)
     case dictionary(DictionaryValue)
-
-    // group sample
-    case slice(ArrayValue)
-    case filter(DictionaryValue)
 }
 
 extension ExplorerValue {
@@ -34,7 +30,7 @@ extension ExplorerValue {
 
     public var isGroup: Bool {
         switch self {
-        case .array, .dictionary, .filter, .slice: return true
+        case .array, .dictionary: return true
         default: return false
         }
     }
@@ -155,10 +151,10 @@ extension ExplorerValue: Codable {
             var singleValueContainer = encoder.singleValueContainer()
             try singleValueContainer.encode(data)
 
-        case .array(let array), .slice(let array):
+        case .array(let array):
             try array.encode(to: encoder)
 
-        case .dictionary(let dict), .filter(let dict):
+        case .dictionary(let dict):
             try dict.encode(to: encoder)
         }
     }
@@ -239,8 +235,6 @@ extension ExplorerValue {
 
     func array(_ value: ArrayValue) -> Self { .array(value) }
     func dictionary(_ value: DictionaryValue) -> Self { .dictionary(value) }
-    func slice(_ value: ArrayValue) -> Self { .slice(value) }
-    func filter(_ value: DictionaryValue) -> Self { .filter(value) }
 }
 
 extension ExplorerValue {
@@ -253,8 +247,8 @@ extension ExplorerValue {
         case .double(let double): return double
         case .bool(let bool): return bool
         case .data(let data): return data
-        case .array(let array), .slice(let array): return array
-        case .dictionary(let dict), .filter(let dict): return dict
+        case .array(let array): return array
+        case .dictionary(let dict): return dict
         }
     }
 
@@ -289,14 +283,14 @@ extension ExplorerValue {
 
     public var array: ArrayValue? {
         switch self {
-        case .array(let array), .slice(let array): return array
+        case .array(let array): return array
         default: return nil
         }
     }
 
     public var dictionary: DictionaryValue? {
         switch self {
-        case .dictionary(let dict), .filter(let dict): return dict
+        case .dictionary(let dict): return dict
         default: return nil
         }
     }
@@ -323,10 +317,10 @@ extension ExplorerValue: CustomStringConvertible {
         case .string(let string): return string
         case .bool(let bool): return bool.description
         case .data(let data): return data.base64EncodedString()
-        case .array(let array), .slice(let array):
+        case .array(let array):
             let elements = array.map(\.description).joined(separator: ",")
             return "[\(elements)]"
-        case .dictionary(let dict), .filter(let dict):
+        case .dictionary(let dict):
             let elements = dict.map { "\($0.key): \($0.value)" }.joined(separator: ",")
             return "[\(elements)]"
         }

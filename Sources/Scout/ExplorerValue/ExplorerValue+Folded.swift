@@ -15,14 +15,14 @@ extension ExplorerValue {
         case .string, .int, .double, .bool, .data:
             return self
 
-        case .array(let array), .slice(let array):
+        case .array(let array):
             if level <= 0 {
                 return self.array <^> [Self.string(foldedMark)]
             } else {
                 return self.array <^> array.map { $0.folded(upTo: level - 1) }
             }
 
-        case .dictionary(let dict), .filter(let dict):
+        case .dictionary(let dict):
             if level <= 0 {
                 return dictionary <^> [foldedKey: .string(foldedMark)]
             } else {

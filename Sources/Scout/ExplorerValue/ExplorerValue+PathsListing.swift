@@ -35,7 +35,7 @@ extension ExplorerValue {
                 paths.append(pathValidation.leading)
             }
 
-        case .array(let array), .slice(let array):
+        case .array(let array):
             if filter.groupAllowed, pathValidation.isValid {
                 paths.append(pathValidation.leading)
             }
@@ -45,7 +45,7 @@ extension ExplorerValue {
                     try element.collectPaths(in: &paths, filter: filter, pathValidation: pathValidation.appendingLeading(index))
                 }
 
-        case .dictionary(let dict), .filter(let dict):
+        case .dictionary(let dict):
             if filter.groupAllowed, pathValidation.isValid {
                 paths.append(pathValidation.leading)
             }
