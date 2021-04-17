@@ -11,7 +11,7 @@ extension ExplorerValue {
         var paths: [Path] = []
 
         if let path = initialPath {
-            let explorer = try getNoDetailedName(path)
+            let explorer = try get(path)
             try explorer.collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: path, filter: filter))
         } else {
             try collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: .empty, filter: filter))

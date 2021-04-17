@@ -10,20 +10,12 @@ extension ExplorerXML {
     // MARK: - PathExplorer
 
     public func get(_ path: Path) throws -> ExplorerXML {
-        try _get(path: Slice(path), detailedName: true)
-    }
-
-    /// Prevent name compositions when subscripting a slice with a key
-    ///
-    /// When a key subscript a filter, the name of the new value is composed
-    /// of the slice name followed, by key. This behavior is sometimes unwanted.
-    func getNoDetailedName(_ path: Path) throws -> ExplorerXML {
-        try _get(path: Slice(path), detailedName: false)
+        try _get(path: Slice(path))
     }
 
     // MARK: General function
 
-    private func _get(path: SlicePath, detailedName: Bool) throws -> Self {
+    private func _get(path: SlicePath) throws -> Self {
         guard let element = path.first else { return self }
 
         let remainder = path.dropFirst()
@@ -34,7 +26,7 @@ extension ExplorerXML {
             let next: ExplorerXML
 
             switch element {
-            case .key(let key): next = try get(key: key, groupSample: groupSample, detailedName: detailedName)
+            case .key(let key): next = try get(key: key, groupSample: groupSample)
             case .index(let index): next = try get(index: index, groupSample: groupSample)
             case .count: next = getCount()
             case .keysList: next = getKeysList()
@@ -42,13 +34,13 @@ extension ExplorerXML {
             case .slice(let bounds): next = try getSlice(within: bounds, groupSample: groupSample)
             }
 
-            return try next._get(path: remainder, detailedName: detailedName)
+            return try next._get(path: remainder)
         }
     }
 
     // MARK: PathElement
 
-    private func get(key: String, groupSample: GroupSample?, detailedName: Bool) throws -> Self {
+    private func get(key: String, groupSample: GroupSample?) throws -> Self {
         switch groupSample {
         case nil:
             do {
@@ -62,9 +54,8 @@ extension ExplorerXML {
             }
 
         case .slice, .filter:
-            let computeName: (String) -> String = { detailedName ? "\($0)_\(key)" : $0 }
             return try copyMappingChildren {
-                try $0.get(key: key, groupSample: nil, detailedName: detailedName).with(name: computeName($0.name))
+                try $0.get(key: key, groupSample: nil).with(name: $0.name)
             }
         }
     }

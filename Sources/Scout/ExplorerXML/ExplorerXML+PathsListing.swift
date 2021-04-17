@@ -14,7 +14,7 @@ extension ExplorerXML {
             if let first = initialPath.first(where: { [.count, .keysList].contains($0) }) {
                 throw ExplorerError.wrongUsage(of: first)
             }
-            let explorer = try getNoDetailedName(initialPath)
+            let explorer = try get(initialPath)
             try explorer.collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: initialPath, filter: filter))
         } else {
             try collectPaths(in: &paths, filter: filter, pathValidation: PathValidation(leading: .empty, filter: filter))
