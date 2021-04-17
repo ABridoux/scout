@@ -86,7 +86,6 @@ extension ExplorerValue {
     }
 
     private func getFilter(with pattern: String, remainder: SlicePath) throws -> Self {
-
         switch self {
         case .dictionary(let dict):
             let regex = try NSRegularExpression(with: pattern)
