@@ -10,6 +10,7 @@ extension ExplorerXML {
     // MARK: PathExplorer
 
     public mutating func add(_ value: ExplorerValue, at path: Path) throws {
+        if referenceIsShared() { self = copy() }
         try _add(value: .explorerValue(value), at: Slice(path))
     }
 

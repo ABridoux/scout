@@ -17,7 +17,8 @@ public struct ExplorerXML: PathExplorer {
 
     // MARK: Element
 
-    private let element: AEXMLElement
+    /// `var` requirement to test reference
+    private var element: AEXMLElement
     var name: String { element.name }
     var xml: String { element.xml }
     func attribute(named name: String) -> String? { element.attributes[name] }
@@ -43,6 +44,7 @@ public struct ExplorerXML: PathExplorer {
             return singleExplorerValue(keepingAttributes: keepingAttributes)
         }
 
+        #warning("It might be useful to offer a strategy customisation for single elements: array or dict")
         if let names = element.uniqueChildrenNames, names.count > 1 { // dict
             let dict = children.map { (key: $0.name, value: $0.explorerValue(keepingAttributes: keepingAttributes)) }
             let dictValue = ExplorerValue.dictionary(Dictionary(uniqueKeysWithValues: dict))
@@ -209,6 +211,15 @@ extension ExplorerXML {
         try children.forEach { child in try copy.addChild(transform(child)) }
         return copy
     }
+}
+
+// MARK: - Reference
+
+extension ExplorerXML {
+
+    /// `true` if the reference of `element` is shared.
+    /// - note: Marked `mutating` but does not mutate. Requirement for `isKnownUniquelyReferenced`
+    mutating func referenceIsShared() -> Bool { !isKnownUniquelyReferenced(&element) }
 }
 
 // MARK: - Setters

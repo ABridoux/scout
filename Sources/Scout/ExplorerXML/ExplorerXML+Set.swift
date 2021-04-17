@@ -12,6 +12,7 @@ extension ExplorerXML {
     // MARK: PathExplorer
 
     public mutating func set(_ path: Path, to newValue: ExplorerValue) throws {
+        if referenceIsShared() { self = copy() }
         try _set(path: Slice(path), to: .explorerValue(newValue))
     }
 
