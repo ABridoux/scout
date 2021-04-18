@@ -5,6 +5,10 @@
 
 import Foundation
 
+/// Parse a string to an array of `PathElement`s
+///
+/// - note: Inspired from [functional Swift](https://www.objc.io/books/functional-swift/)
+/// *Parser Combinators* chapter
 struct PathParser<R> {
     let parse: (Substring) -> (R, Substring)?
 }

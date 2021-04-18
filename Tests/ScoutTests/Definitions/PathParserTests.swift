@@ -85,8 +85,8 @@ final class PathParserTests: XCTestCase {
 
         let result = parser.run("Hello Toto!")
 
-        XCTAssertEqual(result?.0, "Hello ")
-        XCTAssertEqual(result?.1, "Toto!")
+        XCTAssertEqual(result?.result, "Hello ")
+        XCTAssertEqual(result?.remainder, "Toto!")
     }
 
     func testStringNotContains2() {
@@ -94,7 +94,7 @@ final class PathParserTests: XCTestCase {
 
         let result = parser.run("I think Toto is overrated")
 
-        XCTAssertEqual(result?.0, "I think ")
+        XCTAssertEqual(result?.result, "I think ")
     }
 
     func testStringNotContains_Nil() {
@@ -110,8 +110,8 @@ final class PathParserTests: XCTestCase {
 
         let result = parser.run("Hello, Toto!")
 
-        XCTAssertEqual(result?.0, "Hello")
-        XCTAssertEqual(result?.1, ", Toto!")
+        XCTAssertEqual(result?.result, "Hello")
+        XCTAssertEqual(result?.remainder, ", Toto!")
     }
 }
 

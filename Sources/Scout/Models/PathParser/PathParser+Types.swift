@@ -43,6 +43,7 @@ extension PathParser {
         <*> integer
     }
 
+    /// Match when the input starts with the provided string
     static func string(_ string: String) -> PathParser<String> {
         PathParser<String> { input in
             guard input.hasPrefix(string) else { return nil }
@@ -51,6 +52,7 @@ extension PathParser {
         }
     }
 
+    /// Match characters until one of the forbidden ones is encountered
     static func string(forbiddenCharacters firstCharacter: Character, _ additionalCharacters: Character...) -> PathParser<String> {
         PathParser<String> { input in
             guard !input.isEmpty else { return nil }
@@ -68,6 +70,19 @@ extension PathParser {
         }
     }
 
+    /// Match characters until the last ones equal the forbidden string, or if the character matches one of the forbidden ones
+    ///
+    /// ### Examples
+    /// ```
+    /// let parser = PathParsers.string(stoppingAt: "Toto")
+    /// let result = parser.run("Hello Toto!")
+    /// print(result?.result) // "Hello"
+    /// print(result?.remainder) // " Toto!"
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - forbiddenString: The string to stop at
+    ///   - forbiddenCharacters: Additional forbidden characters that should stop the parsing
     static func string(stoppingAt forbiddenString: String, forbiddenCharacters: Character...) -> PathParser<String> {
         PathParser<String> { input in
             guard !input.isEmpty else { return nil }
