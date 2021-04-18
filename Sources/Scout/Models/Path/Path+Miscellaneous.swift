@@ -48,34 +48,3 @@ public extension Collection where SubSequence == Slice<Path> {
         return self[0..<lastIndex]
     }
 }
-
-extension Collection where Element == PathElement {
-
-    public var lastKeyElementName: String? {
-        reversed().first {
-            guard case .key = $0 else { return false }
-            return true
-        }?.key
-    }
-
-    /// Last key component matching the regular expression
-    public func lastKeyComponent(matches regularExpression: NSRegularExpression) -> Bool {
-        guard let key = lastKeyElementName else { return false }
-        return regularExpression.validate(key)
-    }
-}
-
-extension Collection where Element == PathElement {
-
-    var lastGroupSample: ExplorerXML.GroupSample? {
-        for element in reversed() {
-            switch element {
-            case .filter: return .filter
-            case .slice: return .slice
-            default: continue
-            }
-        }
-
-        return nil
-    }
-}

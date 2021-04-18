@@ -7,7 +7,7 @@ import Foundation
 import Scout
 import XCTest
 
-final class PathSetOperationsTests: XCTestCase {
+final class PathMiscellanousTests: XCTestCase {
 
     func testCommonPrefix_Middle() {
         let path = Path(elements: "toto", 1, "Endo", .count)
