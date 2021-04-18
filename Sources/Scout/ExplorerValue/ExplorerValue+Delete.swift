@@ -91,7 +91,7 @@ extension ExplorerValue {
     private mutating func deleteSlice(within bounds: Bounds, tail: SlicePath, deleteIfEmpty: Bool) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
         let range = try bounds.range(arrayCount: array.count)
-        
+
         let newRangeElements = try array[range].compactMap { (element) -> ExplorerValue? in
             var element = element
             let shouldDelete = try element._delete(path: tail, deleteIfEmpty: deleteIfEmpty)

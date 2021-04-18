@@ -24,7 +24,18 @@ public protocol PathElementRepresentable {
 }
 
 extension String: PathElementRepresentable {
-    public var pathValue: PathElement { indexPathElement ?? countPathElement ?? keysListPathElements ?? slicePathElement ?? filterPathElements ?? .key(self) }
+
+    public var pathValue: PathElement {
+        indexPathElement
+            ?? countPathElement
+            ?? keysListPathElements
+            ?? slicePathElement
+            ?? filterPathElements
+            ?? .key(self)
+    }
+}
+
+extension String {
 
     /// Not `nil` if the string can be transformed to a `PathElement.index`
     var indexPathElement: PathElement? {

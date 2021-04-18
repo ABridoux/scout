@@ -39,6 +39,21 @@ public struct Bounds: Hashable {
         self.upper = upper
     }
 
+    /// No bounds targets the `first` or `last` bound
+    init(lower: Int?, upper: Int?) {
+        if let lower = lower {
+            self.lower = Bound(lower)
+        } else {
+            self.lower = .first
+        }
+
+        if let upper = upper {
+            self.upper = Bound(upper)
+        } else {
+            self.upper = .last
+        }
+    }
+
     // MARK: - Functions
 
     /// Compute a range with the bounds for the array count.
