@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import AEXML
