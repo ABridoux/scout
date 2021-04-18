@@ -20,7 +20,7 @@ struct PathsCommand: ScoutCommand {
 
     // MARK: - Properties
 
-    @Option(name: [.customShort("f", allowingJoined: true), .customLong("format")], help: "The data format to read the input")
+    @Option(name: DataFormat.name)
     var dataFormat: Scout.DataFormat
 
     @Argument(help: "Initial path from which the paths should be listed")
@@ -65,13 +65,17 @@ struct PathsCommand: ScoutCommand {
 
         case (nil, .some(let predicates), let target):
             if target != .singleAndGroup {
-                throw RuntimeError.invalidArgumentsCombination(description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'")
+                throw RuntimeError.invalidArgumentsCombination(
+                    description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'"
+                )
             }
             pathsFilter = .value(predicates)
 
         case (.some(let regex), .some(let predicates), let target):
             if target != .singleAndGroup {
-                throw RuntimeError.invalidArgumentsCombination(description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'")
+                throw RuntimeError.invalidArgumentsCombination(
+                    description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'"
+                )
             }
             pathsFilter = .keyAndValue(keyRegex: regex, valuePredicates: predicates)
         }

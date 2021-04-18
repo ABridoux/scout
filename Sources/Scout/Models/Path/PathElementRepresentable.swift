@@ -13,95 +13,21 @@
 /// But the "Expressible" protocols do not allow to do the same with variables.
 /// Thus, using `PathElementRepresentable` allows to instantiate a Path from a mix of Strings and Integers variables:
 /// ```
-/// let firstKey = "people"
-/// let secondKey = "Tom"
-/// let thirdKey = "hobbies"
+/// let tom = "Tom"
+/// let hobbies = "hobbies"
 /// let index = 1
-/// let path: Path = [firstKey, secondKey, thirdKey, index]
+/// let path: Path = [tom, hobbies, index]
 /// ```
+/// - note: This only works for keys and indexes. When dealing with other elements like `.count` or `.slice`,
+/// it's required to use the full name `PathElement.count`, `PathElement.slice`. Otherwise,
+/// the `Path.init(element:)` works with `PathElement` directly although the possibility to use variables
+/// without the `PathElement` specification becomes unavailable.
 public protocol PathElementRepresentable {
     var pathValue: PathElement { get }
 }
 
 extension String: PathElementRepresentable {
-
-    public var pathValue: PathElement {
-        indexPathElement
-            ?? countPathElement
-            ?? keysListPathElements
-            ?? slicePathElement
-            ?? filterPathElements
-            ?? .key(self)
-    }
-}
-
-extension String {
-
-    /// Not `nil` if the string can be transformed to a `PathElement.index`
-    var indexPathElement: PathElement? {
-        guard self.hasPrefix("["), self.hasSuffix("]") else {
-            return nil
-        }
-
-        var copy = self
-        copy.removeFirst()
-        copy.removeLast()
-
-        guard let index = Int(copy) else { return nil }
-        return PathElement.index(index)
-    }
-
-    /// Not `nil` if the string can be transformed to a `PathElement.count`
-    var countPathElement: PathElement? { self == PathElement.count.description ? .count : nil }
-
-    /// Not `nil` if the string can be transformed to a `PathElement.keysList`
-    var keysListPathElements: PathElement? { self == PathElement.keysList.description ? .keysList : nil }
-
-    /// Not `nil` if the string can be transformed to a `PathElement.slice`
-    var slicePathElement: PathElement? {
-        guard
-            hasPrefix("["),
-            hasSuffix("]")
-        else { return nil }
-
-        var copy = self
-        copy.removeFirst()
-        copy.removeLast()
-
-        let splitted = copy.split(separator: ":", omittingEmptySubsequences: false)
-
-        guard splitted.count == 2 else { return nil }
-
-        var lower: Bounds.Bound
-        if splitted[0] == "" {
-            lower = .first
-        } else if let lowerValue = Int(splitted[0]) {
-            lower = .init(lowerValue)
-        } else {
-            return nil
-        }
-
-        var upper: Bounds.Bound
-        if splitted[1] == "" {
-            upper = .last
-        } else if let upperValue = Int(splitted[1]) {
-            upper = .init(upperValue)
-        } else {
-            return nil
-        }
-
-        return .slice(lower, upper)
-    }
-
-    /// Not `nil` if the string can be transformed to a `PathElement.filter`
-    var filterPathElements: PathElement? {
-        guard isEnclosed(by: "#")  else { return nil }
-        var copy = self
-        copy.removeFirst()
-        copy.removeLast()
-        copy = copy.replacingOccurrences(of: "\\#", with: "#")
-        return .filter(copy)
-    }
+    public var pathValue: PathElement { .key(self) }
 }
 
 extension Int: PathElementRepresentable {

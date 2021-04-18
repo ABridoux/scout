@@ -20,8 +20,8 @@ struct DeleteKeyCommand: SADCommand {
 
     var pathsCollection: [Path] { [Path("empty")] }
 
-    @Flag(help: "The data format to read the input")
-    var dataFormat: DataFormat
+    @Option(name: [.customShort("f", allowingJoined: true), .customLong("format")], help: "The data format to read the input")
+    var dataFormat: Scout.DataFormat
 
     @Argument(help: "The regular expression pattern the keys to delete have to match")
     var pattern: String
