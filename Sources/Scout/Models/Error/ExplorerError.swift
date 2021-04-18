@@ -79,7 +79,7 @@ public extension ExplorerError {
     }
 
     static func wrongUsage(of element: PathElement) -> Self {
-        return ExplorerError(description: "The element \(element.keyName) \(element) cannot be used here. \(element.usage)")
+        return ExplorerError(description: "The element \(element.kindDescription) \(element) cannot be used here. \(element.usage)")
     }
 
     static func wrong(bounds: Bounds, arrayCount: Int) -> Self {
