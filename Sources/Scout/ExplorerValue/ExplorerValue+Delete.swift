@@ -23,7 +23,7 @@ extension ExplorerValue {
 
     /// Returns `true` if the end of the path is reached
     private mutating func _delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
-        guard let (head, tail) = path.cutHead() else { return true }
+        guard let (head, tail) = path.headAndTail() else { return true }
 
         try doSettingPath(tail.leftPart) {
             switch head {
@@ -42,90 +42,68 @@ extension ExplorerValue {
     // MARK: PathElement
 
     private mutating func delete(key: String, tail: SlicePath, deleteIfEmpty: Bool) throws {
-        switch self {
+        var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
+        var value = try dict.getJaroWinkler(key: key)
+        let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
 
-        case .dictionary(var dict):
-            var value = try dict.getJaroWinkler(key: key)
-            let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
-
-            if shouldDelete || (value.isEmpty && deleteIfEmpty) {
-                dict.removeValue(forKey: key)
-            } else {
-                dict[key] = value
-            }
-
-            self = .dictionary(dict)
-
-        default:
-            throw ExplorerError.subscriptKeyNoDict
+        if shouldDelete || (value.isEmpty && deleteIfEmpty) {
+            dict.removeValue(forKey: key)
+        } else {
+            dict[key] = value
         }
+
+        self = .dictionary(dict)
     }
 
     private mutating func delete(index: Int, tail: SlicePath, deleteIfEmpty: Bool) throws {
-        switch self {
+        var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
+        let index = try computeIndex(from: index, arrayCount: array.count)
+        var value = array[index]
+        let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
 
-        case .array(var array):
-            let index = try computeIndex(from: index, arrayCount: array.count)
-            var value = array[index]
-            let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
-
-            if shouldDelete || (value.isEmpty && deleteIfEmpty) {
-                array.remove(at: index)
-            } else {
-                array[index] = value
-            }
-            self = .array(array)
-
-        default:
-            throw ExplorerError.subscriptIndexNoArray
+        if shouldDelete || (value.isEmpty && deleteIfEmpty) {
+            array.remove(at: index)
+        } else {
+            array[index] = value
         }
+        self = .array(array)
     }
 
     private mutating func deleteFilter(with pattern: String, tail: SlicePath, deleteIfEmpty: Bool) throws {
-        switch self {
+        let dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
+        let regex = try NSRegularExpression(with: pattern)
 
-        case .dictionary(let dict):
-            let regex = try NSRegularExpression(with: pattern)
+        let modified = try dict.compactMap { (key, value) -> (String, ExplorerValue)? in
+            guard regex.validate(key) else { return (key, value) }
+            var value = value
+            let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
 
-            let modified = try dict.compactMap { (key, value) -> (String, ExplorerValue)? in
-                guard regex.validate(key) else { return (key, value) }
-                var value = value
-                let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
-
-                if shouldDelete || (value.isEmpty && deleteIfEmpty) {
-                    return nil
-                } else {
-                    return (key, value)
-                }
+            if shouldDelete || (value.isEmpty && deleteIfEmpty) {
+                return nil
+            } else {
+                return (key, value)
             }
-
-            self = .dictionary(Dictionary(uniqueKeysWithValues: modified))
-
-        default:
-            throw ExplorerError.wrongUsage(of: .filter(pattern))
         }
+
+        self = .dictionary(Dictionary(uniqueKeysWithValues: modified))
     }
 
     private mutating func deleteSlice(within bounds: Bounds, tail: SlicePath, deleteIfEmpty: Bool) throws {
-        switch self {
+        var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
+        let range = try bounds.range(arrayCount: array.count)
+        
+        let newRangeElements = try array[range].compactMap { (element) -> ExplorerValue? in
+            var element = element
+            let shouldDelete = try element._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
 
-        case .array(var array):
-            let range = try bounds.range(arrayCount: array.count)
-            let newRangeElements = try array[range].compactMap { (element) -> ExplorerValue? in
-                var element = element
-                let shouldDelete = try element._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
-
-                if shouldDelete || (element.isEmpty && deleteIfEmpty) {
-                    return nil
-                } else {
-                    return element
-                }
+            if shouldDelete || (element.isEmpty && deleteIfEmpty) {
+                return nil
+            } else {
+                return element
             }
-            array.replaceSubrange(range, with: newRangeElements)
-            self = .array(array)
-
-        default:
-            throw ExplorerError.wrongUsage(of: .slice(bounds))
         }
+
+        array.replaceSubrange(range, with: newRangeElements)
+        self = .array(array)
     }
 }

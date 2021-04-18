@@ -24,7 +24,7 @@ extension ExplorerXML {
 
     /// Returns `true` if the element should be deleted
     private func _delete(path: SlicePath, deleteIfEmpty: Bool) throws -> Bool {
-        guard let (head, tail) = path.cutHead() else { return true }
+        guard let (head, tail) = path.headAndTail() else { return true }
 
         try doSettingPath(tail.leftPart) {
             switch head {
@@ -44,36 +44,34 @@ extension ExplorerXML {
 
     private func delete(key: String, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let next = try getJaroWinkler(key: key)
-        if try next._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
-            next.removeFromParent()
-        }
+        try delete(tail: tail, on: next, deleteIfEmpty: deleteIfEmpty)
     }
 
     private func delete(index: Int, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let index = try computeIndex(from: index, arrayCount: childrenCount)
         let next = children[index]
-        if try next._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (next.children.isEmpty && deleteIfEmpty) {
-            next.removeFromParent()
-        }
+        try delete(tail: tail, on: next, deleteIfEmpty: deleteIfEmpty)
     }
 
     private func deleteFilter(with pattern: String, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let regex = try NSRegularExpression(with: pattern)
         try children
             .filter { regex.validate($0.name) }
-            .forEach { child in
-                if try child._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
-                    child.removeFromParent()
-                }
-            }
+            .forEach { try delete(tail: tail, on: $0, deleteIfEmpty: deleteIfEmpty) }
     }
 
     private func deleteSlice(within bounds: Bounds, deleteIfEmpty: Bool, tail: SlicePath) throws {
         let range = try bounds.range(arrayCount: childrenCount)
-        try children[range].forEach { child in
-            if try child._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
-                child.removeFromParent()
-            }
+        try children[range].forEach { try delete(tail: tail, on: $0, deleteIfEmpty: deleteIfEmpty) }
+    }
+}
+
+extension ExplorerXML {
+
+    /// Delete the tail in the child and then remove it from its parent if necessary
+    private func delete(tail: SlicePath, on child: ExplorerXML, deleteIfEmpty: Bool) throws {
+        if try child._delete(path: tail, deleteIfEmpty: deleteIfEmpty) || (child.children.isEmpty && deleteIfEmpty) {
+            child.removeFromParent()
         }
     }
 }

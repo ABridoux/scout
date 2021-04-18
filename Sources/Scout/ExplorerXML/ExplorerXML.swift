@@ -217,7 +217,7 @@ extension ExplorerXML {
 
 extension ExplorerXML {
 
-    /// `true` if the reference of `element` is shared.
+    /// `true` if the reference of `element` is shared. Used for copy on write.
     /// - note: Marked `mutating` but does not mutate. Requirement for `isKnownUniquelyReferenced`
     mutating func referenceIsShared() -> Bool { !isKnownUniquelyReferenced(&element) }
 }

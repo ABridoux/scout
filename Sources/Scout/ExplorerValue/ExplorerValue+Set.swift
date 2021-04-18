@@ -22,7 +22,7 @@ extension ExplorerValue {
     // MARK: General function
 
     private mutating func _set(path: SlicePath, to newValue: ExplorerValue) throws {
-        guard let (head, tail) = path.cutHead() else {
+        guard let (head, tail) = path.headAndTail() else {
             self = newValue
             return
         }
@@ -102,7 +102,6 @@ extension ExplorerValue {
 
     private mutating func set(key: String, keyName: String, tail: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-
         var value = try dict.getJaroWinkler(key: key)
         try value._set(path: tail, keyName: keyName)
         dict[key] = value
@@ -111,7 +110,6 @@ extension ExplorerValue {
 
     private mutating func set(index: Int, keyName: String, tail: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
-
         let index = try computeIndex(from: index, arrayCount: array.count)
         var element = array[index]
         try element._set(path: tail, keyName: keyName)
