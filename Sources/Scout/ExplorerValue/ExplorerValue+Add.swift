@@ -21,7 +21,7 @@ extension ExplorerValue {
 
     /// Return the value if it should be added to the parent
     private func _add(path: SlicePath, value: ExplorerValue) throws -> Self {
-        guard let (head, tail) = path.cutHead() else { return value }
+        guard let (head, tail) = path.headAndTail() else { return value }
 
         return try doSettingPath(tail.leftPart) {
             switch head {

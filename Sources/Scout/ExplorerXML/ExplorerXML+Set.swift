@@ -37,7 +37,7 @@ extension ExplorerXML {
     // MARK: General function
 
     private func _set(path: SlicePath, to newValue: ValueSetter) throws {
-        guard let (head, tail) = path.cutHead() else {
+        guard let (head, tail) = path.headAndTail() else {
             set(value: newValue)
             return
         }

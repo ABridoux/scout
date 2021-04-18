@@ -120,12 +120,10 @@ extension ExplorerValue: Codable {
             return .bool(bool)
         } else if let data = try? container.decode(Data.self) {
             return .data(data)
+        } else if container.decodeNil() {
+            return .string("null")
         } else {
-            if container.decodeNil() {
-                return .string("null")
-            } else {
-                throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath)")
-            }
+            throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath)")
         }
     }
 
@@ -238,19 +236,6 @@ extension ExplorerValue {
 }
 
 extension ExplorerValue {
-
-    /// Associated value as `Any`
-    var any: Any {
-        switch self {
-        case .string(let string): return string
-        case .int(let int): return int
-        case .double(let double): return double
-        case .bool(let bool): return bool
-        case .data(let data): return data
-        case .array(let array): return array
-        case .dictionary(let dict): return dict
-        }
-    }
 
     public var int: Int? {
         switch self {

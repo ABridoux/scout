@@ -24,7 +24,7 @@ extension ExplorerXML {
 
     /// Return the value if it should be added to the parent
     private func _add(value: ValueSetter, at path: SlicePath) throws {
-        guard let (head, tail) = path.cutHead() else {
+        guard let (head, tail) = path.headAndTail() else {
             set(value: value)
             return
         }
@@ -53,17 +53,18 @@ extension ExplorerXML {
 
     private func add(value: ValueSetter, at index: Int, tail: SlicePath) throws {
         let index = try computeIndex(from: index, arrayCount: childrenCount)
-
-        if children.allSatisfy(\.isSingle) {
-            let childToInsert = ExplorerXML(name: childrenName)
-            try childToInsert._add(value: value, at: tail)
-            var newChildren = children
-            newChildren.insert(childToInsert, at: index)
-            removeChildrenFromParent()
-            newChildren.forEach(addChild)
-        } else {
+        
+        guard children.allSatisfy(\.isSingle) else {
             try children[index]._add(value: value, at: tail)
+            return
         }
+
+        let childToInsert = ExplorerXML(name: childrenName)
+        try childToInsert._add(value: value, at: tail)
+        var newChildren = children
+        newChildren.insert(childToInsert, at: index)
+        removeChildrenFromParent()
+        newChildren.forEach(addChild)
     }
 
     private func addCount(value: ValueSetter, tail: SlicePath) throws {

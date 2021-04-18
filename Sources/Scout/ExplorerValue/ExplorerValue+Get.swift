@@ -17,7 +17,7 @@ extension ExplorerValue {
 
     /// - parameter detailedName: When `true`, the key name after a filter will be composed of the parent key followed by the child key
     private func _get(path: SlicePath) throws -> Self {
-        guard let (head, tail) = path.cutHead() else { return self }
+        guard let (head, tail) = path.headAndTail() else { return self }
 
         return try doSettingPath(tail.leftPart) {
             switch head {
@@ -34,66 +34,49 @@ extension ExplorerValue {
     // MARK: PathElement
 
     private func get(key: String, tail: SlicePath) throws -> Self {
-        switch self {
-        case .dictionary(let dict):
-            return try dict.getJaroWinkler(key: key)._get(path: tail)
-
-        default:
-            throw ExplorerError.subscriptKeyNoDict
-        }
+        try dictionary
+            .unwrapOrThrow(.subscriptKeyNoDict)
+            .getJaroWinkler(key: key)
+            ._get(path: tail)
     }
 
     private func get(index: Int, tail: SlicePath) throws -> Self {
-
-        switch self {
-        case .array(let array):
-            let index = try computeIndex(from: index, arrayCount: array.count)
-            return try array[index]._get(path: tail)
-
-        default:
-            throw ExplorerError.subscriptIndexNoArray
-        }
+        let array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
+        let index = try computeIndex(from: index, arrayCount: array.count)
+        return try array[index]._get(path: tail)
     }
 
     private func getCount(tail: SlicePath) throws -> Self {
         switch self {
         case .array(let array): return .int(array.count)
         case .dictionary(let dict): return .int(dict.count)
-        default:
-            throw ExplorerError.wrongUsage(of: .count)
+        default: throw ExplorerError.wrongUsage(of: .count)
         }
     }
 
     private func getKeysList(tail: SlicePath) throws -> Self {
-        switch self {
-        case .dictionary(let dict): return try (array <^> dict.keys.sorted().map(ExplorerValue.string))._get(path: tail)
+        let keys = try array <^>
+            dictionary
+            .unwrapOrThrow(.wrongUsage(of: .keysList))
+            .keys
+            .sorted()
+            .map(ExplorerValue.string)
 
-        default:
-            throw ExplorerError.wrongUsage(of: .keysList)
-        }
+        return try keys._get(path: tail)
     }
 
     private func getSlice(for bounds: Bounds, tail: SlicePath) throws -> Self {
-        switch self {
-        case .array(let array):
-            let range = try bounds.range(arrayCount: array.count)
-            return try self.array <^> array[range].map { try $0._get(path: tail) }
-
-        default:
-            throw ExplorerError.wrongUsage(of: .slice(bounds))
-        }
+        let array = try self.array.unwrapOrThrow(.wrongUsage(of: .slice(bounds)))
+        let range = try bounds.range(arrayCount: array.count)
+        return try self.array <^> array[range].map { try $0._get(path: tail) }
     }
 
     private func getFilter(with pattern: String, tail: SlicePath) throws -> Self {
-        switch self {
-        case .dictionary(let dict):
-            let regex = try NSRegularExpression(with: pattern)
-            return try dictionary <^> dict
-                .filter { regex.validate($0.key) }
-                .mapValues { try $0._get(path: tail) }
-
-        default:
-            throw ExplorerError.wrongUsage(of: .filter(pattern))
-        }
+        let regex = try NSRegularExpression(with: pattern)
+        return try dictionary <^>
+            dictionary
+            .unwrapOrThrow(.wrongUsage(of: .filter(pattern)))
+            .filter { regex.validate($0.key) }
+            .mapValues { try $0._get(path: tail) }
     }
 }

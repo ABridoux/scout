@@ -6,6 +6,8 @@
 import Foundation
 
 /// Lower and upper bounds to be used to slice an array
+///
+/// - note: Handles negative indexes
 public struct Bounds: Hashable {
 
     // MARK: - Properties
@@ -39,9 +41,9 @@ public struct Bounds: Hashable {
 
     // MARK: - Functions
 
+    /// Compute a range with the bounds for the array count.
     /// - Parameters:
     ///   - arrayCount: The count of the array to slice
-    ///   - path: Path where the bounds is specified. Used to throw a relevant error
     /// - Throws: If the bounds are invalid
     /// - Returns: A range made from the lower and upper bounds
     public func range(arrayCount: Int) throws -> ClosedRange<Int> {
@@ -94,7 +96,7 @@ public extension Bounds {
 
 extension Bounds {
 
-    /// Wrapper aound an `Int` value to avoid to make all the `Bounds` mutable
+    /// Wrapper around an `Int` value to avoid to make all the `Bounds` mutable
     /// - note: `Bounds` will only mutate those `IntWrapper` values internally
     @propertyWrapper
     final class IntWrapper: Hashable {

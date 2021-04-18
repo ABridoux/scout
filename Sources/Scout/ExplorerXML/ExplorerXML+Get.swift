@@ -47,7 +47,7 @@ extension ExplorerXML {
 
     private func get(index: Int, tail: SlicePath) throws -> Self {
         let index = try computeIndex(from: index, arrayCount: children.count)
-        return children[index]
+        return try children[index]._get(path: tail)
     }
 
     private func getCount(tail: SlicePath) throws -> Self {
@@ -56,16 +56,21 @@ extension ExplorerXML {
 
     private func getKeysList(tail: SlicePath) throws -> Self {
         let copy = copyWithoutChildren()
+
         children.map(\.name).forEach { key in
             let newChild = ExplorerXML(name: "key", value: key)
             copy.addChild(newChild)
         }
-        return try copy.with(name: "\(name)_keys")._get(path: tail)
+
+        return try copy
+            .with(name: "\(name)_keys")
+            ._get(path: tail)
     }
 
     private func getFilter(with pattern: String, tail: SlicePath) throws -> Self {
         let regex = try NSRegularExpression(with: pattern)
         var copy = copyWithoutChildren()
+
         copy.children = try children
             .lazy
             .filter { regex.validate($0.name) }

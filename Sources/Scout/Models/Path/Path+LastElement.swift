@@ -39,7 +39,7 @@ extension Collection where Element == PathElement {
 extension RandomAccessCollection {
 
     /// When not empty, return the first element and self without the first element
-    func cutHead() -> (head: Element, tail: SubSequence)? {
+    func headAndTail() -> (head: Element, tail: SubSequence)? {
         guard let head = first else { return nil }
         return (head, dropFirst())
     }
