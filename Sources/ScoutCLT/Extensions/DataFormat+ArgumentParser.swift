@@ -6,16 +6,8 @@
 import Scout
 import ArgumentParser
 
-extension DataFormat: ExpressibleByArgument {}
+extension DataFormat: ExpressibleByArgument {
 
-extension DataFormat: EnumerableFlag {
-
-    public static func name(for value: DataFormat) -> NameSpecification {
-        switch value {
-        case .json: return [.long, .customShort("J")]
-        case .plist: return [.long, .customShort("P")]
-        case .xml: return [.long, .customShort("X")]
-        case .yaml: return [.long, .customShort("Y")]
-        }
-    }
+    public var defaultValueDescription: String { "The data format to read the input" }
+    static var name: NameSpecification = [.customShort("f", allowingJoined: true), .customLong("format")]
 }
