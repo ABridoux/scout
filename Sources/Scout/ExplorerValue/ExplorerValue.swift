@@ -321,6 +321,7 @@ extension ExplorerValue: CustomDebugStringConvertible {
 
 precedencegroup SequencePrecedence {
     associativity: left
+    higherThan: AdditionPrecedence
 }
 
 infix operator <^>: SequencePrecedence

@@ -5,7 +5,7 @@
 
 import Foundation
 
-public extension Path {
+public extension Collection where Element == PathElement {
 
     /// Retrieve all the index elements
     var compactMapIndexes: [Int] { compactMap(\.index) }
@@ -31,5 +31,20 @@ public extension Path {
             }
             return nil
         }
+    }
+}
+
+public extension Collection where SubSequence == Slice<Path> {
+
+    func commonPrefix(with otherPath: Self) -> Slice<Path> {
+        var iterator = makeIterator()
+        var otherIterator = otherPath.makeIterator()
+        var lastIndex = 0
+
+        while let element = iterator.next(), let otherElement = otherIterator.next(), element == otherElement {
+            lastIndex += 1
+        }
+
+        return self[0..<lastIndex]
     }
 }
