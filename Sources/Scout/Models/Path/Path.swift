@@ -10,19 +10,16 @@ public struct Path: Hashable {
 
     // MARK: - Constants
 
-    public static var empty: Path { .init() }
+    public static let defaultSeparator = "."
+    private static let forbiddenSeparators: Set<String> = ["[", "]", "(", ")"]
 
     // MARK: - Properties
 
     private var elements: [PathElement] = []
 
-    // MARK: - Initialization
+    public static var empty: Path { .init() }
 
-    private init(string: String, splitRegex: NSRegularExpression) {
-        elements = splitRegex
-            .matches(in: string)
-            .map { PathElement(from: String($0).removingEnclosingBrackets()) }
-    }
+    // MARK: - Initialization
 
     /// Instantiate a `Path` for a string representing path components separated with the separator.
     ///
@@ -44,7 +41,7 @@ public struct Path: Hashable {
     /// ### Excluded separators
     /// The following separators will not work: '[', ']', '(', ')'.
     public init(string: String, separator: String = Self.defaultSeparator) throws {
-        try Self.validate(separator: separator)
+        if Self.forbiddenSeparators.contains(separator) { throw PathError.invalidSeparator(separator) }
 
         guard let result = Self.parser(separator: separator).run(string) else {
             elements = []

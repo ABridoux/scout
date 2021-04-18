@@ -28,6 +28,7 @@ extension PathParser {
         digit.many1.map { Int(String($0))! }
     }
 
+    /// Integer with an optional +/- prefix
     static var signedInteger: PathParser<Int> {
         curry { (sign, int) in
             switch sign {

@@ -5,35 +5,22 @@
 
 import Foundation
 
-extension Path: CustomStringConvertible, CustomDebugStringConvertible {
+public extension Collection where Element == PathElement {
 
     /// Prints all the elements in the path, with the default separator
     /// #### Complexity
     /// O(n) where `n`: element's count
-    public var description: String {
+    var description: String {
         var description = reduce(into: "", newDescription)
 
-        if description.hasSuffix(Self.defaultSeparator) {
+        if description.hasSuffix(Path.defaultSeparator) {
             description.removeLast()
         }
 
         return description
     }
 
-    /// Description of the reversed path
-    /// ### Complexity
-    /// O(n) where `n`: element's count
-    public var reversedDescription: String {
-        var description = reversed().reduce(into: "", newDescription)
-
-        if description.hasSuffix(Self.defaultSeparator) {
-            description.removeLast()
-        }
-
-        return description
-    }
-
-    public var debugDescription: String { description }
+    var debugDescription: String { description }
 
     private func newDescription(from description: inout String, with element: PathElement) {
 
@@ -41,7 +28,7 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
 
         case .index, .count, .slice, .keysList:
             // remove the point added automatically to a path element
-            if description.hasSuffix(Self.defaultSeparator) {
+            if description.hasSuffix(Path.defaultSeparator) {
                 description.removeLast()
             }
             description.append(element.description)
@@ -53,6 +40,9 @@ extension Path: CustomStringConvertible, CustomDebugStringConvertible {
             description.append(element.description)
         }
 
-        description.append(Self.defaultSeparator)
+        description.append(Path.defaultSeparator)
     }
 }
+
+extension Path: CustomStringConvertible, CustomDebugStringConvertible {}
+extension Slice: CustomStringConvertible, CustomDebugStringConvertible where Base == Path {}
