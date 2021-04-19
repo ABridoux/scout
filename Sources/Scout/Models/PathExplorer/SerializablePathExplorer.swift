@@ -32,6 +32,9 @@ public protocol SerializablePathExplorer: PathExplorer {
     /// Export the path explorer value to the specified format string data with a default root name "root"
     func exportString(to format: DataFormat, rootName: String?) throws -> String
 
+    /// Returns a new explorer from the provided CSV string when it's possible. Throws otherwise.
+    static func fromCSV(string: String, separator: Character, hasHeaders: Bool) throws -> Self
+
     /// New explorer replacing the group values (array or dictionaries) sub values by a unique one
     /// holding a fold mark to be replaced when exporting the string value.
     /// - note: Use `exportFoldedString(upTo:)` to directly get the string value

@@ -14,9 +14,7 @@ extension PathExplorer {
     func computeIndex(from index: Int, arrayCount: Int) throws -> Int {
         let computedIndex = index < 0 ? arrayCount + index : index
 
-        if computedIndex == 0 && arrayCount == 0 {
-            return 0
-        }
+        if computedIndex == 0 && arrayCount == 0 { return 0 }
 
         guard 0 <= computedIndex, computedIndex < arrayCount else {
             throw ExplorerError.wrong(index: index, arrayCount: arrayCount)

@@ -158,7 +158,7 @@ extension ExplorerValue: Codable {
     }
 }
 
-// MARK: - Any
+// MARK: - Special init
 
 extension ExplorerValue {
 
@@ -180,6 +180,13 @@ extension ExplorerValue {
         } else {
             throw ExplorerError.invalid(value: value)
         }
+    }
+
+    static func singleFrom(string: String) -> ExplorerValue {
+        if let int = Int(string) { return .int(int) }
+        else if let double = Double(string) { return .double(double) }
+        else if let bool = Bool(string) { return .bool(bool) }
+        else { return .string(string) }
     }
 }
 
