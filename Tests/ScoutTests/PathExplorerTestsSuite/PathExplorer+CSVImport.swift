@@ -15,7 +15,7 @@ final class PathExplorerCSVImportTests: XCTestCase {
     }
 
     func testExplorerXML() throws {
-//        try test(ExplorerXML.self)
+        try test(ExplorerXML.self)
     }
 
     func test<P: Explorer>(_ type: P.Type) throws {
