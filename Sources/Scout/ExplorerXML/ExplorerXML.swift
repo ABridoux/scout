@@ -202,7 +202,7 @@ extension ExplorerXML {
         return self
     }
 
-    func set(value: String) {
+    func set(value: String?) {
         element.value = value
     }
 
@@ -247,15 +247,6 @@ extension ExplorerXML {
     /// A new `ExplorerXML` with a new element and new children, keeping the name, value and attributes
     func copy() -> Self {
         ExplorerXML(element: element.copy())
-    }
-}
-
-extension ExplorerXML {
-
-    enum GroupSample {
-        case filter, slice
-
-        static var keySeparator: String { "_" }
     }
 }
 

@@ -127,6 +127,6 @@ extension PathExplorerCSVImportTests {
         let explorer = try P.fromCSV(string: csv, separator: ";", hasHeaders: headers)
         let expectedExplorer = P(value: expected)
 
-        XCTAssertExplorersEqual(explorer, expectedExplorer,file: file, line: line)
+        XCTAssertExplorersEqual(explorer, expectedExplorer, file: file, line: line)
     }
 }

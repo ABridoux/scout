@@ -8,6 +8,8 @@ import SwiftCSV
 
 extension ExplorerValue {
 
+    private typealias Tree = PathTree<ExplorerValue?>
+
     static func fromCSV(string: String, separator: Character, hasHeaders: Bool) throws -> ExplorerValue {
         let csv = try CSV(string: string, delimiter: separator, loadColumns: hasHeaders)
         return try from(csv: csv, headers: hasHeaders)
@@ -24,19 +26,28 @@ extension ExplorerValue {
     }
 
     private static func fromArrayOfDictionaries(csv: CSV) throws -> ExplorerValue {
-        let headers = try csv.header.map { try (key: $0, path: Path(string: $0)) }.sorted { $0.path.comparedByKeyAndIndexes(with: $1.path) }
-        let dicts = try csv.namedRows.map { row -> ExplorerValue in try from(row: row, with: headers) }
+        let rootTree = Tree.root()
+        let headers = try csv.header
+            .map { try (key: $0, path: Path(string: $0)) } // transform keys to paths
+            .sorted { $0.path.comparedByKeyAndIndexes(with: $1.path) } // sort by path
+            .map { ($0.key, rootTree.insert(path: $0.path)) } // insert paths in the PathTree
+
+        let dicts = try csv.namedRows.compactMap { row -> ExplorerValue? in
+            try from(row: row, with: headers, rootTree: rootTree)
+        }
+
         return .array(dicts)
     }
 
-    private static func from(row: [String: String], with headers: [(key: String, path: Path)]) throws -> ExplorerValue {
-        var dict = ExplorerValue.dictionary([:])
-
-        try headers.forEach { (key, path) in
-            guard let value = row[key] else { return }
-            try dict.add(.singleFrom(string: value), at: path)
+    private static func from(row: [String: String], with keysTrees: [(key: String, path: Tree)], rootTree: Tree) throws -> ExplorerValue? {
+        keysTrees.forEach { (key, tree) in
+            if let value = row[key] {
+                tree.value = .leaf(value: .singleFrom(string: value))
+            } else {
+                tree.value = .leaf(value: nil)
+            }
         }
 
-        return dict
+        return try ExplorerValue.newValue(exploring: rootTree)
     }
 }
