@@ -13,3 +13,26 @@ extension RandomAccessCollection {
         return (head, dropFirst())
     }
 }
+
+extension Collection {
+
+    /// Unwrap all the elements mapped by the provided function. If one unwrap fails, `nil` is returned
+    func unwrapAll<T>(_ transform: (Element) throws -> T?) rethrows -> [T]? {
+        var unwrapped: [T] = []
+
+        for element in self {
+            if let transformed = try transform(element) {
+                unwrapped.append(transformed)
+            } else {
+                return nil
+            }
+        }
+
+        return unwrapped
+    }
+
+    /// Unwrap all the elements mapped by the provided key path. If one unwrap fails, `nil` is returned
+    func unwrapAll<T>(_ keyPath: KeyPath<Element, T?>) -> [T]? {
+        unwrapAll { $0[keyPath: keyPath] }
+    }
+}
