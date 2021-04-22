@@ -11,7 +11,7 @@ extension ExplorerXML {
     ///     - keepingAttributes: `true` when the attributes should be included as data
     ///     - singleChildStrategy: Specify how single children should be treated, as they can represent an array or a dictionary.
     /// ### Complexity
-    /// `O(n)`  where `n` is the sum of all children
+    /// `O(n)` where `n` is the sum of all children
     ///
     /// ### Attributes
     /// If a XML element has attributes and `keepingAttributes` is `true`,
@@ -20,8 +20,9 @@ extension ExplorerXML {
     /// and "value" which holds the `ExplorerValue` conversion of the element.
     ///
     /// ### Single child strategy
-    /// When there is only one child, it's not possible to make sure of the group value that should be create: array or dictionary. The `default` strategy will look at the
-    /// child name. If it's the default XML element name, an array will be created. Otherwise, it will be a dictionary. A custom function can be used.
+    /// When there is only one child, it's not possible to make sure of the group value that should be created: array or dictionary.
+    /// The `default` strategy will look at the child name. If it's the default XML element name, an array will be created.
+    /// Otherwise, it will be a dictionary. A custom function can be used.
     public func explorerValue(keepingAttributes: Bool = true, singleChildStrategy: SingleChildStrategy = .default) -> ExplorerValue {
         if children.isEmpty {
             return singleExplorerValue(keepingAttributes: keepingAttributes)
@@ -81,6 +82,8 @@ extension ExplorerXML {
             SingleChildStrategy { (key, value) in transform(key, value) }
         }
 
+        /// Check the the element name. With a default name, an array is returned.
+        /// Otherwise a dictionary
         public static let `default` = SingleChildStrategy { (key, value) in
             if key == Element.defaultName {
                 return array.transform(key, value)
