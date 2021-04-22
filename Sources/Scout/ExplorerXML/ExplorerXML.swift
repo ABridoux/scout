@@ -38,12 +38,63 @@ public struct ExplorerXML: PathExplorer {
     public var data: Data? { nil }
 
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable {
-        try children.map { try T(from: $0.explorerValue()) }
+        try array(of: T.self, keepingAttributes: true, singleChildStrategy: .default)
     }
 
-    public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
-        try Dictionary(uniqueKeysWithValues: children.map { try ($0.name, T(from: $0.explorerValue())) })
+    /// An array of the provided type.
+    ///
+    /// - Parameters:
+    ///     - keepingAttributes: `true` when the attributes should be included as data
+    ///     - singleChildStrategy: Specify how single children should be treated, as they can represent an array or a dictionary.
+    ///
+    /// ### Attributes
+    /// If a XML element has attributes and `keepingAttributes` is `true`,
+    /// the format of the returned `ExplorerValue` will be modified to
+    /// a dictionary with two keys:"attributes" which holds the attributes of the element as `[String: String]`
+    /// and "value" which holds the `ExplorerValue` conversion of the element.
+    ///
+    /// ### Single child strategy
+    /// When there is only one child, it's not possible to make sure of the group value that should be created: array or dictionary.
+    /// The `default` strategy will look at the child name. If it's the default XML element name, an array will be created.
+    /// Otherwise, it will be a dictionary. A custom function can be used.
+    public func array<T: ExplorerValueCreatable>(
+        of type: T.Type,
+        keepingAttributes: Bool,
+        singleChildStrategy: SingleChildStrategy)
+    throws -> [T]  {
+        try children.map { try T(from: $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy)) }
     }
+
+
+    public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
+        try dictionary(of: T.self, keepingAttributes: true, singleChildStrategy: .default)
+    }
+
+    /// A dictionary of the provided type.
+    ///
+    /// - Parameters:
+    ///     - keepingAttributes: `true` when the attributes should be included as data
+    ///     - singleChildStrategy: Specify how single children should be treated, as they can represent an array or a dictionary.
+    ///
+    /// ### Attributes
+    /// If a XML element has attributes and `keepingAttributes` is `true`,
+    /// the format of the returned `ExplorerValue` will be modified to
+    /// a dictionary with two keys:"attributes" which holds the attributes of the element as `[String: String]`
+    /// and "value" which holds the `ExplorerValue` conversion of the element.
+    ///
+    /// ### Single child strategy
+    /// When there is only one child, it's not possible to make sure of the group value that should be created: array or dictionary.
+    /// The `default` strategy will look at the child name. If it's the default XML element name, an array will be created.
+    /// Otherwise, it will be a dictionary. A custom function can be used.
+    public func dictionary<T: ExplorerValueCreatable>(
+        of type: T.Type,
+        keepingAttributes: Bool,
+        singleChildStrategy: SingleChildStrategy)
+    throws -> [String: T] {
+        let dict = children.map { try ($0.name, T(from: $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy))) }
+        try Dictionary(uniqueKeysWithValues: dict)
+    }
+
 
     public var isGroup: Bool { !element.children.isEmpty }
     public var isSingle: Bool { element.children.isEmpty }
