@@ -53,7 +53,7 @@ extension ExplorerValue {
             .toCSV(separator: separator) + "\n"
 
         var csvString = arrayOfDictionaries.reduce(headersLine) { (csvString, value) in
-            let line = value.exploreReduce(initial: "", paths: headers) { (csvString, result) in
+            let line = value.reduceWithMemory(initial: "", paths: headers) { (csvString, result) in
 
                 let string: String
                 switch result {

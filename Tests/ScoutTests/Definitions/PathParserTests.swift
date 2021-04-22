@@ -8,9 +8,11 @@ import XCTest
 
 final class PathParserTests: XCTestCase {
 
+    typealias ElementParsers = Path.ElementParsers
+
     func testKey() {
         test(
-            parser: Path.keyParser(separator: "."),
+            parser: ElementParsers.key(separator: "."),
             on: "firstKey.secondKey",
             expected: "firstKey"
         )
@@ -18,7 +20,7 @@ final class PathParserTests: XCTestCase {
 
     func testIndex() {
         test(
-            parser: Path.indexParser,
+            parser: ElementParsers.index,
             on: "[10]",
             expected: 10
         )
@@ -26,7 +28,7 @@ final class PathParserTests: XCTestCase {
 
     func testIndex_Negative() {
         test(
-            parser: Path.indexParser,
+            parser: ElementParsers.index,
             on: "[-10]",
             expected: -10
         )
@@ -34,7 +36,7 @@ final class PathParserTests: XCTestCase {
 
     func testIndex_Positive() {
         test(
-            parser: Path.indexParser,
+            parser: ElementParsers.index,
             on: "[+10]",
             expected: 10
         )
@@ -42,7 +44,7 @@ final class PathParserTests: XCTestCase {
 
     func testSlice_Full() {
         test(
-            parser: Path.sliceParser,
+            parser: ElementParsers.slice,
             on: "[2:13]",
             expected: .slice(2, 13)
         )
@@ -50,7 +52,7 @@ final class PathParserTests: XCTestCase {
 
     func testSlice_NoLeft() {
         test(
-            parser: Path.sliceParser,
+            parser: ElementParsers.slice,
             on: "[:13]",
             expected: .slice(.first, 13)
         )
@@ -58,7 +60,7 @@ final class PathParserTests: XCTestCase {
 
     func testSlice_NoRight() {
         test(
-            parser: Path.sliceParser,
+            parser: ElementParsers.slice,
             on: "[2:]",
             expected: .slice(2, .last)
         )
@@ -66,7 +68,7 @@ final class PathParserTests: XCTestCase {
 
     func testSlice_NoLeftNoRight() {
         test(
-            parser: Path.sliceParser,
+            parser: ElementParsers.slice,
             on: "[:]",
             expected: .slice(.first, .last)
         )
@@ -74,7 +76,7 @@ final class PathParserTests: XCTestCase {
 
     func testFilter() {
         test(
-            parser: Path.filterParser,
+            parser: ElementParsers.filter,
             on: "#Toto|Endo#",
             expected: .filter("Toto|Endo")
         )

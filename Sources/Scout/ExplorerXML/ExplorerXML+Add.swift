@@ -52,6 +52,10 @@ extension ExplorerXML {
     }
 
     private func add(value: ValueSetter, at index: Int, tail: SlicePath) throws {
+        if index == childrenCount {
+            return try addCount(value: value, tail: tail)
+        }
+
         let index = try computeIndex(from: index, arrayCount: childrenCount)
 
         guard children.allSatisfy(\.isSingle) else {

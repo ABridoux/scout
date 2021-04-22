@@ -32,6 +32,9 @@ let package = Package(
             url: "https://github.com/jpsim/Yams.git",
             from: "4.0.0"),
         .package(
+            url: "https://github.com/swiftcsv/SwiftCSV",
+            from: "0.6.0"),
+        .package(
             url: "https://github.com/ABridoux/BooleanExpressionEvaluation",
             from: "2.0.0")
     ],
@@ -41,6 +44,7 @@ let package = Package(
             dependencies: [
                 "AEXML",
                 "Yams",
+                "SwiftCSV",
                 "BooleanExpressionEvaluation"]),
         .target(
             name: "ScoutCLTCore",

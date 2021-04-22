@@ -31,6 +31,8 @@ final class PathExplorerCSVExportTests: XCTestCase {
         // use this function to launch a test with a specific PathExplorer
     }
 
+    // MARK: - Suite
+
     func testExportCSV_SingleValues<P: SerializablePathExplorer>(_ type: P.Type) throws {
         try testExportCSV(
             P.self,

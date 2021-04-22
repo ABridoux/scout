@@ -31,22 +31,16 @@ extension AEXMLElement {
     var childrenName: String { children.first?.name ?? name }
 
     /// The common name of all the children if one is found
-    /// - note: Handles the case where the name is a path leading to the key when using dictionary filters
     var commonChildrenName: String? {
-        guard
-            let firstChild = children.first,
-            let name = firstChild.name.components(separatedBy: ExplorerXML.GroupSample.keySeparator).last
-        else {
+        guard let firstChildName = children.first?.name else {
             return nil
         }
 
-        for child in children {
-            if child.name.components(separatedBy: ExplorerXML.GroupSample.keySeparator).last != name {
-                return nil
-            }
+        if !children.allSatisfy({ $0.name == firstChildName }) {
+            return nil
         }
 
-        return name
+        return firstChildName
     }
 
     /// `true` if all the children have a different name

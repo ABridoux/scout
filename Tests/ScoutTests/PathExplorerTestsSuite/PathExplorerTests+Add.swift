@@ -33,6 +33,7 @@ final class PathExplorerAddTests: XCTestCase {
         try testAddIndex(P.self)
         try testAddIndex_Negative(P.self)
         try testAddIndex_NestedIndex(P.self)
+        try testAddIndex_ArrayCount(P.self)
         try testAddIndex_NestedKey(P.self)
         try testAddIndex_GroupValue(P.self)
 
@@ -130,6 +131,16 @@ final class PathExplorerAddTests: XCTestCase {
             path: -2,
             value: 2.5,
             expected: [1, 2.5, true, "hello"]
+        )
+    }
+
+    func testAddIndex_ArrayCount<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        try testAdd(
+            P.self,
+            initial: [1, true, "hello"],
+            path: 3,
+            value: 2.5,
+            expected: [1, true, "hello", 2.5]
         )
     }
 

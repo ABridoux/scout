@@ -52,7 +52,7 @@ extension ExplorerXML {
         let headersLine = headers.reduce("") { "\($0)\($1.description.escapingCSV(separator))\(separator)" } + "\n"
 
         var csvString = children.reduce(headersLine) { (csvString, explorer) in
-            let line = explorer.exploreReduce(initial: "", paths: headers) { (csvString, result) in
+            let line = explorer.reduceWithMemory(initial: "", paths: headers) { (csvString, result) in
 
                 let string: String
                 switch result {

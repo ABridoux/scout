@@ -21,6 +21,7 @@ public struct ExplorerXML: PathExplorer {
     private var element: AEXMLElement
     var name: String { element.name }
     var xml: String { element.xml }
+    var attributes: [String: String] { element.attributes }
     func attribute(named name: String) -> String? { element.attributes[name] }
 
     // MARK: PathExplorer
@@ -28,56 +29,10 @@ public struct ExplorerXML: PathExplorer {
     public var string: String? { element.string.trimmingCharacters(in: .whitespacesAndNewlines) == "" ? nil : element.string }
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
+    public var double: Double? { element.double }
+
+    @available(*, deprecated)
     public var real: Double? { element.double }
-
-    /// The `ExplorerValue` conversion of the XML element
-    /// ### Complexity
-    /// `O(n)`  where `n` is the sum of all children
-    ///
-    /// ### Attributes
-    /// If a XML element has attributes and `keepingAttributes` is `true`,
-    /// the format of the returned `ExplorerValue` will be modified to
-    /// a dictionary with two keys:"attributes" which holds the attributes of the element as `[String: String]`
-    /// and "value" which holds the `ExplorerValue` conversion of the element.
-    public func explorerValue(keepingAttributes: Bool = true) -> ExplorerValue {
-        if children.isEmpty {
-            return singleExplorerValue(keepingAttributes: keepingAttributes)
-        }
-
-        #warning("It might be useful to offer a strategy customisation for single elements: array or dict")
-        if let names = element.uniqueChildrenNames, names.count > 1 { // dict
-            let dict = children.map { (key: $0.name, value: $0.explorerValue(keepingAttributes: keepingAttributes)) }
-            let dictValue = ExplorerValue.dictionary(Dictionary(uniqueKeysWithValues: dict))
-            return keepingAttributes ? valueWithAttributes(value: dictValue) : dictValue
-        } else { // array
-
-            let arrayValue = ExplorerValue.array(children.map { $0.explorerValue(keepingAttributes: keepingAttributes) })
-            return keepingAttributes ? valueWithAttributes(value: arrayValue) : arrayValue
-        }
-    }
-
-    private func singleExplorerValue(keepingAttributes: Bool) -> ExplorerValue {
-        let value: ExplorerValue
-        if let int = element.int {
-            value = .int(int)
-        } else if let double = element.double {
-            value = .double(double)
-        } else if let bool = element.bool {
-            value = .bool(bool)
-        } else {
-            value = .string(element.string)
-        }
-
-        return keepingAttributes ? valueWithAttributes(value: value) : value
-    }
-
-    private func valueWithAttributes(value: ExplorerValue) -> ExplorerValue {
-        if element.attributes.isEmpty {
-            return value
-        } else {
-            return .dictionary(["attributes": element.attributes.explorerValue(), "value": value])
-        }
-    }
 
     /// Always `nil` on XML
     public var data: Data? { nil }
@@ -190,6 +145,9 @@ extension ExplorerXML {
     /// `true` if all children have the same name
     var childrenHaveCommonName: Bool { element.commonChildrenName != nil }
 
+    /// All children names. `nil` if two names are reused
+    var uniqueChildrenNames: Set<String>? { element.uniqueChildrenNames }
+
     var children: [ExplorerXML] {
         get { element.children.map { ExplorerXML(element: $0) }}
         set {
@@ -244,7 +202,7 @@ extension ExplorerXML {
         return self
     }
 
-    func set(value: String) {
+    func set(value: String?) {
         element.value = value
     }
 
@@ -289,15 +247,6 @@ extension ExplorerXML {
     /// A new `ExplorerXML` with a new element and new children, keeping the name, value and attributes
     func copy() -> Self {
         ExplorerXML(element: element.copy())
-    }
-}
-
-extension ExplorerXML {
-
-    enum GroupSample {
-        case filter, slice
-
-        static var keySeparator: String { "_" }
     }
 }
 

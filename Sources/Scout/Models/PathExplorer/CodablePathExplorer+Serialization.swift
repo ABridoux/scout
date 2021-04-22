@@ -45,6 +45,10 @@ extension CodablePathExplorer: SerializablePathExplorer {
         try value.exportCSV(separator: separator ?? defaultCSVSeparator)
     }
 
+    public static func fromCSV(string: String, separator: Character, hasHeaders: Bool) throws -> CodablePathExplorer<Format> {
+        try Self(value: .fromCSV(string: string, separator: separator, hasHeaders: hasHeaders))
+    }
+
     public func folded(upTo level: Int) -> Self {
         Self(value: value.folded(upTo: level))
     }

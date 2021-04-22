@@ -48,6 +48,11 @@ extension ExplorerValue {
 
     private func add(index: Int, value: ExplorerValue, tail: SlicePath) throws -> ExplorerValue {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
+
+        if index == array.count {
+            return try addCount(value: value, tail: tail)
+        }
+
         let index = try computeIndex(from: index, arrayCount: array.count)
         let newValue = try array[index]._add(path: tail, value: value)
 
