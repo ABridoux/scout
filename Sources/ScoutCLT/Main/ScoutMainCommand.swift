@@ -29,7 +29,7 @@ struct ScoutMainCommand: ParsableCommand {
             commandName: "scout",
             abstract: abstract,
             discussion: discussion,
-            version: Scout.ScoutVersion.current,
+            version: ScoutVersion.current,
             subcommands: [
                 ReadCommand.self,
                 SetCommand.self,

@@ -26,7 +26,7 @@ struct PathsCommand: ScoutCommand {
     @Argument(help: "Initial path from which the paths should be listed")
     var initialPath: Path?
 
-    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
+    @Option(name: .inputFilePath, help: .inputFilePath, completion: .file())
     var inputFilePath: String?
 
     @Option(name: [.short, .customLong("key")], help: "Specify a regular expression to filter the keys")

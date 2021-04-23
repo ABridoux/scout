@@ -9,40 +9,32 @@ import ScoutCLTCore
 
 final class ExportCommandTests: XCTestCase {
 
-    func testExportCSV() throws {
-        var command = StubCommand()
-        command.csv = true
-
-        XCTAssertEqual(try command.export(), .csv(separator: nil))
-    }
-
     func testExportCSVSeparator() throws {
         var command = StubCommand()
         command.csvSeparator = "/"
 
-        XCTAssertEqual(try command.export(), .csv(separator: "/"))
+        XCTAssertEqual(try command.exportOption(), .csv(separator: "/"))
     }
 
     func testExportDataFormat() throws {
         var command = StubCommand()
         command.exportFormat = .plist
 
-        XCTAssertEqual(try command.export(), .dataFormat(format: .plist))
+        XCTAssertEqual(try command.exportOption(), .dataFormat(format: .plist))
     }
 
     func testExportCSVAndDataFormatThrows() throws {
         var command = StubCommand()
-        command.csv = true
+        command.csvSeparator = ";"
         command.exportFormat = .plist
 
-        XCTAssertThrowsError(try command.export())
+        XCTAssertThrowsError(try command.exportOption())
     }
 }
 
 extension ExportCommandTests {
 
     struct StubCommand: ExportCommand {
-        var csv = false
         var csvSeparator: String?
         var exportFormat: DataFormat?
     }

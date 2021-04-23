@@ -7,27 +7,24 @@ import Foundation
 import Scout
 
 public enum Export: Equatable {
-    case csv(separator: String?)
+    case noExport
+    case csv(separator: String)
     case dataFormat(format: Scout.DataFormat)
 }
 
 public protocol ExportCommand {
-
-    var csv: Bool { get }
     var csvSeparator: String? { get }
     var exportFormat: DataFormat? { get }
 }
 
 public extension ExportCommand {
 
-    func export() throws -> Export? {
-        let csv = self.csv || (csvSeparator != nil)
-
-        switch (csv, exportFormat) {
-        case (true, nil): return .csv(separator: csvSeparator)
-        case (false, .some(let format)): return .dataFormat(format: format)
-        case (false, nil): return nil
-        case (true, .some): throw CLTCoreError.exportConflict
+    func exportOption() throws -> Export {
+        switch (csvSeparator, exportFormat) {
+        case (let separator?, nil): return .csv(separator: separator)
+        case (nil, let format?): return .dataFormat(format: format)
+        case (nil, nil): return .noExport
+        case (.some, .some): throw CLTCoreError.exportConflict
         }
     }
 

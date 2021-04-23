@@ -35,7 +35,6 @@ extension SADCommand {
         return
             color.colorise
             && csvSeparator == nil
-            && csv == false
             && !FileHandle.standardOutput.isPiped
     }
 
@@ -63,7 +62,7 @@ extension SADCommand {
             FileManager.default.createFile(atPath: output, contents: nil, attributes: nil)
         }
 
-        switch try export() {
+        switch try exportOption() {
         case .csv(let separator):
             let csv = try pathExplorer.exportCSV(separator: separator)
             if let output = outputFilePath {
@@ -85,7 +84,7 @@ extension SADCommand {
             }
             return
 
-        case nil:
+        case .noExport:
             break
         }
 
