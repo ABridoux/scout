@@ -173,7 +173,7 @@ extension ExplorerXML {
                 let childExplorer = try ExplorerXML.newValue(exploring: childTree)
                 explorer.addChild(childExplorer)
             }
-            
+
         case .uninitializedLeaf: throw ExplorerError(description: "Uninitialized leaf encountered while building from PathTree")
         }
 

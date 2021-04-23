@@ -61,10 +61,9 @@ public struct ExplorerXML: PathExplorer {
         of type: T.Type,
         keepingAttributes: Bool,
         singleChildStrategy: SingleChildStrategy)
-    throws -> [T]  {
+    throws -> [T] {
         try children.map { try T(from: $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy)) }
     }
-
 
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable {
         try dictionary(of: T.self, keepingAttributes: true, singleChildStrategy: .default)
@@ -91,10 +90,9 @@ public struct ExplorerXML: PathExplorer {
         keepingAttributes: Bool,
         singleChildStrategy: SingleChildStrategy)
     throws -> [String: T] {
-        let dict = children.map { try ($0.name, T(from: $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy))) }
-        try Dictionary(uniqueKeysWithValues: dict)
+        let dict = try children.map { try ($0.name, T(from: $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy))) }
+        return Dictionary(uniqueKeysWithValues: dict)
     }
-
 
     public var isGroup: Bool { !element.children.isEmpty }
     public var isSingle: Bool { element.children.isEmpty }
