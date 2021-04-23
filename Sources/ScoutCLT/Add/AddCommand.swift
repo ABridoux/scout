@@ -18,7 +18,7 @@ struct AddCommand: SADCommand {
 
     // MARK: - Properties
 
-    @Option(name: DataFormat.name)
+    @Option(name: .dataFormat, help: .dataFormat)
     var dataFormat: Scout.DataFormat
 
     @Argument(help: PathAndValue.help)

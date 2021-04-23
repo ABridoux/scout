@@ -7,6 +7,7 @@ import ArgumentParser
 
 extension NameSpecification {
 
+    static let dataFormat: NameSpecification = [.customShort("f", allowingJoined: true), .customLong("format")]
     static let inputFilePath: NameSpecification = [.short, .customLong("input")]
     static let outputFilePath: NameSpecification = [.short, .customLong("output")]
     static let modifyFilePath: NameSpecification = [.short, .customLong("modify")]
@@ -17,6 +18,7 @@ extension NameSpecification {
 
 extension ArgumentHelp {
 
+    static let dataFormat = ArgumentHelp("The data format of the input")
     static let inputFilePath = ArgumentHelp("A file path from which to read the data")
     static let outputFilePath = ArgumentHelp("Write the modified data into the file at the given path")
     static let modifyFilePath = ArgumentHelp("Read and write the data into the same file at the given path")

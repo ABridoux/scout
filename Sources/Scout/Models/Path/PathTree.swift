@@ -45,8 +45,8 @@ final class PathTree<Value: Equatable> {
         PathTree(value: .node(children: children), element: element)
     }
 
-    static func root() -> PathTree {
-        .node(children: [], element: .key("root"))
+    static func root(name: String = "root") -> PathTree {
+        .node(children: [], element: .key(name))
     }
 }
 

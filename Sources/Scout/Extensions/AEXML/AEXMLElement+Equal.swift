@@ -8,6 +8,7 @@ import AEXML
 extension AEXMLElement {
 
     static let defaultName = "element"
+    static let root = "root"
 
     func isEqual(to other: AEXMLElement) -> Bool {
 

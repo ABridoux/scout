@@ -16,8 +16,8 @@ private let discussion =
 To find advanced help and rich examples, please type `scout doc`.
 
 
-Written by Alexis Bridoux.
-\u{001B}[38;5;88mhttps://github.com/ABridoux/scout\u{001B}[0;0m
+Written by Alexis Bridoux. Copyright (c) 2020-present.
+\u{001B}[38;5;88mhttps://www.woodys-findings.com/scout\u{001B}[0;0m
 MIT license, see LICENSE file for details
 """
 
@@ -37,7 +37,7 @@ struct ScoutMainCommand: ParsableCommand {
                 AddCommand.self,
                 DocCommand.self,
                 PathsCommand.self,
+                CSVCommand.self,
                 InstallCompletionScriptCommand.self],
             defaultSubcommand: ReadCommand.self)
-
 }

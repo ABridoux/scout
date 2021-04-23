@@ -9,7 +9,7 @@ import ArgumentParser
 
 extension PathsFilter.ValueTarget: EnumerableFlag {}
 
-struct PathsCommand: ScoutCommand {
+struct PathsCommand: PathExplorerInputCommand {
 
     // MARK: - Constants
 
@@ -20,7 +20,7 @@ struct PathsCommand: ScoutCommand {
 
     // MARK: - Properties
 
-    @Option(name: DataFormat.name)
+    @Option(name: .dataFormat, help: .dataFormat)
     var dataFormat: Scout.DataFormat
 
     @Argument(help: "Initial path from which the paths should be listed")

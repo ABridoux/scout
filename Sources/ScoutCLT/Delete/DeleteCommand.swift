@@ -18,7 +18,7 @@ struct DeleteCommand: SADCommand {
 
     // MARK: - Properties
 
-    @Option(name: DataFormat.name)
+    @Option(name: .dataFormat, help: .dataFormat)
     var dataFormat: Scout.DataFormat
 
     @Argument(help: "Paths to indicate the keys to be deleted")

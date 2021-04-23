@@ -9,7 +9,7 @@ import Foundation
 import Lux
 import ScoutCLTCore
 
-struct ReadCommand: ScoutCommand, ExportCommand {
+struct ReadCommand: PathExplorerInputCommand, ExportCommand {
 
     // MARK: - Constants
 
@@ -30,7 +30,7 @@ struct ReadCommand: ScoutCommand, ExportCommand {
             && !FileHandle.standardOutput.isPiped
     }
 
-    @Option(name: DataFormat.name)
+    @Option(name: .dataFormat, help: .dataFormat)
     var dataFormat: Scout.DataFormat
 
     @Argument(help: .readingPath)

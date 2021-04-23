@@ -10,7 +10,7 @@ import Lux
 import ScoutCLTCore
 
 /// A Set/Add/Delete command for default implementations
-protocol SADCommand: ScoutCommand, ExportCommand {
+protocol SADCommand: PathExplorerInputCommand, ExportCommand {
 
     associatedtype PathCollection: Collection
 
