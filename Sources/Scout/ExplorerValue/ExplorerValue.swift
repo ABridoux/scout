@@ -323,12 +323,7 @@ extension ExplorerValue: CustomDebugStringConvertible {
 
 // MARK: - Helpers and Operators
 
-precedencegroup SequencePrecedence {
-    associativity: left
-    higherThan: AdditionPrecedence
-}
-
-infix operator <^>: SequencePrecedence
+infix operator <^>
 
 /// Apply the left function to the right operand
 /// - note: Mainly used as synthetic sugar to avoid over use of brackets

@@ -137,9 +137,6 @@ where
     ///
     /// #### Appending
     /// To add a key at the end of an array, specify the `PathElement.count`
-    ///
-    /// ### Non-existing key
-    /// Any non existing key encountered in the path will be created.
     mutating func add(_ value: ExplorerValue, at path: Path) throws
 
     /// Add a value at the given path, and return a new modified `PathExplorer`

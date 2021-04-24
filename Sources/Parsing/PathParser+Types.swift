@@ -5,31 +5,31 @@
 
 import Foundation
 
-typealias PathParsers = PathParser<String>
+public typealias Parsers = Parser<String>
 
-extension PathParser {
+public extension Parser {
 
-    static func character(matching condition: @escaping (Character) -> Bool) -> PathParser<Character> {
-        PathParser<Character> { input in
+    static func character(matching condition: @escaping (Character) -> Bool) -> Parser<Character> {
+        Parser<Character> { input in
             guard let char  = input.first, condition(char) else { return nil }
             return (char, input.dropFirst())
         }
     }
 
-    static func character(_ char: Character) -> PathParser<Character> {
+    static func character(_ char: Character) -> Parser<Character> {
         character { $0 == char }
     }
 
-    static var digit: PathParser<Character> {
+    static var digit: Parser<Character> {
         character { $0.isDecimalDigit }
     }
 
-    static var integer: PathParser<Int> {
+    static var integer: Parser<Int> {
         digit.many1.map { Int(String($0))! }
     }
 
     /// Integer with an optional +/- prefix
-    static var signedInteger: PathParser<Int> {
+    static var signedInteger: Parser<Int> {
         curry { (sign, int) in
             switch sign {
             case "+", nil: return int
@@ -44,8 +44,8 @@ extension PathParser {
     }
 
     /// Match when the input starts with the provided string
-    static func string(_ string: String) -> PathParser<String> {
-        PathParser<String> { input in
+    static func string(_ string: String) -> Parser<String> {
+        Parser<String> { input in
             guard input.hasPrefix(string) else { return nil }
             let remainder = input.dropFirst(string.count)
             return (string, remainder)
@@ -53,8 +53,8 @@ extension PathParser {
     }
 
     /// Match characters until one of the forbidden ones is encountered
-    static func string(forbiddenCharacters firstCharacter: Character, _ additionalCharacters: Character...) -> PathParser<String> {
-        PathParser<String> { input in
+    static func string(forbiddenCharacters firstCharacter: Character, _ additionalCharacters: Character...) -> Parser<String> {
+        Parser<String> { input in
             guard !input.isEmpty else { return nil }
             let forbiddenCharacters = Set([firstCharacter] + additionalCharacters)
             var remainder = input
@@ -83,8 +83,8 @@ extension PathParser {
     /// - Parameters:
     ///   - forbiddenString: The string to stop at
     ///   - forbiddenCharacters: Additional forbidden characters that should stop the parsing
-    static func string(stoppingAt forbiddenString: String, forbiddenCharacters: Character...) -> PathParser<String> {
-        PathParser<String> { input in
+    static func string(stoppingAt forbiddenString: String, forbiddenCharacters: Character...) -> Parser<String> {
+        Parser<String> { input in
             guard !input.isEmpty else { return nil }
 
             let forbiddenCharacters = Set(forbiddenCharacters)
@@ -114,19 +114,19 @@ extension PathParser {
         }
     }
 
-    var parenthesised: PathParser<R> {
+    var parenthesised: Parser<R> {
         .character("(") *> self <* .character(")")
     }
 
-    var parenthesisedSquare: PathParser<R> {
+    var parenthesisedSquare: Parser<R> {
         .character("[") *> self <* .character("]")
     }
 
-    var parenthesisedCurl: PathParser<R> {
+    var parenthesisedCurl: Parser<R> {
         .character("{") *> self <* .character("}")
     }
 
-    func enclosed(by character: Character) -> PathParser<R> {
+    func enclosed(by character: Character) -> Parser<R> {
         .character(character) *> self <* .character(character)
     }
 }

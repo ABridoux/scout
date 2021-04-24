@@ -11,6 +11,9 @@ let package = Package(
             name: "Scout",
             targets: ["Scout"]),
         .library(
+            name: "Parsing",
+            targets: ["Parsing"]),
+        .library(
             name: "ScoutCLTCore",
             targets: ["ScoutCLTCore"]),
         .executable(
@@ -45,7 +48,9 @@ let package = Package(
                 "AEXML",
                 "Yams",
                 "SwiftCSV",
+                "Parsing",
                 "BooleanExpressionEvaluation"]),
+        .target(name: "Parsing"),
         .target(
             name: "ScoutCLTCore",
             dependencies: [
@@ -56,7 +61,8 @@ let package = Package(
                 "Scout",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 "Lux",
-                "ScoutCLTCore"]),
+                "ScoutCLTCore",
+                "Parsing"]),
         .testTarget(
             name: "ScoutTests",
             dependencies: ["Scout"]),

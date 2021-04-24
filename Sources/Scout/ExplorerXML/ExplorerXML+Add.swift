@@ -58,7 +58,7 @@ extension ExplorerXML {
 
         let index = try computeIndex(from: index, arrayCount: childrenCount)
 
-        guard children.allSatisfy(\.isSingle) else {
+        guard tail.isEmpty else {
             try children[index]._add(value: value, at: tail)
             return
         }

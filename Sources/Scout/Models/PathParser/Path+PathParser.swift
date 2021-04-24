@@ -4,6 +4,7 @@
 // MIT license, see LICENSE file for details
 
 import Foundation
+import Parsing
 
 extension Path {
     enum ElementParsers {}
@@ -11,42 +12,42 @@ extension Path {
 
 extension Path.ElementParsers {
 
-    static func key(separator: String) -> PathParser<PathElement> {
-        PathParsers.string(stoppingAt: separator, forbiddenCharacters: "[", "{").map(PathElement.key)
+    static func key(separator: String) -> Parser<PathElement> {
+        Parsers.string(stoppingAt: separator, forbiddenCharacters: "[", "{").map(PathElement.key)
     }
 
-    static var parenthesisedKey: PathParser<PathElement> {
-        PathParsers.string(forbiddenCharacters: ")").parenthesised.map(PathElement.key)
+    static var parenthesisedKey: Parser<PathElement> {
+        Parsers.string(forbiddenCharacters: ")").parenthesised.map(PathElement.key)
     }
 
-    static var index: PathParser<PathElement> {
-        PathParsers.signedInteger.parenthesisedSquare.map(PathElement.index)
+    static var index: Parser<PathElement> {
+        Parsers.signedInteger.parenthesisedSquare.map(PathElement.index)
     }
 
-    static var count: PathParser<PathElement> {
-        PathParsers.character("#").parenthesisedSquare.map { _ in PathElement.count }
+    static var count: Parser<PathElement> {
+        Parsers.character("#").parenthesisedSquare.map { _ in PathElement.count }
     }
 
-    static var keysList: PathParser<PathElement> {
-        PathParsers.character("#").parenthesisedCurl.map { _ in PathElement.keysList }
+    static var keysList: Parser<PathElement> {
+        Parsers.character("#").parenthesisedCurl.map { _ in PathElement.keysList }
     }
 
-    static var bounds: PathParser<Bounds> {
+    static var bounds: Parser<Bounds> {
         curry { (lower, _, upper) in Bounds(lower: lower, upper: upper) }
-            <^> PathParsers.signedInteger.optional
+            <^> Parsers.signedInteger.optional
             <*> .character(":")
-            <*> PathParsers.signedInteger.optional
+            <*> Parsers.signedInteger.optional
     }
 
-    static var slice: PathParser<PathElement> {
+    static var slice: Parser<PathElement> {
         bounds.map(PathElement.slice).parenthesisedSquare
     }
 
-    static var filter: PathParser<PathElement> {
-        PathParsers.string(stoppingAt: "#").enclosed(by: "#").map(PathElement.filter)
+    static var filter: Parser<PathElement> {
+        Parsers.string(stoppingAt: "#").enclosed(by: "#").map(PathElement.filter)
     }
 
-    static func singlePathElement(separator: String) -> PathParser<PathElement> {
+    static func singlePathElement(separator: String) -> Parser<PathElement> {
         filter
             <|> slice
             <|> count
@@ -59,7 +60,7 @@ extension Path.ElementParsers {
 
 extension Path {
 
-    static func parser(separator: String) -> PathParser<[PathElement]> {
-        (ElementParsers.singlePathElement(separator: separator) <* PathParsers.string(separator).optional).many
+    static func parser(separator: String) -> Parser<[PathElement]> {
+        (ElementParsers.singlePathElement(separator: separator) <* Parsers.string(separator).optional).many
     }
 }

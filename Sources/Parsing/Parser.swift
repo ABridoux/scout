@@ -9,11 +9,11 @@ import Foundation
 ///
 /// - note: Inspired from [functional Swift](https://www.objc.io/books/functional-swift/)
 /// *Parser Combinators* chapter
-struct PathParser<R> {
+public struct Parser<R> {
     let parse: (Substring) -> (R, Substring)?
 }
 
-extension PathParser {
+public extension Parser {
 
     func run(_ string: String) -> (result: R, remainder: String)? {
         guard let (result, remainder) = parse(Substring(string)) else { return nil }
