@@ -13,7 +13,7 @@ final class ParserTests: XCTestCase {
 
     func testKey() {
         test(
-            parser: ElementParsers.key(separator: "."),
+            parser: ElementParsers.key(separator: ".", forbiddenCharacters: []),
             on: "firstKey.secondKey",
             expected: "firstKey"
         )

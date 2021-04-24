@@ -54,15 +54,14 @@ let package = Package(
         .target(
             name: "ScoutCLTCore",
             dependencies: [
-                "Scout"]),
+                "Scout", "Parsing"]),
         .target(
             name: "ScoutCLT",
             dependencies: [
                 "Scout",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 "Lux",
-                "ScoutCLTCore",
-                "Parsing"]),
+                "ScoutCLTCore"]),
         .testTarget(
             name: "ScoutTests",
             dependencies: ["Scout"]),
@@ -70,6 +69,6 @@ let package = Package(
             name: "ScoutCLTCoreTests",
             dependencies: [
                 "ScoutCLTCore",
-                "Scout"])
+                "Scout", "Parsing"])
     ]
 )

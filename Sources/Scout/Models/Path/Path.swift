@@ -32,7 +32,7 @@ public struct Path: Hashable {
     /// `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
     ///
     /// - parameter string: The string representing the path
-    /// - parameter separator: The separator used to split the string. Default is "."
+    /// - parameter separator: The separator used to split the string. Default is ".".
     ///
     /// ### Brackets
     /// When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
@@ -108,11 +108,6 @@ extension Path: RangeReplaceableCollection {
     where Self.Element == C.Element {
         elements.replaceSubrange(subrange, with: newElements)
     }
-}
-
-extension Path: BidirectionalCollection {
-
-    public func index(before i: Int) -> Int { elements.index(before: i) }
 }
 
 extension Path: MutableCollection {}

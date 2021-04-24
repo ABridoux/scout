@@ -28,6 +28,17 @@ public extension Parser {
         digit.many1.map { Int(String($0))! }
     }
 
+    /// Match any non empty string
+    static var nonEmptyString: Parser<String> {
+        Parser<String> { input in
+            if input.isEmpty {
+                return nil
+            } else {
+                return (String(input), "")
+            }
+        }
+    }
+
     /// Integer with an optional +/- prefix
     static var signedInteger: Parser<Int> {
         curry { (sign, int) in
@@ -83,7 +94,7 @@ public extension Parser {
     /// - Parameters:
     ///   - forbiddenString: The string to stop at
     ///   - forbiddenCharacters: Additional forbidden characters that should stop the parsing
-    static func string(stoppingAt forbiddenString: String, forbiddenCharacters: Character...) -> Parser<String> {
+    static func string(stoppingAt forbiddenString: String, forbiddenCharacters: [Character]) -> Parser<String> {
         Parser<String> { input in
             guard !input.isEmpty else { return nil }
 
@@ -114,6 +125,10 @@ public extension Parser {
         }
     }
 
+    static func string(stoppingAt forbiddenString: String, forbiddenCharacters: Character...) -> Parser<String> {
+        string(stoppingAt: forbiddenString, forbiddenCharacters: forbiddenCharacters)
+    }
+
     var parenthesised: Parser<R> {
         .character("(") *> self <* .character(")")
     }
@@ -124,6 +139,10 @@ public extension Parser {
 
     var parenthesisedCurl: Parser<R> {
         .character("{") *> self <* .character("}")
+    }
+
+    var parenthesisedChevrons: Parser<R> {
+        .character("<") *> self <* .character(">")
     }
 
     func enclosed(by character: Character) -> Parser<R> {

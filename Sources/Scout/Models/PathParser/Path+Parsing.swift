@@ -12,8 +12,11 @@ extension Path {
 
 extension Path.ElementParsers {
 
-    static func key(separator: String) -> Parser<PathElement> {
-        Parsers.string(stoppingAt: separator, forbiddenCharacters: "[", "{").map(PathElement.key)
+    static func key(separator: String, forbiddenCharacters: [Character]) -> Parser<PathElement> {
+        Parsers.string(
+            stoppingAt: separator,
+            forbiddenCharacters: forbiddenCharacters + ["[", "{"]
+        ).map(PathElement.key)
     }
 
     static var parenthesisedKey: Parser<PathElement> {
@@ -47,20 +50,26 @@ extension Path.ElementParsers {
         Parsers.string(stoppingAt: "#").enclosed(by: "#").map(PathElement.filter)
     }
 
-    static func singlePathElement(separator: String) -> Parser<PathElement> {
+    static func singlePathElement(separator: String, forbiddenCharacters: [Character]) -> Parser<PathElement> {
         filter
             <|> slice
             <|> count
             <|> keysList
             <|> index
             <|> parenthesisedKey
-            <|> key(separator: separator)
+            <|> key(separator: separator, forbiddenCharacters: forbiddenCharacters)
     }
 }
 
 extension Path {
 
-    static func parser(separator: String) -> Parser<[PathElement]> {
-        (ElementParsers.singlePathElement(separator: separator) <* Parsers.string(separator).optional).many
+    /// Parse a `Path`
+    /// - Parameters:
+    ///   - separator: Separator between keys elements
+    ///   - keyForbiddenCharacters: Optionally prevent characters to be parsed in a key name
+    public static func parser(separator: String, keyForbiddenCharacters: [Character] = []) -> Parser<[PathElement]> {
+        (ElementParsers.singlePathElement(separator: separator, forbiddenCharacters: keyForbiddenCharacters)
+            <* Parsers.string(separator).optional
+        ).many
     }
 }

@@ -5,6 +5,7 @@
 
 import ArgumentParser
 import Scout
+import ScoutCLTCore
 import Foundation
 
 struct AddCommand: SADCommand {
@@ -47,33 +48,8 @@ struct AddCommand: SADCommand {
 
     // MARK: - Functions
 
-    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
-        let (path, value) = (pathCollectionElement.readingPath, pathCollectionElement.value)
-
-        let explorerValue: ExplorerValue
-
-        if let forceType = pathCollectionElement.forceType {
-
-            switch forceType {
-            case .string:
-                explorerValue = .string(value)
-
-            case .real:
-                let double = try Double(value).unwrapOrThrow(.valueConversion(value: value, type: "Double"))
-                explorerValue = .double(double)
-
-            case .int:
-                let int = try Int(value).unwrapOrThrow(.valueConversion(value: value, type: "Int"))
-                explorerValue = .int(int)
-
-            case .bool:
-                let bool = try Bool(value).unwrapOrThrow(.valueConversion(value: value, type: "Bool"))
-                explorerValue = .bool(bool)
-            }
-        } else {
-            explorerValue = .init(fromSingle: value)
-        }
-
-        try pathExplorer.add(explorerValue, at: path)
+    func perform<P: PathExplorer>(pathExplorer: inout P, pathAndValue: PathAndValue) throws {
+        let (path, value) = (pathAndValue.readingPath, pathAndValue.value)
+        try pathExplorer.add(value, at: path)
     }
 }
