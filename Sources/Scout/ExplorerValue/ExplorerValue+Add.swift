@@ -37,10 +37,10 @@ extension ExplorerValue {
 
     private func add(key: String, value: ExplorerValue, tail: SlicePath) throws -> ExplorerValue {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-        if let existingValue = dict[key] {
-            dict[key] = try existingValue._add(path: tail, value: value)
-        } else if tail.isEmpty {
+        if tail.isEmpty, dict[key] == nil {
             dict[key] = value
+        } else {
+            dict[key] = try dict.getJaroWinkler(key: key)._add(path: tail, value: value)
         }
 
         return .dictionary(dict)

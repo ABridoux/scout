@@ -112,6 +112,14 @@ final class ValueParserTest: XCTestCase {
         )
     }
 
+    func testDictionary_Empty() {
+        test(
+            parser: PathAndValue.ValueParsers.parser,
+            on: "[:]",
+            expected: [:]
+        )
+    }
+
     // MARK: - Array
 
     func testArray_Automatic() {
@@ -135,6 +143,14 @@ final class ValueParserTest: XCTestCase {
             parser: PathAndValue.ValueParsers.array,
             on: "[123, [456, 789]]",
             expected: [.automatic("123"), [.automatic("456"), .automatic("789")]]
+        )
+    }
+
+    func testArray_Empty() {
+        test(
+            parser: PathAndValue.ValueParsers.parser,
+            on: "[]",
+            expected: []
         )
     }
 

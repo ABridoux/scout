@@ -48,24 +48,20 @@ extension PathAndValue.ValueParsers {
             <*> .lazy(parser.surrounded(by: .whiteSpacesOrNewLines))
     }
 
+    static var emptyDictionary: Parser<ValueType> {
+        Parsers.string("[:]").map { _ in ValueType.dictionary([:]) }
+    }
+
     static var dictionary: Parser<ValueType> {
         (dictionaryElement <* Parsers.character(",").optional)
             .many1
             .parenthesisedSquare
             .map { elements -> ValueType in
-                var keys: Set<String> = []
-                
-                for element in elements {
-
-                    if keys.contains(element.key) {
-                        let dictDescription = elements.map { "\($0.key): \($0.value.description)" }.joined(separator: ", ")
-                        let description = "Duplicate key '\(element.key)' in the dictionary [\(dictDescription)]"
-                        return .error(description)
-                    } else {
-                        keys.insert(element.key)
-                    }
+                if let duplicate = elements.map(\.key).duplicate() {
+                    let dictDescription = elements.map { "\($0.key): \($0.value.description)" }.joined(separator: ", ")
+                    let description = "Duplicate key '\(duplicate)' in the dictionary [\(dictDescription)]"
+                    return .error(description)
                 }
-
                 let dict = Dictionary(uniqueKeysWithValues: elements)
                 return .dictionary(dict)
         }
@@ -75,11 +71,15 @@ extension PathAndValue.ValueParsers {
         .lazy(parser.surrounded(by: .whiteSpacesOrNewLines))
     }
 
+    static var emptyArray: Parser<ValueType> {
+        Parsers.string("[]").map { _ in ValueType.array([]) }
+    }
+
     static var array: Parser<ValueType> {
         (arrayElement <* Parsers.character(",").optional)
             .many1
             .parenthesisedSquare
-            .map { .array($0) }
+            .map(ValueType.array)
     }
 
     static var error: Parser<ValueType> {
@@ -91,12 +91,14 @@ extension PathAndValue.ValueParsers {
     }
 
     static var parser: Parser<ValueType> {
-        dictionary
-            <|> array
-            <|> keyName
+        keyName
             <|> real
             <|> string
             <|> automatic
+            <|> emptyArray
+            <|> emptyDictionary
+            <|> array
+            <|> dictionary
     }
 }
 
