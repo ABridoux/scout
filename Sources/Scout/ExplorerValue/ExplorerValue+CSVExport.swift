@@ -19,7 +19,7 @@ extension ExplorerValue {
 
     private func toCSV(separator: String) -> String {
         switch self {
-        case .string, .bool, .int, .double, .data:
+        case .string, .bool, .int, .double, .data, .date:
             return description.escapingCSV(separator)
 
         case .dictionary(let dict):

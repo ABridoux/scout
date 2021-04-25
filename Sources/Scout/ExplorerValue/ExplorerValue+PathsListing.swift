@@ -28,7 +28,7 @@ extension ExplorerValue {
     ///   - lastKey: The last encountered key element value
     private func collectPaths(in paths: inout [Path], filter: PathsFilter, pathValidation: PathValidation) throws {
         switch self {
-        case .int, .double, .bool, .data, .string:
+        case .int, .double, .bool, .data, .string, .date:
             guard filter.singleAllowed, pathValidation.isValid else { return }
 
             if try filter.validate(value: self) {

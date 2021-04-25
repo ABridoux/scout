@@ -12,7 +12,7 @@ extension ExplorerValue {
 
     func folded(upTo level: Int) -> Self {
         switch self {
-        case .string, .int, .double, .bool, .data:
+        case .string, .int, .double, .bool, .data, .date:
             return self
 
         case .array(let array):

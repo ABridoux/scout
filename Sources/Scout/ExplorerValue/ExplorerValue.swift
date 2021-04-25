@@ -18,6 +18,7 @@ public indirect enum ExplorerValue {
     case string(String)
     case bool(Bool)
     case data(Data)
+    case date(Date)
 
     // group
     case array(ArrayValue)
@@ -149,6 +150,10 @@ extension ExplorerValue: Codable {
             var singleValueContainer = encoder.singleValueContainer()
             try singleValueContainer.encode(data)
 
+        case .date(let date):
+            var singleValueContainer = encoder.singleValueContainer()
+            try singleValueContainer.encode(date)
+
         case .array(let array):
             try array.encode(to: encoder)
 
@@ -173,6 +178,8 @@ extension ExplorerValue {
             self = .bool(bool)
         } else if let data = value as? Data {
             self = .data(data)
+        } else if let date = value as? Date {
+            self = .date(date)
         } else if let dict = value as? [String: Any] {
             self = try .dictionary(dict.mapValues { try ExplorerValue(value: $0) })
         } else if let array = value as? [Any] {
@@ -306,6 +313,7 @@ extension ExplorerValue: CustomStringConvertible {
         case .string(let string): return string
         case .bool(let bool): return bool.description
         case .data(let data): return data.base64EncodedString()
+        case .date(let date): return date.description
         case .array(let array):
             let elements = array.map(\.description).joined(separator: ",")
             return "[\(elements)]"

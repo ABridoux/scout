@@ -127,6 +127,7 @@ public struct ExplorerXML: PathExplorer {
         case .double(let double): self.init(name: name, value: double.description)
         case .bool(let bool): self.init(name: name, value: bool.description)
         case .data(let data): self.init(name: name, value: data.base64EncodedString())
+        case .date(let date): self.init(name: name, value: date.description)
 
         case .array(let array):
             let element = Element(name: name)
@@ -278,6 +279,7 @@ extension ExplorerXML {
         case .double(let double): set(value: double.description)
         case .bool(let bool): set(value: bool.description)
         case .data(let data): set(value: data.base64EncodedString())
+        case .date(let date): set(value: date.description)
 
         case .array(let array):
             removeChildrenFromParent()
