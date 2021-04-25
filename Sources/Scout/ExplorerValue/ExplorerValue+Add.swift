@@ -37,10 +37,10 @@ extension ExplorerValue {
 
     private func add(key: String, value: ExplorerValue, tail: SlicePath) throws -> ExplorerValue {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-        if let existingValue = dict[key] {
-            dict[key] = try existingValue._add(path: tail, value: value)
+        if tail.isEmpty, dict[key] == nil {
+            dict[key] = value
         } else {
-            dict[key] = try createValueToAdd(value: value, path: tail)
+            dict[key] = try dict.getJaroWinkler(key: key)._add(path: tail, value: value)
         }
 
         return .dictionary(dict)
@@ -56,8 +56,7 @@ extension ExplorerValue {
         let index = try computeIndex(from: index, arrayCount: array.count)
         let newValue = try array[index]._add(path: tail, value: value)
 
-        if array.allSatisfy(\.isSingle) {
-            #warning("This behavior is the current one but is strange. A new PathElement should be offered to differentiate between insertion and modification")
+        if tail.isEmpty {
             array.insert(newValue, at: index)
         } else {
             array[index] = newValue
@@ -66,43 +65,11 @@ extension ExplorerValue {
     }
 
     private func addCount(value: ExplorerValue, tail: SlicePath) throws -> ExplorerValue {
-        if var array = self.array {
-            let newValue = try createValueToAdd(value: value, path: tail)
-            array.append(newValue)
-            return .array(array)
-        } else {
-            return try createValueToAdd(value: value, path: [.count] + tail)
+        guard tail.isEmpty else {
+            throw ExplorerError.wrongUsage(of: .count)
         }
-    }
-}
-
-// MARK: - Helpers
-
-extension ExplorerValue {
-
-    private func createValueToAdd(value: ExplorerValue, path: SlicePath) throws -> ExplorerValue {
-        guard let element = path.first else { return value }
-        let tail = path.dropFirst()
-
-        switch element {
-        case .key(let key):
-            var dict = DictionaryValue()
-            dict[key] = try createValueToAdd(value: value, path: tail)
-            return .dictionary(dict)
-
-        case .index:
-            var array = ArrayValue()
-            try array.append(createValueToAdd(value: value, path: tail))
-            return .array(array)
-
-        case .count:
-            var array = ArrayValue()
-            try array.append(createValueToAdd(value: value, path: tail))
-            return .array(array)
-
-        default:
-            assertionFailure("This case should be handled before in the _add function")
-            throw ExplorerError.wrongUsage(of: element)
-        }
+        var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
+        array.append(value)
+        return .array(array)
     }
 }

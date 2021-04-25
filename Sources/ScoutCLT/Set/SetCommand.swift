@@ -5,6 +5,7 @@
 
 import ArgumentParser
 import Scout
+import ScoutCLTCore
 
 struct SetCommand: SADCommand {
 
@@ -46,38 +47,13 @@ struct SetCommand: SADCommand {
 
     // MARK: - Functions
 
-    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathCollectionElement: PathAndValue) throws {
-        let (path, value) = (pathCollectionElement.readingPath, pathCollectionElement.value)
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathAndValue: PathAndValue) throws {
+        let (path, value) = (pathAndValue.readingPath, pathAndValue.value)
 
-        if pathCollectionElement.changeKey {
-            try pathExplorer.set(path, keyNameTo: value)
-            return
-        }
-
-        let explorerValue: ExplorerValue
-
-        if let forceType = pathCollectionElement.forceType {
-
-            switch forceType {
-            case .string:
-                explorerValue = .string(value)
-
-            case .real:
-                let double = try Double(value).unwrapOrThrow(.valueConversion(value: value, type: "Double"))
-                explorerValue = .double(double)
-
-            case .int:
-                let int = try Int(value).unwrapOrThrow(.valueConversion(value: value, type: "Int"))
-                explorerValue = .int(int)
-
-            case .bool:
-                let bool = try Bool(value).unwrapOrThrow(.valueConversion(value: value, type: "Bool"))
-                explorerValue = .bool(bool)
-            }
+        if case let .keyName(keyName) = value {
+            try pathExplorer.set(path, keyNameTo: keyName)
         } else {
-            explorerValue = .init(fromSingle: value)
+            try pathExplorer.set(path, to: value)
         }
-
-        try pathExplorer.set(path, to: explorerValue)
     }
 }

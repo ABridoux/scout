@@ -225,9 +225,6 @@ public extension PathExplorer {
     ///
     /// #### Appending
     /// To add a key at the end of an array, specify the `PathElement.count`
-    ///
-    /// ### Non-existing key
-    /// Any non existing key encountered in the path will be created.
     /// - Throws: If the `newValue.explorerValue` function fails
     mutating func add(_ value: ExplorerValueRepresentable, at path: Path) throws { try add(value.explorerValue(), at: path) }
 
@@ -239,9 +236,6 @@ public extension PathExplorer {
     ///
     /// #### Appending
     /// To add a key at the end of an array, specify the `PathElement.count`
-    ///
-    /// ### Non-existing key
-    /// Any non existing key encountered in the path will be created.
     /// - Throws: If the `newValue.explorerValue()` function fails
     mutating func add(_ value: ExplorerValueRepresentable, at path: PathElement...) throws { try add(value.explorerValue(), at: Path(path)) }
 
@@ -268,9 +262,6 @@ public extension PathExplorer {
     ///
     /// #### Appending
     /// To add a key at the end of an array, specify the `PathElement.count`
-    ///
-    /// ### Non-existing key
-    /// Any non existing key encountered in the path will be created.
     /// - Throws: If the `newValue.explorerValue()` function fails
     func adding(_ value: ExplorerValueRepresentable, at path: Path) throws -> Self { try adding(value.explorerValue(), at: path) }
 
@@ -282,9 +273,6 @@ public extension PathExplorer {
     ///
     /// #### Appending
     /// To add a key at the end of an array, specify the `PathElement.count`
-    ///
-    /// ### Non-existing key
-    /// Any non existing key encountered in the path will be created.
     /// - Throws: If the `newValue.explorerValue()` function fails
     func adding(_ value: ExplorerValueRepresentable, at path: PathElement...) throws -> Self { try adding(value.explorerValue(), at: Path(path)) }
 }

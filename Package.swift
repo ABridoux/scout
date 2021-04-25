@@ -11,6 +11,9 @@ let package = Package(
             name: "Scout",
             targets: ["Scout"]),
         .library(
+            name: "Parsing",
+            targets: ["Parsing"]),
+        .library(
             name: "ScoutCLTCore",
             targets: ["ScoutCLTCore"]),
         .executable(
@@ -45,11 +48,13 @@ let package = Package(
                 "AEXML",
                 "Yams",
                 "SwiftCSV",
+                "Parsing",
                 "BooleanExpressionEvaluation"]),
+        .target(name: "Parsing"),
         .target(
             name: "ScoutCLTCore",
             dependencies: [
-                "Scout"]),
+                "Scout", "Parsing"]),
         .target(
             name: "ScoutCLT",
             dependencies: [
@@ -64,6 +69,6 @@ let package = Package(
             name: "ScoutCLTCoreTests",
             dependencies: [
                 "ScoutCLTCore",
-                "Scout"])
+                "Scout", "Parsing"])
     ]
 )

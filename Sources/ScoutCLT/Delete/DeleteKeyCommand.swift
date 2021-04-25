@@ -55,7 +55,7 @@ struct DeleteKeyCommand: SADCommand {
 
     // MARK: - Functions
 
-    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathAndValue: Path) throws {
         // postponed to 3.1.0
 
 //         will be called only once

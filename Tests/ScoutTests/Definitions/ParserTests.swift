@@ -3,16 +3,17 @@
 // Copyright (c) Alexis Bridoux 2020
 // MIT license, see LICENSE file for details
 
+import Parsing
 @testable import Scout
 import XCTest
 
-final class PathParserTests: XCTestCase {
+final class ParserTests: XCTestCase {
 
     typealias ElementParsers = Path.ElementParsers
 
     func testKey() {
         test(
-            parser: ElementParsers.key(separator: "."),
+            parser: ElementParsers.key(separator: ".", forbiddenCharacters: []),
             on: "firstKey.secondKey",
             expected: "firstKey"
         )
@@ -83,7 +84,7 @@ final class PathParserTests: XCTestCase {
     }
 
     func testStringNotContains1() {
-        let parser = PathParsers.string(stoppingAt: "Toto")
+        let parser = Parsers.string(stoppingAt: "Toto")
 
         let result = parser.run("Hello Toto!")
 
@@ -92,7 +93,7 @@ final class PathParserTests: XCTestCase {
     }
 
     func testStringNotContains2() {
-        let parser = PathParsers.string(stoppingAt: "Toto")
+        let parser = Parsers.string(stoppingAt: "Toto")
 
         let result = parser.run("I think Toto is overrated")
 
@@ -100,7 +101,7 @@ final class PathParserTests: XCTestCase {
     }
 
     func testStringNotContains_Nil() {
-        let parser = PathParsers.string(stoppingAt: "Toto")
+        let parser = Parsers.string(stoppingAt: "Toto")
 
         let result = parser.run("Toto is a stub name")
 
@@ -108,7 +109,7 @@ final class PathParserTests: XCTestCase {
     }
 
     func testStringNotContains_ForbiddenCharacter() {
-        let parser = PathParsers.string(stoppingAt: "Toto", forbiddenCharacters: ",")
+        let parser = Parsers.string(stoppingAt: "Toto", forbiddenCharacters: ",")
 
         let result = parser.run("Hello, Toto!")
 
@@ -117,10 +118,10 @@ final class PathParserTests: XCTestCase {
     }
 }
 
-extension PathParserTests {
+extension ParserTests {
 
     func test(
-        parser: PathParser<PathElement>,
+        parser: Parser<PathElement>,
         on string: String,
         expected: PathElement,
         file: StaticString = #file,

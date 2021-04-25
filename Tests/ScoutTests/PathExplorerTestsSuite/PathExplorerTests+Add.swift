@@ -14,6 +14,8 @@ final class PathExplorerAddTests: XCTestCase {
 
         // specific tests for serializable values
         try testAddKey_ThrowsOnNonDictionary(ExplorerValue.self)
+        try testAddIndex_ThrowOnNonArray(ExplorerValue.self)
+        try testAddCount_ThrowOnNonArray(ExplorerValue.self)
     }
 
     func testExplorerXML() throws {
@@ -25,7 +27,6 @@ final class PathExplorerAddTests: XCTestCase {
         try testAddKey(P.self)
         try testAddKey_NestedKey(P.self)
         try testAddKey_NestedIndex(P.self)
-        try testAddKey_UnknownKeyIsCreated(P.self)
         try testAddKey_GroupValue(P.self)
         try testAddKey_ThrowsIfWrongElement(P.self)
 
@@ -39,13 +40,10 @@ final class PathExplorerAddTests: XCTestCase {
 
         // count
         try testAddCount(P.self)
-        try testAddCount_Nested(P.self)
-        try testAddCount_EmptyArray(P.self)
     }
 
     func testStub() throws {
         // use this function to launch a test with a specific PathExplorer
-        try testAddCount_Nested(ExplorerXML.self)
     }
 
     // MARK: - Key
@@ -77,16 +75,6 @@ final class PathExplorerAddTests: XCTestCase {
             path: 1, "Riri",
             value: 2.5,
             expected: [["Toto": 2], ["Toto": 2, "Riri": 2.5]]
-        )
-    }
-
-    func testAddKey_UnknownKeyIsCreated<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        try testAdd(
-            P.self,
-            initial: ["Endo": ["Toto": 2]],
-            path: "Socrate", "Riri",
-            value: 2.5,
-            expected: ["Endo": ["Toto": 2], "Socrate": ["Riri": 2.5]]
         )
     }
 
@@ -174,6 +162,12 @@ final class PathExplorerAddTests: XCTestCase {
         )
     }
 
+    func testAddIndex_ThrowOnNonArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        var array: ExplorerValue = [1, 2, 3]
+
+        XCTAssertErrorsEqual(try array.add("Toto", at: 0, 1), ExplorerError.subscriptIndexNoArray.with(path: 0))
+    }
+
     // MARK: - Count
 
     func testAddCount<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -186,24 +180,10 @@ final class PathExplorerAddTests: XCTestCase {
         )
     }
 
-    func testAddCount_Nested<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        try testAdd(
-            P.self,
-            initial: [[1, 2], [1, 2], [1, 2]],
-            path: .count, 0,
-            value: "here",
-            expected: [[1, 2], [1, 2], [1, 2], ["here"]]
-        )
-    }
+    func testAddCount_ThrowOnNonArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
+        var array: ExplorerValue = [1, 2, 3]
 
-    func testAddCount_EmptyArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
-        try testAdd(
-            P.self,
-            initial: [1, 2],
-            path: 0, .count,
-            value: "here",
-            expected: [["here"], 1, 2]
-        )
+        XCTAssertErrorsEqual(try array.add("Toto", at: 0, .count), ExplorerError.subscriptIndexNoArray.with(path: 0))
     }
 }
 

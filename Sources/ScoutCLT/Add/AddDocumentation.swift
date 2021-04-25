@@ -40,7 +40,7 @@ enum AddDocumentation: Documentation {
     \(header: "Append a value")
     To add a value at the end of an array, specify the '[#]' symbol rather than an index
 
-    \(forceTypeDoc)
+    \(valueSpecificationDoc)
 
     \(examplesHeader)
 

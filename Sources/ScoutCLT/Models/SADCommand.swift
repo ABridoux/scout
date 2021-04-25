@@ -23,7 +23,7 @@ protocol SADCommand: PathExplorerInputCommand, ExportCommand {
     var outputFilePath: String? { get }
 
     /// Executed for each `pathsCollection` element
-    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathCollectionElement: PathCollection.Element) throws
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathAndValue: PathCollection.Element) throws
 }
 
 extension SADCommand {
@@ -42,7 +42,7 @@ extension SADCommand {
         let outputPath = modifyFilePath?.replacingTilde ?? outputFilePath?.replacingTilde
 
         var explorer = pathExplorer
-        try pathsCollection.forEach { try perform(pathExplorer: &explorer, pathCollectionElement: $0) }
+        try pathsCollection.forEach { try perform(pathExplorer: &explorer, pathAndValue: $0) }
         try printOutput(outputPath, dataWith: explorer, colorise: colorise, level: level)
     }
 }
