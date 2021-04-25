@@ -4,6 +4,7 @@
 // MIT license, see LICENSE file for details
 
 import Lux
+import ScoutCLTCore
 
 /// Piece of documentation used to be printed
 protocol Documentation {
@@ -37,7 +38,7 @@ extension Documentation {
     static var notesHeader: String {
         """
         Notes
-        ====
+        =====
         """
     }
 
@@ -110,14 +111,8 @@ extension Documentation {
         """
     }
 
-    static var forceTypeDoc: String {
-        """
-        \(header: "Forcing a type")
-        String: enclose the value with slash signs to force the value as a string: /valueAsString/.
-        Boolean: enclose the value with interrogative signs to force the value as a boolean: ?valueToBoolean?.
-        Real: enclose the value with tilde signs to force the value as a real: ~valueToReal~.
-        Integer: enclose the value with chevron signs to force the value as an integer: <valueToInteger>.
-        """
+    static var valueSpecificationDoc: String {
+        PathAndValue.abstract
     }
 }
 

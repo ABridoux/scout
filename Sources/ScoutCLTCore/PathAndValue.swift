@@ -20,44 +20,19 @@ public struct PathAndValue {
 
     public init?(string: String) {
         guard
-            let result = Self.parser.run(string),
-            result.remainder.isEmpty
+            let result = Self.parser.run(string)
         else { return nil }
+
+        guard result.remainder.isEmpty else {
+            if let error = result.result.value.firstError {
+                print(error)
+            } else {
+                print("Value parsing error at \(result.remainder)")
+            }
+            return nil
+        }
 
         readingPath = Path(elements: result.result.pathElements)
         value = result.result.value
-    }
-}
-
-public indirect enum ValueType: Equatable {
-    case string(String)
-    case real(String)
-    case keyName(String)
-    case automatic(String)
-    case dictionary([String: ValueType])
-}
-
-extension ValueType: ExplorerValueRepresentable {
-
-    public func explorerValue() throws -> ExplorerValue {
-        switch self {
-        case .string(let string):
-            return .string(string)
-
-        case .real(let real):
-            guard let double = Double(real) else {
-                throw CLTCoreError.valueConversion(value: real, type: "Double")
-            }
-            return .double(double)
-
-        case .automatic(let string):
-            return .init(fromSingle: string)
-
-        case .keyName:
-            throw CLTCoreError.wrongUsage("A keyName value cannot be used here")
-
-        case .dictionary(let dict):
-            return try .dictionary(dict.mapValues { try $0.explorerValue() })
-        }
     }
 }

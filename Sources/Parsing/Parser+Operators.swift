@@ -56,6 +56,13 @@ public extension Parser {
     }
 }
 
+public extension Parser where R == String {
+
+    func trimming(in characterSet: CharacterSet) -> Parser<String> {
+        map { $0.trimmingCharacters(in: characterSet) }
+    }
+}
+
 // MARK: - Operators
 
 public func curry<A, B, C>(_ f: @escaping (A, B) -> C) -> (A) -> (B) -> C {

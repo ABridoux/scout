@@ -28,6 +28,14 @@ public extension Parser {
         digit.many1.map { Int(String($0))! }
     }
 
+    static var whiteSpaceOrNewLine: Parser<Character> {
+        character { $0.isNewline || $0.isWhitespace }
+    }
+
+    static var whiteSpacesOrNewLines: Parser<String> {
+        whiteSpaceOrNewLine.many.map { String($0) }
+    }
+
     /// Match any non empty string
     static var nonEmptyString: Parser<String> {
         Parser<String> { input in
@@ -65,9 +73,14 @@ public extension Parser {
 
     /// Match characters until one of the forbidden ones is encountered
     static func string(forbiddenCharacters firstCharacter: Character, _ additionalCharacters: Character...) -> Parser<String> {
+        string(forbiddenCharacters: [firstCharacter] + additionalCharacters)
+    }
+
+    /// Match characters until one of the forbidden ones is encountered
+    static func string(forbiddenCharacters: [Character]) -> Parser<String> {
         Parser<String> { input in
             guard !input.isEmpty else { return nil }
-            let forbiddenCharacters = Set([firstCharacter] + additionalCharacters)
+            let forbiddenCharacters = Set(forbiddenCharacters)
             var remainder = input
             var currentString = ""
 
@@ -128,6 +141,9 @@ public extension Parser {
     static func string(stoppingAt forbiddenString: String, forbiddenCharacters: Character...) -> Parser<String> {
         string(stoppingAt: forbiddenString, forbiddenCharacters: forbiddenCharacters)
     }
+}
+
+public extension Parser {
 
     var parenthesised: Parser<R> {
         .character("(") *> self <* .character(")")
@@ -145,7 +161,18 @@ public extension Parser {
         .character("<") *> self <* .character(">")
     }
 
-    func enclosed(by character: Character) -> Parser<R> {
+    func enclosed(by character: Character) -> Parser {
         .character(character) *> self <* .character(character)
+    }
+
+    func surrounded<A>(by parser: Parser<A>) -> Parser {
+        parser *> self <* parser
+    }
+}
+
+public extension Parser {
+
+    static func lazy<A>(_ parser: @autoclosure @escaping () -> Parser<A>) -> Parser<A> {
+        return Parser<A> { parser().parse($0) }
     }
 }
