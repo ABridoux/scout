@@ -23,12 +23,13 @@ public struct PathAndValue {
             let result = Self.parser.run(string)
         else { return nil }
 
+        if let error = result.result.value.firstError {
+            print("An error occurred while parsing the argument '\(string)'")
+            print(error)
+            return nil
+        }
+
         guard result.remainder.isEmpty else {
-            if let error = result.result.value.firstError {
-                print(error)
-            } else {
-                print("Value parsing error at \(result.remainder)")
-            }
             return nil
         }
 

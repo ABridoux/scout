@@ -54,6 +54,7 @@ extension PathAndValue.ValueParsers {
             .parenthesisedSquare
             .map { elements -> ValueType in
                 var keys: Set<String> = []
+                
                 for element in elements {
 
                     if keys.contains(element.key) {
@@ -81,6 +82,14 @@ extension PathAndValue.ValueParsers {
             .map { .array($0) }
     }
 
+    static var error: Parser<ValueType> {
+        Parser<ValueType> { input in
+            guard !input.isEmpty else { return nil }
+            let description = "Parsing error in value '\(input)'"
+            return (ValueType.error(description), "")
+        }
+    }
+
     static var parser: Parser<ValueType> {
         dictionary
             <|> array
@@ -99,7 +108,7 @@ extension PathAndValue {
         curry { path, _, value in (path, value) }
             <^> Path.parser(separator: ".", keyForbiddenCharacters: ["="])
             <*> .character("=")
-            <*> ValueParsers.parser
+            <*> (ValueParsers.parser <|> ValueParsers.error)
     }
 }
 

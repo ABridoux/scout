@@ -11,6 +11,10 @@ import Foundation
 /// *Parser Combinators* chapter
 public struct Parser<R> {
     let parse: (Substring) -> (R, Substring)?
+
+    public init(parse: @escaping (Substring) -> (R, Substring)?) {
+        self.parse = parse
+    }
 }
 
 public extension Parser {

@@ -56,7 +56,6 @@ enum SetDocumentation: Documentation {
 
     \(bold: "Set key name")
     Enclose the value with sharp signs to change the key name: #keyName#.
-
     \(valueSpecificationDoc)
 
     \(miscDoc)
