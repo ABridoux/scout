@@ -17,6 +17,15 @@ public indirect enum ValueType: Equatable {
 
 extension ValueType {
 
+    var string: String? {
+        switch self {
+        case .string(let string), .real(let string), .automatic(let string):
+            return string
+        default:
+            return nil
+        }
+    }
+
     var dictionary: [String: ValueType]? {
         if case let .dictionary(dict) = self {
             return dict

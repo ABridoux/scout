@@ -178,6 +178,24 @@ final class ValueParserTest: XCTestCase {
             ]
         )
     }
+
+    // MARK: - Zsh array
+
+    func testZshArray() {
+        test(
+            parser: PathAndValue.ValueParsers.zshArray,
+            on: "[Riri Fifi Loulou]",
+            expected: [.automatic("Riri"), .automatic("Fifi"), .automatic("Loulou")]
+        )
+    }
+
+    func testZshAssociativeArray() {
+        test(
+            parser: PathAndValue.ValueParsers.zshAssociativeArray,
+            on: "{Riri 10 Fifi 20 Loulou 30}",
+            expected: ["Riri": .automatic("10"), "Fifi": .automatic("20"), "Loulou": .automatic("30")]
+        )
+    }
 }
 
 extension ValueParserTest {
