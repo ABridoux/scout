@@ -49,17 +49,17 @@ extension PathAndValue.ValueParsers {
     }
 
     static var emptyDictionary: Parser<ValueType> {
-        Parsers.string("[:]").map { _ in ValueType.dictionary([:]) }
+        Parsers.string("{}").map { _ in ValueType.dictionary([:]) }
     }
 
     static var dictionary: Parser<ValueType> {
         (dictionaryElement <* Parsers.character(",").optional)
             .many1
-            .parenthesisedSquare
+            .parenthesisedCurl
             .map { elements -> ValueType in
                 if let duplicate = elements.map(\.key).duplicate() {
                     let dictDescription = elements.map { "\($0.key): \($0.value.description)" }.joined(separator: ", ")
-                    let description = "Duplicate key '\(duplicate)' in the dictionary [\(dictDescription)]"
+                    let description = "Duplicate key '\(duplicate)' in the dictionary {\(dictDescription)}"
                     return .error(description)
                 }
                 let dict = Dictionary(uniqueKeysWithValues: elements)
