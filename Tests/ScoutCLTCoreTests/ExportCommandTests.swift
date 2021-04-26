@@ -36,6 +36,6 @@ extension ExportCommandTests {
 
     struct StubCommand: ExportCommand {
         var csvSeparator: String?
-        var exportFormat: DataFormat?
+        var exportFormat: ExportFormat?
     }
 }

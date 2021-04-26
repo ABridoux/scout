@@ -154,7 +154,7 @@ extension PathAndValue {
         curry { path, _, value in (path, value) }
             <^> Path.parser(separator: ".", keyForbiddenCharacters: ["="])
             <*> .character("=")
-            <*> (ValueParsers.zshGroup <|> ValueParsers.parser <|> ValueParsers.error)
+            <*> (ValueParsers.parser <|> ValueParsers.zshGroup <|> ValueParsers.error)
     }
 }
 
