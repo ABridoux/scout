@@ -16,6 +16,7 @@ protocol PathExplorerInputCommand: ParsableCommand {
     /// A file path from which to read and write the data
     var modifyFilePath: String? { get }
 
+    /// The data format to use to read the data
     var dataFormat: Scout.DataFormat { get }
 
     /// Called with the correct `PathExplorer` when `inferPathExplorer(from:in:)` completes

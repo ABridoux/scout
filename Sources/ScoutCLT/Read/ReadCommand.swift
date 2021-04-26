@@ -52,7 +52,7 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
     var csvSeparator: String?
 
     @Option(name: .export, help: .export)
-    var exportFormat: Scout.DataFormat?
+    var exportFormat: ExportFormat?
 
     // MARK: - Functions
 
@@ -60,7 +60,6 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
         let readingPath = self.readingPath ?? Path()
         var explorer = try pathExplorer.get(readingPath)
         let value = try getValue(from: &explorer)
-        let colorInjector = try self.colorInjector(for: exportFormat ?? P.format)
 
         if value == "" {
             throw RuntimeError.noValueAt(path: readingPath.description)
@@ -71,8 +70,15 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
             return
         }
 
-        let output = colorise ? colorInjector.inject(in: value) : value
-        print(output)
+        switch try exportOption() {
+        case .array, .dictionary, .noExport, .csv: // cases already handled in getValue()
+            print(value)
+
+        case .dataFormat(let format):
+            let colorInjector = try self.colorInjector(for: format)
+            let output = colorInjector.inject(in: value)
+            print(output)
+        }
     }
 
     func getValue<Explorer: SerializablePathExplorer>(from explorer: inout Explorer) throws -> String {
@@ -84,6 +90,26 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
 
         case .dataFormat(let format):
             return try explorer.exportString(to: format, rootName: fileName(of: inputFilePath))
+
+        case .array:
+            do {
+                let array = try explorer.array(of: GroupExportValue.self).map(\.value).joined(separator: " ")
+                return "\(array)"
+
+            } catch {
+                throw RuntimeError.custom("Unable to represent the value as an array of single elements")
+            }
+
+        case .dictionary:
+            do {
+                let dict = try explorer.dictionary(of: GroupExportValue.self)
+                    .map { "\($0.key) \($0.value.value)" }
+                    .joined(separator: " ")
+                return "\(dict)"
+
+            } catch {
+                throw RuntimeError.custom("Unable to represent the value as an array of single elements")
+            }
 
         case .noExport:
             break

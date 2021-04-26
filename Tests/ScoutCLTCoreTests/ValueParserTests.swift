@@ -59,14 +59,6 @@ final class ValueParserTest: XCTestCase {
         XCTAssertEqual(result?.value, .automatic("dog"))
     }
 
-    func testDictionary_Automatic() {
-        test(
-            parser: PathAndValue.ValueParsers.dictionary,
-            on: "[Endo: dog]",
-            expected: .dictionary(["Endo": .automatic("dog")])
-        )
-    }
-
     func testDictionaryElement_String() {
         let result = PathAndValue.ValueParsers.dictionaryElement.run("Endo: '123'")?.result
 
@@ -74,10 +66,18 @@ final class ValueParserTest: XCTestCase {
         XCTAssertEqual(result?.value, .string("123"))
     }
 
+    func testDictionary_Automatic() {
+        test(
+            parser: PathAndValue.ValueParsers.dictionary,
+            on: "{Endo: dog}",
+            expected: .dictionary(["Endo": .automatic("dog")])
+        )
+    }
+
     func testDictionary_String() {
         test(
             parser: PathAndValue.ValueParsers.dictionary,
-            on: "[Endo: '123']",
+            on: "{Endo: '123'}",
             expected: ["Endo": .string("123")]
         )
     }
@@ -85,7 +85,7 @@ final class ValueParserTest: XCTestCase {
     func testDictionary_Heterogeneous_Flat() {
         test(
             parser: PathAndValue.ValueParsers.dictionary,
-            on: "[Endo: dog, Socrate: 'cat', Riri: 123]",
+            on: "{Endo: dog, Socrate: 'cat', Riri: 123}",
             expected:
                 ["Endo": .automatic("dog"),
                  "Socrate": .string("cat"),
@@ -96,7 +96,7 @@ final class ValueParserTest: XCTestCase {
     func testDictionary_Heterogeneous_Nested() {
         test(
             parser: PathAndValue.ValueParsers.dictionary,
-            on: "[ducks: [Riri: foolish, Fifi: brave, Loulou: visionary]]",
+            on: "{ducks: {Riri: foolish, Fifi: brave, Loulou: visionary}}",
             expected:
                 ["ducks":
                     ["Riri": .automatic("foolish"), "Fifi": .automatic("brave"), "Loulou": .automatic("visionary")]
@@ -107,15 +107,15 @@ final class ValueParserTest: XCTestCase {
     func testDictionary_ThrowsIfDuplicateKeys() {
         test(
             parser: PathAndValue.ValueParsers.dictionary,
-            on: "[ducks: [Riri: foolish, Riri: brave, Loulou: visionary]]",
-            expected: ["ducks": .error("Duplicate key 'Riri' in the dictionary [Riri: foolish, Riri: brave, Loulou: visionary]")]
+            on: "{ducks: {Riri: foolish, Riri: brave, Loulou: visionary}}",
+            expected: ["ducks": .error("Duplicate key 'Riri' in the dictionary {Riri: foolish, Riri: brave, Loulou: visionary}")]
         )
     }
 
     func testDictionary_Empty() {
         test(
             parser: PathAndValue.ValueParsers.parser,
-            on: "[:]",
+            on: "{}",
             expected: [:]
         )
     }
@@ -159,7 +159,7 @@ final class ValueParserTest: XCTestCase {
     func testMixing1() {
         test(
             parser: PathAndValue.ValueParsers.parser,
-            on: "[[name: Endo, age: 11], [name: Socrate, age: 23]]",
+            on: "[{name: Endo, age: 11}, {name: Socrate, age: 23}]",
             expected: [
                 ["name": .automatic("Endo"), "age": .automatic("11")],
                 ["name": .automatic("Socrate"), "age": .automatic("23")]
@@ -170,12 +170,30 @@ final class ValueParserTest: XCTestCase {
     func testMixing2() {
         test(
             parser: PathAndValue.ValueParsers.parser,
-            on: "[Riri: [123, 456], Fifi: [789], Loulou: ~23~]",
+            on: "{Riri: [123, 456], Fifi: [789], Loulou: ~23~}",
             expected: [
                 "Riri": [.automatic("123"), .automatic("456")],
                 "Fifi": [.automatic("789")],
                 "Loulou": .real("23")
             ]
+        )
+    }
+
+    // MARK: - Zsh array
+
+    func testZshArray() {
+        test(
+            parser: PathAndValue.ValueParsers.zshArray,
+            on: "[Riri Fifi Loulou]",
+            expected: [.automatic("Riri"), .automatic("Fifi"), .automatic("Loulou")]
+        )
+    }
+
+    func testZshAssociativeArray() {
+        test(
+            parser: PathAndValue.ValueParsers.zshAssociativeArray,
+            on: "{Riri 10 Fifi 20 Loulou 30}",
+            expected: ["Riri": .automatic("10"), "Fifi": .automatic("20"), "Loulou": .automatic("30")]
         )
     }
 }

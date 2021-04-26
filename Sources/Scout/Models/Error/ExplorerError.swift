@@ -98,7 +98,7 @@ public extension ExplorerError {
     }
 
     static func mismatchingType<T>(_ type: T.Type, value: ExplorerValue) -> Self {
-        ExplorerError(description: "ExplorerValue \(value) cannot be represented as \(T.self)")
+        ExplorerError(description: "ExplorerValue '\(value)' cannot be represented as \(T.self)")
     }
 
     static func predicateNotEvaluatable(_ predicate: String, description: String) -> Self {

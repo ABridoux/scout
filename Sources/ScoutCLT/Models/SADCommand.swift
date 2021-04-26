@@ -49,7 +49,7 @@ extension SADCommand {
 
 extension SADCommand {
 
-    /// Print the data from the path explorer and colorize it if specified
+    /// Print the data from the path explorer and highlight it if specified
     /// - Parameters:
     ///   - outputFilePath: A file path to a file where to write the data
     ///   - pathExplorer: The path explorer to use to get the data
@@ -83,6 +83,26 @@ extension SADCommand {
                 try printOutput(output: string, with: format)
             }
             return
+
+        case .array:
+            do {
+                let array = try pathExplorer.array(of: GroupExportValue.self).map(\.value).joined(separator: " ")
+                print("\(array)")
+
+            } catch {
+                throw RuntimeError.custom("Unable to represent the value as an array of single elements")
+            }
+
+        case .dictionary:
+            do {
+                let dict = try pathExplorer.dictionary(of: GroupExportValue.self)
+                    .map { "\($0.key) \($0.value.value)" }
+                    .joined(separator: " ")
+                print("\(dict)")
+
+            } catch {
+                throw RuntimeError.custom("Unable to represent the value as a dictionary of single elements")
+            }
 
         case .noExport:
             break
