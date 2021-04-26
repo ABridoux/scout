@@ -6,7 +6,6 @@
 import ArgumentParser
 import Scout
 import ScoutCLTCore
-import Foundation
 
 struct AddCommand: SADCommand {
 
@@ -44,7 +43,7 @@ struct AddCommand: SADCommand {
     var csvSeparator: String?
 
     @Option(name: .export, help: .export)
-    var exportFormat: Scout.DataFormat?
+    var exportFormat: ExportFormat?
 
     // MARK: - Functions
 

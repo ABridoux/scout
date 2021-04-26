@@ -5,7 +5,7 @@
 
 import ArgumentParser
 import Scout
-import Foundation
+import ScoutCLTCore
 
 struct DeleteCommand: SADCommand {
 
@@ -46,7 +46,7 @@ struct DeleteCommand: SADCommand {
     var csvSeparator: String?
 
     @Option(name: .export, help: .export)
-    var exportFormat: Scout.DataFormat?
+    var exportFormat: ExportFormat?
 
     // MARK: - Functions
 

@@ -3,7 +3,7 @@
 // Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
-import Foundation
+import ScoutCLTCore
 import Scout
 import ArgumentParser
 
@@ -51,7 +51,7 @@ struct DeleteKeyCommand: SADCommand {
     var csvSeparator: String?
 
     @Option(name: [.short, .customLong("export")], help: "Convert the data to the specified format")
-    var exportFormat: Scout.DataFormat?
+    var exportFormat: ExportFormat?
 
     // MARK: - Functions
 

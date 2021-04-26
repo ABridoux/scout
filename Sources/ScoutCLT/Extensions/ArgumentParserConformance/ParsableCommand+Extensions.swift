@@ -7,6 +7,7 @@ import Foundation
 import ArgumentParser
 import Scout
 import Lux
+import ScoutCLTCore
 
 extension ParsableCommand {
 

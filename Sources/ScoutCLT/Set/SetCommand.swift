@@ -43,7 +43,7 @@ struct SetCommand: SADCommand {
     var csvSeparator: String?
 
     @Option(name: .export, help: .export)
-    var exportFormat: Scout.DataFormat?
+    var exportFormat: ExportFormat?
 
     // MARK: - Functions
 
