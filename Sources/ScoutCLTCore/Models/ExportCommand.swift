@@ -21,6 +21,7 @@ public protocol ExportCommand {
 
 public extension ExportCommand {
 
+    /// Returns the export option specified depending on several inputs: csv, data format, Zsh group values
     func exportOption() throws -> Export {
         switch (csvSeparator, exportFormat) {
         case (let separator?, nil): return .csv(separator: separator)

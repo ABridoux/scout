@@ -71,12 +71,17 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
         }
 
         switch try exportOption() {
-        case .array, .dictionary, .noExport, .csv: // cases already handled in getValue()
+        case .array, .dictionary, .csv: // cases already handled in getValue()
             print(value)
+
+        case .noExport:
+            let colorInjector = try self.colorInjector(for: P.format)
+            let output = colorise ? colorInjector.inject(in: value) : value
+            print(output)
 
         case .dataFormat(let format):
             let colorInjector = try self.colorInjector(for: format)
-            let output = colorInjector.inject(in: value)
+            let output = colorise ? colorInjector.inject(in: value) : value
             print(output)
         }
     }
