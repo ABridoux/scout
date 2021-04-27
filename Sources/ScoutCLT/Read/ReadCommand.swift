@@ -93,7 +93,7 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
 
         case .array:
             do {
-                let array = try explorer.array(of: GroupExportValue.self).map(\.value).joined(separator: " ")
+                let array = try explorer.array(of: GroupExportValue.self).map(\.value).joined(separator: "\n")
                 return "\(array)"
 
             } catch {
@@ -103,8 +103,8 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
         case .dictionary:
             do {
                 let dict = try explorer.dictionary(of: GroupExportValue.self)
-                    .map { "\($0.key) \($0.value.value)" }
-                    .joined(separator: " ")
+                    .map { "\($0.key)\n\($0.value.value)" }
+                    .joined(separator: "\n")
                 return "\(dict)"
 
             } catch {
