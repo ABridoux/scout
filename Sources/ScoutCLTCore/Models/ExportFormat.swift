@@ -7,5 +7,5 @@ import Scout
 
 /// Models the value the export process can take
 public enum ExportFormat: String, CaseIterable, Equatable {
-    case json, plist, yaml, xml, array, dict
+    case json, plist, yaml, xml, array, dictionary
 }

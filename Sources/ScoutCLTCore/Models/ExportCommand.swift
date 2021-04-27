@@ -28,7 +28,7 @@ public extension ExportCommand {
         case (nil, let format?):
             switch format {
             case .array: return .array
-            case .dict: return .dictionary
+            case .dictionary: return .dictionary
             case .json: return .dataFormat(format: .json)
             case .plist: return .dataFormat(format: .plist)
             case .yaml: return .dataFormat(format: .yaml)
