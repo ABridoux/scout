@@ -19,6 +19,13 @@ extension PathExplorer {
         try paths.forEach { try history.explore(path: $0, using: block) }
     }
 
+    /// Reduce provided paths and execute the block for each of them.
+    ///
+    /// The discovered explorer will be kept for the next path when paths have a common prefix.
+    /// Thus this function works better when the array of paths is sorted
+    /// - Parameters:
+    ///   - paths: The paths to get
+    ///   - block: The block to execute with the explorer retrieved for the path
     func reduceWithMemory<T>(initial: T, paths: [Path], using transform: (_ result: T, _ explorer: Result<Self, ExplorerError>) throws -> T) rethrows -> T {
         var result = initial
         try exploreWithMemory(paths: paths) { (explorer) in

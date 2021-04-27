@@ -23,10 +23,10 @@ extension ExplorerValue {
             return description.escapingCSV(separator)
 
         case .dictionary(let dict):
-            return dict.map { $0.value.toCSV(separator: separator) }.joined(separator: separator) + separator
+            return dict.map { $0.value.toCSV(separator: separator) }.joined(separator: separator)
 
         case .array(let array):
-            return array.map { $0.toCSV(separator: separator) }.joined(separator: separator) + separator
+            return array.map { $0.toCSV(separator: separator) }.joined(separator: separator)
         }
     }
 
@@ -53,7 +53,7 @@ extension ExplorerValue {
             .toCSV(separator: separator) + "\n"
 
         var csvString = arrayOfDictionaries.reduce(headersLine) { (csvString, value) in
-            let line = value.reduceWithMemory(initial: "", paths: headers) { (csvString, result) in
+            var line = value.reduceWithMemory(initial: "", paths: headers) { (csvString, result) in
 
                 let string: String
                 switch result {
@@ -62,9 +62,12 @@ extension ExplorerValue {
                 }
                 return "\(csvString)\(string)\(separator)"
             }
+            guard !line.isEmpty else { return csvString }
+            line.removeLast()
             return "\(csvString)\(line)\n"
         }
 
+        guard !csvString.isEmpty else { return "" }
         csvString.removeLast()
         return csvString
     }
@@ -75,6 +78,7 @@ extension ExplorerValue {
             return "\(csvString)\(line)\n"
         }
 
+        guard !csvString.isEmpty else { return "" }
         csvString.removeLast()
         return csvString
     }
@@ -93,6 +97,7 @@ extension ExplorerValue {
                 return "\(csvString)\(key)\(separator)\(line)\n"
         }
 
+        guard !csvString.isEmpty else { return "" }
         csvString.removeLast()
         return csvString
     }

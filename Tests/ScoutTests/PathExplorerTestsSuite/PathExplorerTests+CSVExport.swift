@@ -37,7 +37,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
         try testExportCSV(
             P.self,
             value: ["Riri", "Fifi", "Loulou"],
-            expected: "Riri;Fifi;Loulou;"
+            expected: "Riri;Fifi;Loulou"
         )
     }
 
@@ -47,10 +47,10 @@ final class PathExplorerCSVExportTests: XCTestCase {
             value: [["name": "Riri", "age": 15], ["name": "Fifi", "age": 15], ["name": "Loulou", "age": 15]],
             expected:
             """
-            age;name;
-            15;Riri;
-            15;Fifi;
-            15;Loulou;
+            age;name
+            15;Riri
+            15;Fifi
+            15;Loulou
             """
         )
     }
@@ -63,10 +63,10 @@ final class PathExplorerCSVExportTests: XCTestCase {
                      ["name": "Loulou", "family": ["uncle": "Donald", "aunt": "Daisy"]]],
             expected:
             """
-            family.aunt;family.uncle;name;
-            Daisy;Donald;Riri;
-            Daisy;Donald;Fifi;
-            Daisy;Donald;Loulou;
+            family.aunt;family.uncle;name
+            Daisy;Donald;Riri
+            Daisy;Donald;Fifi
+            Daisy;Donald;Loulou
             """
         )
     }
@@ -79,10 +79,10 @@ final class PathExplorerCSVExportTests: XCTestCase {
                      ["name": "Loulou", "family": ["uncle": "Donald"]]],
             expected:
             """
-            family.aunt;family.uncle;name;
-            Daisy;NULL;Riri;
-            Daisy;Donald;Fifi;
-            NULL;Donald;Loulou;
+            family.aunt;family.uncle;name
+            Daisy;NULL;Riri
+            Daisy;Donald;Fifi
+            NULL;Donald;Loulou
             """
         )
     }
@@ -95,10 +95,10 @@ final class PathExplorerCSVExportTests: XCTestCase {
                      ["name": "Loulou", "brothers": ["Riri", "Fifi"]]],
             expected:
             """
-            brothers[0];brothers[1];name;
-            Fifi;Loulou;Riri;
-            Riri;Loulou;Fifi;
-            Riri;Fifi;Loulou;
+            brothers[0];brothers[1];name
+            Fifi;Loulou;Riri
+            Riri;Loulou;Fifi
+            Riri;Fifi;Loulou
             """
         )
     }
@@ -109,9 +109,9 @@ final class PathExplorerCSVExportTests: XCTestCase {
             value: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
             expected:
             """
-            1;2;3;
-            4;5;6;
-            7;8;9;
+            1;2;3
+            4;5;6
+            7;8;9
             """
         )
     }
@@ -122,8 +122,8 @@ final class PathExplorerCSVExportTests: XCTestCase {
             value: ["duckFamily": ["Donald", "Daisy"], "mouseFamily": ["Mickey", "Minnie"]],
             expected:
             """
-            duckFamily;Donald;Daisy;
-            mouseFamily;Mickey;Minnie;
+            duckFamily;Donald;Daisy
+            mouseFamily;Mickey;Minnie
             """
         )
     }
@@ -134,7 +134,7 @@ final class PathExplorerCSVExportTests: XCTestCase {
             value: ["phrase with; separator", "phrase without separator"],
             expected:
             """
-            "phrase with; separator";phrase without separator;
+            "phrase with; separator";phrase without separator
             """
         )
     }

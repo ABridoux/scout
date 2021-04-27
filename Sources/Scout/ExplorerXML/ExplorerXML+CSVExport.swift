@@ -24,7 +24,10 @@ extension ExplorerXML {
     }
 
     private func exportAsArrayOfSingles(separator: String) throws -> String {
-        children.reduce("") { (csvString, explorer) in "\(csvString)\(explorer.description.escapingCSV(separator))\(separator)" }
+        var string = children.reduce("") { (csvString, explorer) in "\(csvString)\(explorer.description.escapingCSV(separator))\(separator)" }
+        guard !string.isEmpty else { return "" }
+        string.removeLast()
+        return string
     }
 
     private func exportAsArrayOfArrays(separator: String) throws -> String {
@@ -32,6 +35,7 @@ extension ExplorerXML {
             try "\(csvString)\(explorerXML.exportAsArrayOfSingles(separator: separator))\n"
         }
 
+        guard !csvString.isEmpty else { return "" }
         csvString.removeLast()
         return csvString
     }
@@ -43,16 +47,20 @@ extension ExplorerXML {
             try "\(csvString)\(explorer.name)\(separator)\(explorer.exportAsArrayOfSingles(separator: separator))\n"
         }
 
+        guard !csvString.isEmpty else { return "" }
         csvString.removeLast()
         return csvString
     }
 
     private func exportCSVAsArrayOfDictionaries(separator: String) throws -> String {
         let headers = try self.headers().sortedByKeysAndIndexes()
-        let headersLine = headers.reduce("") { "\($0)\($1.description.escapingCSV(separator))\(separator)" } + "\n"
+        var headersLine = headers.reduce("") { "\($0)\($1.description.escapingCSV(separator))\(separator)" }
+        guard !headersLine.isEmpty else { return "" }
+        headersLine.removeLast()
+        headersLine = "\(headersLine)\n"
 
         var csvString = children.reduce(headersLine) { (csvString, explorer) in
-            let line = explorer.reduceWithMemory(initial: "", paths: headers) { (csvString, result) in
+            var line = explorer.reduceWithMemory(initial: "", paths: headers) { (csvString, result) in
 
                 let string: String
                 switch result {
@@ -61,9 +69,12 @@ extension ExplorerXML {
                 }
                 return "\(csvString)\(string)\(separator)"
             }
+            guard !line.isEmpty else { return csvString }
+            line.removeLast()
             return "\(csvString)\(line)\n"
         }
 
+        guard !csvString.isEmpty else { return "" }
         csvString.removeLast()
         return csvString
     }
