@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [4.0.0](https://github.com/ABridoux/scout/tree/3.0.3) (28/04/2021)
+### Added
+- Conversion from CSV input to one of the available formats [#181]
+- `Data` and `Date` values support [#197]
+- Set and add features support `Codable` values [#199]
+- Possibility to read XML attributes
+- Better integration with Zsh arrays and associative arrays [#235]
+
+### Changed
+- `PathExplorer` is now implemented by `ExplorerValue` for Plist, JSON and YAML [#199]
+- Moved from serialisation to `Codable` using `ExplorerValue` for Plist, JSON and YAML. [#206]
+- ”Add” features will no more create values on the fly. Only when a key/index is final will it be created/inserted. The method is now to first add an empty array or dictionary. [#210]
+- `Path` parsing is now done with a parser rather than with regular expressions [#227]
+- Command-line: `--format|-f` now required to specify the input format
+- Command-line: `--csv` removed and `--csv-spe` renamed `--csv-exp`
+- `PathExplorerXML` renamed to `ExplorerXML` and implements Copy on Write.
+
 ## [3.0.3](https://github.com/ABridoux/scout/tree/3.0.3) (08/04/2021)
 ### Fixed
 - Reading from standard input temporary fix for deprecation issue [#191]
