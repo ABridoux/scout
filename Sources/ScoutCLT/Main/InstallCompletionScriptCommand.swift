@@ -14,7 +14,7 @@ struct InstallCompletionScriptCommand: ParsableCommand {
 
     static let configuration = CommandConfiguration(
         commandName: "install-completion-script",
-        abstract: "Install Scout completion script in the right directoy",
+        abstract: "Install Scout completion script in the right directory",
         discussion: "See \(argumentParserDocumentation)",
         shouldDisplay: false)
 
@@ -26,7 +26,7 @@ struct InstallCompletionScriptCommand: ParsableCommand {
     func run() throws {
 
         guard let shell = CompletionShell.autodetected() else {
-            throw RuntimeError.completionScriptInstallation(description: "Unable to find the prefered shell")
+            throw RuntimeError.completionScriptInstallation(description: "Unable to find the preferred shell")
         }
 
         var compShell: CompShell
@@ -49,7 +49,7 @@ struct InstallCompletionScriptCommand: ParsableCommand {
             }
 
         default:
-            throw RuntimeError.completionScriptInstallation(description: "Unable to find the prefered shell. Please refer to \(argumentParserDocumentation)")
+            throw RuntimeError.completionScriptInstallation(description: "Unable to find the preferred shell. Please refer to \(argumentParserDocumentation)")
         }
 
         let shellType = type(of: compShell)

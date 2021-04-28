@@ -19,8 +19,8 @@ enum ReadDocumentation: Documentation {
          (#"`scout read "Arnaud.hobbies[-2:]"`"#, #"will output Arnaud's last two hobbies"#),
          (##"`scout read "#.*#.hobbies[:1]"`"##, #"will output Tom's and Arnaud's first two hobbies"#),
          (##"`scout read "#.*#.hobbies[#]"`"##, #"will output Tom's and Arnaud's hobbies count"#),
-         (#"`scout read "Tom.hobbies[:]" --csv`"#, #"will ouput Tom hobbies as CSV"#),
-         (#"`scout read -i People.json -e yaml`"#, #"will convert the JSON file to YAML"#)]
+         (#"`scout read "Tom.hobbies[:]" --csv-exp ";"`"#, #"will ouput Tom hobbies as CSV"#),
+         (#"`scout read -i People.json -f json -e yaml`"#, #"will convert the JSON file to YAML"#)]
 
     static let text =
     """
@@ -37,8 +37,8 @@ enum ReadDocumentation: Documentation {
     \(commonDoc)
 
     \(header: "Count/Keys symbols")
-    - Get an dictionary or an array count with the '[#]' symbol.
-    - List the keys of a dictionary witht the '{#}' symbol.
+    - Get a dictionary or an array count with the '[#]' symbol.
+    - List the keys of a dictionary with the '{#}' symbol.
 
     \(slicingAndFilteringDoc)
 

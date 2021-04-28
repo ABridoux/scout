@@ -18,7 +18,7 @@ extension Documentation {
     static var nc: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--nc") }
     static var csv: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv") }
     static var export: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-e|--export") }
-    static var csvSep: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv-sep") }
+    static var csvExport: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv-exp") }
     static var level: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-l") }
 
     /// Get one example per line
@@ -103,8 +103,9 @@ extension Documentation {
         Useful to avoid slowdowns when dealing with large files.
 
         \(header: "Export")
-        Export the data to another available format with the \(export) command.
-        Output an array or a dictionary of arrays as CSV with the \(csv) flag or \(csvSep) option.
+        Export the data to another available format with the \(export) command. It's also possible to specify 'array' or
+        'dictionary' to export the data respectively as a Zsh array or associative array.
+        Output an array or a dictionary of arrays as CSV with the \(csvExport) option.
 
         \(header: "Folding")
         Fold the arrays and dictionaries at a certain depth level with the \(level) option.

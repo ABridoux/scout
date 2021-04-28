@@ -30,24 +30,24 @@ Force the specified value to be a real (Plist only).
 Usage: enclose the value with tildes: ~value~.
 
 \(subheader: "Array")
-Usage: enclose a list of values and separate them with commas ','.
+Usage: enclose with square brackets a list of values and separate them with commas ','.
 Use single quote to specify strings with commas.
 It's possible to nest arrays or dictionaries.
 
 Examples
 ````````
 [Endo, 'String, with a comma', 123, ~40~]
-[Endo, [values, in , nested, array]]
+[Endo, [values, in, nested, array]]
 
 \(subheader: "Dictionary")
-Usage: enclose a list of (key, value) pairs separated with a double point ':' and separate them with commas ','.
+Usage: enclose with curl brackets a list of (key, value) pairs separated with a double point ':' and separate them with commas ','.
 Use single quote to specify strings with commas or a key with a commas.
 It's possible to nest dictionaries or arrays.
 
 Examples
 ````````
-[Riri: 20, Fifi: duck, Loulou: '60']
-[ducks: [Riri, Fifi, Loulou], mouses: [Mickey: 20, Minnie: 30]]
+{Riri: 20, Fifi: duck, Loulou: '60'}
+ducks: {Riri, Fifi, Loulou}, mouses: {Mickey: 20, Minnie: 30}}
 
 """
 
