@@ -54,8 +54,8 @@ Supported formats:
 The wiki can be found [here](https://www.woodys-findings.com/scout/wiki/home).
 
 ### News
-- Checkout what's new in **Scout** 3.0.0 [here](https://www.woodys-findings.com/scout/news-3.0.0).
-- Checkout what's new in **Scout** 2.0.0 [here](https://www.woodys-findings.com/scout/news-2.0.0).
+- Checkout what's new in **Scout** 4.0.0 [here](https://www.woodys-findings.com/scout/news-4.0.0).
+- Checkout what’s new in **Scout** 3.0.0 [here](https://www.woodys-findings.com/scout/news-3.0.0).
 
 ## Why?
 
@@ -81,6 +81,7 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
     - Force a type
     - Dictionary and array count
     - Dictionary keys
+    - XML attributes reading
     - Delete array or dictionary when deleting all its values 
     - Array slicing for *read* and *delete* commands 
     - Dictionary filtering for *read* and *delete* commands 
@@ -89,6 +90,8 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 - Find best match in case of a typo
 - Data formats conversion (e.g. JSON -> Plist, YAML -> XML)
 - CSV export for arrays and dictionaries of arrays 
+- CSV import with precise data structure shaping
+- Export to a Zsh array or associative array
 - Syntax highlighting
 - Folding at a depth level
 - Auto-completion for commands 
@@ -138,9 +141,9 @@ You can [learn more](https://www.woodys-findings.com/scout/wiki/list-paths) abou
 #### Stream or file input
 Set the input as a file with the input option `-i | --input` or as the last process/command output with a pipe:
 ```bash
-scout "path.to.value" -i File
+scout "path.to.value" -i File.yml -f yaml
 # is the same as
-cat File | scout "path.to.value"
+cat File | scout "path.to.value" -f yaml
 ```
 
 #### Find best match in case of a typo
@@ -158,7 +161,7 @@ curl --silent "https://api.github.com/repos/ABridoux/scout/releases/latest" | sc
 Another example with one of the playground files and the following command:
 
 ```bash
-scout -i People.plist "people.Robert.age=2"
+scout read -i People.plist -f plist "people.Robert.age=2"
 ```
 
 When dealing with large files (although it is not recommended to output large files in the terminal), highlighting the output might bring to slowdowns. It's possible to deactivate the colorisation with the flag `--no-color` or `--nc`. This is automatic when writing the output in a file or when the program output is piped.
@@ -168,7 +171,13 @@ The library offer a conversion feature from a supported format to another one li
 [Learn more](https://www.woodys-findings.com/scout/wiki/conversion)
 
 #### CSV export
-Export data when dealing with arrays or a dictionary of arrays. Default separator ';' or customisable.
+Export data when dealing with arrays or a dictionary of arrays.
+
+#### CSV import
+Convert CSV input to one of the available formats. When the CSV has named headers, specify how the data structure should be built (array, dictionary) using paths.
+
+#### Zsh arrays
+Export a 1-dimension array to a Zsh array with the `-e array` option and to an associative array with the `-e dictionary` option.
 
 ##### Customise colors
 You can specify your own colors set as explained [here](https://www.woodys-findings.com/scout/wiki/highlighting). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
@@ -254,7 +263,7 @@ The same goes for the [Yams](https://www.woodys-findings.com/scout/wiki/home) an
 
 Thanks also to the team at Apple behind the [ArgumentParser](https://github.com/apple/swift-argument-parser) library. They have done an incredible work to make command line tools in Swift easy to implement.
 
-Finally, thanks to [Thijs Xhaflaire](https://github.com/txhaflaire/) and [Armin Briegel](https://github.com/scriptingosx) for your ideas and your helpful feedback.
+Finally, thanks to [Thijs Xhaflaire](https://github.com/txhaflaire/) and [Armin Briegel](https://github.com/scriptingosx) for their ideas and helpful feedback.
 
 ### References
 Font used for the logo: Ver Army by [Damien Gosset](http://sweeep.fr/cv/index.php?c=fonts).

@@ -20,7 +20,7 @@ extension AEXMLElement {
             return newElement
         }
 
-        children.forEach { newElement.addChild($0.copyFlat()) }
+        children.forEach { newElement.addChild($0.copy()) }
         return newElement
     }
 
