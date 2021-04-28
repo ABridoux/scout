@@ -1,27 +1,18 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
 
 extension NSRegularExpression {
 
-    // MARK: - Initialization
-
-    convenience init(pattern: String, path: Path) throws {
+    convenience init(with pattern: String) throws {
         do {
             try self.init(pattern: pattern)
         } catch {
-            throw PathExplorerError.wrongRegularExpression(pattern: pattern, in: path)
+            throw ExplorerError.wrong(regexPattern: pattern)
         }
-    }
-
-    // MARK: - Functions
-
-    func matches(in string: String) -> [Substring] {
-        let matches = self.matches(in: string, options: [], range: string.nsRange)
-        return matches.map { string[$0.range] }
     }
 
     /// Validate a string if the first match found by the regex is the overall string

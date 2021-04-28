@@ -1,11 +1,13 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
 
 /// Lower and upper bounds to be used to slice an array
+///
+/// - note: Handles negative indexes
 public struct Bounds: Hashable {
 
     // MARK: - Properties
@@ -37,14 +39,29 @@ public struct Bounds: Hashable {
         self.upper = upper
     }
 
+    /// No bounds targets the `first` or `last` bound
+    init(lower: Int?, upper: Int?) {
+        if let lower = lower {
+            self.lower = Bound(lower)
+        } else {
+            self.lower = .first
+        }
+
+        if let upper = upper {
+            self.upper = Bound(upper)
+        } else {
+            self.upper = .last
+        }
+    }
+
     // MARK: - Functions
 
+    /// Compute a range with the bounds for the array count.
     /// - Parameters:
     ///   - arrayCount: The count of the array to slice
-    ///   - path: Path where the bounds is specified. Used to throw a relevant error
     /// - Throws: If the bounds are invalid
     /// - Returns: A range made from the lower and upper bounds
-    public func range(arrayCount: Int, path: Path) throws -> ClosedRange<Int> {
+    public func range(arrayCount: Int) throws -> ClosedRange<Int> {
         let lower = self.lower.value < 0 ? arrayCount + self.lower.value : self.lower.value
 
         let upper: Int
@@ -57,7 +74,7 @@ public struct Bounds: Hashable {
         }
 
         guard 0 <= lower, lower <= upper, upper <= arrayCount else {
-            throw PathExplorerError.wrongBounds(self, in: path, arrayCount: arrayCount)
+            throw ExplorerError.wrong(bounds: self, arrayCount: arrayCount)
         }
 
         lastComputedLower = lower
@@ -94,7 +111,7 @@ public extension Bounds {
 
 extension Bounds {
 
-    /// Wrapper aound an `Int` value to avoid to make all the `Bounds` mutable
+    /// Wrapper around an `Int` value to avoid to make all the `Bounds` mutable
     /// - note: `Bounds` will only mutate those `IntWrapper` values internally
     @propertyWrapper
     final class IntWrapper: Hashable {

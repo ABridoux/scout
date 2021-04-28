@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
@@ -23,6 +23,17 @@ extension Array {
             return Array(leftPart + rightPart)
         } else {
             return Array(leftPart)
+        }
+    }
+}
+
+extension Array {
+
+    mutating func modifyEach(_ modify: (inout Element) throws -> Void) rethrows {
+        try self = map { element in
+            var element = element
+            try modify(&element)
+            return element
         }
     }
 }

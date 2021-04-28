@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import ArgumentParser
@@ -30,7 +30,7 @@ enum SetDocumentation: Documentation {
 
     private static let examples =
         [(#"`scout set "[1].changefreq=yearly"`"#, #"will change the second url #changefreq# key value to "yearly""#),
-        (#"`scout set "[0].priority"=2.0`"#, #"will change the first url #priority# key value to 2.0"#),
+        (#"`scout set "[0].priority=2.0"`"#, #"will change the first url #priority# key value to 2.0"#),
         (#"`scout set "[1].changefreq=yearly"` "urlset[0].priority=2.0"`"#, #"will change both the second url #changefreq# key value to "yearly"\#n and the first url #priority# key value to 2.0"#),
         (#"`scout set "[-1].priority=2.0"`"#, #"will change the last url #priority# key value to 2.0"#),
         (#"`scout set "[0].changefreq=#frequence#"`"#, #"will change the first url #changefreq# key name to #frequence#"#),
@@ -56,8 +56,7 @@ enum SetDocumentation: Documentation {
 
     \(bold: "Set key name")
     Enclose the value with sharp signs to change the key name: #keyName#.
-
-    \(forceTypeDoc)
+    \(valueSpecificationDoc)
 
     \(miscDoc)
 

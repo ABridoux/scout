@@ -12,72 +12,62 @@ final class BoundsTests: XCTestCase {
 
     func testGetArraySlice() throws {
         let bounds = Bounds(lower: 2, upper: 7)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertEqual(try bounds.range(arrayCount: 11, path: path), 2...7)
+        XCTAssertEqual(try bounds.range(arrayCount: 11), 2...7)
     }
 
     func testGetArraySlice_FirstIndex() throws {
         let bounds = Bounds(lower: .first, upper: 5)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertEqual(try bounds.range(arrayCount: 11, path: path), 0...5)
+        XCTAssertEqual(try bounds.range(arrayCount: 11), 0...5)
     }
 
     func testGetArraySlice_LastIndex() throws {
         let bounds = Bounds(lower: 2, upper: .last)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertEqual(try bounds.range(arrayCount: 6, path: path), 2...5)
+        XCTAssertEqual(try bounds.range(arrayCount: 6), 2...5)
     }
 
     func testGetArraySlice_LowerNegative() throws {
         let bounds = Bounds(lower: -2, upper: .last)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertEqual(try bounds.range(arrayCount: 6, path: path), 4...5)
+        XCTAssertEqual(try bounds.range(arrayCount: 6), 4...5)
     }
 
     func testGetArraySlice_UpperNegative() throws {
         let bounds = Bounds(lower: 4, upper: -2)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertEqual(try bounds.range(arrayCount: 10, path: path), 4...8)
+        XCTAssertEqual(try bounds.range(arrayCount: 10), 4...8)
     }
 
     func testGetArraySlice_LowerNegativeAndUpperEquals0Throws() throws {
         let bounds = Bounds(lower: -2, upper: 0)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertErrorsEqual(try bounds.range(arrayCount: 11, path: path), .wrongBounds(bounds, in: path, arrayCount: 11))
+        XCTAssertErrorsEqual(try bounds.range(arrayCount: 11), .wrong(bounds: bounds, arrayCount: 11))
     }
 
     func testGetArraySlice_LowerGreaterThanLastIndexThrows() throws {
         let bounds = Bounds(lower: 10, upper: 1)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertErrorsEqual(try bounds.range(arrayCount: 6, path: path), .wrongBounds(bounds, in: path, arrayCount: 6))
+        XCTAssertErrorsEqual(try bounds.range(arrayCount: 6), .wrong(bounds: bounds, arrayCount: 6))
     }
 
     func testRange_LowerNegativeGreaterThanUpperThrows() throws {
         let bounds = Bounds(lower: -2, upper: 1)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertErrorsEqual(try bounds.range(arrayCount: 11, path: path), .wrongBounds(bounds, in: path, arrayCount: 11))
+        XCTAssertErrorsEqual(try bounds.range(arrayCount: 11), .wrong(bounds: bounds, arrayCount: 11))
     }
 
     func testGetArraySlice_UpperLesserThanLowerThrows() throws {
         let bounds = Bounds(lower: 2, upper: 1)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertErrorsEqual(try bounds.range(arrayCount: 6, path: path), .wrongBounds(bounds, in: path, arrayCount: 6))
+        XCTAssertErrorsEqual(try bounds.range(arrayCount: 6), .wrong(bounds: bounds, arrayCount: 6))
     }
 
     func testRange_UpperNegativeLesserThanLowerThrows() throws {
         let bounds = Bounds(lower: 5, upper: -7)
-        let path = stubPath.appending(.slice(bounds))
 
-        XCTAssertErrorsEqual(try bounds.range(arrayCount: 11, path: path), .wrongBounds(bounds, in: path, arrayCount: 11))
+        XCTAssertErrorsEqual(try bounds.range(arrayCount: 11), .wrong(bounds: bounds, arrayCount: 11))
     }
 
     func testEqualBound() {

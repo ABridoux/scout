@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
@@ -10,47 +10,16 @@ public struct Path: Hashable {
 
     // MARK: - Constants
 
-    public static var empty: Path { .init() }
+    public static let defaultSeparator = "."
+    private static let forbiddenSeparators: Set<String> = ["[", "]", "(", ")"]
 
     // MARK: - Properties
 
-    private var elements = [PathElement]()
+    private var elements: [PathElement] = []
+
+    public static var empty: Path { .init() }
 
     // MARK: - Initialization
-
-    private init(string: String, splitRegex: NSRegularExpression) {
-        elements = splitRegex
-            .matches(in: string)
-            .map { PathElement(from: String($0).removingEnclosingBrackets()) }
-    }
-
-    /// Instantiate a `Path` for a string representing path components separated with the default separator '.'.
-    ///
-    /// ### Example with default separator '.'
-    ///
-    /// `computers[2].name` will make the path `["computers", 2, "name"]`
-    ///
-    /// `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
-    ///
-    /// `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
-    ///
-    /// - parameter string: The string representing the path
-    /// - parameter separator: The separator used to split the string. Default is "."
-    ///
-    /// ### Brackets
-    /// When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
-    /// will make the path ["computer", "general.information", "serial_number"]
-    public init(string: String) {
-        let pattern = Self.splitRegexPattern()
-        let splitRegex: NSRegularExpression
-        do {
-            splitRegex = try NSRegularExpression(pattern: pattern)
-        } catch {
-            preconditionFailure(PathError.invalidRegex(pattern: pattern).localizedDescription)
-        }
-
-        self.init(string: string, splitRegex: splitRegex)
-    }
 
     /// Instantiate a `Path` for a string representing path components separated with the separator.
     ///
@@ -63,7 +32,7 @@ public struct Path: Hashable {
     /// `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
     ///
     /// - parameter string: The string representing the path
-    /// - parameter separator: The separator used to split the string. Default is "."
+    /// - parameter separator: The separator used to split the string. Default is ".".
     ///
     /// ### Brackets
     /// When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
@@ -71,22 +40,20 @@ public struct Path: Hashable {
     ///
     /// ### Excluded separators
     /// The following separators will not work: '[', ']', '(', ')'.
-    ///
-    ///
-    /// When using a special character for a [regular expression](https://developer.apple.com/documentation/foundation/nsregularexpression#1965589),
-    /// it is required to quote it with "\\".
-    public init(string: String, separator: String) throws {
-        try Self.validate(separator: separator)
-        let pattern = Self.splitRegexPattern(separator: separator)
+    public init(string: String, separator: String = Self.defaultSeparator) throws {
+        if Self.forbiddenSeparators.contains(separator) { throw PathError.invalidSeparator(separator) }
 
-        let splitRegex: NSRegularExpression
-        do {
-            splitRegex = try NSRegularExpression(pattern: pattern)
-        } catch {
-            throw PathError.invalidRegex(pattern: pattern)
+        guard let result = Self.parser(separator: separator).run(string) else {
+            elements = []
+            return
         }
 
-        self.init(string: string, splitRegex: splitRegex)
+        guard result.remainder.isEmpty else {
+            throw PathError.invalidStringPath(String(result.remainder))
+        }
+
+        elements = result.result
+
     }
 
     public init() {
@@ -141,11 +108,6 @@ extension Path: RangeReplaceableCollection {
     where Self.Element == C.Element {
         elements.replaceSubrange(subrange, with: newElements)
     }
-}
-
-extension Path: BidirectionalCollection {
-
-    public func index(before i: Int) -> Int { elements.index(before: i) }
 }
 
 extension Path: MutableCollection {}

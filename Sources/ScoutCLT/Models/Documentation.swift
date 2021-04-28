@@ -1,9 +1,10 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Lux
+import ScoutCLTCore
 
 /// Piece of documentation used to be printed
 protocol Documentation {
@@ -17,7 +18,7 @@ extension Documentation {
     static var nc: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--nc") }
     static var csv: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv") }
     static var export: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-e|--export") }
-    static var csvSep: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv-sep") }
+    static var csvExport: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "--csv-exp") }
     static var level: String { zshInjector.delegate.inject(.optionNameOrFlag, in: .terminal, "-l") }
 
     /// Get one example per line
@@ -37,7 +38,7 @@ extension Documentation {
     static var notesHeader: String {
         """
         Notes
-        ====
+        =====
         """
     }
 
@@ -102,22 +103,17 @@ extension Documentation {
         Useful to avoid slowdowns when dealing with large files.
 
         \(header: "Export")
-        Export the data to another available format with the \(export) command.
-        Output an array or a dictionary of arrays as CSV with the \(csv) flag or \(csvSep) option.
+        Export the data to another available format with the \(export) command. It's also possible to specify 'array' or
+        'dictionary' to export the data respectively as a Zsh array or associative array.
+        Output an array or a dictionary of arrays as CSV with the \(csvExport) option.
 
         \(header: "Folding")
         Fold the arrays and dictionaries at a certain depth level with the \(level) option.
         """
     }
 
-    static var forceTypeDoc: String {
-        """
-        \(header: "Forcing a type")
-        String: enclose the value with slash signs to force the value as a string: /valueAsString/.
-        Boolean: enclose the value with interrogative signs to force the value as a boolean: ?valueToBoolean?.
-        Real: enclose the value with tilde signs to force the value as a real: ~valueToReal~.
-        Integer: enclose the value with chevron signs to force the value as an integer: <valueToInteger>.
-        """
+    static var valueSpecificationDoc: String {
+        PathAndValue.abstract
     }
 }
 

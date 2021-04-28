@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/ABridoux/BooleanExpressionEvaluation",
         "state": {
           "branch": null,
-          "revision": "ab25774a0368e12def337fa941a41a6be2757fd1",
-          "version": "2.0.0"
+          "revision": "0af945fffa42447e455620ccaaa26d80528e3884",
+          "version": "2.0.1"
         }
       },
       {
@@ -42,8 +42,17 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "9564d61b08a5335ae0a36f789a7d71493eacadfc",
-          "version": "0.3.2"
+          "revision": "47bd06ebeff8146ecd0020809e186218b46f465f",
+          "version": "0.4.2"
+        }
+      },
+      {
+        "package": "SwiftCSV",
+        "repositoryURL": "https://github.com/swiftcsv/SwiftCSV",
+        "state": {
+          "branch": null,
+          "revision": "ad2042d0ba2ea260246b0e1b1d5710cbc53e2836",
+          "version": "0.6.0"
         }
       },
       {
@@ -60,8 +69,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "9003d51672e516cc59297b7e96bff1dfdedcb4ea",
-          "version": "4.0.4"
+          "revision": "9ff1cc9327586db4e0c8f46f064b6a82ec1566fa",
+          "version": "4.0.6"
         }
       }
     ]

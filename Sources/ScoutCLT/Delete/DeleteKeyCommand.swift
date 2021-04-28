@@ -1,9 +1,9 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
-import Foundation
+import ScoutCLTCore
 import Scout
 import ArgumentParser
 
@@ -19,6 +19,9 @@ struct DeleteKeyCommand: SADCommand {
     // MARK: - Properties
 
     var pathsCollection: [Path] { [Path("empty")] }
+
+    @Option(name: [.customShort("f", allowingJoined: true), .customLong("format")], help: "The data format to read the input")
+    var dataFormat: Scout.DataFormat
 
     @Argument(help: "The regular expression pattern the keys to delete have to match")
     var pattern: String
@@ -48,11 +51,11 @@ struct DeleteKeyCommand: SADCommand {
     var csvSeparator: String?
 
     @Option(name: [.short, .customLong("export")], help: "Convert the data to the specified format")
-    var exportFormat: Scout.DataFormat?
+    var exportFormat: ExportFormat?
 
     // MARK: - Functions
 
-    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathAndValue: Path) throws {
         // postponed to 3.1.0
 
 //         will be called only once

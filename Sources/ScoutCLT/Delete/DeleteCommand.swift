@@ -1,11 +1,11 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import ArgumentParser
 import Scout
-import Foundation
+import ScoutCLTCore
 
 struct DeleteCommand: SADCommand {
 
@@ -18,39 +18,39 @@ struct DeleteCommand: SADCommand {
 
     // MARK: - Properties
 
+    @Option(name: .dataFormat, help: .dataFormat)
+    var dataFormat: Scout.DataFormat
+
     @Argument(help: "Paths to indicate the keys to be deleted")
     var pathsCollection = [Path]()
 
-    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
+    @Option(name: .inputFilePath, help: .inputFilePath, completion: .file())
     var inputFilePath: String?
 
-    @Option(name: [.short, .customLong("output")], help: "Write the modified data into the file at the given path", completion: .file())
+    @Option(name: .outputFilePath, help: .outputFilePath, completion: .file())
     var outputFilePath: String?
 
-    @Option(name: [.short, .customLong("modify")], help: "Read and write the data into the same file at the given path", completion: .file())
+    @Option(name: .modifyFilePath, help: .modifyFilePath, completion: .file())
     var modifyFilePath: String?
 
-    @Flag(help: "Highlight the ouput. --no-color or --nc to prevent it")
+    @Flag(help: .colorise)
     var color = ColorFlag.color
 
-    @Option(name: [.short, .long], help: "Fold the data at the given depth level")
+    @Option(name: .fold, help: .fold)
     var level: Int?
 
     @Flag(name: [.short, .long], help: "When the deleted value leaves the array or dictionary holding it empty, delete it too")
     var recursive = false
 
-    @Flag(name: [.customLong("csv")], help: "Convert the array data into CSV with the standard separator ';'")
-    var csv = false
-
-    @Option(name: [.customLong("csv-sep")], help: "Convert the array data into CSV with the given separator")
+    @Option(name: .csvSeparator, help: .csvSeparator)
     var csvSeparator: String?
 
-    @Option(name: [.short, .customLong("export")], help: "Convert the data to the specified format")
-    var exportFormat: Scout.DataFormat?
+    @Option(name: .export, help: .export)
+    var exportFormat: ExportFormat?
 
     // MARK: - Functions
 
-    func perform<P: PathExplorer>(pathExplorer: inout P, pathCollectionElement: Path) throws {
-        try pathExplorer.delete(pathCollectionElement, deleteIfEmpty: recursive)
+    func perform<P: SerializablePathExplorer>(pathExplorer: inout P, pathAndValue: Path) throws {
+        try pathExplorer.delete(pathAndValue, deleteIfEmpty: recursive)
     }
 }

@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 extension String {
@@ -30,20 +30,15 @@ extension String {
 private struct JaroWinklerDistance {
     var string1: String
     var string2: String
-
-    // avoid to recompute the strings counts each time
-    var count1: Int
-    var count2: Int
-
-    var maxSpacing: Int
+    var count1: Int { string1.count }
+    var count2: Int { string2.count }
+    let maxSpacing: Int
 
     init(_ string1: String, _ string2: String) {
         self.string1 = string1
         self.string2 = string2
-        count1 = string1.count
-        count2 = string2.count
 
-        maxSpacing = max(count1, count2) / 2 - 1
+        maxSpacing = max(string1.count, string2.count) / 2 - 1
     }
 
     func computeMatches() -> [Int] {

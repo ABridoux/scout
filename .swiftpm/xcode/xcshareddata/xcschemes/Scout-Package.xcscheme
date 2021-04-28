@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1140"
+   LastUpgradeVersion = "1220"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -28,9 +28,37 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ScoutCLTCore"
+               BuildableName = "ScoutCLTCore"
+               BlueprintName = "ScoutCLTCore"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "ScoutCLT"
                BuildableName = "ScoutCLT"
                BlueprintName = "ScoutCLT"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ScoutCLTCoreTests"
+               BuildableName = "ScoutCLTCoreTests"
+               BlueprintName = "ScoutCLTCoreTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -56,9 +84,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ScoutCLTCore"
-               BuildableName = "ScoutCLTCore"
-               BlueprintName = "ScoutCLTCore"
+               BlueprintIdentifier = "Parsing"
+               BuildableName = "Parsing"
+               BlueprintName = "Parsing"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -74,6 +102,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ScoutCLTCoreTests"
+               BuildableName = "ScoutCLTCoreTests"
+               BlueprintName = "ScoutCLTCoreTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "ScoutTests"
                BuildableName = "ScoutTests"
                BlueprintName = "ScoutTests"
@@ -84,19 +122,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ScoutCLTTests"
-               BuildableName = "ScoutCLTTests"
-               BlueprintName = "ScoutCLTTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ScoutCLTCoreTests"
-               BuildableName = "ScoutCLTCoreTests"
-               BlueprintName = "ScoutCLTCoreTests"
+               BlueprintIdentifier = "ParsingTests"
+               BuildableName = "ParsingTests"
+               BlueprintName = "ParsingTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

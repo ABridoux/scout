@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
@@ -50,14 +50,6 @@ public enum PathElement: Hashable {
         }
     }
 
-    /// Can subscript an array or a dictionay
-    public var isGroupSubscripter: Bool {
-        switch self {
-        case .count, .keysList, .index, .slice, .filter: return true
-        case .key: return false
-        }
-    }
-
     public var usage: String {
         switch self {
         case .key: return "A key subscript a dictionary and is specified with a dot '.' then the key name like 'dictionary.keyName'"
@@ -67,30 +59,6 @@ public enum PathElement: Hashable {
         case .slice: return "A slice is specified after an array with lower and upper bounds. It is enclosed by square brackets and the bounds are specified separated by ':' like '[lower:upper]'"
         case .filter: return "A filter is a regular expression placed after a dictionary to filter the keys to target. It is enclosed by sharp signs like '#[a-zA-Z]*#'"
         }
-    }
-
-    // MARK: - Initialization
-
-    init(from string: String) {
-        if let index = string.indexPathElement {
-            self = index
-        } else if let count = string.countPathElement {
-            self = count
-        } else if let keysList = string.keysListPathElements {
-            self = keysList
-        } else if string == Self.defaultCountSymbol {
-            self = .count
-        } else if let range = string.slicePathElement {
-            self = range
-        } else if let filter = string.filterPathElements {
-            self = filter
-        } else {
-            self = .key(string)
-        }
-    }
-
-    public static func slice(_ lower: Bounds.Bound, _ upper: Bounds.Bound) -> PathElement {
-        .slice(Bounds(lower: lower, upper: upper))
     }
 }
 
@@ -128,16 +96,14 @@ extension PathElement: CustomStringConvertible {
         }
     }
 
-    /// Name of the path element when used as a key in  a dictionary
-    /// - note: Mainly used for the sliced and filtetered key names
-    var keyName: String {
+    var kindDescription: String {
         switch self {
-        case .key(let key): return key
-        case .index(let index): return "index\(index))"
+        case .key: return "key"
+        case .index: return "index"
         case .count: return "count"
         case .keysList: return "keysList"
-        case .slice(let bounds): return "slice(\(bounds.lowerString),\(bounds.upperString))"
-        case .filter(let pattern): return "filter(\(pattern))"
+        case .slice: return "slice"
+        case .filter: return "filter"
         }
     }
 }

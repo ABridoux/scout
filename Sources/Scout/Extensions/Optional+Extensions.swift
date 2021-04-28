@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
@@ -18,4 +18,26 @@ func !!<T>(optional: T?, errorMessage: @autoclosure () -> String) -> T {
         return unwrapped
     }
     fatalError(errorMessage())
+}
+
+extension Optional {
+
+    func unwrapOrThrow(error: Error) throws -> Wrapped {
+        guard let wrapped = self else {
+            throw error
+        }
+        return wrapped
+    }
+
+    func unwrapOrThrow(_ error: ExplorerError) throws -> Wrapped {
+        try unwrapOrThrow(error: error)
+    }
+
+    func unwrapOrThrow(_ error: DecodingError) throws -> Wrapped {
+        try unwrapOrThrow(error: error)
+    }
+
+    func unwrapOrThrow(_ error: SerializationError) throws -> Wrapped {
+        try unwrapOrThrow(error: error)
+    }
 }

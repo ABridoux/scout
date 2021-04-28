@@ -1,6 +1,6 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
@@ -9,7 +9,7 @@ import ArgumentParser
 
 extension PathsFilter.ValueTarget: EnumerableFlag {}
 
-struct PathsCommand: ScoutCommand {
+struct PathsCommand: PathExplorerInputCommand {
 
     // MARK: - Constants
 
@@ -20,19 +20,22 @@ struct PathsCommand: ScoutCommand {
 
     // MARK: - Properties
 
+    @Option(name: .dataFormat, help: .dataFormat)
+    var dataFormat: Scout.DataFormat
+
     @Argument(help: "Initial path from which the paths should be listed")
     var initialPath: Path?
 
-    @Option(name: [.short, .customLong("input")], help: "A file path from which to read the data", completion: .file())
+    @Option(name: .inputFilePath, help: .inputFilePath, completion: .file())
     var inputFilePath: String?
 
     @Option(name: [.short, .customLong("key")], help: "Specify a regular expression to filter the keys")
-    var keyRegexPattren: String?
+    var keyRegexPattern: String?
 
     @Option(name: [.short, .customLong("value")], help: "Specify a predicate to filter the values of the paths. Several predicates can be specified. A value validated by any of the predicates will be valid.")
     var valuePredicates = [String]()
 
-    @Flag(help: "Target single values (stirng, number, bool), group values (array, dictionary), or both.")
+    @Flag(help: "Target single values (string, number, bool), group values (array, dictionary), or both.")
     var valueTarget = PathsFilter.ValueTarget.singleAndGroup
 
     // MARK: - Functions
@@ -42,7 +45,7 @@ struct PathsCommand: ScoutCommand {
         let valuePredicates = self.valuePredicates.isEmpty ? nil : try self.valuePredicates.map { try PathsFilter.ExpressionPredicate(format: $0) }
         var keyRegex: NSRegularExpression?
 
-        if let pattern = keyRegexPattren {
+        if let pattern = keyRegexPattern {
             keyRegex = try regexFrom(pattern: pattern)
         }
 
@@ -62,18 +65,22 @@ struct PathsCommand: ScoutCommand {
 
         case (nil, .some(let predicates), let target):
             if target != .singleAndGroup {
-                throw RuntimeError.invalidArgumentsCombination(description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'")
+                throw RuntimeError.invalidArgumentsCombination(
+                    description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'"
+                )
             }
             pathsFilter = .value(predicates)
 
         case (.some(let regex), .some(let predicates), let target):
             if target != .singleAndGroup {
-                throw RuntimeError.invalidArgumentsCombination(description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'")
+                throw RuntimeError.invalidArgumentsCombination(
+                    description: "Using the target flag is not allowed with the (--value|-v) option. Consider removing '--\(target.rawValue)'"
+                )
             }
             pathsFilter = .keyAndValue(keyRegex: regex, valuePredicates: predicates)
         }
 
-        let paths = try pathExplorer.listPaths(startingAt: initialPath, filter: pathsFilter)
+        let paths = try pathExplorer.listPaths(startingAt: initialPath, filter: pathsFilter).sortedByKeysAndIndexes()
 
         paths.forEach { print($0.flattened()) }
     }

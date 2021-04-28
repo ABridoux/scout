@@ -1,49 +1,48 @@
 //
 // Scout
-// Copyright (c) Alexis Bridoux 2020
+// Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
 import Foundation
 
-extension Path: CustomStringConvertible, CustomDebugStringConvertible {
+public extension Collection where Element == PathElement {
 
     /// Prints all the elements in the path, with the default separator
     /// #### Complexity
-    /// O(n) with `n` number of elements in the path
-    public var description: String { computeDescription() }
+    /// O(n) where `n`: element's count
+    var description: String {
+        var description = reduce(into: "", newDescription)
 
-    public var debugDescription: String { description }
-
-    func computeDescription(ignore: ((PathElement) -> Bool)? = nil) -> String {
-        var description = ""
-
-        forEach { element in
-            if let ignore = ignore, ignore(element) { return }
-
-            switch element {
-
-            case .index, .count, .slice, .keysList:
-                // remove the point added automatically to a path element
-                if description.hasSuffix(Self.defaultSeparator) {
-                    description.removeLast()
-                }
-                description.append(element.description)
-
-            case .filter(let pattern):
-                description.append("#\(pattern)#")
-
-            case .key:
-                description.append(element.description)
-            }
-
-            description.append(Self.defaultSeparator)
-        }
-
-        // remove the last point if any
-        if description.hasSuffix(Self.defaultSeparator) {
+        if description.hasSuffix(Path.defaultSeparator) {
             description.removeLast()
         }
 
         return description
     }
+
+    var debugDescription: String { description }
+
+    private func newDescription(from description: inout String, with element: PathElement) {
+
+        switch element {
+
+        case .index, .count, .slice, .keysList:
+            // remove the point added automatically to a path element
+            if description.hasSuffix(Path.defaultSeparator) {
+                description.removeLast()
+            }
+            description.append(element.description)
+
+        case .filter(let pattern):
+            description.append("#\(pattern)#")
+
+        case .key:
+            description.append(element.description)
+        }
+
+        description.append(Path.defaultSeparator)
+    }
 }
+
+extension Path: CustomStringConvertible, CustomDebugStringConvertible {}
+extension Slice: CustomStringConvertible, CustomDebugStringConvertible where Base == Path {}
