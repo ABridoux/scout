@@ -190,7 +190,12 @@ extension ExplorerValue {
     }
 
     static func singleFrom(string: String) -> ExplorerValue {
-        if let int = Int(string) { return .int(int) } else if let double = Double(string) { return .double(double) } else if let bool = Bool(string) { return .bool(bool) } else { return .string(string) }
+        // swiftlint:disable statement_position
+        if let int = Int(string) { return .int(int) }
+        else if let double = Double(string) { return .double(double) }
+        else if let bool = Bool(string) { return .bool(bool) }
+        else { return .string(string) }
+        // swiftlint:enable statement_position
     }
 }
 

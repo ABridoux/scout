@@ -15,7 +15,6 @@ extension ExplorerValue {
 
     // MARK: General function
 
-    /// - parameter detailedName: When `true`, the key name after a filter will be composed of the parent key followed by the child key
     private func _get(path: SlicePath) throws -> Self {
         guard let (head, tail) = path.headAndTail() else { return self }
 
