@@ -107,9 +107,19 @@ extension ExplorerValueDecoder {
             return value
         }
 
+        mutating func decode(_ type: Date.Type) throws -> Date {
+            let value = try array[currentIndex].date.unwrapOrThrow(.typeMismatch(Date.self, codingPath: codingPath))
+            currentIndex += 1
+            return value
+        }
+
         mutating func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
             if T.self == Data.self {
                 return try decode(Data.self) as! T
+            }
+
+            if T.self == Date.self {
+                return try decode(Date.self) as! T
             }
 
             let decoder = ExplorerValueDecoder(array[currentIndex], codingPath: codingPath)
