@@ -74,8 +74,17 @@ extension ExplorerValueEncoder {
             try encoder.value.add(.data(value), at: path.appending(key.stringValue))
         }
 
+        mutating func encode(_ value: Date, forKey key: Key) throws {
+            try encoder.value.add(.date(value), at: path.appending(key.stringValue))
+        }
+
         mutating func encode<T>(_ value: T, forKey key: Key) throws where T: Encodable {
             if let data = value as? Data {
+                try encode(data, forKey: key)
+                return
+            }
+
+            if let data = value as? Date {
                 try encode(data, forKey: key)
                 return
             }

@@ -282,6 +282,11 @@ extension ExplorerValue {
         return data
     }
 
+    public var date: Date? {
+        guard case let .date(date) = self else { return nil }
+        return date
+    }
+
     public var array: ArrayValue? {
         switch self {
         case .array(let array): return array

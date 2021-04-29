@@ -126,11 +126,21 @@ extension ExplorerValueDecoder {
                 .unwrapOrThrow(.typeMismatch(Data.self, codingPath: codingPath + [key]))
         }
 
+        func decode(_ type: Date.Type, forKey key: Key) throws -> Date {
+            try valueFor(key: key)
+                .date
+                .unwrapOrThrow(.typeMismatch(Date.self, codingPath: codingPath + [key]))
+        }
+
         func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
             let value = try valueFor(key: key)
 
             if T.self == Data.self {
                 return try decode(Data.self, forKey: key) as! T
+            }
+
+            if T.self == Date.self {
+                return try decode(Date.self, forKey: key) as! T
             }
 
             let decoder = ExplorerValueDecoder(value, codingPath: codingPath + [key])
