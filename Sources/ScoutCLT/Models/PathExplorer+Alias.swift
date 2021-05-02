@@ -6,6 +6,6 @@
 import Scout
 
 typealias Xml = PathExplorers.Xml
-typealias Json = PathExplorers.Json
+typealias Json = CodablePathExplorer<CodableFormats.JsonDateIso8601>
 typealias Plist = PathExplorers.Plist
 typealias Yaml = PathExplorers.Yaml
