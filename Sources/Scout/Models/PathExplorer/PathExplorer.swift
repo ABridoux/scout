@@ -31,6 +31,9 @@ where
     /// Non `nil` if the key is of the `Double` type
     var real: Double? { get }
 
+    /// Non `nil` if the key is of the `Double` type
+    var double: Double? { get }
+
     /// Non `nil` if the key is of the `Data` type
     var data: Data? { get }
 

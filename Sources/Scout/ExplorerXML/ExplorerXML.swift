@@ -31,7 +31,7 @@ public struct ExplorerXML: PathExplorer {
     public var int: Int? { element.int }
     public var double: Double? { element.double }
 
-    @available(*, deprecated)
+    @available(*, deprecated, renamed: "double")
     public var real: Double? { element.double }
 
     /// Always `nil` on XML
