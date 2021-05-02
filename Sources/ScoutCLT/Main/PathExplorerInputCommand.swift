@@ -7,7 +7,7 @@ import Foundation
 import Scout
 import ArgumentParser
 
-/// Try to get a PathExplorer from the input
+/// Try to get a `PathExplorer` from the input
 protocol PathExplorerInputCommand: ParsableCommand {
 
     /// A file path from which to read the data
@@ -34,8 +34,8 @@ extension PathExplorerInputCommand {
     func run() throws {
         var filePath: String?
         switch (inputFilePath?.replacingTilde, modifyFilePath?.replacingTilde) {
-        case (.some(let path), nil): filePath = path
-        case (nil, .some(let path)): filePath = path
+        case (let path?, nil): filePath = path
+        case (nil, let path?): filePath = path
         case (nil, nil): break
         case (.some, .some): throw RuntimeError.invalidArgumentsCombination(description: "Combining (-i|--input) with (-m|--modify) is not allowed")
         }

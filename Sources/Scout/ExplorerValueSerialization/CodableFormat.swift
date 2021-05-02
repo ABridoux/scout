@@ -42,14 +42,49 @@ public extension CodableFormats {
             + #"|(?<=\{)\s*"\#(foldedKey)"\s*:\s*"\#(foldedMark)"\s*(?=\})"# // dict
         }
 
-        public static func encode<E: Encodable>(_ value: E, rootName: String?) throws -> Data {
+        private static let encoder: JSONEncoder = {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted
-            return try encoder.encode(value)
+            return encoder
+        }()
+
+        private static let decoder: JSONDecoder = JSONDecoder()
+
+        public static func encode<E: Encodable>(_ value: E, rootName: String?) throws -> Data {
+            try encoder.encode(value)
         }
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
-            try JSONDecoder().decode(type, from: data)
+            try decoder.decode(type, from: data)
+        }
+    }
+}
+
+extension CodableFormats {
+
+    public enum JsonDateIso8601: CodableFormat {
+
+        public static let dataFormat: DataFormat = .json
+        public static var foldedRegexPattern: String { JsonDefault.foldedRegexPattern }
+
+        private static let decoder: JSONDecoder = {
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return decoder
+        }()
+
+        private static let encoder: JSONEncoder = {
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            return encoder
+        }()
+
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+            try decoder.decode(type, from: data)
+        }
+
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
+            try encoder.encode(value)
         }
     }
 }
@@ -65,14 +100,20 @@ public extension CodableFormats {
             + #"|(?<=<dict>)\s*<key>\#(foldedKey)</key>\s*<string>\#(foldedMark)</string>\s*(?=</dict>)"# // dict
         }
 
-        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
+        private static let encoder: PropertyListEncoder = {
             let encoder = PropertyListEncoder()
             encoder.outputFormat = .xml
-            return try encoder.encode(value)
+            return encoder
+        }()
+
+        private static let decoder: PropertyListDecoder = PropertyListDecoder()
+
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
+            try encoder.encode(value)
         }
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
-            try PropertyListDecoder().decode(type, from: data)
+            try decoder.decode(type, from: data)
         }
     }
 }
@@ -88,12 +129,15 @@ public extension CodableFormats {
             + #"|\#(foldedKey)\s*:\s*\#(foldedMark)\s*(?=\n)"# // dict
         }
 
+        private static let encoder = YAMLEncoder()
+        private static let decoder = YAMLDecoder()
+
         public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
-            try YAMLEncoder().encode(value).data(using: .utf8).unwrapOrThrow(.stringToData)
+            try encoder.encode(value).data(using: .utf8).unwrapOrThrow(.stringToData)
         }
 
         public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
-            try YAMLDecoder().decode(type, from: data)
+            try decoder.decode(type, from: data)
         }
     }
 }

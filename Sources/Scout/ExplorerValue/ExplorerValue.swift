@@ -121,10 +121,12 @@ extension ExplorerValue: Codable {
             return .bool(bool)
         } else if let data = try? container.decode(Data.self) {
             return .data(data)
+        } else if let date = try? container.decode(Date.self) {
+            return .date(date)
         } else if container.decodeNil() {
             return .string("null")
         } else {
-            throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath)")
+            throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath.pathDescription)")
         }
     }
 
