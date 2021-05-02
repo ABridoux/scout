@@ -16,21 +16,33 @@ extension ExplorerXML {
         try _set(path: Slice(path), to: .explorerValue(newValue))
     }
 
+    /// Set the path to the given `AEXMLElement` value rather than an `ExplorerValue`
+    public mutating func set(_ path: Path, to element: Element) throws {
+        try _set(path: Slice(path), to: .explorerXML(ExplorerXML(element: element)))
+    }
+
+    /// Set the path to the given `ExplorerXML` value rather than an `ExplorerValue`
+    public mutating func set(_ path: Path, to explorer: ExplorerXML) throws {
+        try _set(path: Slice(path), to: .explorerXML(explorer))
+    }
+
     public func setting(_ path: Path, to newValue: ExplorerValue) throws -> ExplorerXML {
         var modified = copy()
         try modified.set(path, to: newValue)
         return modified
     }
 
-    /// Set the path to the given AEXMLElement rather than an `ExplorerValue`
-    public mutating func set(_ path: Path, to newElement: Element) throws {
-        try _set(path: Slice(path), to: .xmlElement(newElement))
+    /// Set the path to the given `AEXMLElement` value rather than an `ExplorerValue`
+    public func setting(_ path: Path, to element: Element) throws -> ExplorerXML {
+        var modified = copy()
+        try modified.set(path, to: element)
+        return modified
     }
 
-    /// Set the path to the given AEXMLElement rather than an `ExplorerValue`
-    public func setting(_ path: Path, to newElement: Element) throws -> ExplorerXML {
+    /// Set the path to the given `ExplorerXML` value  rather than an `ExplorerValue`
+    public func setting(_ path: Path, to explorer: ExplorerXML) throws -> ExplorerXML {
         var modified = copy()
-        try modified.set(path, to: newElement)
+        try modified.set(path, to: explorer)
         return modified
     }
 

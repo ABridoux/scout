@@ -259,7 +259,7 @@ extension ExplorerXML {
     func set(value: ValueSetter) {
         switch value {
         case .explorerValue(let value): set(newValue: value)
-        case .xmlElement(let element): set(newElement: element)
+        case .explorerXML(let explorer): set(newElement: explorer.element)
         }
     }
 
@@ -306,7 +306,7 @@ extension ExplorerXML {
     /// Wrapper to more easily handle setting an ExplorerValue or Element
     enum ValueSetter {
         case explorerValue(ExplorerValue)
-        case xmlElement(Element)
+        case explorerXML(ExplorerXML)
     }
 }
 
