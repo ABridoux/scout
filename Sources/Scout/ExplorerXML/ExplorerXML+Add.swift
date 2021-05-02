@@ -14,9 +14,35 @@ extension ExplorerXML {
         try _add(value: .explorerValue(value), at: Slice(path))
     }
 
+    /// Add the given `AEXMLElement` value rather than an `ExplorerValue`
+    public mutating func add(_ element: Element, at path: Path) throws {
+        if referenceIsShared() { self = copy() }
+        try _add(value: .explorerXML(ExplorerXML(element: element)), at: Slice(path))
+    }
+
+    /// Add the given `ExplorerXML` value rather than an `ExplorerValue`
+    public mutating func add(_ explorer: ExplorerXML, at path: Path) throws {
+        if referenceIsShared() { self = copy() }
+        try _add(value: .explorerXML(explorer), at: Slice(path))
+    }
+
     public func adding(_ value: ExplorerValue, at path: Path) throws -> ExplorerXML {
         var copy = self.copy()
         try copy.add(value, at: path)
+        return copy
+    }
+
+    /// Add the given `AEXMLElement` value rather than an `ExplorerValue`
+    public func adding(_ element: Element, at path: Path) throws -> ExplorerXML {
+        var copy = self.copy()
+        try copy.add(element, at: path)
+        return copy
+    }
+
+    /// Add the given `ExplorerXML` value rather than an `ExplorerValue`
+    public func adding(_ explorerXML: ExplorerXML, at path: Path) throws -> ExplorerXML {
+        var copy = self.copy()
+        try copy.add(explorerXML, at: path)
         return copy
     }
 
