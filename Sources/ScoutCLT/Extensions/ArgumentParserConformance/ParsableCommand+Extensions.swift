@@ -43,7 +43,7 @@ extension ParsableCommand {
 
 extension ParsableCommand {
 
-    func colorInjector(for format: Scout.DataFormat) throws -> TextInjector {
+    func colorInjector(for format: Scout.DataFormat) throws -> (String) -> String {
         switch format {
 
         case .json:
@@ -51,28 +51,28 @@ extension ParsableCommand {
             if let colors = try getColorFile()?.json {
                 jsonInjector.delegate = JSONInjectorColorDelegate(colors: colors)
             }
-            return jsonInjector
+            return jsonInjector.inject
 
         case .plist:
             let plistInjector = PlistInjector(type: .terminal)
             if let colors = try getColorFile()?.plist {
                 plistInjector.delegate = PlistInjectorColorDelegate(colors: colors)
             }
-            return plistInjector
+            return plistInjector.inject
 
         case .yaml:
             let yamlInjector = YAMLInjector(type: .terminal)
             if let colors = try getColorFile()?.yaml {
                 yamlInjector.delegate = YAMLInjectorColorDelegate(colors: colors)
             }
-            return yamlInjector
+            return yamlInjector.inject
 
         case .xml:
             let xmlInjector = XMLEnhancedInjector(type: .terminal)
             if let colors = try getColorFile()?.xml {
                 xmlInjector.delegate = XMLInjectorColorDelegate(colors: colors)
             }
-            return xmlInjector
+            return xmlInjector.inject
         }
     }
 

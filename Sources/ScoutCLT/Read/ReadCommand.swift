@@ -75,13 +75,13 @@ struct ReadCommand: PathExplorerInputCommand, ExportCommand {
             print(value)
 
         case .noExport:
-            let colorInjector = try self.colorInjector(for: P.format)
-            let output = colorise ? colorInjector.inject(in: value) : value
+            let highlight = try self.colorInjector(for: P.format)
+            let output = colorise ? highlight(value) : value
             print(output)
 
         case .dataFormat(let format):
-            let colorInjector = try self.colorInjector(for: format)
-            let output = colorise ? colorInjector.inject(in: value) : value
+            let highlight = try self.colorInjector(for: format)
+            let output = colorise ? highlight(value) : value
             print(output)
         }
     }

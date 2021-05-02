@@ -126,8 +126,8 @@ extension SADCommand {
 
     func printOutput(output: String, with format: Scout.DataFormat) throws {
         if colorise {
-            let injector = try colorInjector(for: format)
-            print(injector.inject(in: output))
+            let highlight = try colorInjector(for: format)
+            print(highlight(output))
         } else {
             print(output)
         }

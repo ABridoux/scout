@@ -76,6 +76,7 @@ extension CodableFormats {
         private static let encoder: JSONEncoder = {
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
+            encoder.outputFormatting = .prettyPrinted
             return encoder
         }()
 

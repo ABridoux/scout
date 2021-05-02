@@ -94,6 +94,23 @@ public extension Parser {
         }
     }
 
+    /// Match characters until one of the forbidden ones is encountered
+    static func string(forbiddenCharacters isForbidden: @escaping (Character) -> Bool) -> Parser<String> {
+        Parser<String> { input in
+            guard !input.isEmpty else { return nil }
+            var remainder = input
+            var currentString = ""
+
+            while let char = remainder.first {
+                if isForbidden(char) { break }
+                currentString += String(char)
+                remainder = remainder.dropFirst()
+            }
+
+            return currentString.isEmpty ? nil : (currentString, remainder)
+        }
+    }
+
     /// Match characters until the last ones equal the forbidden string, or if the character matches one of the forbidden ones
     ///
     /// ### Examples
