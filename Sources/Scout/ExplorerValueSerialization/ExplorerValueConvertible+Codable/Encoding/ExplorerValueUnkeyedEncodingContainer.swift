@@ -91,9 +91,19 @@ extension ExplorerValueEncoder {
             count += 1
         }
 
+        mutating func encode(_ value: Date) throws {
+            try encoder.value.add(.date(value), at: path.appending(.count))
+            count += 1
+        }
+
         mutating func encode<T>(_ value: T) throws where T: Encodable {
             if let data = value as? Data {
                 try encode(data)
+                return
+            }
+
+            if let date = value as? Date {
+                try encode(date)
                 return
             }
 

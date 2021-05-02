@@ -121,10 +121,12 @@ extension ExplorerValue: Codable {
             return .bool(bool)
         } else if let data = try? container.decode(Data.self) {
             return .data(data)
+        } else if let date = try? container.decode(Date.self) {
+            return .date(date)
         } else if container.decodeNil() {
             return .string("null")
         } else {
-            throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath)")
+            throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath.pathDescription)")
         }
     }
 
@@ -190,7 +192,12 @@ extension ExplorerValue {
     }
 
     static func singleFrom(string: String) -> ExplorerValue {
-        if let int = Int(string) { return .int(int) } else if let double = Double(string) { return .double(double) } else if let bool = Bool(string) { return .bool(bool) } else { return .string(string) }
+        // swiftlint:disable statement_position
+        if let int = Int(string) { return .int(int) }
+        else if let double = Double(string) { return .double(double) }
+        else if let bool = Bool(string) { return .bool(bool) }
+        else { return .string(string) }
+        // swiftlint:enable statement_position
     }
 }
 
@@ -275,6 +282,11 @@ extension ExplorerValue {
     public var data: Data? {
         guard case let .data(data) = self else { return nil }
         return data
+    }
+
+    public var date: Date? {
+        guard case let .date(date) = self else { return nil }
+        return date
     }
 
     public var array: ArrayValue? {

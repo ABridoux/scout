@@ -101,3 +101,16 @@ infix operator <|>: SequencePrecedence
 public func <|><A>(lhs: Parser<A>, rhs: Parser<A>) -> Parser<A> {
     lhs.or(rhs)
 }
+
+infix operator <+>: SequencePrecedence
+public func <+><A>(lhs: Parser<A>, rhs: Parser<A>) -> Parser<[A]> {
+    curry { [$0, $1] } <^> lhs <*> rhs
+}
+
+public func <+><A>(lhs: Parser<[A]>, rhs: Parser<A>) -> Parser<[A]> {
+    curry { $0 + [$1] } <^> lhs <*> rhs
+}
+
+public func <+><A>(lhs: Parser<[A]>, rhs: Parser<[A]>) -> Parser<[A]> {
+    curry { $0 + $1 } <^> lhs <*> rhs
+}

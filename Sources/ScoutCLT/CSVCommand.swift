@@ -71,8 +71,8 @@ struct CSVCommand: ParsableCommand {
 
         } else {
             var output = try explorer.exportString()
-            let colorInjector = try self.colorInjector(for: dataFormat)
-            output = colorise ? colorInjector.inject(in: output) : output
+            let highlight = try self.colorInjector(for: dataFormat)
+            output = colorise ? highlight(output) : output
             print(output)
         }
     }
