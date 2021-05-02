@@ -3,7 +3,12 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
-## [4.0.0](https://github.com/ABridoux/scout/tree/3.0.3) (28/04/2021)
+## [4.0.1](https://github.com/ABridoux/scout/tree/4.0.1) (02/05/2021)
+### Fixed
+- Date decoding and `PathExplorer.date` [#239]
+- `ExplorerXML` add and set features works with `ExplroerXML` values [#241]
+
+## [4.0.0](https://github.com/ABridoux/scout/tree/4.0.0) (28/04/2021)
 ### Added
 - Conversion from CSV input to one of the available formats [#181]
 - `Data` and `Date` values support [#197]
