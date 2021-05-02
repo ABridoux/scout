@@ -80,11 +80,11 @@ extension CodableFormats {
             return encoder
         }()
 
-        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D : Decodable {
+        public static func decode<D>(_ type: D.Type, from data: Data) throws -> D where D: Decodable {
             try decoder.decode(type, from: data)
         }
 
-        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E : Encodable {
+        public static func encode<E>(_ value: E, rootName: String?) throws -> Data where E: Encodable {
             try encoder.encode(value)
         }
     }
