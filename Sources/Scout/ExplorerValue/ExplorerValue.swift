@@ -6,7 +6,7 @@
 import Foundation
 
 /// The values a `PathExplorer` can take
-public indirect enum ExplorerValue {
+public enum ExplorerValue {
 
     public typealias ArrayValue = [ExplorerValue]
     public typealias DictionaryValue = [String: ExplorerValue]
