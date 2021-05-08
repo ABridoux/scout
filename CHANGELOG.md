@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [4.0.2](https://github.com/ABridoux/scout/tree/4.0.2) (08/05/2021)
+### Changed
+- Removed useless `indirect` attribute on `ExplorerValue` enum.
+- Deprecated `PathExplorer.real` for `PathExplorer.double`.
+
 ## [4.0.1](https://github.com/ABridoux/scout/tree/4.0.1) (02/05/2021)
 ### Fixed
 - Date decoding and `PathExplorer.date` [#239]

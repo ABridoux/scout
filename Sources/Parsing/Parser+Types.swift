@@ -11,7 +11,7 @@ public extension Parser {
 
     static func character(matching condition: @escaping (Character) -> Bool) -> Parser<Character> {
         Parser<Character> { input in
-            guard let char  = input.first, condition(char) else { return nil }
+            guard let char = input.first, condition(char) else { return nil }
             return (char, input.dropFirst())
         }
     }

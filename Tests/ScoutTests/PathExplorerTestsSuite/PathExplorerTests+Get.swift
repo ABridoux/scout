@@ -131,7 +131,7 @@ final class PathExplorerGetTests: XCTestCase {
         XCTAssertEqual(try explorer.get(0).string, "Endo")
         XCTAssertEqual(try explorer.get(1).int, 1)
         XCTAssertEqual(try explorer.get(2).bool, false)
-        XCTAssertEqual(try explorer.get(3).real, 2.5)
+        XCTAssertEqual(try explorer.get(3).double, 2.5)
     }
 
     func testGetIndex_LastIndex<P: EquatablePathExplorer>(_ type: P.Type) throws {

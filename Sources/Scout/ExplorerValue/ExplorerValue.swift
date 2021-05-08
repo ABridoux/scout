@@ -6,11 +6,7 @@
 import Foundation
 
 /// The values a `PathExplorer` can take
-public indirect enum ExplorerValue {
-
-    public typealias ArrayValue = [ExplorerValue]
-    public typealias DictionaryValue = [String: ExplorerValue]
-    typealias SlicePath = Slice<Path>
+public enum ExplorerValue {
 
     // single
     case int(Int)
@@ -23,6 +19,12 @@ public indirect enum ExplorerValue {
     // group
     case array(ArrayValue)
     case dictionary(DictionaryValue)
+}
+
+extension ExplorerValue {
+    public typealias ArrayValue = [ExplorerValue]
+    public typealias DictionaryValue = [String: ExplorerValue]
+    typealias SlicePath = Slice<Path>
 }
 
 extension ExplorerValue {
@@ -267,6 +269,7 @@ extension ExplorerValue {
         return double
     }
 
+    @available(*, deprecated, renamed: "double")
     public var real: Double? { double }
 
     public var string: String? {
