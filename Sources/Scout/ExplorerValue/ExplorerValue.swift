@@ -269,6 +269,7 @@ extension ExplorerValue {
         return double
     }
 
+    @available(*, deprecated, renamed: "double")
     public var real: Double? { double }
 
     public var string: String? {

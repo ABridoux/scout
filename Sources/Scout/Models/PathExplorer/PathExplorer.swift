@@ -29,6 +29,7 @@ where
     var int: Int? { get }
 
     /// Non `nil` if the key is of the `Double` type
+    @available(*, deprecated, renamed: "double")
     var real: Double? { get }
 
     /// Non `nil` if the key is of the `Double` type
