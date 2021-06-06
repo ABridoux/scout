@@ -57,7 +57,7 @@ extension ExplorerValue {
 
     private mutating func delete(index: Int, tail: SlicePath, deleteIfEmpty: Bool) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
-        let index = try computeIndex(from: index, arrayCount: array.count)
+        let index = try Self.computeIndex(from: index, arrayCount: array.count)
         var value = array[index]
         let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
 

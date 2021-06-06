@@ -6,9 +6,17 @@
 import XCTest
 @testable import Scout
 
-final class ArrayExtensionsTests: XCTestCase {
+final class ArrayExtensionsTests: XCTestCase {}
 
-    let stubArray = ["Riri", "Fifi", "Loulou", "Scrooge", "Donald", "Daisy"]
+// MARK: - Delete range
+
+extension ArrayExtensionsTests {
+
+    // MARK: Stubs
+
+    var stubArray: [String] { ["Riri", "Fifi", "Loulou", "Scrooge", "Donald", "Daisy"] }
+
+    // MARK: Tests
 
     func testDeleteRange1() throws {
         let range = 2...4
@@ -28,3 +36,4 @@ final class ArrayExtensionsTests: XCTestCase {
         XCTAssertEqual(stubArray.remove(in: range), ["Donald", "Daisy"])
     }
 }
+
