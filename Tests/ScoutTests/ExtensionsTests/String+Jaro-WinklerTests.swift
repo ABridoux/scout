@@ -33,4 +33,9 @@ final class String_JaroWinklerTests: XCTestCase {
         let result = target.bestJaroWinklerMatchIn(propositions: propositions)
         XCTAssertEqual(result, "version")
     }
+
+    func testMatchSingleCharacters_Equals0() {
+        let result = "b".jaroWinklerDistance(from: "a")
+        XCTAssertEqual(result, 0)
+    }
 }
