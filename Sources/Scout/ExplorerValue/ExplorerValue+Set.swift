@@ -48,7 +48,7 @@ extension ExplorerValue {
 
     private mutating func set(index: Int, to newValue: Self, tail: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
-        let index = try computeIndex(from: index, arrayCount: array.count)
+        let index = try Self.computeIndex(from: index, arrayCount: array.count)
         var element = array[index]
         try element._set(path: tail, to: newValue)
         array[index] = element
@@ -110,7 +110,7 @@ extension ExplorerValue {
 
     private mutating func set(index: Int, keyName: String, tail: SlicePath) throws {
         var array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
-        let index = try computeIndex(from: index, arrayCount: array.count)
+        let index = try Self.computeIndex(from: index, arrayCount: array.count)
         var element = array[index]
         try element._set(path: tail, keyName: keyName)
         array[index] = element

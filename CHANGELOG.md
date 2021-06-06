@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [4.0.3]( https://github.com/ABridoux/scout/tree/4.0.3) (06/06/2021)
+### Fixed
+- Jaro-Winkler crash when comparing two strings of single characters. [#253]
+- `computeIndex(from:arrayCount:)` fixed empty arrays and 0 index [#254]
+
 ## [4.0.2](https://github.com/ABridoux/scout/tree/4.0.2) (08/05/2021)
 ### Changed
 - Removed useless `indirect` attribute on `ExplorerValue` enum.

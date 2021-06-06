@@ -53,7 +53,7 @@ extension ExplorerValue {
             return try addCount(value: value, tail: tail)
         }
 
-        let index = try computeIndex(from: index, arrayCount: array.count)
+        let index = try Self.computeIndex(from: index, arrayCount: array.count)
         let newValue = try array[index]._add(path: tail, value: value)
 
         if tail.isEmpty {
