@@ -41,7 +41,7 @@ extension ExplorerValue {
 
     private func get(index: Int, tail: SlicePath) throws -> Self {
         let array = try self.array.unwrapOrThrow(.subscriptIndexNoArray)
-        let index = try computeIndex(from: index, arrayCount: array.count)
+        let index = try Self.computeIndex(from: index, arrayCount: array.count)
         return try array[index]._get(path: tail)
     }
 

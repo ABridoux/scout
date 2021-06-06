@@ -48,7 +48,7 @@ extension ExplorerXML {
     }
 
     private func delete(index: Int, deleteIfEmpty: Bool, tail: SlicePath) throws {
-        let index = try computeIndex(from: index, arrayCount: childrenCount)
+        let index = try Self.computeIndex(from: index, arrayCount: childrenCount)
         let next = children[index]
         try delete(tail: tail, on: next, deleteIfEmpty: deleteIfEmpty)
     }

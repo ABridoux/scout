@@ -46,7 +46,7 @@ extension ExplorerXML {
     }
 
     private func get(index: Int, tail: SlicePath) throws -> Self {
-        let index = try computeIndex(from: index, arrayCount: children.count)
+        let index = try Self.computeIndex(from: index, arrayCount: children.count)
         return try children[index]._get(path: tail)
     }
 

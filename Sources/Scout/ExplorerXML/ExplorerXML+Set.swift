@@ -60,7 +60,7 @@ extension ExplorerXML {
                 try getJaroWinkler(key: key)._set(path: tail, to: newValue)
 
             case .index(let index):
-                let index = try computeIndex(from: index, arrayCount: childrenCount)
+                let index = try Self.computeIndex(from: index, arrayCount: childrenCount)
                 try children[index]._set(path: tail, to: newValue)
 
             default: throw ExplorerError.wrongUsage(of: head)
@@ -95,7 +95,7 @@ extension ExplorerXML {
                 try getJaroWinkler(key: key).set(path: tail, keyNameTo: newKeyName)
 
             case .index(let index):
-                let index = try computeIndex(from: index, arrayCount: childrenCount)
+                let index = try Self.computeIndex(from: index, arrayCount: childrenCount)
                 try children[index].set(path: tail, keyNameTo: newKeyName)
 
             default: throw ExplorerError.wrongUsage(of: element)

@@ -82,7 +82,7 @@ extension ExplorerXML {
             return try addCount(value: value, tail: tail)
         }
 
-        let index = try computeIndex(from: index, arrayCount: childrenCount)
+        let index = try Self.computeIndex(from: index, arrayCount: childrenCount)
 
         guard tail.isEmpty else {
             try children[index]._add(value: value, at: tail)
