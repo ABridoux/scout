@@ -38,7 +38,7 @@ private struct JaroWinklerDistance {
         self.string1 = string1
         self.string2 = string2
 
-        maxSpacing = max(string1.count, string2.count) / 2 - 1
+        maxSpacing = max(0, max(string1.count, string2.count) / 2 - 1)
     }
 
     func computeMatches() -> [Int] {
