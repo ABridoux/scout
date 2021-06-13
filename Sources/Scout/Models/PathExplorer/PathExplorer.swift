@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Wrap different structs to explore several format: Json, Plist and Xml
+/// Wrap several structs to explore several format: Json, Plist, YAML and Xml
 public protocol PathExplorer: CustomStringConvertible, CustomDebugStringConvertible,
     ExpressibleByStringLiteral,
     ExpressibleByBooleanLiteral,
@@ -38,6 +38,9 @@ where
     /// Non `nil` if the key is of the `Data` type
     var data: Data? { get }
 
+    /// Non `nil` if the key is of the `Date` type
+    var date: Date? { get }
+
     /// An array of the provided type
     func array<T: ExplorerValueCreatable>(of type: T.Type) throws -> [T]
 
@@ -56,6 +59,10 @@ where
 
     // MARK: - Initialization
 
+
+    /// - Parameters:
+    ///    - value: The value the explorer will take
+    ///    - name: Optionally provide a name for a root element with Xml explorers
     init(value: ExplorerValue, name: String?)
 
     // MARK: - Get
@@ -86,7 +93,6 @@ where
     /// For example, -1 targets the last element and -3 the last 3rd element.
     ///
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
-    /// - note: The type of the `value` parameter will be automatically inferred. To force the `value`type, use the parameter `as type`
     func setting(_ path: Path, to newValue: ExplorerValue) throws -> Self
 
     // MARK: - Set key name

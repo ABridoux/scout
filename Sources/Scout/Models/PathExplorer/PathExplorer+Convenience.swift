@@ -7,6 +7,7 @@ import Foundation
 
 public extension PathExplorer {
 
+    /// Same as ``init(value:name:)`` with a default `nil` value for `name`
     init(value: ExplorerValue) {
         self.init(value: value, name: nil)
     }
@@ -50,7 +51,7 @@ public extension PathExplorer {
 
     // MARK: Mutating ExplorerValueRepresentable
 
-    /// Set the value of the key at the given path
+    /// Set the provided `ExplorerValueRepresentable`value of the key at the given path
     ///
     /// #### Negative index
     /// It's possible to specify a negative index to target the last nth element of an array.

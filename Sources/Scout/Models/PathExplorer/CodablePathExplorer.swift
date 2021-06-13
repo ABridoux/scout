@@ -19,6 +19,7 @@ public struct CodablePathExplorer<Format: CodableFormat>: PathExplorer {
     public var real: Double? { value.real }
     public var double: Double? { value.double }
     public var data: Data? { value.data }
+    public var date: Date? { value.date }
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable { try value.array(of: type) }
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable { try value.dictionary(of: type) }
 

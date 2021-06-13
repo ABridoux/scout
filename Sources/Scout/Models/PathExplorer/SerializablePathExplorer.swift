@@ -10,6 +10,7 @@ public protocol SerializablePathExplorer: PathExplorer {
 
     static var format: DataFormat { get }
 
+    /// Initialise a new ``PathExplorer`` from the `Data`
     init(data: Data) throws
 
     /// Export the path explorer value to data
@@ -18,7 +19,7 @@ public protocol SerializablePathExplorer: PathExplorer {
     /// Export the path explorer value to a String
     ///
     /// - note: The single values will be exported correspondingly to the data format.
-    /// For instance: `<string>Hello</string>` and not ust `Hello`.
+    /// For instance: `<string>Hello</string>` and not  `Hello`.
     /// To get only the value of the `PathExplorer` without the data , use `description`
     /// or the corresponding type (e.g. `pathExplorer.int` or `pathExplorer.bool`)
     func exportString() throws -> String

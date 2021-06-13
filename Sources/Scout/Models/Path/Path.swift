@@ -35,7 +35,7 @@ public struct Path: Hashable {
     /// - parameter separator: The separator used to split the string. Default is ".".
     ///
     /// ### Brackets
-    /// When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
+    /// When enclosed with brackets, a path element will not be parsed. For example `computer.(general.information).serial_number`
     /// will make the path ["computer", "general.information", "serial_number"]
     ///
     /// ### Excluded separators

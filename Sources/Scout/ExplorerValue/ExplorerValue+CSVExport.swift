@@ -103,6 +103,7 @@ extension ExplorerValue {
     }
 
     /// The headers for the array of dictionaries
+    ///
     /// #### Complexity
     /// `O(n)` where `n` is the number of elements in the array
     private func headers(in array: ArrayValue) -> Set<Path>? {

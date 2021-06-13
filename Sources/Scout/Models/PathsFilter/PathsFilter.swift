@@ -5,6 +5,7 @@
 
 import Foundation
 
+/// Specify filtering when listing the paths in a   `PathExplorer`
 public enum PathsFilter {
     /// No filter on key or value.
     case targetOnly(ValueTarget)
