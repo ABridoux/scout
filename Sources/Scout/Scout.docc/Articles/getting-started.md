@@ -7,7 +7,7 @@ Scout uses types conforming to the protocols ``PathExplorer`` and ``Serializable
 
 The provided examples will reference this "People" file (here as YAML).
 
-> Note: The "People" files can be  found in the Playground folder.
+> Note: The full "People" files are used to try Scout and can be found in the Playground folder.
 
 ```yaml
 Robert:
@@ -17,14 +17,6 @@ Robert:
   - video games
   - party
   - tennis
-  running_records:
-  - - 10
-    - 12
-    - 9
-    - 10
-  - - 9
-    - 12
-    - 11
 Suzanne:
   job: actress
   movies:
@@ -41,7 +33,7 @@ Tom:
   - guitar
 ```
 
-## Read data
+## Navigate through data
 
 The simplest way to read data in any of the supported format is to use one of the ``PathExplorers`` implementation.
 For instance, let's imagine that the file is read and converted to a `Data` value. Here's how to make an explorer for the YAML format, using ``SerializablePathExplorer/init(data:)``
@@ -50,15 +42,69 @@ For instance, let's imagine that the file is read and converted to a `Data` valu
 let yaml = try PathExplorers.Yaml(data: data)
 ```
 
-It's then possible to use the ``PathExplorer/get(_:)-6pa9h`` method to read the "height" value in the "Tom" dictionary.
+It's then possible to use the ``PathExplorer/get(_:)-2ghf1`` method to read the "height" value in the "Tom" dictionary.
 
 ```swift
 let tomHeightYaml = try yaml.get("Tom", "height")
 ```
 
-This will return a new `PathExplorers.Yaml`. That's the logic of Scout: when reading, setting, deleting or adding values in a `PathExplorer`, the returned value will be another `PathExplorer`. This allows to keep performing operation easily. When the explorer has the right value, use the several options to access its value. For instance here to get Tom's height as a `Double`
+This will return a new `PathExplorers.Yaml`. That's the logic of Scout: when reading, setting, deleting or adding values in a `PathExplorer`, the returned value will be another `PathExplorer`. This allows to keep performing operation easily. When the explorer has the right value, use one of the several options to access its value. For instance here to get Tom's height as a `Double`
 
 ```swift
 let tomHeight = tomHeightYaml.double
 // tomHeight: Double?
 ```
+More concisely, if you are only interested into getting Tom's height, you could write
+
+```swift
+let tomHeight = try yaml.get("Tom", "height").double
+```
+
+> Note: As you might have noticed, calling `get()` can throw an error. This is the case for most `PathExplorer` functions. Whenever an element in the provided path does not exist, for instance an index out of bounds, or a missing key, a relevant error will be thrown to let you take the relevant action.
+
+As a last example, here's how to read Robert first hobby:
+
+```swift
+let robert1stHobby = try yaml.get("Robert", "hobbies", 0)
+```
+
+> Tip: Use negative indexes to specify an index from the *end* of the array.
+
+To lean more about ``Path``s and how they can help you targeting specific pieces of data, you can read <doc:mastering-paths>.
+
+## Manipulate data
+
+Using the same logic, it's possible to set, delete or add values.
+
+For instance, to set Robert's age to 45 with the ``PathExplorer/set(_:to:)-9d877`` function:
+
+```swift
+var yaml = try PathExplorers.Yaml(data: data)
+try yaml.set("Robert", "age", to: 45)
+```
+
+Or to add a new key named "score" with a value of 25 to Tom's dictionary with the ``PathExplorer/add(_:at:)-2kii6`` function:
+
+```swift
+var yaml = try PathExplorers.Yaml(data: data)
+try yaml.add(25, at: "Tom", "score")
+```
+
+Those modifications all have specificities, like the "delete" one that can also delete an array or dictionary when left empty. To get more information about those features, please refer to ``PathExplorer``.
+
+Also, it's worth mentioning that there are counterparts of those functions that will rather return a modified copy of the explorer. This is useful to chain operations.
+
+For instance, to set Tom's height to 160, add a new surname key to Robert's dictionary and remove Suzanne second movie: 
+```swift
+let yaml = try PathExplorers.Yaml(data: data)
+let result = yaml
+    .setting("Tom", "height", to: 160)
+    .adding("Bob", to: "Robert", "surname")
+    .deleting("Suzanne", "movies", 1)
+```
+
+> Note: Using plain strings, numbers and booleans is made possible because ``ExplorerValue`` implements most "ExpressibleBy" protocols like `ExpressibleByStringLiteral`. To learn more about  `ExplorerValue`, you can read <doc:explorer-value-diving>.
+
+
+## Export the results
+

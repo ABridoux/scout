@@ -11,6 +11,8 @@ public protocol SerializablePathExplorer: PathExplorer {
     static var format: DataFormat { get }
 
     /// Initialise a new ``PathExplorer`` from the `Data`
+    ///
+    /// - Throws: If the data cannot be serialized into the format
     init(data: Data) throws
 
     /// Export the path explorer value to data
