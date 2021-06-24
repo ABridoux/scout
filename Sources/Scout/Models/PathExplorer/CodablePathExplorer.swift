@@ -5,7 +5,9 @@
 
 import Foundation
 
-/// A `PathExplorer` using an `ExplorerValue` and can be encoded/decoded with the provided `CodableFormat`
+/// A  concrete implementation of `PathExplorer` with a specific ``CodableFormat``.
+///
+/// - note: Mainly a wrapper around ``ExplorerValue`` to offer a unified interface for all `Codable` `PathExplorer`s
 public struct CodablePathExplorer<Format: CodableFormat>: PathExplorer {
 
     // MARK: - Properties

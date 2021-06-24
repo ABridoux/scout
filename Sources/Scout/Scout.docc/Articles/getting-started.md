@@ -112,12 +112,12 @@ let result = yaml
     .deleting("Suzanne", "movies", 1)
 ```
 
-> Note: Using plain strings, numbers and booleans is made possible because ``ExplorerValue`` implements most "ExpressibleBy" protocols like `ExpressibleByStringLiteral`. To learn more about  `ExplorerValue`, you can read <doc:explorer-value-diving>.
+> Note: Using plain strings, numbers and booleans is made possible because ``PathElement`` implements `ExpressibleByStringLiteral` and `ExpressibleByIntLiteral`.
 
 
 ## Export the results
 
-If ``PathExplorer``  is used to navigate through data, the protocol ``SerializablePathExplorer`` refines it to offer import and export options.
+If ``PathExplorer`` is used to navigate through data, the protocol ``SerializablePathExplorer`` refines it to offer import and export options.
 
 Once you are satisfied with the resulting `SerializablePathExplorer` - regardless of the operations you performed - it's possible to export the explorer as a `Data` value or to another format.
 To export it to a `Data` value, use ``SerializablePathExplorer/exportData()`` function.

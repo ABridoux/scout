@@ -63,7 +63,7 @@ extension Path.ElementParsers {
 
 extension Path {
 
-    /// Parse a `Path`
+    /// Parse a `Path` from a provided `String`
     /// - Parameters:
     ///   - separator: Separator between keys elements
     ///   - keyForbiddenCharacters: Optionally prevent characters to be parsed in a key name
