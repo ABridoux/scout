@@ -50,9 +50,9 @@ All functions perform the same operation but offer to work with an array, variad
 - ``set(_:to:)-9d877``
 - ``set(_:to:)-376n0``
 
-### Setting values in place
+### Setting values in a new explorer
 
-The "setting" functions are the counterpart of the "set" ones, but will modify the explorer in place rather than returning a new one.
+The "setting" functions are the counterpart of the "set" ones, but will return a new explorer rather than modify it.
 
 - ``setting(_:to:)-7q3g``
 - ``setting(_:to:)-9vtr8``
@@ -67,9 +67,9 @@ All functions perform the same operation but offer to work with an array, variad
 - ``set(_:keyNameTo:)-5j60r``
 - ``set(_:keyNameTo:)-1zwfv``
 
-### Settings key names in place
+### Settings key names in a new explorer
 
-The "setting key name" functions are the counterpart of the "set key name" ones, but will modify the explorer in place rather than returning a new one.
+The "setting key name" functions are the counterpart of the "set" ones, but will return a new explorer rather than modify it.
 
 - ``setting(_:keyNameTo:)-7ar89``
 - ``setting(_:keyNameTo:)-1vrh``
@@ -84,9 +84,9 @@ All functions perform the same operation but offer to work with an array, variad
 - ``delete(_:deleteIfEmpty:)-40w9g``
 - ``delete(_:deleteIfEmpty:)-2uxwq``
 
-### Deleting values in place
+### Deleting values in a new explorer
 
-The "deleting" functions are the counterpart of the "delete" ones, but will modify the explorer in place rather than returning a new one.
+The "deleting" functions are the counterpart of the "set" ones, but will return a new explorer rather than modify it.
 
 - ``deleting(_:deleteIfEmpty:)-32ufs``
 - ``deleting(_:deleteIfEmpty:)-1byw9``
@@ -101,9 +101,9 @@ All functions perform the same operation but offer to work with an array, variad
 - ``add(_:at:)-2kii6``
 - ``add(_:at:)-2zxor``
 
-### Adding values in place
+### Adding values in a new explorer
 
-The "adding" functions are the counterpart of the "add" ones, but will modify the explorer in place rather than returning a new one.
+The "adding" functions are the counterpart of the "set" ones, but will return a new explorer rather than modify it.
 
 - ``adding(_:at:)-7fd9c``
 - ``adding(_:at:)-4ju9b``
