@@ -22,11 +22,13 @@ public protocol SerializablePathExplorer: PathExplorer {
     ///
     /// - note: The single values will be exported correspondingly to the data format.
     /// For instance: `<string>Hello</string>` and not  `Hello`.
-    /// To get only the value of the `PathExplorer` without the data , use `description`
+    /// To get only the value of the `PathExplorer` without the format , use `description`
     /// or the corresponding type (e.g. `pathExplorer.int` or `pathExplorer.bool`)
     func exportString() throws -> String
 
-    /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
+    /// Export the path explorer value to a CSV if possible, using the provided separator.
+    ///
+    /// - note: Not all values are exportable to CSV. For instance, a three dimensions array is not exportable, neither an array of heterogeneous dictionaries.
     func exportCSV(separator: String?) throws -> String
 
     /// Export the path explorer value to the specified format data with a default root name "root"
@@ -35,7 +37,14 @@ public protocol SerializablePathExplorer: PathExplorer {
     /// Export the path explorer value to the specified format string data with a default root name "root"
     func exportString(to format: DataFormat, rootName: String?) throws -> String
 
-    /// Returns a new explorer from the provided CSV string when it's possible. Throws otherwise.
+    /// Returns a new explorer from the provided CSV string when it's possible.
+    /// - Parameters:
+    ///     - string: The CSV as `String`
+    ///     - separator: The `Character` used as separator in the CSV string
+    ///     - hasHeaders: Specify whether the CSV string has named headers. Named headers can be full ``Path``s to structure the explorer
+    ///
+    /// - Returns: A `SerializablePathExplorer` from the provided CSV
+    /// - Throws: If the CSV cannot be converted to Self
     static func fromCSV(string: String, separator: Character, hasHeaders: Bool) throws -> Self
 
     /// New explorer replacing the group values (array or dictionaries) sub values by a unique one
@@ -44,15 +53,22 @@ public protocol SerializablePathExplorer: PathExplorer {
     func folded(upTo level: Int) -> Self
 
     /// Folded explored description, replacing the group values (array or dictionaries) sub values by a single string "..."
+    ///
+    /// - Important: To be used only for display purpose as the returned string will not have a proper format
     func exportFoldedString(upTo level: Int) throws -> String
+}
+
+extension SerializablePathExplorer {
+
+    var defaultCSVSeparator: String { ";" }
+    var nullCSVValue: String { "NULL" }
 }
 
 public extension SerializablePathExplorer {
 
-    var defaultCSVSeparator: String { ";" }
-    var nullCSVValue: String { "NULL" }
-
-    /// Export the path explorer value to a CSV if possible. Use the default separator ';' if none specified
+    /// Export the path explorer value to a CSV if possible. Using the default separator ';'
+    ///
+    /// - note: Not all values are exportable to CSV. For instance, a three dimensions array is not exportable, neither an array of heterogeneous dictionaries.
     func exportCSV() throws -> String {
         try exportCSV(separator: nil)
     }

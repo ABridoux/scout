@@ -33,14 +33,23 @@ Tom:
   - guitar
 ```
 
-## Navigate through data
+## Create a PathExplorer
 
-The simplest way to read data in any of the supported format is to use one of the ``PathExplorers`` implementation.
-For instance, let's imagine that the file is read and converted to a `Data` value. Here's how to make an explorer for the YAML format, using ``SerializablePathExplorer/init(data:)``
+The simplest way to read data in any of the supported format is to use one of the ``PathExplorers`` implementation and to call ``SerializablePathExplorer/init(data:)``.
+
+For instance, let's imagine that the file is read and converted to a `Data` value. Here's how to make an explorer for the YAML format.
 
 ```swift
 let yaml = try PathExplorers.Yaml(data: data)
 ```
+
+Similarly, if the format was Plist:
+
+```swift
+let plist = try PathExplorers.Plist(data: data)
+```
+
+## Navigate through data
 
 It's then possible to use the ``PathExplorer/get(_:)-2ghf1`` method to read the "height" value in the "Tom" dictionary.
 
@@ -62,10 +71,10 @@ let tomHeight = try yaml.get("Tom", "height").double
 
 > Note: As you might have noticed, calling `get()` can throw an error. This is the case for most `PathExplorer` functions. Whenever an element in the provided path does not exist, for instance an index out of bounds, or a missing key, a relevant error will be thrown to let you take the relevant action.
 
-As a last example, here's how to read Robert first hobby:
+As a last example, here's how to read Robert first hobby inside an array:
 
 ```swift
-let robert1stHobby = try yaml.get("Robert", "hobbies", 0)
+let robertFirstHobby = try yaml.get("Robert", "hobbies", 0)
 ```
 
 > Tip: Use negative indexes to specify an index from the *end* of the array.
@@ -108,3 +117,11 @@ let result = yaml
 
 ## Export the results
 
+If ``PathExplorer``  is used to navigate through data, the protocol ``SerializablePathExplorer`` refines it to offer import and export options.
+
+Once you are satisfied with the resulting `SerializablePathExplorer` - regardless of the operations you performed - it's possible to export the explorer as a `Data` value or to another format.
+To export it to a `Data` value, use ``SerializablePathExplorer/exportData()`` function.
+
+When needed, it's possible to specify another format when exporting: for instance, if a plist was decoded from a file and has to be converted to a JSON format. See ``SerializablePathExplorer/exportData(to:)`` for more informations.
+
+Similarly, other export features are available like export to a `String` or to a CSV string.

@@ -55,7 +55,7 @@ let package = Package(
             name: "ScoutCLTCore",
             dependencies: [
                 "Scout", "Parsing"]),
-        .target(
+        .executableTarget(
             name: "ScoutCLT",
             dependencies: [
                 "Scout",

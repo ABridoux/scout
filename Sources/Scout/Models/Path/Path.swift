@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Collection of `PathElement`s to subscript a `PathExplorer`
+/// Collection of ``PathElement``s to subscript a `PathExplorer`
 public struct Path: Hashable {
 
     // MARK: - Constants

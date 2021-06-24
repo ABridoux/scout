@@ -6,10 +6,37 @@
 
 ## Overview
 
-Protocol refining ``PathExplorer`` to offer features like conversion to another format or serialization. Explorers in  ``PathExplorers`` implement this protocol.
+Protocol refining ``PathExplorer`` to offer features like conversion to another format or serialization. Explorers in ``PathExplorers`` implement this protocol.
 
 ## Topics
 
-### <!--@START_MENU_TOKEN@-->Group<!--@END_MENU_TOKEN@-->
+### Initializers
 
-- <!--@START_MENU_TOKEN@-->``Symbol``<!--@END_MENU_TOKEN@-->
+- ``init(data:)``
+- ``fromCSV(string:separator:hasHeaders:)``
+
+### Get format info
+
+- ``format``
+
+### Export as Data
+
+- ``exportData()``
+- ``exportData(to:)``
+- ``exportData(to:rootName:)``
+
+### Export as String
+
+- ``exportString()``
+- ``exportString(to:)``
+- ``exportString(to:rootName:)``
+
+### Export as CSV
+
+- ``exportCSV()``
+- ``exportCSV(separator:)``
+
+### Export folded String
+
+- ``exportFoldedString(upTo:)``
+- ``folded(upTo:)``
