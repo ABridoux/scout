@@ -72,7 +72,8 @@ A `Path` can be instantiated from `PathElement`s in an array or as variadic para
 ```swift
 let path = Path(elements: "Robert", "hobbies", 1)
 let firstHobby = try json.get(path: path).string
-print(firstHobby) // "party"
+print(firstHobby)
+// "party"
 ```
 
 > The `PathExplorer` functions always offer convenience versions to use `PathElement` directly. This is useful to avoid creating a `Path` when it does not already exist or when having a more "scripting" approach.
@@ -89,7 +90,7 @@ For instance to target Suzanne's last movie:
 Path(elements: "Suzanne", "movies", -1)
 ```
 
-The following figure shows how negative indexes are handled.
+The following `ducks` array shows how negative indexes are handled with `PathElement.index`
 
 ```
 ["Riri", "Fifi", "Loulou", "Donald", "Daisy"]
@@ -125,14 +126,86 @@ For instance, to list Tom's keys:
 ```swift
 let path = Path(elements: "Tom", .keysList)
 let tomKeys = try json.get(path: path).array(of: String.self)
-print(tomKeys) // ["age", "hobbies", "height"]
+print(tomKeys)
+// ["age", "hobbies", "height"]
 ```
 
 ## Scope groups
 
+When working with arrays and dictionaries, it might be useful to be able to target a specific part in the values. For instance to exclude the first and last value in an array, or to target only keys starting with a certain prefix in a dictionary.
+
+Those features are available with ``PathElement/slice(_:)`` to slice an array and ``PathElement/filter(_:)`` to filter keys in a dictionary.
+
+### Slice arrays
+
+With ``PathElement/slice(_:)``, it's possible to target a contiguous part of an array. For instance to get Robert's first two hobbies.
+
+> note: When represented as a `String`, the slice element is specified as two integers separated by a double point and enclosed by squared brackets like `[0:2]` or `[2:-4]`. When the left value is the first index, it is omitted. The same goes for the right value when it's the last valid index.
+
+```swift
+let path = Path(elements: "Robert", "hobbies", .slice(0, 1))
+let robertFirstTwoHobbies = try json.get(path: path).array(of: String.self)
+print(robertFirstTwoHobbies) // ["video games", "party"]
+```
+
+Similarly with the ``PathElement/index(_:)``, it's possible to use negative indexes. Here to get Suzanne last two movies' titles.
+```swift
+let path = Path(elements: "Suzanne", "movies", .slice(-2, -1), "title")
+let titles = try json.get(path: path).array(of: String.self)
+print(titles)
+// ["Yesterday will never go", "What about today?"]
+```
+
+The following `ducks` array explains how positive and negative indexes are interpreted with `PathElement.slice`
+```
+["Riri", "Fifi", "Loulou", "Donald", "Daisy"]
+[  0   ,   1   ,    2    ,    3    ,    4   ] (Positive)
+[ -5   ,  -4   ,   -3    ,   -2    ,   -1   ] (Negative)
+```
+
+- `ducks[0:2]` targets `["Riri", "Fifi", "Loulou"]`
+- `ducks[2:-2]` targets `["Loulou", "Donald"]`
+- `ducks[-3:-1]` targets `["Loulou", "Donald", "Daisy"]`
+
+### Filter dictionaries
+
+``PathElement/filter(_:)`` lets you provide a regular expression to match certain keys in a dictionary. All the keys that do not fully match the expression will be filtered.
+
+For instance, to get all keys in Tom's dictionary that start with "h".
+
+```swift
+let path = Path(elements: "Tom", .filter("h.*"))
+let filteredTom = try json.get(path: path)
+print(filteredTom)
+// {
+//   "hobbies" : [
+//     "cooking",
+//     "guitar"
+//   ],
+//   "height" : 175
+// }
+```
+
+Or to get Tom and Robert first hobby.
+
+```swift
+let path = Path(elements: .filter("Tom|Robert"), "hobbies", 0)
+let firstHobbies = try json.get(path: path).dictionary(of: String.self)
+print(firstHobbies)
+// ["Tom": "cooking", "Robert": "video games"]
+```
+
+### Mixing up
+
+It's possible to mix both array slicing and dictionary filtering in a same path. For instance to get Tom and Robert first two hobbies.
+
+```swift
+try json.get(.filter("Tom|Robert"), "hobbies", .slide(.first, 1))
+```
+
 
 ## Literals and PathElementRepresentable
-Using plain strings, numbers and booleans is made possible because ``PathElement`` implements `ExpressibleByStringLiteral` and `ExpressibleByIntLiteral`. When it comes to use variables as `PathElement`, it is required to specify the element.
+Using plain strings and numbers is made possible because ``PathElement`` implements `ExpressibleByStringLiteral` and `ExpressibleByIntLiteral`. When it comes to use variables as `PathElement`, it is required to specify the element.
 
 For instance with the first example path to target Robert's second hobby.
 
@@ -140,7 +213,7 @@ For instance with the first example path to target Robert's second hobby.
 let firstKey = "Robert"
 let secondKey = "hobbies"
 let firstIndex = 1
-let path = Path(elements: [.key(firstKey), .key(secondKey), .index(firstIndex)])
+let path = Path(elements: .key(firstKey), .key(secondKey), .index(firstIndex))
 ```
 
 As this syntax might be a bit heavy, it's possible to use ``PathElementRepresentable`` to create the `Path` with  ``Path/init(_:)-1b2iy``. With it, the code above can be rewritten like so.
@@ -152,4 +225,8 @@ let firstIndex = 1
 let path = Path(firstKey, secondKey, firstIndex)
 ```
 
-The drawback is that this is possible only for `PathElement.index` and `PathElement.key`. When dealing with other elements like ``PathElement/count``, it is required to specify the `PathElement` type.
+The drawback is that this is possible only for `PathElement.index` and `PathElement.key`. When dealing with other elements like ``PathElement/count``, it is required to specify the `PathElement` type:
+
+```swift
+Path(firstKey, secondKey, PathElement.count)
+```
