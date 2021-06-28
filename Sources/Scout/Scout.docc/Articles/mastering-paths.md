@@ -177,13 +177,15 @@ For instance, to get all keys in Tom's dictionary that start with "h".
 let path = Path(elements: "Tom", .filter("h.*"))
 let filteredTom = try json.get(path: path)
 print(filteredTom)
-// {
-//   "hobbies" : [
-//     "cooking",
-//     "guitar"
-//   ],
-//   "height" : 175
-// }
+```
+```json
+{
+  "hobbies" : [
+    "cooking",
+    "guitar"
+  ],
+  "height" : 175
+}
 ```
 
 Or to get Tom and Robert first hobby.
@@ -200,33 +202,49 @@ print(firstHobbies)
 It's possible to mix both array slicing and dictionary filtering in a same path. For instance to get Tom and Robert first two hobbies.
 
 ```swift
-try json.get(.filter("Tom|Robert"), "hobbies", .slide(.first, 1))
+let path = Path(elements: .filter("Tom|Robert"), "hobbies", .slide(.first, 1)) 
+let hobbies = try json.get(path: path)
+print(hobbies)
 ```
 
+```json
+{
+  "Tom" : [
+    "cooking",
+    "guitar"
+  ],
+  "Robert" : [
+    "video games",
+    "party"
+  ]
+}
+```
 
 ## Literals and PathElementRepresentable
-Using plain strings and numbers is made possible because ``PathElement`` implements `ExpressibleByStringLiteral` and `ExpressibleByIntLiteral`. When it comes to use variables as `PathElement`, it is required to specify the element.
+Using plain strings and numbers is made possible because ``PathElement`` implements `ExpressibleByStringLiteral` and `ExpressibleByIntLiteral`. But when it comes to use variables as `PathElement`, it is required to specify the element.
 
 For instance with the first example path to target Robert's second hobby.
 
 ```swift
-let firstKey = "Robert"
-let secondKey = "hobbies"
-let firstIndex = 1
-let path = Path(elements: .key(firstKey), .key(secondKey), .index(firstIndex))
+let robertKey = "Robert"
+let hobbiesKey = "hobbies"
+let hobbyIndex = 1
+let path = Path(elements: .key(robertKey), .key(hobbiesKey), .index(hobbyIndex))
 ```
 
 As this syntax might be a bit heavy, it's possible to use ``PathElementRepresentable`` to create the `Path` with  ``Path/init(_:)-1b2iy``. With it, the code above can be rewritten like so.
 
 ```swift
-let firstKey = "Robert"
-let secondKey = "hobbies"
-let firstIndex = 1
-let path = Path(firstKey, secondKey, firstIndex)
+let robertKey = "Robert"
+let hobbiesKey = "hobbies"
+let hobbyIndex = 1
+let path = Path(robertKey, hobbiesKey, hobbyIndex)
 ```
 
-The drawback is that this is possible only for `PathElement.index` and `PathElement.key`. When dealing with other elements like ``PathElement/count``, it is required to specify the `PathElement` type:
+The drawback is that this is possible only for `PathElement.index` and `PathElement.key`. When dealing with other elements like ``PathElement/count``, it is required to specify the `PathElement` type.
 
 ```swift
-Path(firstKey, secondKey, PathElement.count)
+Path(robertKey, hobbiesKey, PathElement.count)
 ```
+
+The convenience overloads for the `PathExplorer` functions similarly works with `PathElement` and `PathElementRepresentable`. 

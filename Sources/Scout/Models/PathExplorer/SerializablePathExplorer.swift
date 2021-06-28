@@ -8,9 +8,10 @@ import Foundation
 /// A `PathExplorer` which can be instantiated from data and export itself to another format
 public protocol SerializablePathExplorer: PathExplorer {
 
+    /// The `DataFormat` of the serializable `PathExplorer`: JSON, Plist, XML, or YAML
     static var format: DataFormat { get }
 
-    /// Initialise a new ``PathExplorer`` from the `Data`
+    /// Initialize a new ``PathExplorer`` from the `Data`
     ///
     /// - Throws: If the data cannot be serialized into the format
     init(data: Data) throws
@@ -49,7 +50,7 @@ public protocol SerializablePathExplorer: PathExplorer {
 
     /// New explorer replacing the group values (array or dictionaries) sub values by a unique one
     /// holding a fold mark to be replaced when exporting the string value.
-    /// - note: Use `exportFoldedString(upTo:)` to directly get the string value
+    /// - note: Use ``exportFoldedString(upTo:)`` to directly get the string value
     func folded(upTo level: Int) -> Self
 
     /// Folded explored description, replacing the group values (array or dictionaries) sub values by a single string "..."

@@ -51,3 +51,14 @@ A `Path` is easily represented as a `String`, which is especially useful when wo
 When a `Path` contains special group scoping elements like ``PathElement/slice(_:)`` or ``PathElement/filter(_:)``, specifying a `PathElement.index` or `PathElement.key` will not refer to an immediate dictionary or array. The "flatten" operation will replace the slices and the filters in the `Path` with the proper values when the path is complete. Mainly used in paths listing ``PathExplorer/listPaths(startingAt:)``.
 
 - ``flattened()``
+
+### Map elements (Collection)
+
+- ``Path/compactMapIndexes``
+- ``Path/compactMapKeys``
+- ``Path/compactMapSlices``
+- ``Path/compactMapFilter``
+
+### Compare path (Collection)
+
+- ``Path/commonPrefix(with:)``

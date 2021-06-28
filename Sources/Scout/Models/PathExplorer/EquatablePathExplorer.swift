@@ -9,7 +9,8 @@ import Foundation
 protocol EquatablePathExplorer: PathExplorer {
 
     /// `true` when self is equal to the provided other element.
-    /// #### Complexity
+    /// 
+    /// ### Complexity
     /// Most often `O(n)` where `n` is the children count.
     func isEqual(to other: Self) -> Bool
 }
