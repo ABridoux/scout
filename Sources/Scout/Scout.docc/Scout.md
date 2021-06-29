@@ -14,16 +14,19 @@ Supported formats:
 
 ### Essential
 - <doc:getting-started>
+- ``PathExplorer``
+- ``Path``
 
-### Exploring data
+### Explore data
 
 - ``PathExplorer``
 - ``PathExplorers``
 - ``ExplorerError``
 
-### Manipulating paths
+### Manipulate paths
 
 - <doc:mastering-paths>
+- <doc:listing-path>
 - ``Path``
 - ``PathElement``
 - ``PathElementRepresentable``
@@ -43,7 +46,7 @@ Supported formats:
 
 ### Set and add custom types
 
-- <doc:explorer-value-diving>
+- <doc:custom-types-explorerValue>
 - ``ExplorerValue``
 - ``ExplorerValueCreatable``
 - ``ExplorerValueRepresentable``

@@ -125,20 +125,20 @@ public extension PathExplorer {
     /// Add a value at the given path.
     ///
     /// ### Appending
-    /// To add a key at the end of an array, specify the `PathElement.count`
+    /// To add a key at the end of an array, specify  ``PathElement/count``
     mutating func add(_ value: ExplorerValue, at path: PathElement...) throws { try add(value, at: Path(path)) }
 
     /// Add a value at the given path.
     ///
     /// ### Appending
-    /// To add a key at the end of an array, specify the `PathElement.count`
+    /// To add a key at the end of an array, specify ``PathElement/count``
     /// - Throws: If the `newValue.explorerValue` function fails
     mutating func add(_ value: ExplorerValueRepresentable, at path: Path) throws { try add(value.explorerValue(), at: path) }
 
     /// Add a value at the given path.
     ///
     /// ### Appending
-    /// To add a key at the end of an array, specify the `PathElement.count`
+    /// To add a key at the end of an array, specify ``PathElement/count``
     /// - Throws: If the `newValue.explorerValue()` function fails
     mutating func add(_ value: ExplorerValueRepresentable, at path: PathElement...) throws { try add(value.explorerValue(), at: Path(path)) }
 
@@ -147,23 +147,20 @@ public extension PathExplorer {
     /// Add a value at the given path, and return a new modified `PathExplorer`
     ///
     /// ### Appending
-    /// To add a key at the end of an array, specify the `PathElement.count`
-    ///
-    /// ### Non-existing key
-    /// Any non existing key encountered in the path will be created.
+    /// To add a key at the end of an array, specify ``PathElement/count``
     func adding(_ value: ExplorerValue, at path: PathElement...) throws -> Self { try adding(value, at: Path(path)) }
 
     /// Add a value at the given path, and return a new modified `PathExplorer`
     ///
     /// ### Appending
-    /// To add a key at the end of an array, specify the `PathElement.count`
+    /// To add a key at the end of an array, specify ``PathElement/count``
     /// - Throws: If the `newValue.explorerValue()` function fails
     func adding(_ value: ExplorerValueRepresentable, at path: Path) throws -> Self { try adding(value.explorerValue(), at: path) }
 
     /// Add a value at the given path, and return a new modified `PathExplorer`
     ///
     /// ### Appending
-    /// To add a key at the end of an array, specify the `PathElement.count`
+    /// To add a key at the end of an array, specify  ``PathElement/count``
     /// - Throws: If the `newValue.explorerValue()` function fails
     func adding(_ value: ExplorerValueRepresentable, at path: PathElement...) throws -> Self { try adding(value.explorerValue(), at: Path(path)) }
 }

@@ -69,7 +69,7 @@ More concisely, if you are only interested into getting Tom's height, you could 
 let tomHeight = try yaml.get("Tom", "height").double
 ```
 
-> Note: As you might have noticed, calling `get()` can throw an error. This is the case for most `PathExplorer` functions. Whenever an element in the provided path does not exist, for instance an index out of bounds, or a missing key, a relevant error will be thrown to let you take the relevant action.
+> Note: As you might have noticed, calling `get()` can throw an error. This is the case for most `PathExplorer` functions. Whenever an element in the provided path does not exist, for instance an index out of bounds, or a missing key, a relevant error will be thrown.
 
 As a last example, here's how to read Robert first hobby inside an array:
 
