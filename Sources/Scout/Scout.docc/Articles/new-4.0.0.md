@@ -59,8 +59,8 @@ let array: ExplorerValue = ["Riri", "Fifi", "Loulou"]
 ```
 
 ### Codable
-``ExplorerValue`` conforms to `Codable`. The new SerializablePathExplorer (used for JSON, Plist and XML) uses this conformance to offer initialisation from Data. But this also means that any Coder can be used to read an ExplorerValue from Data. This was already possible to use a different serializer than the default one in the previous implementations. But customizing a Coder is much simpler and now more common in Swift. For instance, setting a custom `Date` decoding strategy is always offered in most coders.
-
+``ExplorerValue`` conforms to `Codable`. The new SerializablePathExplorer (used for JSON, Plist and XML) uses this conformance to offer initialization from Data. But this also means that any Coder can be used to read an `ExplorerValue` from Data. This was already possible to use a different serializer than the default one in the previous implementations. But customizing a Coder is much simpler and now more common in Swift. For instance, setting a custom `Date` decoding strategy is always offered in most coders.
+be
 ### Conversion with ExplorerValueRepresentable
 
 Setting and adding a value to an explorer now works with ExplorerValue. For instance, to set Tom’s age to 60:

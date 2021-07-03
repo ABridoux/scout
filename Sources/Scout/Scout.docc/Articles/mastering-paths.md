@@ -6,7 +6,7 @@
 
 Basically, a `Path` is a collection of ``PathElement``s in a specific order. The sequence of `PathElement`s lets the explorer know what value to target next. When navigating to a value is not possible, the explorer will throw an error.
 
-The examples in this article will refer to this json file, stored in a ``PathExplorers/Json`` value referred to as `json`. To learn more about 
+The examples in this article will refer to this json file, stored in a ``PathExplorers/Json`` value referred to as `json`. 
 
 > Note: The full "People" files are used to try Scout and can be found in the Playground folder.
 
@@ -71,8 +71,8 @@ A `Path` can be instantiated from `PathElement`s in an array or as variadic para
 - Make a `Path` targeting Robert's second hobby
 ```swift
 let path = Path(elements: "Robert", "hobbies", 1)
-let firstHobby = try json.get(path: path).string
-print(firstHobby)
+let secondHobby = try json.get(path: path).string
+print(secondHobby)
 // "party"
 ```
 
@@ -110,7 +110,7 @@ Scout offers to get a dictionary or array count with ``PathElement/count``. This
 For instance, to get Robert's hobbies count.
 ```swift
 let path = Path(elements: "Robert", "hobbies", .count)
-let count = try json.get(path: path).count
+let count = try json.get(path: path).int
 print(count) // 3
 ```
 
