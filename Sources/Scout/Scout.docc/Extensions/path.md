@@ -6,7 +6,7 @@
 
 ## Overview
 
-Paths are the way to feed a ``PathExplorer`` to navigate through data. `PathExplorer`'s operations will often take a `Path` (or a collection of ``PathElement``s) to target precisely where to be ran.
+Paths are the way to feed a ``PathExplorer`` to navigate through data. `PathExplorer`'s operations will often take a `Path` (or a collection of ``PathElement``s) to target precisely where to run.
 
 Basically, a `Path` is a collection of ``PathElement``s in a specific order. The sequence of `PathElement`s lets the explorer know what value to target next. When navigating to a value is not possible, the explorer will throw an error.
 

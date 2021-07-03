@@ -3,7 +3,7 @@
 // Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
-/// Protocol to allow to subscript a `PathExplorer` without using directly the `PathElement` enum.
+/// Protocol to allow to subscript a `PathExplorer` without using directly the ``PathElement`` enum.
 ///
 /// As `PathElement` already conforms to `ExpressibleByStringLiteral` and `ExpressibleByIntegerLiteral`,
 /// it is possible to instantiate a Path without the need of using the `PathElementRepresentable` protocol:

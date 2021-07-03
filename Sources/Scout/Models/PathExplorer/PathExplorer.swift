@@ -119,6 +119,6 @@ where
     /// Returns all the paths leading to single or group values
     /// - Parameters:
     ///   - initialPath: Scope the returned paths with this path as a starting point
-    ///   - filter: Optionally provide a filter on the key and/or value. Default is `noFilter`
+    ///   - filter: Optionally provide a filter on the key and/or value. Default is ``PathsFilter/noFilter``
     func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path]
 }

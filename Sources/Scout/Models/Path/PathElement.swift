@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Tthe possible elements that can be used to subscript a ``PathExplorer``
+/// The possible elements that can be used to subscript a ``PathExplorer``
 public enum PathElement: Hashable {
 
     // MARK: - Constants

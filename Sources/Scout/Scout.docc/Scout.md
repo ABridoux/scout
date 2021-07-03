@@ -26,7 +26,7 @@ Supported formats:
 ### Manipulate paths
 
 - <doc:mastering-paths>
-- <doc:listing-path>
+- <doc:paths-listing>
 - ``Path``
 - ``PathElement``
 - ``PathElementRepresentable``
