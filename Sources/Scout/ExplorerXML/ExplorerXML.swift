@@ -30,6 +30,11 @@ public struct ExplorerXML: PathExplorer {
     public var bool: Bool? { element.bool }
     public var int: Int? { element.int }
     public var double: Double? { element.double }
+    
+    /// XML `date` element is always `nil`
+    ///
+    /// Date types are not natively supported by XML
+    public var date: Date? { nil }
 
     @available(*, deprecated, renamed: "double")
     public var real: Double? { element.double }

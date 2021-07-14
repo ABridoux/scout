@@ -7,6 +7,7 @@ import Foundation
 
 extension PathElement {
 
+    /// Placed after an array to slice it with a `Bounds` value
     public static func slice(_ lower: Bounds.Bound, _ upper: Bounds.Bound) -> PathElement {
         .slice(Bounds(lower: lower, upper: upper))
     }

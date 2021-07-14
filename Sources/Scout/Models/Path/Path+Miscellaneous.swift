@@ -36,12 +36,15 @@ public extension Collection where Element == PathElement {
 
 public extension Collection where SubSequence == Slice<Path> {
 
+    /// The greatest prefix that both paths have in common
     func commonPrefix(with otherPath: Self) -> Slice<Path> {
         var iterator = makeIterator()
         var otherIterator = otherPath.makeIterator()
         var lastIndex = 0
 
-        while let element = iterator.next(), let otherElement = otherIterator.next(), element == otherElement {
+        while
+            let element = iterator.next(), let otherElement = otherIterator.next(),
+            element == otherElement {
             lastIndex += 1
         }
 

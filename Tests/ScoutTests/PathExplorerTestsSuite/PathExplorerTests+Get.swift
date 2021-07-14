@@ -91,8 +91,10 @@ final class PathExplorerGetTests: XCTestCase {
     func testGetKey_MissingKeyThrows_BestMatch<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo": 2, "toto": true, "Riri": "duck", "score": 12.5])
 
-        XCTAssertErrorsEqual(try explorer.get("tata"),
-                             ExplorerError.missing(key: "tata", bestMatch: "toto"))
+        XCTAssertErrorsEqual(
+            try explorer.get("tata"),
+            .missing(key: "tata", bestMatch: "toto")
+        )
     }
 
     func testGetKey_NestedKey<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -104,8 +106,10 @@ final class PathExplorerGetTests: XCTestCase {
     func testGet_MissingNestedKeyThrows<P: PathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["firstKey": ["secondKey": 23]])
 
-        XCTAssertErrorsEqual(try explorer.get("firstKey", "kirk"),
-                        ExplorerError.missing(key: "kirk", bestMatch: nil).with(path: "firstKey"))
+        XCTAssertErrorsEqual(
+            try explorer.get("firstKey", "kirk"),
+            .missing(key: "kirk", bestMatch: nil).with(path: "firstKey")
+        )
     }
 
     func testGetKey_ThrowsOnNoDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
@@ -175,8 +179,10 @@ final class PathExplorerGetTests: XCTestCase {
     func testGetCount_ThrowsOnNonGroup() throws {
         let array: ExplorerValue = ["Endo", 1, false, 2.5]
 
-        XCTAssertErrorsEqual(try array.get(0, .count),
-                             ExplorerError.wrongUsage(of: .count).with(path: 0))
+        XCTAssertErrorsEqual(
+            try array.get(0, .count),
+            .wrongUsage(of: .count).with(path: 0)
+        )
     }
 
     // MARK: - Keys list
@@ -193,7 +199,10 @@ final class PathExplorerGetTests: XCTestCase {
     func testGetKeysList_ThrowsOnNonDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo", 1, false, 2.5])
 
-        XCTAssertErrorsEqual(try explorer.get(.keysList), .wrongUsage(of: .keysList))
+        XCTAssertErrorsEqual(
+            try explorer.get(.keysList),
+            .wrongUsage(of: .keysList)
+        )
     }
 
     // MARK: - Filter
@@ -236,6 +245,7 @@ final class PathExplorerGetTests: XCTestCase {
 
     func testGetFilter_ThrowsOnNonDictionary<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Endo", 1, false, 2.5])
+
         XCTAssertErrorsEqual(try explorer.get(.filter("toto")),
                              .wrongUsage(of: .filter("toto"))
         )
@@ -283,7 +293,10 @@ final class PathExplorerGetTests: XCTestCase {
     func testGetSlice_ThrowsOnNonArray<P: EquatablePathExplorer>(_ type: P.Type) throws {
         let explorer = P(value: ["Tom": 10, "Robert": true, "Suzanne": "Here"])
 
-        XCTAssertErrorsEqual(try explorer.get(.slice(0, 1)), .wrongUsage(of: .slice(0, 1)))
+        XCTAssertErrorsEqual(
+            try explorer.get(.slice(0, 1)),
+            .wrongUsage(of: .slice(0, 1))
+        )
     }
 }
 

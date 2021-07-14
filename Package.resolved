@@ -20,7 +20,7 @@
         }
       },
       {
-        "package": "Lux",
+        "package": "lux",
         "repositoryURL": "https://github.com/ABridoux/lux",
         "state": {
           "branch": null,

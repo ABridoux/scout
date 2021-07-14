@@ -17,13 +17,13 @@ public protocol ValuePredicate {
 
 extension PathsFilter {
 
-    /// Specify a boolean expression to filter the value
+    /// Specify a `String` boolean expression to filter the value
     ///
     /// The value is specified as the variable 'value' in the expression.
     /// - `value > 10`
     /// - `value hasPrefix 'Lou' && value hasSuffix 'lou'`
     ///
-    /// - note: Public wrapper around BooleanExpressionEvaluation.Expression
+    /// - note: Public wrapper around `BooleanExpressionEvaluation/Expression`
     public final class ExpressionPredicate: ValuePredicate {
         private(set) var expression: Expression
 

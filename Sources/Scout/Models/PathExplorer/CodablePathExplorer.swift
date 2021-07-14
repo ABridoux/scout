@@ -5,7 +5,9 @@
 
 import Foundation
 
-/// A `PathExplorer` using an `ExplorerValue` and can be encoded/decoded with the provided `CodableFormat`
+/// A  concrete implementation of `PathExplorer` with a specific ``CodableFormat``.
+///
+/// - note: Mainly a wrapper around ``ExplorerValue`` to offer a unified interface for all `Codable` `PathExplorer`s
 public struct CodablePathExplorer<Format: CodableFormat>: PathExplorer {
 
     // MARK: - Properties
@@ -19,6 +21,7 @@ public struct CodablePathExplorer<Format: CodableFormat>: PathExplorer {
     public var real: Double? { value.real }
     public var double: Double? { value.double }
     public var data: Data? { value.data }
+    public var date: Date? { value.date }
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable { try value.array(of: type) }
     public func dictionary<T>(of type: T.Type) throws -> [String: T] where T: ExplorerValueCreatable { try value.dictionary(of: type) }
 
