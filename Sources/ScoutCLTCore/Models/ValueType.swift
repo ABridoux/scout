@@ -5,7 +5,7 @@
 
 import Scout
 
-public indirect enum ValueType: Equatable {
+public enum ValueType: Equatable {
     case string(String)
     case real(String)
     case keyName(String)

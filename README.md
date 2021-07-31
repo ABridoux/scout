@@ -41,6 +41,13 @@ Supported formats:
 - YAML
 - XML
 
+#### Minimum requirements
+- macOS: 10.13+
+- iOS: 10.0+
+- tvOS: 10.0+
+- watchOS: 4.0+
+
+
 ## Summary
 - [Why](#why)
 - [Features](#features)
