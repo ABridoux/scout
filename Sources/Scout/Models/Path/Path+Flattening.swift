@@ -5,60 +5,6 @@
 
 import Foundation
 
-// MARK: - Storage
-
-private struct IndexedSlice {
-    var index: Int
-    var lowerBound: Int
-    var upperBound: Int
-}
-
-private struct Indexed<Value> {
-    var index: Int
-    var value: Value
-}
-
-private struct IndexedCollection<Value>: Collection {
-    typealias Element = Indexed<Value>
-
-    var elements: [Element]
-
-    var startIndex: Int { elements.startIndex }
-    var endIndex: Int { elements.endIndex }
-
-    init() {
-        elements = []
-    }
-
-    subscript(position: Int) -> Element { elements[position] }
-    func index(after i: Int) -> Int { elements.index(after: i) }
-
-    func makeIterator() -> IndexingIterator<[Element]> {
-        elements.makeIterator()
-    }
-
-    mutating func append(index: Int, value: Value) {
-        elements.append(.init(index: index, value: value))
-    }
-
-    mutating func popLast() -> Element? { elements.popLast() }
-    mutating func removeAll() { elements.removeAll() }
-}
-
-private struct IndexedElements {
-    var indexes = IndexedCollection<Int>()
-    var slices = [IndexedSlice]()
-    var keys = IndexedCollection<String>()
-    var filters = IndexedCollection<String>()
-}
-
-private extension Array where Element == IndexedSlice {
-
-    mutating func append(index: Int, lower: Int, upper: Int) {
-        append(.init(index: index, lowerBound: lower, upperBound: upper))
-    }
-}
-
 // MARK: - Functions
 
 extension Path {
@@ -66,7 +12,7 @@ extension Path {
     /// Compute the path by changing the special path elements like slices or filters
     ///
     /// Filters are changed to the key they correspond to. Slices are changed to indexes.
-    /// #### Complexity
+    /// ### Complexity
     /// O(n) with `n` the count of elements in the path
     public func flattened() -> Path {
         var indexedElements = getIndexedElements()
@@ -89,6 +35,11 @@ extension Path {
 
         return Path(newPath)
     }
+}
+
+// MARK: Helpers
+
+extension Path {
 
     /// Parse the path and store the relevant elements with their indexes
     private func getIndexedElements() -> IndexedElements {
@@ -182,5 +133,55 @@ extension Path {
             newPath[filter.index] = .key(key.value)
             indexesToRemove.append(key.index)
         }
+    }
+}
+
+// MARK: - Storage models
+
+private struct IndexedSlice {
+    var index: Int
+    var lowerBound: Int
+    var upperBound: Int
+}
+
+private struct Indexed<Value> {
+    var index: Int
+    var value: Value
+}
+
+private struct IndexedCollection<Value>: Collection {
+    typealias Element = Indexed<Value>
+
+    var elements: [Element] = []
+
+    var startIndex: Int { elements.startIndex }
+    var endIndex: Int { elements.endIndex }
+
+    subscript(position: Int) -> Element { elements[position] }
+    func index(after i: Int) -> Int { elements.index(after: i) }
+
+    func makeIterator() -> IndexingIterator<[Element]> {
+        elements.makeIterator()
+    }
+
+    mutating func append(index: Int, value: Value) {
+        elements.append(.init(index: index, value: value))
+    }
+
+    mutating func popLast() -> Element? { elements.popLast() }
+    mutating func removeAll() { elements.removeAll() }
+}
+
+private struct IndexedElements {
+    var indexes = IndexedCollection<Int>()
+    var slices = [IndexedSlice]()
+    var keys = IndexedCollection<String>()
+    var filters = IndexedCollection<String>()
+}
+
+private extension Array where Element == IndexedSlice {
+
+    mutating func append(index: Int, lower: Int, upper: Int) {
+        append(.init(index: index, lowerBound: lower, upperBound: upper))
     }
 }

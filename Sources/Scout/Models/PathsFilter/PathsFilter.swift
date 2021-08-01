@@ -5,6 +5,7 @@
 
 import Foundation
 
+/// Provided to the ``PathExplorer/listPaths(startingAt:filter:)-4tkeq`` function to target specific paths when listing them.
 public enum PathsFilter {
     /// No filter on key or value.
     case targetOnly(ValueTarget)

@@ -8,7 +8,8 @@ import Foundation
 public extension Collection where Element == PathElement {
 
     /// Prints all the elements in the path, with the default separator
-    /// #### Complexity
+    /// 
+    /// ### Complexity
     /// O(n) where `n`: element's count
     var description: String {
         var description = reduce(into: "", newDescription)

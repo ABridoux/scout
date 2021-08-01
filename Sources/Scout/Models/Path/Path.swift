@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Collection of `PathElement`s to subscript a `PathExplorer`
+/// Collection of ``PathElement``s to subscript a `PathExplorer`
 public struct Path: Hashable {
 
     // MARK: - Constants
@@ -17,28 +17,27 @@ public struct Path: Hashable {
 
     private var elements: [PathElement] = []
 
+    /// An empty `Path`
     public static var empty: Path { .init() }
 
     // MARK: - Initialization
 
     /// Instantiate a `Path` for a string representing path components separated with the separator.
     ///
-    /// ### Example with default separator '.'
+    /// ## Example with default separator '.'
     ///
-    /// `computers[2].name` will make the path `["computers", 2, "name"]`
-    ///
-    /// `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
-    ///
-    /// `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
+    /// - `computers[2].name` will make the path `["computers", 2, "name"]`
+    /// - `computer.general.serial_number` will make the path `["computer", "general", "serial_number"]`
+    /// - `company.computers[#]` will make the path `["company", "computers", PathElement.count]`
     ///
     /// - parameter string: The string representing the path
     /// - parameter separator: The separator used to split the string. Default is ".".
     ///
-    /// ### Brackets
-    /// When enclosed with brackets, a path element will not be parsed. For example ```computer.(general.information).serial_number```
+    /// ## Brackets
+    /// When enclosed with brackets, a path element will not be parsed. For example `computer.(general.information).serial_number`
     /// will make the path ["computer", "general.information", "serial_number"]
     ///
-    /// ### Excluded separators
+    /// ## Excluded separators
     /// The following separators will not work: '[', ']', '(', ')'.
     public init(string: String, separator: String = Self.defaultSeparator) throws {
         if Self.forbiddenSeparators.contains(separator) { throw PathError.invalidSeparator(separator) }

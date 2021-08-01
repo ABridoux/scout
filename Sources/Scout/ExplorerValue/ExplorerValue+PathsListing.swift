@@ -62,6 +62,8 @@ extension ExplorerValue {
     /// Holds the logic to validate a path built during paths listing
     private struct PathValidation {
         let filter: PathsFilter
+
+        /// The path leading to the value
         private(set) var leading: Path
         private var isInitial = true
         private var hasOneKeyValidated = false

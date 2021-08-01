@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Store the possible elements that can be used to subscript a `PathExplorer`
+/// The possible elements that can be used to subscript a ``PathExplorer``
 public enum PathElement: Hashable {
 
     // MARK: - Constants
@@ -50,7 +50,7 @@ public enum PathElement: Hashable {
         }
     }
 
-    public var usage: String {
+    var usage: String {
         switch self {
         case .key: return "A key subscript a dictionary and is specified with a dot '.' then the key name like 'dictionary.keyName'"
         case .index: return "An index subscript an array and is specified as an integer enclosed with square brackets like '[1]'"

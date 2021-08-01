@@ -5,6 +5,7 @@
 
 import Foundation
 
+/// Errors that can be thrown when exploring data using a ``PathExplorer``
 public struct ExplorerError: LocalizedError, Equatable {
     public private(set) var path: Path
     let description: String
@@ -58,30 +59,37 @@ extension ExplorerError {
 
 public extension ExplorerError {
 
+    /// The provided value is not convertible to an ``ExplorerValue``
     static func invalid(value: Any) -> Self {
         ExplorerError(description: "The value \(value) is not convertible to ExplorerValue")
     }
 
+    /// The key used to subscript is missing. A best match in the existing key is provided if one is found.
     static func missing(key: String, bestMatch: String?) -> Self {
         ExplorerError(description: "Missing key '\(key)' in dictionary. Best match found: '\(bestMatch ?? "none")'")
     }
 
+    /// Trying to subscript something with a key although it's not a dictionary
     static var subscriptKeyNoDict: Self {
         ExplorerError(description: "The value cannot be subscripted with a string as it is not a dictionary")
     }
 
+    /// The provided index is out of bounds to subscript the array
     static func wrong(index: Int, arrayCount: Int) -> Self {
         ExplorerError(description: "Index \(index) out of bounds to subscript the array with \(arrayCount) elements")
     }
 
+    /// Trying to subscript something with an index although it's not an array
     static var subscriptIndexNoArray: Self {
         ExplorerError(description: "The value cannot be subscripted with an index as it is not an array")
     }
 
+    /// The ``PathElement`` is misplaced or forbidden for the feature
     static func wrongUsage(of element: PathElement) -> Self {
         return ExplorerError(description: "The element \(element.kindDescription) \(element) cannot be used here. \(element.usage)")
     }
 
+    /// The bounds provided to the ``PathElement/slice(_:)`` element are not valid to slice the array.
     static func wrong(bounds: Bounds, arrayCount: Int) -> Self {
         let description =
         """
@@ -93,14 +101,19 @@ public extension ExplorerError {
         return ExplorerError(description: description)
     }
 
+    /// The regular expression pattern is invalid
     static func wrong(regexPattern: String) -> Self {
         ExplorerError(description: "The string '\(regexPattern)' is not a valid regular expression pattern")
     }
 
+    /// The conversion from an ``ExplorerValue`` to the provided type has failed
     static func mismatchingType<T>(_ type: T.Type, value: ExplorerValue) -> Self {
         ExplorerError(description: "ExplorerValue '\(value)' cannot be represented as \(T.self)")
     }
 
+    /// The predicate in invalid.
+    ///
+    /// For instance, a `String` value is evaluated against a predicate taking an `Int` as input
     static func predicateNotEvaluatable(_ predicate: String, description: String) -> Self {
         ExplorerError(description: #"Unable to evaluate the predicate "\#(predicate)". \#(description)"#)
     }

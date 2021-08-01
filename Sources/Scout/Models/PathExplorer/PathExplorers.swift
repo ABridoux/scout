@@ -5,7 +5,9 @@
 
 import Foundation
 
-/// Namespace to find all PathExplorers in a single place
+/// Namespace to find all default PathExplorers in a single place
+///
+/// Use default explorers for a format: `PathExplorers.Json`, `PathExplorers.Xml`...
 public enum PathExplorers {
 
     public typealias Json = CodablePathExplorer<CodableFormats.JsonDefault>

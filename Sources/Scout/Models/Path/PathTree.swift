@@ -7,7 +7,7 @@ import Foundation
 
 /// A collection of paths arranged following their common prefixes.
 ///
-/// Useful when building a PathExplorer from a list of paths to reuse the last created explorer
+/// Useful when building a `PathExplorer` from a list of paths to reuse the last created explorer
 /// to add children to it (rather than starting again from the root each time).
 final class PathTree<Value: Equatable> {
 
@@ -30,7 +30,7 @@ final class PathTree<Value: Equatable> {
         return nil
     }
 
-    // MARK: - Initialisation
+    // MARK: - Initialization
 
     init(value: ValueType, element: PathElement) {
         self.value = value
