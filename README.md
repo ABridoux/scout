@@ -42,6 +42,7 @@ Supported formats:
 - XML
 
 #### Minimum requirements
+- Swift: 5.4+
 - macOS: 10.13+
 - iOS: 10.0+
 - tvOS: 10.0+

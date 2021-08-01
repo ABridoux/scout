@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [4.0.4]( https://github.com/ABridoux/scout/tree/4.0.4) (01/08/2021)
+
+### Changed
+- Bumped Swift version to 5.4
+- Added list version requirements in the Readme [#251] 
+
+### Fixed
+- tvOS version requirement [#263]
+
 ## [4.0.3]( https://github.com/ABridoux/scout/tree/4.0.3) (06/06/2021)
 ### Fixed
 - Jaro-Winkler crash when comparing two strings of single characters. [#253]
