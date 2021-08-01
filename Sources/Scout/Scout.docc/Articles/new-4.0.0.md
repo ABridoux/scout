@@ -36,7 +36,7 @@ Serializable PathExplorers like Plist, JSON and YAML or others like XML can use 
 The new ``ExplorerValue`` is the following enum.
 
 ```swift
-public indirect enum ExplorerValue {
+public enum ExplorerValue {
     case int(Int)
     case double(Double)
     case string(String)
