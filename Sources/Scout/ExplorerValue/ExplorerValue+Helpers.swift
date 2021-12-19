@@ -21,3 +21,17 @@ extension PathExplorer {
         return computedIndex
     }
 }
+
+// MARK: - Operators
+
+infix operator <^>
+
+/// Apply the left function to the right operand
+/// - note: Mainly used as synthetic sugar to avoid over use of brackets
+func <^><A, B>(lhs: (A) -> B, rhs: A) -> B { lhs(rhs) }
+
+extension ExplorerValue: EquatablePathExplorer {
+    public init(value: ExplorerValue, name: String?) {
+        self = value
+    }
+}
