@@ -8,44 +8,35 @@ extension ExplorerXML {
     /// The `ExplorerValue` conversion of the XML element
     ///
     /// - Parameters:
-    ///     - keepingAttributes: `true` when the attributes should be included as data
+    ///     - attributesStrategy: Specify how attributes should be handled
     ///     - singleChildStrategy: Specify how single children should be treated, as they can represent an array or a dictionary.
+    ///
     /// ### Complexity
     /// `O(n)` where `n` is the sum of all children
-    ///
-    /// ### Attributes
-    /// If a XML element has attributes and `keepingAttributes` is `true`,
-    /// the format of the returned `ExplorerValue` will be modified to
-    /// a dictionary with two keys:"attributes" which holds the attributes of the element as `[String: String]`
-    /// and "value" which holds the `ExplorerValue` conversion of the element.
-    ///
-    /// ### Single child strategy
-    /// When there is only one child, it's not possible to make sure of the group value that should be created: array or dictionary.
-    /// The `default` strategy will look at the child name. If it's the default XML element name, an array will be created.
-    /// Otherwise, it will be a dictionary. A custom function can be used.
-    public func explorerValue(keepingAttributes: Bool = true, singleChildStrategy: SingleChildStrategy = .default) -> ExplorerValue {
+    public func explorerValue(attributesStrategy: AttributesStrategy, singleChildStrategy: SingleChildStrategy = .default) -> ExplorerValue {
         if children.isEmpty {
-            return singleExplorerValue(keepingAttributes: keepingAttributes)
+            return singleExplorerValue(attributesStrategy: attributesStrategy)
         }
 
         if children.count == 1 {
             let name = children[0].name
-            let value = children[0].explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy)
+            let value = children[0].explorerValue(attributesStrategy: attributesStrategy, singleChildStrategy: singleChildStrategy)
             return singleChildStrategy.transform(name, value)
         }
 
         if let names = uniqueChildrenNames, names.count > 1 { // dict
-            let dict = children.map { (key: $0.name, value: $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy)) }
+            let dict = children.map { (key: $0.name, value: $0.explorerValue(attributesStrategy: attributesStrategy, singleChildStrategy: singleChildStrategy)) }
             let dictValue = ExplorerValue.dictionary(Dictionary(uniqueKeysWithValues: dict))
-            return keepingAttributes ? valueWithAttributes(value: dictValue) : dictValue
+            return attributesStrategy.transform(attributes, name, dictValue)
+
         } else { // array
 
-            let arrayValue = ExplorerValue.array(children.map { $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy) })
-            return keepingAttributes ? valueWithAttributes(value: arrayValue) : arrayValue
+            let arrayValue = ExplorerValue.array(children.map { $0.explorerValue(attributesStrategy: attributesStrategy, singleChildStrategy: singleChildStrategy) })
+            return attributesStrategy.transform(attributes, name, arrayValue)
         }
     }
 
-    private func singleExplorerValue(keepingAttributes: Bool) -> ExplorerValue {
+    private func singleExplorerValue(attributesStrategy: AttributesStrategy) -> ExplorerValue {
         let value: ExplorerValue
         if let int = self.int {
             value = .int(int)
@@ -57,10 +48,34 @@ extension ExplorerXML {
             value = .string(self.string ?? "")
         }
 
-        return keepingAttributes ? valueWithAttributes(value: value) : value
+        return attributesStrategy.transform(attributes, name, value)
     }
+}
 
-    private func valueWithAttributes(value: ExplorerValue) -> ExplorerValue {
+// MARK: - AttributesStrategy
+
+extension ExplorerXML {
+
+    public struct AttributesStrategy {
+
+        public typealias Transform = (_ attributes: [String: String], _ key: String, _ value: ExplorerValue) -> ExplorerValue
+        let transform: Transform
+
+        public init(transform: @escaping Transform) {
+            self.transform = transform
+        }
+    }
+}
+
+extension ExplorerXML.AttributesStrategy {
+
+    /// Ignore the attributes during the ``ExplorerValue`` conversion
+    public static let ignore = Self { _, _, value in value }
+
+    /// If attributes are not empty, the value will be split in a dictionary with an "attributes" and "value" keys.
+    ///
+    /// "attributes" is of type `[String: String]` and `value` is the value
+    public static let split = Self { attributes, _, value in
         if attributes.isEmpty {
             return value
         } else {
@@ -68,28 +83,105 @@ extension ExplorerXML {
         }
     }
 
-    public struct SingleChildStrategy {
-        public typealias Transform = (_ key: String, _ value: ExplorerValue) -> ExplorerValue
-        var transform: Transform
+    /// Scout will try to merge the attributes with the elements.
+    ///
+    /// ### Behavior
+    /// - When there are no children, the result is a dictionary with the attributes and the child.
+    /// - When the children are a dictionary, both dictionaries will be merged, using the `duplicateStrategy` when there are duplicate keys
+    ///  - When the children are an array, the result will be a dictionary holding the attributes and an "elements" key associated to the children array
+    ///
+    ///  - parameter duplicatesStrategy: When the children are a dictionary, both dictionaries will be merged,
+    ///   using the `duplicateStrategy` when there are duplicate keys
+    public static func merge(duplicatesStrategy: MergeDuplicatesStrategy) -> Self {
+        Self { attributes, key, value in
+           guard !attributes.isEmpty else { return value }
 
-        init(transform: @escaping Transform) {
+           let mappedAttributes = attributes.mapValues(ExplorerValue.singleFrom)
+           switch value {
+           case .string, .int, .double, .bool, .date, .data:
+               return .dictionary([key: value].merging(mappedAttributes, uniquingKeysWith: duplicatesStrategy.transform))
+
+           case let .dictionary(dict):
+               return .dictionary(dict.merging(mappedAttributes, uniquingKeysWith: duplicatesStrategy.transform))
+
+           case .array:
+               return .dictionary(mappedAttributes.merging([ExplorerXML.Element.arrayDefaultName: value], uniquingKeysWith: duplicatesStrategy.transform))
+           }
+        }
+    }
+}
+
+extension ExplorerXML.AttributesStrategy {
+
+    /// A strategy to decide which value to keep when duplicate keys are present during a ``ExplorerXML/AttributesStrategy/merge(duplicatesStrategy:)`` strategy
+    public struct MergeDuplicatesStrategy {
+        public typealias Transform = (_ attribute: ExplorerValue, _ element: ExplorerValue) -> ExplorerValue
+
+        let transform: Transform
+
+        public init(transform: @escaping Transform) {
             self.transform = transform
         }
+    }
+}
 
-        public static let dictionary = SingleChildStrategy { (key, value) -> ExplorerValue in .dictionary([key: value]) }
-        public static let array = SingleChildStrategy { (_, value) -> ExplorerValue in .array([value]) }
-        public static func custom(_ transform: @escaping Transform) -> SingleChildStrategy {
-            SingleChildStrategy { (key, value) in transform(key, value) }
-        }
+extension ExplorerXML.AttributesStrategy.MergeDuplicatesStrategy {
 
-        /// Check the the element name. With a default name, an array is returned.
-        /// Otherwise a dictionary
-        public static let `default` = SingleChildStrategy { (key, value) in
-            if key == Element.defaultName {
-                return array.transform(key, value)
-            } else {
-                return dictionary.transform(key, value)
-            }
+    /// In case of a duplicate when merging the attributes and the element, the attribute will be kept and the element discarded
+    public static let attribute = Self { attribute, _ in attribute }
+
+    /// In case of a duplicate when merging the attributes and the element, the element will be kept and the attribute discarded
+    public static let element = Self { _, element in element }
+
+}
+
+// MARK: - SingleChildStrategy
+
+extension ExplorerXML {
+
+    /// When there is only one child, it's not possible to make sure of the group value that should be created: array or dictionary.
+    /// The `default` strategy will look at the child name. If it's the default XML element name, an array will be created.
+    /// Otherwise, it will be a dictionary. A custom strategy can be used with ``SingleChildStrategy/init(transform:)``
+    public struct SingleChildStrategy {
+        public typealias Transform = (_ key: String, _ value: ExplorerValue) -> ExplorerValue
+        let transform: Transform
+
+        public init(transform: @escaping Transform) {
+            self.transform = transform
         }
+    }
+}
+
+extension ExplorerXML.SingleChildStrategy {
+
+    public static let dictionary = Self { (key, value) -> ExplorerValue in .dictionary([key: value]) }
+    public static let array = Self { (_, value) -> ExplorerValue in .array([value]) }
+
+    /// Check the the element name. With a default name, an array is returned.
+    /// Otherwise a dictionary
+    public static let `default` = Self { (key, value) in
+        if key == ExplorerXML.Element.singleDefaultName {
+            return array.transform(key, value)
+        } else {
+            return dictionary.transform(key, value)
+        }
+    }
+}
+
+// MARK: - Deprecated
+
+extension ExplorerXML {
+
+    @available(*, deprecated, message: "Use ExplorerXML.explorerValue(attributesStrategy:singleChildStrategy:) instead")
+    public func explorerValue(keepingAttributes: Bool = true, singleChildStrategy: SingleChildStrategy = .default) -> ExplorerValue {
+        explorerValue(attributesStrategy: keepingAttributes ? .split : .ignore, singleChildStrategy: singleChildStrategy)
+    }
+}
+
+extension ExplorerXML.SingleChildStrategy {
+
+    @available(*, deprecated, message: "Use ExplorerXML.SingleChildStrategy.init(transform:) instead")
+    public static func custom(_ transform: @escaping Transform) -> Self {
+        Self { (key, value) in transform(key, value) }
     }
 }

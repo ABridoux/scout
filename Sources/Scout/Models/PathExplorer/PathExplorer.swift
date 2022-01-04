@@ -22,7 +22,7 @@ where
     /// Non `nil` if the key is of the `String` type
     var string: String? { get }
 
-    /// Non `nil` if the key is of the `Bool` type
+    /// Non `nil` if the key is of the `Bool` type or of `Int` type with 0 or 1 for value
     var bool: Bool? { get }
 
     /// Non `nil` if the key is of the `Integer` type

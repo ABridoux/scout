@@ -20,17 +20,17 @@ extension ExplorerXML {
             return try fromArrayOfDictionaries(csv: csv)
 
         } else if csv.enumeratedRows.count == 1 {
-            let explorer = ExplorerXML(name: Element.defaultName)
-            csv.enumeratedRows[0].forEach { explorer.addChild(ExplorerXML(name: Element.defaultName, value: $0)) }
+            let explorer = ExplorerXML(name: Element.singleDefaultName)
+            csv.enumeratedRows[0].forEach { explorer.addChild(ExplorerXML(name: Element.singleDefaultName, value: $0)) }
             return explorer
 
         } else {
-            let explorer = ExplorerXML(name: Element.defaultName)
+            let explorer = ExplorerXML(name: Element.singleDefaultName)
             let rows = [csv.header] + csv.enumeratedRows
 
             rows.forEach { row in
-                let childArray = ExplorerXML(name: Element.defaultName)
-                row.forEach { childArray.addChild(ExplorerXML(name: Element.defaultName, value: $0)) }
+                let childArray = ExplorerXML(name: Element.singleDefaultName)
+                row.forEach { childArray.addChild(ExplorerXML(name: Element.singleDefaultName, value: $0)) }
                 explorer.addChild(childArray)
             }
 

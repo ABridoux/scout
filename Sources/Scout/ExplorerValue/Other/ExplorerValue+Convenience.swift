@@ -33,9 +33,23 @@ extension ExplorerValue {
         return string
     }
 
+    /// Non `nil` if  `self` is ``ExplorerValue/bool`` or ``ExplorerValue/int`` with 0 or 1 for value
     public var bool: Bool? {
-        guard case let .bool(bool) = self else { return nil }
-        return bool
+        if case let .int(int) = self {
+            if int == 0 {
+                return false
+            } else if int == 1 {
+                return true
+            } else {
+                return nil
+            }
+        }
+
+        if case let .bool(bool) = self {
+            return bool
+        }
+
+        return nil
     }
 
     public var data: Data? {

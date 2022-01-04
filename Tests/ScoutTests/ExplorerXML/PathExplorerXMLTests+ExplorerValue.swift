@@ -16,11 +16,24 @@ final class ExplorerXMLExplorerValueTests: XCTestCase {
             expected: "toto")
     }
 
-    func testString_Attributes() {
+    func testString_SplitAttributes() {
         testExplorerValue(
-            initial: ExplorerXML(name: "", value: "toto").with(attributes: ["parent": "tata"]),
-            expected: ["attributes": ["parent": "tata"],
-                       "value": "toto"])
+            initial: ExplorerXML(name: "name", value: "toto").with(attributes: ["parent": "tata"]),
+            expected: [
+                "attributes": ["parent": "tata"],
+                "value": "toto"
+            ]
+        )
+    }
+
+    func testString_MergeAttributes() {
+        testExplorerValue(
+            attributesStrategy: .merge(duplicatesStrategy: .element),
+            initial: ExplorerXML(name: "name", value: "toto").with(attributes: ["parent": "tata"]),
+            expected: [
+                "name": "toto", "parent": "tata"
+            ]
+        )
     }
 
     func testInt() {
@@ -29,11 +42,24 @@ final class ExplorerXMLExplorerValueTests: XCTestCase {
             expected: 20)
     }
 
-    func testInt_Attributes() {
+    func testInt_SplitAttributes() {
         testExplorerValue(
             initial: ExplorerXML(name: "", value: "20").with(attributes: ["parent": "tata"]),
-            expected: ["attributes": ["parent": "tata"],
-                       "value": 20])
+            expected: [
+                "attributes": ["parent": "tata"],
+                "value": 20
+            ]
+        )
+    }
+
+    func testInt_MergeAttributes() {
+        testExplorerValue(
+            attributesStrategy: .merge(duplicatesStrategy: .element),
+            initial: ExplorerXML(name: "user", value: "toto").with(attributes: ["score": "10"]),
+            expected: [
+                "user": "toto", "score": 10
+            ]
+        )
     }
 
     func testDouble() {
@@ -42,11 +68,24 @@ final class ExplorerXMLExplorerValueTests: XCTestCase {
             expected: 10.5)
     }
 
-    func testDouble_Attributes() {
+    func testDouble_SplitAttributes() {
         testExplorerValue(
             initial: ExplorerXML(name: "", value: "10.5").with(attributes: ["parent": "tata"]),
-            expected: ["attributes": ["parent": "tata"],
-                       "value": 10.5])
+            expected: [
+                "attributes": ["parent": "tata"],
+                "value": 10.5
+            ]
+        )
+    }
+
+    func testDouble_MergeAttributes() {
+        testExplorerValue(
+            attributesStrategy: .merge(duplicatesStrategy: .element),
+            initial: ExplorerXML(name: "user", value: "toto").with(attributes: ["score": "10.5"]),
+            expected: [
+                "user": "toto", "score": 10.5
+            ]
+        )
     }
 
     func testBool() {
@@ -55,12 +94,27 @@ final class ExplorerXMLExplorerValueTests: XCTestCase {
             expected: true)
     }
 
-    func testBool_Attributes() {
+    func testBool_SplitAttributes() {
         testExplorerValue(
             initial: ExplorerXML(name: "", value: "true").with(attributes: ["parent": "tata"]),
-            expected: ["attributes": ["parent": "tata"],
-                       "value": true])
+            expected: [
+                "attributes": ["parent": "tata"],
+                "value": true
+            ]
+        )
     }
+
+    func testBool_MergeAttributes() {
+        testExplorerValue(
+            attributesStrategy: .merge(duplicatesStrategy: .element),
+            initial: ExplorerXML(name: "user", value: "toto").with(attributes: ["isAdmin": "true"]),
+            expected: [
+                "user": "toto", "isAdmin": true
+            ]
+        )
+    }
+
+    // MARK: Group
 
     func testArray() {
         testExplorerValue(
@@ -68,11 +122,24 @@ final class ExplorerXMLExplorerValueTests: XCTestCase {
             expected: ["Riri", "Fifi", "Loulou"])
     }
 
-    func testArray_Attributes() {
+    func testArray_SplitAttributes() {
         testExplorerValue(
             initial: ExplorerXML(value: ["Riri", "Fifi", "Loulou"]).with(attributes: ["parent": "tata"]),
-            expected: ["attributes": ["parent": "tata"],
-                       "value": ["Riri", "Fifi", "Loulou"]])
+            expected: [
+                "attributes": ["parent": "tata"],
+                "value": ["Riri", "Fifi", "Loulou"]
+            ]
+        )
+    }
+
+    func testArray_MergeAttributes() {
+        testExplorerValue(
+            attributesStrategy: .merge(duplicatesStrategy: .element),
+            initial: ExplorerXML(value: ["Riri", "Fifi", "Loulou"]).with(attributes: ["parent": "tata"]),
+            expected: [
+                "parent": "tata", "elements": ["Riri", "Fifi", "Loulou"]
+            ]
+        )
     }
 
     func testDictionary() {
@@ -81,21 +148,36 @@ final class ExplorerXMLExplorerValueTests: XCTestCase {
             expected: ["Toto": [true], "Endo": 1])
     }
 
-    func testDictionary_Attributes() {
+    func testDictionary_SplitAttributes() {
         testExplorerValue(
             initial: ExplorerXML(value: ["Toto": [true], "Endo": 1]).with(attributes: ["parent": "tata"]),
-            expected: ["attributes": ["parent": "tata"],
-                       "value": ["Toto": [true], "Endo": 1]])
+            expected: [
+                "attributes": ["parent": "tata"],
+                "value": ["Toto": [true], "Endo": 1]
+            ]
+        )
+    }
+
+    func testDictionary_MergeAttributes() {
+        testExplorerValue(
+            attributesStrategy: .merge(duplicatesStrategy: .element),
+            initial: ExplorerXML(value: ["Toto": [true], "Endo": 1]).with(attributes: ["parent": "tata"]),
+            expected: [
+                "parent": "tata", "Toto": [true], "Endo": 1
+            ]
+        )
     }
 }
 
 extension ExplorerXMLExplorerValueTests {
 
     func testExplorerValue(
+        attributesStrategy: ExplorerXML.AttributesStrategy = .split,
         initial: ExplorerXML,
         expected: ExplorerValue,
         file: StaticString = #file,
-        line: UInt = #line) {
-        XCTAssertEqual(initial.explorerValue(), expected)
+        line: UInt = #line
+    ) {
+        XCTAssertEqual(initial.explorerValue(attributesStrategy: attributesStrategy), expected)
     }
 }

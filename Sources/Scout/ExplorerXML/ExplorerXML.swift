@@ -124,7 +124,7 @@ public struct ExplorerXML: PathExplorer {
     }
 
     public init(value: ExplorerValue, name: String?) {
-        let name = name ?? Element.defaultName
+        let name = name ?? Element.singleDefaultName
 
         switch value {
         case .string(let string): self.init(name: name, value: string)
@@ -153,19 +153,19 @@ public struct ExplorerXML: PathExplorer {
     }
 
     public init(stringLiteral value: String) {
-        element = Element(name: Element.defaultName, value: value)
+        element = Element(name: Element.singleDefaultName, value: value)
     }
 
     public init(booleanLiteral value: Bool) {
-        element = Element(name: Element.defaultName, value: value.description)
+        element = Element(name: Element.singleDefaultName, value: value.description)
     }
 
     public init(integerLiteral value: Int) {
-        element = Element(name: Element.defaultName, value: value.description)
+        element = Element(name: Element.singleDefaultName, value: value.description)
     }
 
     public init(floatLiteral value: Double) {
-        element = Element(name: Element.defaultName, value: value.description)
+        element = Element(name: Element.singleDefaultName, value: value.description)
     }
 }
 

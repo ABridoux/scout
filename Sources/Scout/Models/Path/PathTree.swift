@@ -158,7 +158,7 @@ extension ExplorerXML {
         let name: String
         switch tree.element {
         case .key(let key): name = key
-        case .index: name = Element.defaultName
+        case .index: name = Element.singleDefaultName
         default: throw ExplorerError.wrongUsage(of: tree.element)
         }
 

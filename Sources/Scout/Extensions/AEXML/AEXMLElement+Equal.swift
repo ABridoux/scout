@@ -7,7 +7,8 @@ import AEXML
 
 extension AEXMLElement {
 
-    static let defaultName = "element"
+    static let singleDefaultName = "element"
+    static let arrayDefaultName = "elements"
     static let root = "root"
 
     func isEqual(to other: AEXMLElement) -> Bool {
@@ -18,7 +19,7 @@ extension AEXMLElement {
 
         if children.isEmpty, other.children.isEmpty {
             return attributes == other.attributes
-                && (name == other.name || [name, other.name].contains("root") || [name, other.name].contains(Self.defaultName)) // root names are not always the same
+                && (name == other.name || [name, other.name].contains("root") || [name, other.name].contains(Self.singleDefaultName)) // root names are not always the same
                 && value == other.value
         }
 
