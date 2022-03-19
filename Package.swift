@@ -28,7 +28,6 @@ let package = Package(
             url: "https://github.com/apple/swift-argument-parser",
             from: "0.0.1"),
         .package(
-            name: "Lux",
             url: "https://github.com/ABridoux/lux",
             from: "0.1.0"),
         .package(
@@ -53,19 +52,26 @@ let package = Package(
                 "Yams",
                 "SwiftCSV",
                 "Parsing",
-                "BooleanExpressionEvaluation"]),
+                "BooleanExpressionEvaluation"
+            ]
+        ),
         .target(name: "Parsing"),
         .target(
             name: "ScoutCLTCore",
             dependencies: [
-                "Scout", "Parsing"]),
+                "Scout",
+                "Parsing"
+            ]
+        ),
         .executableTarget(
             name: "ScoutCLT",
             dependencies: [
                 "Scout",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                "Lux",
-                "ScoutCLTCore"]),
+                .product(name: "Lux", package: "Lux"),
+                "ScoutCLTCore"
+            ]
+        ),
         .testTarget(
             name: "ScoutTests",
             dependencies: ["Scout"]),
@@ -73,6 +79,9 @@ let package = Package(
             name: "ScoutCLTCoreTests",
             dependencies: [
                 "ScoutCLTCore",
-                "Scout", "Parsing"])
+                "Scout",
+                "Parsing"
+            ]
+        )
     ]
 )
