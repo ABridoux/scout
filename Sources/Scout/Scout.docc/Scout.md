@@ -21,6 +21,7 @@ Supported formats:
 
 - ``PathExplorer``
 - ``PathExplorers``
+- ``ExplorerValue``
 - ``ExplorerError``
 
 ### Manipulate paths
@@ -47,7 +48,6 @@ Supported formats:
 ### Set and add custom types
 
 - <doc:custom-types-explorerValue>
-- ``ExplorerValue``
 - ``ExplorerValueCreatable``
 - ``ExplorerValueRepresentable``
 - ``ExplorerValueConvertible``

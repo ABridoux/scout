@@ -15,7 +15,7 @@ public protocol ExplorerValueRepresentable {
     func explorerValue() throws -> ExplorerValue
 }
 
-/// Can be instantiated from an `ExplorerValue`
+/// Can be instantiated from an ``ExplorerValue``
 /// - note: Default implementation provided for types conforming to `Decodable`
 public protocol ExplorerValueCreatable {
 
@@ -23,7 +23,7 @@ public protocol ExplorerValueCreatable {
     init(from explorerValue: ExplorerValue) throws
 }
 
-/// Can be represented *as* and instantiated *from* an `ExplorerValue`
+/// Can be represented *as* and instantiated *from* an ``ExplorerValue``
 /// - note: Default implementation provided for types conforming to `Codable`
 public typealias ExplorerValueConvertible = ExplorerValueRepresentable & ExplorerValueCreatable
 
