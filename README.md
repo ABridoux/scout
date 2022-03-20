@@ -58,8 +58,8 @@ Supported formats:
 
 ### Wiki
 
-The Swift wiki can be found on the [Github pages](https://abridoux.github.io/scout/documentation/scout)
-The command-line wiki can be found on [Woody's Findings](https://www.woodys-findings.com/scout/wiki-command-line/home) 
+The **Swift** wiki can be found on the [Github pages](https://abridoux.github.io/scout/documentation/scout)
+The **command-line** wiki can be found on [Woody's Findings](https://www.woodys-findings.com/scout/wiki-command-line/home) 
 
 ### News
 - Checkout what's new in **Scout** 4.0.0 [here](https://www.woodys-findings.com/scout/news-4.0.0).
@@ -76,7 +76,7 @@ I have been working with many Mac admins recently, and many had to deal with Jso
 You can use a library for each format. But I am not aware today of a library that unifies all of them. So, what you learned with [jq](https://stedolan.github.io/jq/) cannot be reused to parse Plist data. You would have to learn to use **PlistBuddy** or the **defaults** command. With Scout, you can parse the same way Json, Plist and Xml data.
 
 #### Using a generic text-processing tool
-Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is [really easy to use](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line).
+Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is [really easy to use](https://www.woodys-findings.com/scout/wiki-command-line/examples).
 
 <br>
 
