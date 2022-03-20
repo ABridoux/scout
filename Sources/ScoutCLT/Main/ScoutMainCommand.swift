@@ -21,6 +21,7 @@ Written by Alexis Bridoux. Copyright (c) 2020-present.
 MIT license, see LICENSE file for details
 """
 
+@main
 struct ScoutMainCommand: ParsableCommand {
 
     // MARK: - Constants

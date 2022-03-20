@@ -30,7 +30,7 @@ Install<br>
     <br/>
 </p>
 
-# Scout <a href="https://github.com/ABridoux/scout/releases"><img src="https://img.shields.io/github/v/release/Abridoux/scout?color=lightgrey&label=latest" /></a>
+# Scout <a href="https://github.com/ABridoux/scout/releases"><img src="https://img.shields.io/github/v/release/Abridoux/scout?color=lightgrey&label=latest"/></a>
 
 This library aims to make specific formats data values reading and writing simple when the data format is not known at build time.
 It was inspired by [SwiftyJson](https://github.com/SwiftyJSON/SwiftyJSON) and all the projects that followed, while trying to cover more ground, like Xml or Plist. It unifies writing and reading for those different formats. Getting a value in a Json format would be the same as getting a value in a Xml format.
@@ -42,12 +42,11 @@ Supported formats:
 - XML
 
 #### Minimum requirements
-- Swift: 5.4+
+- Swift: 5.5+
 - macOS: 10.13+
 - iOS: 10.0+
 - tvOS: 10.0+
 - watchOS: 4.0+
-
 
 ## Summary
 - [Why](#why)
@@ -59,7 +58,8 @@ Supported formats:
 
 ### Wiki
 
-The wiki can be found [here](https://www.woodys-findings.com/scout/wiki/home).
+The **Swift** wiki can be found on the [Github pages](https://abridoux.github.io/scout/documentation/scout)
+The **command-line** wiki can be found on [Woody's Findings](https://www.woodys-findings.com/scout/wiki-command-line/home) 
 
 ### News
 - Checkout what's new in **Scout** 4.0.0 [here](https://www.woodys-findings.com/scout/news-4.0.0).
@@ -76,12 +76,12 @@ I have been working with many Mac admins recently, and many had to deal with Jso
 You can use a library for each format. But I am not aware today of a library that unifies all of them. So, what you learned with [jq](https://stedolan.github.io/jq/) cannot be reused to parse Plist data. You would have to learn to use **PlistBuddy** or the **defaults** command. With Scout, you can parse the same way Json, Plist and Xml data.
 
 #### Using a generic text-processing tool
-Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is [really easy to use](https://github.com/ABridoux/scout/wiki/%5B20%5D-Usage-examples:-command-line).
+Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But it is not that easy to learn. And you have to find a way to parse each different format. **Scout** is [really easy to use](https://www.woodys-findings.com/scout/wiki-command-line/examples).
 
 <br>
 
 ## Features
-- CRUD functions for JSON, Plist and XML data format
+- CRUD functions for JSON, Plist, XML and YAML data format
     - Read, Set, Delete or Add a value at a specific path in the data
     - Subscript dictionary with a dot "."
     - Subscript arrays with an index between brackets [index]. Negative indexes allowed.
@@ -106,7 +106,7 @@ Don't get me wrong, **awk** is a wonderful tool. It can do so many things. But i
 
 ### Insights
 
-The [wiki](https://www.woodys-findings.com/scout/wiki/home) gives more details to use those features. Also, the [Playground](Playground) folder offers several commands to play with a *People* file in several formats. The same commands can be found on this [page](https://www.woodys-findings.com/scout/wiki/examples).
+The wiki ([Swift](https://abridoux.github.io/scout/documentation/scout) | [Command-line](https://www.woodys-findings.com/scout/wiki-command-line/home)) gives more details to use those features. Also, the [Playground](Playground) folder offers several commands to play with a *People* file in several formats. The same commands can be found on this [page](https://www.woodys-findings.com/scout/wiki-command-line/examples).
 
 #### CRUD functions for JSON, Plist and XML data format
 - add a value (Create)
@@ -144,7 +144,7 @@ Specify a regular expression between sharp signs '#' to filter the keys of a dic
 It's possible to list the paths in the data to iterate over the values. The paths can be retrieved as an array in a shell script to be used in a loop.
 This list can be filtered to target only single or group values, specific keys or values, or paths starting from a base.
 
-You can [learn more](https://www.woodys-findings.com/scout/wiki/list-paths) about this feature. Also, [scripting recipes](https://www.woodys-findings.com/scout/wiki/scripting-recipes) are provided with use cases using this feature.
+You can [learn more](https://www.woodys-findings.com/scout/wiki-command-line/list-paths) about this feature. Also, [scripting recipes](https://www.woodys-findings.com/scout/wiki-command-line/scripting-recipes) are provided with use cases using this feature.
 
 #### Stream or file input
 Set the input as a file with the input option `-i | --input` or as the last process/command output with a pipe:
@@ -176,7 +176,7 @@ When dealing with large files (although it is not recommended to output large fi
 
 #### Data formats conversion
 The library offer a conversion feature from a supported format to another one like Plist -> JSON or YAML -> XML. Read or modify the data and export it to another format.
-[Learn more](https://www.woodys-findings.com/scout/wiki/conversion)
+[Learn more](https://www.woodys-findings.com/scout/wiki-command-line/conversion)
 
 #### CSV export
 Export data when dealing with arrays or a dictionary of arrays.
@@ -188,7 +188,7 @@ Convert CSV input to one of the available formats. When the CSV has named header
 Export a 1-dimension array to a Zsh array with the `-e array` option and to an associative array with the `-e dictionary` option.
 
 ##### Customise colors
-You can specify your own colors set as explained [here](https://www.woodys-findings.com/scout/wiki/highlighting). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
+You can specify your own colors set as explained [here](https://www.woodys-findings.com/scout/wiki-command-line/highlighting). Also, some presets for the macOS terminal default styles can be found in the [Highlight presets folder](Highlight-presets)
 
 #### Folding
 Fold arrays or dictionaries at a certain depth level to make the data more readable
@@ -267,7 +267,7 @@ You can find and try examples with one file *People* using the different availab
 First of all, many thanks to all contributors of this library. Their help is truly appreciated.
 
 To parse and edit XML data, as the standard library does not offer a simple way to do it, **Scout** uses the wonderful library of Marko Tadić: [AEXML](https://github.com/tadija/AEXML). He has done an amazing work. And if several XML parsing and writing libraries exist today, I would definitely recommend his. Marko, you might never read those lines, but thank you!
-The same goes for the [Yams](https://www.woodys-findings.com/scout/wiki/home) and its contributors. Thank you for this project.
+The same goes for the [Yams](https://github.com/jpsim/Yams) and its contributors. Thank you for this project.
 
 Thanks also to the team at Apple behind the [ArgumentParser](https://github.com/apple/swift-argument-parser) library. They have done an incredible work to make command line tools in Swift easy to implement.
 

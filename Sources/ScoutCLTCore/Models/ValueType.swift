@@ -5,6 +5,7 @@
 
 import Scout
 
+/// The possible types when setting values in a path
 public enum ValueType: Equatable {
     case string(String)
     case real(String)

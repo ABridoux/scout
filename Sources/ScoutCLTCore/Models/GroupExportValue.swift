@@ -8,12 +8,11 @@ import Scout
 
 /// Type serving only the purpose to map dictionaries or arrays
 /// returned by a `PathExplorer` to a `String` value.
-///
-/// Init throws if the value is not single.
 public struct GroupExportValue: ExplorerValueCreatable {
 
     public let value: String
 
+    /// - throws: if the value is not single.
     public init(from explorerValue: ExplorerValue) throws {
         switch explorerValue {
         case .string(let string): value = string

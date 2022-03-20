@@ -4,5 +4,5 @@
 // MIT license, see LICENSE file for details
 
 public enum ScoutVersion {
-    public static let current = "4.0.4"
+    public static let current = "4.1.0"
 }
