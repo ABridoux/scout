@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. `Scout` adheres to [Semantic Versioning](http://semver.org).
 
 ---
+## [4.1.0]( https://github.com/ABridoux/scout/tree/4.1.0) (20/03/2022)
+
+### Added
+- Online docC documentation 
+
+### Changed
+- Bumped to minimum Swift version 5.6 [#265]
+
+### Fixed
+- docC warnings
+- Dead links in the Readme [#268]  
+
 ## [4.0.4]( https://github.com/ABridoux/scout/tree/4.0.4) (01/08/2021)
 
 ### Changed
