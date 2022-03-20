@@ -12,6 +12,9 @@ Supported formats:
 
 ## Topics
 
+### Updates
+- <doc:new-4.0.0>
+
 ### Essential
 - <doc:getting-started>
 - ``PathExplorer``
@@ -51,6 +54,3 @@ Supported formats:
 - ``ExplorerValueCreatable``
 - ``ExplorerValueRepresentable``
 - ``ExplorerValueConvertible``
-
-### Follow updates
-- <doc:new-4.0.0>

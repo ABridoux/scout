@@ -23,7 +23,10 @@ extension ExplorerXML {
     /// When there is only one child, it's not possible to make sure of the group value that should be created: array or dictionary.
     /// The `default` strategy will look at the child name. If it's the default XML element name, an array will be created.
     /// Otherwise, it will be a dictionary. A custom function can be used.
-    public func explorerValue(keepingAttributes: Bool = true, singleChildStrategy: SingleChildStrategy = .default) -> ExplorerValue {
+    public func explorerValue(
+        keepingAttributes: Bool = true,
+        singleChildStrategy: SingleChildStrategy = .default
+    ) -> ExplorerValue {
         if children.isEmpty {
             return singleExplorerValue(keepingAttributes: keepingAttributes)
         }
