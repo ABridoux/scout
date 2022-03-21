@@ -3,7 +3,7 @@
 <br>
 Swift package<br>
     <a href="#">
-        <img src="https://img.shields.io/badge/Swift-5.3-orange" />
+        <img src="https://img.shields.io/badge/Swift-5.6-orange" />
     </a>
     <a href="https://swift.org/package-manager">
         <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
@@ -42,7 +42,7 @@ Supported formats:
 - XML
 
 #### Minimum requirements
-- Swift: 5.5+
+- Swift: 5.6+
 - macOS: 10.13+
 - iOS: 10.0+
 - tvOS: 10.0+
@@ -58,8 +58,8 @@ Supported formats:
 
 ### Wiki
 
-The **Swift** wiki can be found on the [Github pages](https://abridoux.github.io/scout/documentation/scout)
-The **command-line** wiki can be found on [Woody's Findings](https://www.woodys-findings.com/scout/wiki-command-line/home) 
+The **Swift** wiki can be found on the [Github pages](https://abridoux.github.io/scout/documentation/scout).
+The **command-line** wiki can be found on [Woody's Findings](https://www.woodys-findings.com/scout/wiki-command-line/home) .
 
 ### News
 - Checkout what's new in **Scout** 4.0.0 [here](https://www.woodys-findings.com/scout/news-4.0.0).
