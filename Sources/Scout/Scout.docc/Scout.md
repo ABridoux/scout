@@ -16,6 +16,7 @@ Supported formats:
 - <doc:new-4.0.0>
 
 ### Essential
+- <doc:getting-started-tuto>
 - <doc:getting-started>
 - ``PathExplorer``
 - ``Path``

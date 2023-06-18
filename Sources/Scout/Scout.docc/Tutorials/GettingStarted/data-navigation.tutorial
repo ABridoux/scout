@@ -1,0 +1,17 @@
+@Tutorial(time: 10) {
+    @Intro(title: "Data navigation") {
+        Learn how to navigate through data using ``Scout/PathExplorers``.
+    }
+    
+    @Section(title: "Create a PathExplorer") {
+        @ContentAndMedia {
+            The simplest way to read data in any of the supported format is to use one of the ``Scout/PathExplorers`` implementation and to call ``Scout/SerializablePathExplorer/init(data:)``.
+        }
+        
+        @Steps {
+            @Step {
+                For instance, let’s imagine that the file is read and converted to a Data value. Here’s how to make an explorer for the YAML format.
+            }
+        }
+    }
+}

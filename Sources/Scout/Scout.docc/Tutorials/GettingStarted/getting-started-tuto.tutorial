@@ -1,0 +1,11 @@
+@Tutorials(name: "Scout") {
+    @Intro(title: "Getting started") {
+        Quickly learn how to use Scout’s main features.
+    }
+    
+    @Chapter(name: "Materials") {
+        Have a look at the data you are going to work with.
+        
+        @TutorialReference(tutorial: "doc:data-navigation")
+    }
+}
