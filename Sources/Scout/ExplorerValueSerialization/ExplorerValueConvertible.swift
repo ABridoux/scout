@@ -5,7 +5,7 @@
 
 import Foundation
 
-// MARK: - Protocols
+// MARK: - ExplorerValueRepresentable
 
 /// Can be represented as an `ExplorerValue`
 /// - note: Default implementation provided for types conforming to `Encodable`
@@ -15,6 +15,8 @@ public protocol ExplorerValueRepresentable {
     func explorerValue() throws -> ExplorerValue
 }
 
+// MARK: - ExplorerValueCreatable
+
 /// Can be instantiated from an ``ExplorerValue``
 /// - note: Default implementation provided for types conforming to `Decodable`
 public protocol ExplorerValueCreatable {
@@ -23,11 +25,13 @@ public protocol ExplorerValueCreatable {
     init(from explorerValue: ExplorerValue) throws
 }
 
+// MARK: - ExplorerValueConvertible
+
 /// Can be represented *as* and instantiated *from* an ``ExplorerValue``
 /// - note: Default implementation provided for types conforming to `Codable`
 public typealias ExplorerValueConvertible = ExplorerValueRepresentable & ExplorerValueCreatable
 
-// MARK: - Codable implementations
+// MARK: - Encodable
 
 public extension ExplorerValueRepresentable where Self: Encodable {
 
@@ -37,6 +41,8 @@ public extension ExplorerValueRepresentable where Self: Encodable {
         return encoder.value
     }
 }
+
+// MARK: - Decodable
 
 public extension ExplorerValueCreatable where Self: Decodable {
 

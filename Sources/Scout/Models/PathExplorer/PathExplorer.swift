@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - PathExplorer
+
 /// Wrap several structs to explore several format: Json, Plist, YAML and Xml
 public protocol PathExplorer: CustomStringConvertible, CustomDebugStringConvertible,
     ExpressibleByStringLiteral,
@@ -17,7 +19,7 @@ where
     IntegerLiteralType == Int,
     FloatLiteralType == Double {
 
-    // MARK: - Conversion
+    // MARK: Conversion
 
     /// Non `nil` if the key is of the `String` type
     var string: String? { get }
@@ -57,20 +59,19 @@ where
     /// For XML, `true` is the element has nat least one child
     var isSingle: Bool { get }
 
-    // MARK: - Initialization
-
+    // MARK: Init
 
     /// - Parameters:
     ///    - value: The value the explorer will take
     ///    - name: Optionally provide a name for a root element with Xml explorers
     init(value: ExplorerValue, name: String?)
 
-    // MARK: - Get
+    // MARK: Get
 
     /// Get the key at the given path
     func get(_ path: Path) throws -> Self
 
-    // MARK: - Set
+    // MARK: Set
 
     /// Set the value of the key at the given path
     mutating func set(_ path: Path, to newValue: ExplorerValue) throws
@@ -78,7 +79,7 @@ where
     /// Set the value of the key at the given path and returns a new modified `PathExplorer`
     func setting(_ path: Path, to newValue: ExplorerValue) throws -> Self
 
-    // MARK: - Set key name
+    // MARK: Set key name
 
     /// Set the name of the key at the given path
     mutating func set(_ path: Path, keyNameTo newKeyName: String) throws
@@ -86,7 +87,7 @@ where
     /// Set the name of the key at the given path, and return a new modified `PathExplorer`
     func setting(_ path: Path, keyNameTo keyName: String) throws -> Self
 
-    // MARK: - Delete
+    // MARK: Delete
 
     /// Delete the key at the given path.
     ///
@@ -100,7 +101,7 @@ where
     /// - Throws: If the path is invalid (e.g. a key does not exist in a dictionary, or indicating an index on a non-array key)
     func deleting(_ path: Path, deleteIfEmpty: Bool) throws  -> Self
 
-    // MARK: - Add
+    // MARK: Add
 
     /// Add a value at the given path.
     ///
@@ -114,7 +115,7 @@ where
     /// To add a key at the end of an array, specify the `PathElement.count`
     func adding(_ value: ExplorerValue, at path: Path) throws -> Self
 
-    // MARK: - Paths listing
+    // MARK: Paths listing
 
     /// Returns all the paths leading to single or group values
     /// - Parameters:

@@ -5,15 +5,27 @@
 
 import Foundation
 
+// MARK: - ExplorerValueDecoder
+
 final class ExplorerValueDecoder: Decoder {
+
+    // MARK: Properties
+
     var codingPath: [CodingKey]
     var userInfo: [CodingUserInfoKey: Any] = [:]
     let value: ExplorerValue
+
+    // MARK: Init
 
     init(_ value: ExplorerValue, codingPath: [CodingKey] = []) {
         self.value = value
         self.codingPath = codingPath
     }
+}
+
+// MARK: - Containers
+
+extension ExplorerValueDecoder {
 
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         KeyedDecodingContainer(Container(value: value, codingPath: codingPath, decoder: self))
@@ -27,6 +39,11 @@ final class ExplorerValueDecoder: Decoder {
     func singleValueContainer() throws -> SingleValueDecodingContainer {
         SingleValueContainer(value: value, codingPath: codingPath, decoder: self)
     }
+}
+
+// MARK: - Error
+
+extension ExplorerValueDecoder {
 
     func valueTypeError<T>(type: T.Type) -> DecodingError {
         DecodingError.typeMismatch(

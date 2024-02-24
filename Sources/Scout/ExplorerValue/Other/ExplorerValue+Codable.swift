@@ -5,11 +5,18 @@
 
 import Foundation
 
+// MARK: - ExplorerCodingKey
+
 extension ExplorerValue: Codable {
 
     private struct ExplorerCodingKey: CodingKey {
+
+        // MARK: Properties
+
         var stringValue: String
         var intValue: Int?
+
+        // MARK: Init
 
         init?(stringValue: String) {
             self.stringValue = stringValue
@@ -20,6 +27,11 @@ extension ExplorerValue: Codable {
             stringValue = String(intValue)
         }
     }
+}
+
+// MARK: - Decode
+
+extension ExplorerValue {
 
     public init(from decoder: Decoder) throws {
         if let container = try? decoder.container(keyedBy: ExplorerCodingKey.self) {
@@ -65,6 +77,11 @@ extension ExplorerValue: Codable {
             throw ExplorerError(description: "Unable to decode single value in data. \(container.codingPath.pathDescription)")
         }
     }
+}
+
+// MARK: - Encode
+
+extension ExplorerValue {
 
     public func encode(to encoder: Encoder) throws {
         switch self {

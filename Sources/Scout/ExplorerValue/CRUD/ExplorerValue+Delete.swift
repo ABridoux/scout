@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - Delete
+
 extension ExplorerValue {
 
     // MARK: PathExplorer
@@ -43,7 +45,7 @@ extension ExplorerValue {
 
     private mutating func delete(key: String, tail: SlicePath, deleteIfEmpty: Bool) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-        var value = try dict.getJaroWinkler(key: key)
+        var value = try dict.jaroWinkler(key: key)
         let shouldDelete = try value._delete(path: tail, deleteIfEmpty: deleteIfEmpty)
 
         if shouldDelete || (value.isEmpty && deleteIfEmpty) {

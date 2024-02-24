@@ -5,14 +5,26 @@
 
 import Foundation
 
+// MARK: - ExplorerValueEncoder
+
 final class ExplorerValueEncoder: Encoder {
+
+    // MARK: Properties
+
     var codingPath: [CodingKey]
     var userInfo: [CodingUserInfoKey: Any] = [:]
     var value: ExplorerValue!
 
+    // MARK: Init
+
     init(codingPath: [CodingKey] = []) {
         self.codingPath = codingPath
     }
+}
+
+// MARK: - Containers
+
+extension ExplorerValueEncoder {
 
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         value = .dictionary([:])

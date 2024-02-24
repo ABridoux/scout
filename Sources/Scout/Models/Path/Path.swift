@@ -5,22 +5,24 @@
 
 import Foundation
 
+// MARK: - Path
+
 /// Collection of ``PathElement``s to subscript a `PathExplorer`
 public struct Path: Hashable {
 
-    // MARK: - Constants
+    // MARK: Constants
 
     public static let defaultSeparator = "."
     private static let forbiddenSeparators: Set<String> = ["[", "]", "(", ")"]
 
-    // MARK: - Properties
+    // MARK: Properties
 
     private var elements: [PathElement] = []
 
     /// An empty `Path`
     public static var empty: Path { .init() }
 
-    // MARK: - Initialization
+    // MARK: Init
 
     /// Instantiate a `Path` for a string representing path components separated with the separator.
     ///
@@ -78,8 +80,11 @@ public struct Path: Hashable {
     public init(elements: [PathElement]) {
         self.init(elements)
     }
+}
 
-    // MARK: - Functions
+// MARK: - Append
+
+extension Path {
 
     public func appending(_ elements: PathElementRepresentable...) -> Path { Path(self.elements + elements) }
     public func appending(_ elements: PathElement...) -> Path { Path(self.elements + elements) }
@@ -101,21 +106,35 @@ extension Path: Collection {
     }
 }
 
+// MARK: - RangeReplaceableCollection
+
 extension Path: RangeReplaceableCollection {
 
-    public mutating func replaceSubrange<C: Collection>(_ subrange: Range<Int>, with newElements: C)
-    where Self.Element == C.Element {
+    public mutating func replaceSubrange<C: Collection>(
+        _ subrange: Range<Int>,
+        with newElements: C
+    ) where Self.Element == C.Element {
         elements.replaceSubrange(subrange, with: newElements)
     }
 }
 
+// MARK: - MutableCollection
+
 extension Path: MutableCollection {}
+
+// MARK: - RandomAccessCollection
+
 extension Path: RandomAccessCollection {}
 
 // MARK: - ExpressibleByArrayLiteral
 
 extension Path: ExpressibleByArrayLiteral {
+
+    // MARK: Type alias
+
     public typealias ArrayLiteralElement = PathElementRepresentable
+
+    // MARK: Init
 
     public init(arrayLiteral elements: PathElementRepresentable...) {
         self.elements = elements.map(\.pathValue)

@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - String
+
 extension String: ExplorerValueConvertible {
 
     public func explorerValue() -> ExplorerValue { .string(self) }
@@ -13,6 +15,8 @@ extension String: ExplorerValueConvertible {
         self = try explorerValue.string.unwrapOrThrow(.mismatchingType(String.self, value: explorerValue))
     }
 }
+
+// MARK: - Int
 
 extension Int: ExplorerValueConvertible {
 
@@ -23,6 +27,8 @@ extension Int: ExplorerValueConvertible {
     }
 }
 
+// MARK: - Double
+
 extension Double: ExplorerValueConvertible {
 
     public func explorerValue() -> ExplorerValue { .double(self) }
@@ -31,6 +37,8 @@ extension Double: ExplorerValueConvertible {
         self = try explorerValue.double.unwrapOrThrow(.mismatchingType(Double.self, value: explorerValue))
     }
 }
+
+// MARK: - Bool
 
 extension Bool: ExplorerValueConvertible {
 
@@ -41,6 +49,8 @@ extension Bool: ExplorerValueConvertible {
     }
 }
 
+// MARK: - Data
+
 extension Data: ExplorerValueConvertible {
 
     public func explorerValue() -> ExplorerValue { .data(self) }
@@ -49,6 +59,8 @@ extension Data: ExplorerValueConvertible {
         self = try explorerValue.data.unwrapOrThrow(.mismatchingType(Data.self, value: explorerValue))
     }
 }
+
+// MARK: - Array
 
 extension Array: ExplorerValueConvertible where Element: ExplorerValueConvertible {
 
@@ -61,6 +73,8 @@ extension Array: ExplorerValueConvertible where Element: ExplorerValueConvertibl
     }
 }
 
+// MARK: - Dictionary
+
 extension Dictionary: ExplorerValueConvertible where Key == String, Value: ExplorerValueConvertible {
 
     public func explorerValue() throws -> ExplorerValue { try .dictionary(mapValues { try $0.explorerValue() })}
@@ -72,7 +86,7 @@ extension Dictionary: ExplorerValueConvertible where Key == String, Value: Explo
     }
 }
 
-// MARK: Array with primitives
+// MARK: - Array with primitives
 
 extension Array where Element == String {
     public func explorerValue() -> ExplorerValue { .array(map { $0.explorerValue() })}
@@ -90,7 +104,7 @@ extension Array where Element == Data {
     public func explorerValue() -> ExplorerValue { .array(map { $0.explorerValue() })}
 }
 
-// MARK: Dictionary with primitives
+// MARK: - Dictionary with primitives
 
 extension Dictionary where Key == String, Value == String {
     public func explorerValue() -> ExplorerValue { .dictionary(mapValues { $0.explorerValue() })}

@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - Add
+
 extension ExplorerXML {
 
     // MARK: PathExplorer

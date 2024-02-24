@@ -3,6 +3,8 @@
 // Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
+// MARK: - CustomStringConvertible
+
 extension ExplorerValue: CustomStringConvertible {
 
     public var description: String {
@@ -22,6 +24,8 @@ extension ExplorerValue: CustomStringConvertible {
         }
     }
 }
+
+// MARK: - CustomDebugStringConvertible
 
 extension ExplorerValue: CustomDebugStringConvertible {
 

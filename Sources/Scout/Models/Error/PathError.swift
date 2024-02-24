@@ -5,10 +5,18 @@
 
 import Foundation
 
-enum PathError: LocalizedError {
+// MARK: - PathError
+
+enum PathError {
+
     case invalidStringPath(_ string: String)
     case invalidSeparator(String)
     case invalidRegex(pattern: String)
+}
+
+// MARK: - LocalizedError
+
+extension PathError: LocalizedError {
 
     var errorDescription: String? {
         switch self {

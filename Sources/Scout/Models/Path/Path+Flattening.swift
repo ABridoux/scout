@@ -37,7 +37,7 @@ extension Path {
     }
 }
 
-// MARK: Helpers
+// MARK: - Helpers
 
 extension Path {
 

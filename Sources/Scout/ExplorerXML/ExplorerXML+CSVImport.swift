@@ -6,6 +6,8 @@
 import AEXML
 import SwiftCSV
 
+// MARK: - CSV import
+
 extension ExplorerXML {
 
     private typealias Tree = PathTree<String?>

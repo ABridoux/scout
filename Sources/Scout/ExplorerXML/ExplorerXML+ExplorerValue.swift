@@ -3,6 +3,8 @@
 // Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
+// MARK: - ExplorerValue
+
 extension ExplorerXML {
 
     /// The `ExplorerValue` conversion of the XML element
@@ -68,31 +70,6 @@ extension ExplorerXML {
             return value
         } else {
             return .dictionary(["attributes": attributes.explorerValue(), "value": value])
-        }
-    }
-
-    public struct SingleChildStrategy {
-        public typealias Transform = (_ key: String, _ value: ExplorerValue) -> ExplorerValue
-        var transform: Transform
-
-        init(transform: @escaping Transform) {
-            self.transform = transform
-        }
-
-        public static let dictionary = SingleChildStrategy { (key, value) -> ExplorerValue in .dictionary([key: value]) }
-        public static let array = SingleChildStrategy { (_, value) -> ExplorerValue in .array([value]) }
-        public static func custom(_ transform: @escaping Transform) -> SingleChildStrategy {
-            SingleChildStrategy { (key, value) in transform(key, value) }
-        }
-
-        /// Check the the element name. With a default name, an array is returned.
-        /// Otherwise a dictionary
-        public static let `default` = SingleChildStrategy { (key, value) in
-            if key == Element.defaultName {
-                return array.transform(key, value)
-            } else {
-                return dictionary.transform(key, value)
-            }
         }
     }
 }

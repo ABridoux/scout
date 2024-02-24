@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - typeMismatch
+
 extension DecodingError {
 
     static func typeMismatch<T>(_ type: T.Type, codingPath: [CodingKey]) -> DecodingError {

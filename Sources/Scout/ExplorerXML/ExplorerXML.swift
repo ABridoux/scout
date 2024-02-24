@@ -6,25 +6,26 @@
 import Foundation
 import AEXML
 
+// MARK: - ExplorerXML
+
 public struct ExplorerXML: PathExplorer {
 
-    // MARK: - Constants
+    // MARK: Constants
 
     typealias SlicePath = Slice<Path>
     public typealias Element = AEXMLElement
 
-    // MARK: - Properties
-
-    // MARK: Element
+    // MARK: Properties
 
     /// `var` requirement to test reference
     private var element: AEXMLElement
+
+    // MARK: Computed
+
     var name: String { element.name }
     var xml: String { element.xml }
     var attributes: [String: String] { element.attributes }
     func attribute(named name: String) -> String? { element.attributes[name] }
-
-    // MARK: PathExplorer
 
     public var string: String? { element.string.trimmingCharacters(in: .whitespacesAndNewlines) == "" ? nil : element.string }
     public var bool: Bool? { element.bool }
@@ -41,6 +42,80 @@ public struct ExplorerXML: PathExplorer {
 
     /// Always `nil` on XML
     public var data: Data? { nil }
+
+    public var isGroup: Bool { !element.children.isEmpty }
+    public var isSingle: Bool { element.children.isEmpty }
+
+    public var description: String {
+        if element.children.isEmpty, element.attributes.isEmpty, let value = element.value {
+            // single value
+            return value
+        }
+
+        return element.xmlSpaces
+    }
+
+    public var debugDescription: String { description }
+
+    // MARK: Initialization
+
+    init(element: Element) {
+        self.element = element
+    }
+
+    init(name: String, value: String? = nil) {
+        self.init(element: Element(name: name, value: value))
+    }
+
+    public init(value: ExplorerValue, name: String?) {
+        let name = name ?? Element.defaultName
+
+        switch value {
+        case .string(let string): self.init(name: name, value: string)
+        case .int(let int): self.init(name: name, value: int.description)
+        case .double(let double): self.init(name: name, value: double.description)
+        case .bool(let bool): self.init(name: name, value: bool.description)
+        case .data(let data): self.init(name: name, value: data.base64EncodedString())
+        case .date(let date): self.init(name: name, value: date.description)
+
+        case .array(let array):
+            let element = Element(name: name)
+            self.init(element: element)
+            array.forEach { (value) in
+                let explorer = ExplorerXML(value: value, name: nil)
+                addChild(explorer)
+            }
+
+        case .dictionary(let dict):
+            let element = Element(name: name)
+            self.init(element: element)
+            dict.forEach { (key, value) in
+                let explorer = ExplorerXML(value: value, name: key)
+                addChild(explorer)
+            }
+        }
+    }
+
+    public init(stringLiteral value: String) {
+        element = Element(name: Element.defaultName, value: value)
+    }
+
+    public init(booleanLiteral value: Bool) {
+        element = Element(name: Element.defaultName, value: value.description)
+    }
+
+    public init(integerLiteral value: Int) {
+        element = Element(name: Element.defaultName, value: value.description)
+    }
+
+    public init(floatLiteral value: Double) {
+        element = Element(name: Element.defaultName, value: value.description)
+    }
+}
+
+// MARK: - Collection tranform
+
+extension ExplorerXML {
 
     public func array<T>(of type: T.Type) throws -> [T] where T: ExplorerValueCreatable {
         try array(of: T.self, keepingAttributes: true, singleChildStrategy: .default)
@@ -97,75 +172,6 @@ public struct ExplorerXML: PathExplorer {
     throws -> [String: T] {
         let dict = try children.map { try ($0.name, T(from: $0.explorerValue(keepingAttributes: keepingAttributes, singleChildStrategy: singleChildStrategy))) }
         return Dictionary(uniqueKeysWithValues: dict)
-    }
-
-    public var isGroup: Bool { !element.children.isEmpty }
-    public var isSingle: Bool { element.children.isEmpty }
-
-    public var description: String {
-        if element.children.isEmpty, element.attributes.isEmpty, let value = element.value {
-            // single value
-            return value
-        }
-
-        return element.xmlSpaces
-    }
-
-    public var debugDescription: String { description }
-
-    // MARK: - Initialization
-
-    init(element: Element) {
-        self.element = element
-    }
-
-    init(name: String, value: String? = nil) {
-        self.init(element: Element(name: name, value: value))
-    }
-
-    public init(value: ExplorerValue, name: String?) {
-        let name = name ?? Element.defaultName
-
-        switch value {
-        case .string(let string): self.init(name: name, value: string)
-        case .int(let int): self.init(name: name, value: int.description)
-        case .double(let double): self.init(name: name, value: double.description)
-        case .bool(let bool): self.init(name: name, value: bool.description)
-        case .data(let data): self.init(name: name, value: data.base64EncodedString())
-        case .date(let date): self.init(name: name, value: date.description)
-
-        case .array(let array):
-            let element = Element(name: name)
-            self.init(element: element)
-            array.forEach { (value) in
-                let explorer = ExplorerXML(value: value, name: nil)
-                addChild(explorer)
-            }
-
-        case .dictionary(let dict):
-            let element = Element(name: name)
-            self.init(element: element)
-            dict.forEach { (key, value) in
-                let explorer = ExplorerXML(value: value, name: key)
-                addChild(explorer)
-            }
-        }
-    }
-
-    public init(stringLiteral value: String) {
-        element = Element(name: Element.defaultName, value: value)
-    }
-
-    public init(booleanLiteral value: Bool) {
-        element = Element(name: Element.defaultName, value: value.description)
-    }
-
-    public init(integerLiteral value: Int) {
-        element = Element(name: Element.defaultName, value: value.description)
-    }
-
-    public init(floatLiteral value: Double) {
-        element = Element(name: Element.defaultName, value: value.description)
     }
 }
 
@@ -298,20 +304,13 @@ extension ExplorerXML {
     }
 }
 
+// MARK: - Copy
+
 extension ExplorerXML {
 
     /// A new `ExplorerXML` with a new element and new children, keeping the name, value and attributes
     func copy() -> Self {
         ExplorerXML(element: element.copy())
-    }
-}
-
-extension ExplorerXML {
-
-    /// Wrapper to more easily handle setting an ExplorerValue or Element
-    enum ValueSetter {
-        case explorerValue(ExplorerValue)
-        case explorerXML(ExplorerXML)
     }
 }
 

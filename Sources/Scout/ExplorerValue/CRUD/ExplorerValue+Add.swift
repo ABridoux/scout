@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - Add
+
 extension ExplorerValue {
 
     // MARK: PathExplorer
@@ -40,7 +42,7 @@ extension ExplorerValue {
         if tail.isEmpty, dict[key] == nil {
             dict[key] = value
         } else {
-            dict[key] = try dict.getJaroWinkler(key: key)._add(path: tail, value: value)
+            dict[key] = try dict.jaroWinkler(key: key)._add(path: tail, value: value)
         }
 
         return .dictionary(dict)

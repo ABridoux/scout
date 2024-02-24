@@ -5,8 +5,11 @@
 
 import Foundation
 
+// MARK: - PathsFilter
+
 /// Provided to the ``PathExplorer/listPaths(startingAt:filter:)-4tkeq`` function to target specific paths when listing them.
 public enum PathsFilter {
+
     /// No filter on key or value.
     case targetOnly(ValueTarget)
 
@@ -18,6 +21,11 @@ public enum PathsFilter {
 
     /// Filter the keys based on a regular expression and the value based on predicates. The value is valid when one of the predicates validates it.
     case keyAndValue(keyRegex: NSRegularExpression, valuePredicates: [ValuePredicate])
+}
+
+// MARK: - Computed
+
+extension PathsFilter {
 
     /// Allows group values (array, dictionaries)
     var groupAllowed: Bool {
@@ -34,6 +42,11 @@ public enum PathsFilter {
         case .value, .keyAndValue: return true
         }
     }
+}
+
+// MARK: - Validation
+
+extension PathsFilter {
 
     /// Validate a key when the filter has a key regex. `true` otherwise
     func validate(key: String) -> Bool {
