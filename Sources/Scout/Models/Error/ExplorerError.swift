@@ -5,12 +5,21 @@
 
 import Foundation
 
+// MARK: - ExplorerError
+
 /// Errors that can be thrown when exploring data using a ``PathExplorer``
 public struct ExplorerError: LocalizedError, Equatable {
+
+    // MARK: Properties
+
     public private(set) var path: Path
     let description: String
 
+    // MARK: Computed
+
     public var errorDescription: String? { "'\(path.description)' ▶︎ \(description)" }
+
+    // MARK: Init
 
     init(path: Path = .empty, description: String) {
         self.path = path

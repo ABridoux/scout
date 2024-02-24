@@ -6,6 +6,8 @@
 import Foundation
 import SwiftCSV
 
+// MARK: - CSV import
+
 extension ExplorerValue {
 
     private typealias Tree = PathTree<ExplorerValue?>

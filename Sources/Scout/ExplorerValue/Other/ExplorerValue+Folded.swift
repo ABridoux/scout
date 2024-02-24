@@ -5,10 +5,16 @@
 
 import Foundation
 
+// MARK: - Folding
+
 extension ExplorerValue {
+
+    // MARK: Constants
 
     private var foldedKey: String { Folding.foldedKey }
     private var foldedMark: String { Folding.foldedMark }
+
+    // MARK: Fold
 
     func folded(upTo level: Int) -> Self {
         switch self {

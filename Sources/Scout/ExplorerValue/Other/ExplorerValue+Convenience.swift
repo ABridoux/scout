@@ -5,11 +5,7 @@
 
 import Foundation
 
-extension ExplorerValue {
-
-    func array(_ value: ArrayValue) -> Self { .array(value) }
-    func dictionary(_ value: DictionaryValue) -> Self { .dictionary(value) }
-}
+// MARK: - Scalar
 
 extension ExplorerValue {
 
@@ -47,6 +43,11 @@ extension ExplorerValue {
         guard case let .date(date) = self else { return nil }
         return date
     }
+}
+
+// MARK: - Collection
+
+extension ExplorerValue {
 
     public var array: ArrayValue? {
         switch self {
@@ -71,6 +72,9 @@ extension ExplorerValue {
         let dict = try dictionary.unwrapOrThrow(.mismatchingType(DictionaryValue.self, value: self))
         return try dict.mapValues { try T(from: $0) }
     }
+
+    func array(_ value: ArrayValue) -> Self { .array(value) }
+    func dictionary(_ value: DictionaryValue) -> Self { .dictionary(value) }
 }
 
 // MARK: - Group

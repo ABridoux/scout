@@ -5,12 +5,14 @@
 
 import Foundation
 
-/// Lower and upper bounds to be used to slice an array
+// MARK: - Bounds
+
+/// Lower and upper bounds to be used to slice an array.
 ///
-/// - note: Handles negative indexes
+/// - note: Handles negative indexes.
 public struct Bounds: Hashable {
 
-    // MARK: - Properties
+    // MARK: Properties
 
     /// Use the `range(lastValidIndex:path)` function to access to the lower bound
     private let lower: Bound
@@ -24,6 +26,8 @@ public struct Bounds: Hashable {
     @IntWrapper
     private(set) var lastComputedUpper
 
+    // MARK: Computed
+
     /// Description of the lower bound.
     /// - note: Do not use this value to convert it to an Int. Rather use the `range(arrayCount:path)` function to access to the lower bound
     var lowerString: String { lower == .first ? "" : String(lower.value) }
@@ -32,7 +36,7 @@ public struct Bounds: Hashable {
     /// - note: Do not use this value to convert it to an Int. Rather use the `range(arrayCount:path)` function to access to the upper bound
     var upperString: String { upper == .last ? "" : String(upper.value) }
 
-    // MARK: - Initialization
+    // MARK: Init
 
     public init(lower: Bound, upper: Bound) {
         self.lower = lower
@@ -53,8 +57,11 @@ public struct Bounds: Hashable {
             self.upper = .last
         }
     }
+}
 
-    // MARK: - Functions
+// MARK: - Range
+
+extension Bounds {
 
     /// Compute a range with the bounds for the array count.
     /// - Parameters:
@@ -81,49 +88,5 @@ public struct Bounds: Hashable {
         lastComputedUpper = upper
 
         return lower...upper
-    }
-}
-
-public extension Bounds {
-
-    struct Bound: ExpressibleByIntegerLiteral, Hashable {
-        public typealias IntegerLiteralType = Int
-        public static let first = Bound(0, identifier: "first")
-        public static let last = Bound(-1, identifier: "last")
-
-        var value: Int
-        private(set) var identifier: String?
-
-        public init(integerLiteral value: Int) {
-            self.value = value
-        }
-
-        public init(_ value: Int) {
-            self.value = value
-        }
-
-        private init(_ value: Int, identifier: String) {
-            self.value = value
-            self.identifier = identifier
-        }
-    }
-}
-
-extension Bounds {
-
-    /// Wrapper around an `Int` value to avoid to make all the `Bounds` mutable
-    /// - note: `Bounds` will only mutate those `IntWrapper` values internally
-    @propertyWrapper
-    final class IntWrapper: Hashable {
-
-        fileprivate(set) var wrappedValue: Int?
-
-        static func == (lhs: IntWrapper, rhs: IntWrapper) -> Bool {
-            lhs.wrappedValue == rhs.wrappedValue
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(wrappedValue)
-        }
     }
 }

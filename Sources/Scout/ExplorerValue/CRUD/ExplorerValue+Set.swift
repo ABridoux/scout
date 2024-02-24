@@ -40,7 +40,7 @@ extension ExplorerValue {
 
     private mutating func set(key: String, to newValue: ExplorerValue, tail: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-        var value = try dict.getJaroWinkler(key: key)
+        var value = try dict.jaroWinkler(key: key)
         try value._set(path: tail, to: newValue)
         dict[key] = value
         self = .dictionary(dict)
@@ -84,7 +84,7 @@ extension ExplorerValue {
             }
 
             var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-            let value = try dict.getJaroWinkler(key: key)
+            let value = try dict.jaroWinkler(key: key)
             dict.removeValue(forKey: key)
             dict[keyName] = value
             self = .dictionary(dict)
@@ -102,7 +102,7 @@ extension ExplorerValue {
 
     private mutating func set(key: String, keyName: String, tail: SlicePath) throws {
         var dict = try dictionary.unwrapOrThrow(.subscriptKeyNoDict)
-        var value = try dict.getJaroWinkler(key: key)
+        var value = try dict.jaroWinkler(key: key)
         try value._set(path: tail, keyName: keyName)
         dict[key] = value
         self = .dictionary(dict)

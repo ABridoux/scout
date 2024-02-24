@@ -5,11 +5,19 @@
 
 import Foundation
 
-public enum SerializationError: LocalizedError {
+// MARK: - SerializationError
+
+/// Error that can be thrown during serialization operations.
+public enum SerializationError {
 
     case dataToString
     case stringToData
     case notCSVExportable(description: String)
+}
+
+// MARK: - LocalizedError
+
+extension SerializationError: LocalizedError {
 
     public var errorDescription: String? {
         switch self {

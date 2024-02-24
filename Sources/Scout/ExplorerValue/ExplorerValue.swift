@@ -5,8 +5,10 @@
 
 import Foundation
 
+// MARK: - ExplorerValue
+
 /// The values a `PathExplorer` can take
-public enum ExplorerValue {
+public enum ExplorerValue: Sendable {
 
     // single
     case int(Int)

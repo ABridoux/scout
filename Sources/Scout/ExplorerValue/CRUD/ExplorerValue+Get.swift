@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - Get
+
 extension ExplorerValue {
 
     // MARK: PathExplorer
@@ -35,7 +37,7 @@ extension ExplorerValue {
     private func get(key: String, tail: SlicePath) throws -> Self {
         try dictionary
             .unwrapOrThrow(.subscriptKeyNoDict)
-            .getJaroWinkler(key: key)
+            .jaroWinkler(key: key)
             ._get(path: tail)
     }
 

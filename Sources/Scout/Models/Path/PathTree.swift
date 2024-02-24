@@ -5,16 +5,20 @@
 
 import Foundation
 
+// MARK: - PathTree
+
 /// A collection of paths arranged following their common prefixes.
 ///
 /// Useful when building a `PathExplorer` from a list of paths to reuse the last created explorer
 /// to add children to it (rather than starting again from the root each time).
 final class PathTree<Value: Equatable> {
 
-    // MARK: - Properties
+    // MARK: Properties
 
     let element: PathElement
     var value: ValueType
+
+    // MARK: Computed
 
     var keyed: (key: String, tree: PathTree)? {
         if let key = element.key {
@@ -30,12 +34,17 @@ final class PathTree<Value: Equatable> {
         return nil
     }
 
-    // MARK: - Initialization
+    // MARK: Init
 
     init(value: ValueType, element: PathElement) {
         self.value = value
         self.element = element
     }
+}
+
+// MARK: - Static
+
+extension PathTree {
 
     static func leaf(value: Value, element: PathElement) -> PathTree {
         PathTree(value: .leaf(value: value), element: element)
@@ -96,20 +105,11 @@ extension PathTree {
     }
 }
 
+// MARK: - Equatable
+
 extension PathTree: Equatable {
     static func == (lhs: PathTree<Value>, rhs: PathTree<Value>) -> Bool {
         lhs.element == rhs.element && lhs.value == rhs.value
-    }
-}
-
-// MARK: - Equatable
-
-extension PathTree {
-
-    enum ValueType: Equatable {
-        case uninitializedLeaf
-        case leaf(value: Value)
-        case node(children: [PathTree])
     }
 }
 
@@ -150,7 +150,7 @@ extension PathTree {
     }
 }
 
-// MARK: - PathExplorer
+// MARK: - ExplorerXML
 
 extension ExplorerXML {
 
@@ -180,6 +180,8 @@ extension ExplorerXML {
         return explorer
     }
 }
+
+// MARK: - ExplorerValue
 
 extension ExplorerValue {
 

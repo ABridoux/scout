@@ -5,7 +5,9 @@
 
 import Foundation
 
-/// Internal protocol to declare how to test equality to another PathExplorer of the same type without publicly declare conformance to  `Equatable`
+// MARK: - EquatablePathExplorer
+
+/// Internal protocol to declare how to test equality to another PathExplorer of the same type without publicly declare conformance to  `Equatable`.
 protocol EquatablePathExplorer: PathExplorer {
 
     /// `true` when self is equal to the provided other element.
@@ -14,6 +16,8 @@ protocol EquatablePathExplorer: PathExplorer {
     /// Most often `O(n)` where `n` is the children count.
     func isEqual(to other: Self) -> Bool
 }
+
+// MARK: - Default implementation
 
 extension EquatablePathExplorer where Self: Equatable {
 

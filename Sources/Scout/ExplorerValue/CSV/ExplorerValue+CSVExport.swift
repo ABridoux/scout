@@ -3,6 +3,8 @@
 // Copyright (c) 2020-present Alexis Bridoux
 // MIT license, see LICENSE file for details
 
+// MARK: - CSV export
+
 extension ExplorerValue {
 
     func exportCSV(separator: String) throws -> String {

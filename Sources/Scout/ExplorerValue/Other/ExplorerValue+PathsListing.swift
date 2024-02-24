@@ -5,8 +5,15 @@
 
 import Foundation
 
-extension ExplorerValue {
+// MARK: - Paths listing
 
+extension ExplorerValue {
+    
+    /// List paths starting at the provided paths.
+    /// - Parameters:
+    ///   - initialPath: Path in the data where to start listing paths, excluding other paths at the same or higher levels.
+    ///   - filter: Additional filter for the paths to be listed.
+    /// - Returns: Array of listed and filtered paths.
     public func listPaths(startingAt initialPath: Path?, filter: PathsFilter) throws -> [Path] {
         var paths: [Path] = []
 
@@ -20,12 +27,12 @@ extension ExplorerValue {
         return paths.map { $0.flattened() }
     }
 
-    /// Explorer self and add the relevant paths to the array
+    /// Explorer self and add the relevant paths to the array.
     /// - Parameters:
-    ///   - paths: Array of paths where to add paths
-    ///   - filter: A filter allowing to filter the path
-    ///   - leadingPath: The starting path leading to the explorer
-    ///   - lastKey: The last encountered key element value
+    ///   - paths: Array of paths where to add paths.
+    ///   - filter: A filter allowing to filter the path.
+    ///   - leadingPath: The starting path leading to the explorer.
+    ///   - lastKey: The last encountered key element value.
     private func collectPaths(in paths: inout [Path], filter: PathsFilter, pathValidation: PathValidation) throws {
         switch self {
         case .int, .double, .bool, .data, .string, .date:
@@ -57,10 +64,15 @@ extension ExplorerValue {
     }
 }
 
+// MARK: - PathValidation
+
 extension ExplorerValue {
 
-    /// Holds the logic to validate a path built during paths listing
+    /// Holds the logic to validate a path built during paths listing.
     private struct PathValidation {
+
+        // MARK: Properties
+
         let filter: PathsFilter
 
         /// The path leading to the value
@@ -68,8 +80,12 @@ extension ExplorerValue {
         private var isInitial = true
         private var hasOneKeyValidated = false
 
+        // MARK: Computed
+
         /// `true` when the leading path can be added, depending on the filter and the initial path
         var isValid: Bool { !isInitial && hasOneKeyValidated }
+
+        // MARK: Init
 
         init(leading: Path, filter: PathsFilter) {
             self.leading = leading
@@ -79,6 +95,8 @@ extension ExplorerValue {
                 .compactMap(\.key)
                 .contains { filter.validate(key: $0) }
         }
+
+        // MARK: Append
 
         func appendingLeading(_ element: PathElementRepresentable) -> PathValidation {
             var copy = self

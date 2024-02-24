@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - SerializablePathExplorer
+
 /// A `PathExplorer` which can be instantiated from data and export itself to another format
 public protocol SerializablePathExplorer: PathExplorer {
 
@@ -59,11 +61,15 @@ public protocol SerializablePathExplorer: PathExplorer {
     func exportFoldedString(upTo level: Int) throws -> String
 }
 
+// MARK: - Constants
+
 extension SerializablePathExplorer {
 
     var defaultCSVSeparator: String { ";" }
     var nullCSVValue: String { "NULL" }
 }
+
+// MARK: - Default implementations
 
 public extension SerializablePathExplorer {
 

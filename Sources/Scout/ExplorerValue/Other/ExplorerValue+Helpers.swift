@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - Compute index
+
 extension PathExplorer {
 
     /// Compute the index, positive or negative. Negative index uses the array count.
@@ -26,8 +28,8 @@ extension PathExplorer {
 
 infix operator <^>
 
-/// Apply the left function to the right operand
-/// - note: Mainly used as synthetic sugar to avoid over use of brackets
+/// Apply the left function to the right operand.
+/// - note: Mainly used as synthetic sugar to avoid over use of brackets.
 func <^><A, B>(lhs: (A) -> B, rhs: A) -> B { lhs(rhs) }
 
 extension ExplorerValue: EquatablePathExplorer {

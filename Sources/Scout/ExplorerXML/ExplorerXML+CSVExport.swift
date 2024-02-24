@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - CSV export
+
 extension ExplorerXML {
 
     public func exportCSV(separator: String?) throws -> String {

@@ -5,10 +5,12 @@
 
 import Foundation
 
+// MARK: - PathElement
+
 /// The possible elements that can be used to subscript a ``PathExplorer``
 public enum PathElement: Hashable {
 
-    // MARK: - Constants
+    // MARK: Constants
 
     // -- Cases
     case key(String)
@@ -29,8 +31,11 @@ public enum PathElement: Hashable {
     // -- Symbols
     static let defaultCountSymbol = "#"
     static let defaultKeysListSymbol = "#"
+}
 
-    // MARK: - Properties
+// MARK: - Computed
+
+extension PathElement {
 
     /// String value if self is a `key`
     var key: String? {
@@ -62,21 +67,37 @@ public enum PathElement: Hashable {
     }
 }
 
+// MARK: - ExpressibleByStringLiteral
+
 extension PathElement: ExpressibleByStringLiteral {
+
+    // MARK: Type alias
+
     public typealias StringLiteralType = String
+
+    // MARK: Init
 
     public init(stringLiteral: String) {
         self = .key(stringLiteral)
     }
 }
 
+// MARK: - ExpressibleByIntegerLiteral
+
 extension PathElement: ExpressibleByIntegerLiteral {
+
+    // MARK: Type alias
+
     public typealias IntegerLiteralType = Int
+
+    // MARK: Init
 
     public init(integerLiteral: Int) {
         self = .index(integerLiteral)
     }
 }
+
+// MARK: - ExpressibleByIntegerLiteral
 
 extension PathElement: CustomStringConvertible {
 

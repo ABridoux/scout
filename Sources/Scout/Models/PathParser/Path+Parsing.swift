@@ -6,9 +6,13 @@
 import Foundation
 import Parsing
 
+// MARK: - ElementParsers
+
 extension Path {
     enum ElementParsers {}
 }
+
+// MARK: - Elements
 
 extension Path.ElementParsers {
 
@@ -60,6 +64,8 @@ extension Path.ElementParsers {
             <|> key(separator: separator, forbiddenCharacters: forbiddenCharacters)
     }
 }
+
+// MARK: - Public
 
 extension Path {
 

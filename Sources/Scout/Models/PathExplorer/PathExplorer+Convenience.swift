@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - Convenience init
+
 public extension PathExplorer {
 
     /// Same as ``init(value:name:)`` with a default `nil` value for `name`
