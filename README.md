@@ -8,9 +8,6 @@ Swift package<br>
     <a href="https://swift.org/package-manager">
         <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
     </a>
-    <a href="https://github.com/ABridoux/scout/actions?query=workflow%3ASwift">
-        <img src="https://img.shields.io/github/workflow/status/ABridoux/scout/Swift?label=tests&logo=GitHub" />
-    </a>
     <a href="https://codecov.io/gh/ABridoux/scout">
         <img src="https://codecov.io/gh/ABridoux/scout/branch/master/graph/badge.svg" />
     </a>
@@ -19,7 +16,8 @@ Install<br>
     <a href="#">
         <img src="https://img.shields.io/badge/platforms-mac+linux-brightgreen.svg?style=flat" alt="Mac + Linux" />
     </a>
-    <a href="https://github.com/ABridoux/scout/releases">														<img src="https://img.shields.io/badge/cli-tool-informational">
+    <a href="https://github.com/ABridoux/scout/releases">
+        <img src="https://img.shields.io/badge/cli-tool-informational">
     </a>
      <a href="https://github.com/ABridoux/scout/releases">
         <img src="https://img.shields.io/badge/install-pkg%2Bzip-blue" />
