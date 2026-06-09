@@ -35,7 +35,7 @@ let package = Package(
             from: "4.0.0"),
         .package(
             url: "https://github.com/swiftcsv/SwiftCSV",
-            from: "0.6.0"),
+            .upToNextMinor(from: "0.6.0")),
         .package(
             url: "https://github.com/ABridoux/BooleanExpressionEvaluation",
             from: "2.0.0"),

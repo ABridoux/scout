@@ -20,7 +20,7 @@ extension PathsFilter {
 
         // MARK: Properties
 
-        private(set) var expression: Expression
+        private(set) var expression: BooleanExpressionEvaluation.Expression
 
         /// The value types that the operators in the expression support
         private(set) var operatorsValueTypes: Set<ValueType>
@@ -29,7 +29,7 @@ extension PathsFilter {
 
         /// Specify a predicate with a 'value' variable that will be replaced with a concrete value during evaluation
         public init(format: String) throws {
-            expression = try Expression(format)
+            expression = try BooleanExpressionEvaluation.Expression(format)
             operatorsValueTypes = expression.operators.reduce(Self.allValueTypesSet) { $0.intersection(Self.valueTypes(of: $1)) }
         }
     }
